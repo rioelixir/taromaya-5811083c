@@ -92,11 +92,11 @@ export function shuffleAndDraw(count: number, positions: string[]): DrawnCard[] 
   }));
 }
 
-export const SPREADS: Record<string, { label: string; positions: string[]; blurb: string }> = {
-  "one":    { label: "One Card",     positions: ["Guidance"], blurb: "A focused pulse of insight for right now." },
-  "three":  { label: "Past · Present · Future", positions: ["Past", "Present", "Future"], blurb: "See the arc of your situation across time." },
-  "five":   { label: "Five Card Cross", positions: ["You", "Challenge", "Foundation", "Advice", "Outcome"], blurb: "A grounded look at the forces at play." },
-  "celtic": { label: "Celtic Cross", positions: ["Present", "Challenge", "Foundation", "Past", "Crown", "Future", "Self", "Environment", "Hopes/Fears", "Outcome"], blurb: "The classic 10-card deep-dive." },
-  "love":   { label: "Love Spread", positions: ["You", "Them", "Connection", "Advice", "Outcome"], blurb: "Illuminate the heart of a relationship." },
-  "career": { label: "Career Spread", positions: ["Current path", "Hidden strength", "Obstacle", "Action", "Outcome"], blurb: "Clarify direction and momentum in your work." },
+export type SpreadKey = "one" | "yesno" | "ppf" | "freestyle";
+
+export const SPREADS: Record<SpreadKey, { label: string; positions: string[]; blurb: string; freestyle?: boolean }> = {
+  one:       { label: "One Card",                positions: ["Guidance"], blurb: "A focused pulse of insight for right now." },
+  yesno:     { label: "Yes / No",                positions: ["Answer"],   blurb: "A direct binary answer with nuance." },
+  ppf:       { label: "Past · Present · Future", positions: ["Past", "Present", "Future"], blurb: "See the arc of your situation across time." },
+  freestyle: { label: "Freestyle Board",         positions: [],           blurb: "Drop as many cards as you like — anywhere.", freestyle: true },
 };
