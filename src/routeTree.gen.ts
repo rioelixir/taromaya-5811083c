@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransitsRouteImport } from './routes/transits'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -32,6 +33,7 @@ import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as AiRouteImport } from './routes/ai'
+import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
@@ -40,6 +42,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 const TransitsRoute = TransitsRouteImport.update({
   id: '/transits',
   path: '/transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TarotRoute = TarotRouteImport.update({
@@ -152,6 +159,11 @@ const AiRoute = AiRouteImport.update({
   path: '/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcceptTermsRoute = AcceptTermsRouteImport.update({
+  id: '/accept-terms',
+  path: '/accept-terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -174,6 +186,7 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -196,12 +209,14 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -224,6 +239,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -232,6 +248,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -254,6 +271,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
@@ -262,6 +280,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -284,12 +303,14 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/admin'
     | '/saved'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -312,6 +333,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/admin'
     | '/saved'
@@ -319,6 +341,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -341,6 +364,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/_authenticated/admin'
     | '/_authenticated/saved'
@@ -349,6 +373,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AcceptTermsRoute: typeof AcceptTermsRoute
   AiRoute: typeof AiRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
@@ -371,6 +396,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
+  TermsRoute: typeof TermsRoute
   TransitsRoute: typeof TransitsRoute
 }
 
@@ -381,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/transits'
       fullPath: '/transits'
       preLoaderRoute: typeof TransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tarot': {
@@ -537,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accept-terms': {
+      id: '/accept-terms'
+      path: '/accept-terms'
+      fullPath: '/accept-terms'
+      preLoaderRoute: typeof AcceptTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -584,6 +624,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AcceptTermsRoute: AcceptTermsRoute,
   AiRoute: AiRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
@@ -606,6 +647,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
+  TermsRoute: TermsRoute,
   TransitsRoute: TransitsRoute,
 }
 export const routeTree = rootRouteImport

@@ -132,23 +132,52 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const PUBLIC_PATHS = ["/auth", "/terms", "/accept-terms"];
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
-    // Auth state → invalidate router matches (redirects & data refresh).
-    import("@/integrations/supabase/client").then(({ supabase }) => {
+    let unsub: (() => void) | undefined;
+
+    import("@/integrations/supabase/client").then(async ({ supabase }) => {
       if (!mounted) return;
+
+      const enforce = async () => {
+        const path = window.location.pathname;
+        const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
+        const { data } = await supabase.auth.getSession();
+        const user = data.session?.user;
+        if (!user) {
+          if (!isPublic) router.navigate({ to: "/auth" });
+          return;
+        }
+        // Signed in — verify terms acceptance.
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("terms_accepted_at")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!profile?.terms_accepted_at) {
+          if (path !== "/accept-terms" && path !== "/terms") {
+            router.navigate({ to: "/accept-terms" });
+          }
+        }
+      };
+
+      await enforce();
+
       const { data: sub } = supabase.auth.onAuthStateChange((event) => {
         if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
         router.invalidate();
         if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+        enforce();
       });
-      return () => sub.subscription.unsubscribe();
+      unsub = () => sub.subscription.unsubscribe();
     });
-    return () => { mounted = false; };
+    return () => { mounted = false; unsub?.(); };
   }, [router, queryClient]);
 
   return (
