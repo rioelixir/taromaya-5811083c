@@ -31,6 +31,9 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 130;
 const CARD_H = 200;
+const DECK_COUNT = 5;
+const MINI_W = 62;
+const MINI_H = 96;
 
 function randomReversed() {
   return Math.random() < 0.3;
@@ -44,6 +47,14 @@ function shuffledDeck() {
     [d[i], d[j]] = [d[j], d[i]];
   }
   return d;
+}
+
+// Split a single shuffled deck into DECK_COUNT sub-stacks (round-robin).
+function makeDecks(): TarotCard[][] {
+  const shuffled = shuffledDeck();
+  const decks: TarotCard[][] = Array.from({ length: DECK_COUNT }, () => []);
+  shuffled.forEach((c, i) => decks[i % DECK_COUNT].push(c));
+  return decks;
 }
 
 function TarotPage() {
