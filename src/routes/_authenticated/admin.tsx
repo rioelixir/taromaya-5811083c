@@ -67,6 +67,7 @@ function AdminPage() {
         <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
+        <TabBtn active={tab === "assets"} onClick={() => setTab("assets")} icon={<ImageIcon className="h-4 w-4" />}>Assets</TabBtn>
       </div>
 
       {tab === "overview" && <OverviewTab />}
@@ -75,6 +76,7 @@ function AdminPage() {
       {tab === "subs" && <SubscriptionsTab />}
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
+      {tab === "assets" && <AdminAssetsTab />}
     </PageShell>
   );
 }
