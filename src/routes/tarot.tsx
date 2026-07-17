@@ -327,7 +327,7 @@ function TarotPage() {
       </div>
 
       {/* Canvas */}
-      <div className="relative z-10 w-full px-4 sm:px-6 pt-6 pb-40">
+      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 pt-6 pb-40">
         <div
           ref={canvasRef}
           onPointerMove={onPointerMove}
