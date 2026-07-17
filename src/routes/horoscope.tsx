@@ -46,12 +46,15 @@ const SCORE_KEYS = ["Love","Career","Health","Wealth","Emotions","Luck"] as cons
 function HoroscopePage() {
   const [period, setPeriod] = useState<Period>("Daily");
   const [sign, setSign] = useState<string | null>(null);
-  const [aiText, setAiText] = useState<string | null>(null);
+  const [readings, setReadings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [batchLoading, setBatchLoading] = useState<string | null>(null);
   const [showChinese, setShowChinese] = useState(false);
 
   const ai = useServerFn(aiReading);
   const today = useMemo(() => new Date(), []);
+
+  const cacheKey = (s: string, p: Period) => `${p}-${s}-${today.toDateString()}`;
 
   const luck = (s: string) => {
     const seed = seedFor(s, period, today);
@@ -67,22 +70,40 @@ function HoroscopePage() {
     };
   };
 
-  const generateReading = async (s: string) => {
-    setSign(s); setAiText(null); setLoading(true);
-    try {
-      const l = luck(s);
-      const res = await ai({
-        data: {
-          system: "You are a poetic modern astrologer. Write elegant, uplifting, specific horoscopes. Markdown allowed. Never hedged.",
-          prompt: `Write the ${period.toLowerCase()} horoscope for ${s} for ${today.toDateString()}.
+  const generateFor = async (s: string): Promise<string> => {
+    const key = cacheKey(s, period);
+    if (readings[key]) return readings[key];
+    const l = luck(s);
+    const res = await ai({
+      data: {
+        system: "You are a poetic modern astrologer. Write elegant, uplifting, specific horoscopes. Markdown allowed. Never hedged.",
+        prompt: `Write the ${period.toLowerCase()} horoscope for ${s} for ${today.toDateString()}.
 Include sections: Overview, Love & Relationships, Career & Money, Health & Wellbeing, Guidance.
 Reference: lucky number ${l.luckyNumber}, colour ${l.luckyColor}, direction ${l.direction}.
 About 350 words.`,
-        },
-      });
-      setAiText(res.text);
-    } finally { setLoading(false); }
+      },
+    });
+    setReadings((prev) => ({ ...prev, [key]: res.text }));
+    return res.text;
   };
+
+  const generateReading = async (s: string) => {
+    setSign(s); setLoading(true);
+    try { await generateFor(s); } finally { setLoading(false); }
+  };
+
+  const generateAll = async () => {
+    setBatchLoading("all");
+    try {
+      for (const s of SIGN_NAMES) {
+        setBatchLoading(s);
+        await generateFor(s);
+      }
+    } finally { setBatchLoading(null); }
+  };
+
+  const currentReading = sign ? readings[cacheKey(sign, period)] : null;
+
 
   return (
     <PageShell
