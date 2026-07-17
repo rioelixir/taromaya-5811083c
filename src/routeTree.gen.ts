@@ -9,8 +9,104 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PanchangRouteImport } from './routes/panchang'
+import { Route as NumerologyRouteImport } from './routes/numerology'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as KundliRouteImport } from './routes/kundli'
+import { Route as JournalRouteImport } from './routes/journal'
+import { Route as HoroscopeRouteImport } from './routes/horoscope'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as CompatibilityRouteImport } from './routes/compatibility'
+import { Route as BookmarksRouteImport } from './routes/bookmarks'
+import { Route as AstrologyRouteImport } from './routes/astrology'
+import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TarotRoute = TarotRouteImport.update({
+  id: '/tarot',
+  path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanchangRoute = PanchangRouteImport.update({
+  id: '/panchang',
+  path: '/panchang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NumerologyRoute = NumerologyRouteImport.update({
+  id: '/numerology',
+  path: '/numerology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KundliRoute = KundliRouteImport.update({
+  id: '/kundli',
+  path: '/kundli',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HoroscopeRoute = HoroscopeRouteImport.update({
+  id: '/horoscope',
+  path: '/horoscope',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompatibilityRoute = CompatibilityRouteImport.update({
+  id: '/compatibility',
+  path: '/compatibility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookmarksRoute = BookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AstrologyRoute = AstrologyRouteImport.update({
+  id: '/astrology',
+  path: '/astrology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiRoute = AiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +115,256 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
+  '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/history': typeof HistoryRoute
+  '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
+  '/kundli': typeof KundliRoute
+  '/learn': typeof LearnRoute
+  '/numerology': typeof NumerologyRoute
+  '/panchang': typeof PanchangRoute
+  '/profile': typeof ProfileRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
+  '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/history': typeof HistoryRoute
+  '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
+  '/kundli': typeof KundliRoute
+  '/learn': typeof LearnRoute
+  '/numerology': typeof NumerologyRoute
+  '/panchang': typeof PanchangRoute
+  '/profile': typeof ProfileRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
+  '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
+  '/compatibility': typeof CompatibilityRoute
+  '/history': typeof HistoryRoute
+  '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
+  '/kundli': typeof KundliRoute
+  '/learn': typeof LearnRoute
+  '/numerology': typeof NumerologyRoute
+  '/panchang': typeof PanchangRoute
+  '/profile': typeof ProfileRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai'
+    | '/astrology'
+    | '/bookmarks'
+    | '/compatibility'
+    | '/history'
+    | '/horoscope'
+    | '/journal'
+    | '/kundli'
+    | '/learn'
+    | '/numerology'
+    | '/panchang'
+    | '/profile'
+    | '/reports'
+    | '/settings'
+    | '/sitemap.xml'
+    | '/tarot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ai'
+    | '/astrology'
+    | '/bookmarks'
+    | '/compatibility'
+    | '/history'
+    | '/horoscope'
+    | '/journal'
+    | '/kundli'
+    | '/learn'
+    | '/numerology'
+    | '/panchang'
+    | '/profile'
+    | '/reports'
+    | '/settings'
+    | '/sitemap.xml'
+    | '/tarot'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai'
+    | '/astrology'
+    | '/bookmarks'
+    | '/compatibility'
+    | '/history'
+    | '/horoscope'
+    | '/journal'
+    | '/kundli'
+    | '/learn'
+    | '/numerology'
+    | '/panchang'
+    | '/profile'
+    | '/reports'
+    | '/settings'
+    | '/sitemap.xml'
+    | '/tarot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiRoute: typeof AiRoute
+  AstrologyRoute: typeof AstrologyRoute
+  BookmarksRoute: typeof BookmarksRoute
+  CompatibilityRoute: typeof CompatibilityRoute
+  HistoryRoute: typeof HistoryRoute
+  HoroscopeRoute: typeof HoroscopeRoute
+  JournalRoute: typeof JournalRoute
+  KundliRoute: typeof KundliRoute
+  LearnRoute: typeof LearnRoute
+  NumerologyRoute: typeof NumerologyRoute
+  PanchangRoute: typeof PanchangRoute
+  ProfileRoute: typeof ProfileRoute
+  ReportsRoute: typeof ReportsRoute
+  SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TarotRoute: typeof TarotRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tarot': {
+      id: '/tarot'
+      path: '/tarot'
+      fullPath: '/tarot'
+      preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panchang': {
+      id: '/panchang'
+      path: '/panchang'
+      fullPath: '/panchang'
+      preLoaderRoute: typeof PanchangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/numerology': {
+      id: '/numerology'
+      path: '/numerology'
+      fullPath: '/numerology'
+      preLoaderRoute: typeof NumerologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kundli': {
+      id: '/kundli'
+      path: '/kundli'
+      fullPath: '/kundli'
+      preLoaderRoute: typeof KundliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/horoscope': {
+      id: '/horoscope'
+      path: '/horoscope'
+      fullPath: '/horoscope'
+      preLoaderRoute: typeof HoroscopeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compatibility': {
+      id: '/compatibility'
+      path: '/compatibility'
+      fullPath: '/compatibility'
+      preLoaderRoute: typeof CompatibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookmarks': {
+      id: '/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/astrology': {
+      id: '/astrology'
+      path: '/astrology'
+      fullPath: '/astrology'
+      preLoaderRoute: typeof AstrologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai': {
+      id: '/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +377,23 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiRoute: AiRoute,
+  AstrologyRoute: AstrologyRoute,
+  BookmarksRoute: BookmarksRoute,
+  CompatibilityRoute: CompatibilityRoute,
+  HistoryRoute: HistoryRoute,
+  HoroscopeRoute: HoroscopeRoute,
+  JournalRoute: JournalRoute,
+  KundliRoute: KundliRoute,
+  LearnRoute: LearnRoute,
+  NumerologyRoute: NumerologyRoute,
+  PanchangRoute: PanchangRoute,
+  ProfileRoute: ProfileRoute,
+  ReportsRoute: ReportsRoute,
+  SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
