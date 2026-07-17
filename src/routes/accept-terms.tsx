@@ -23,6 +23,11 @@ function AcceptTerms() {
         navigate({ to: "/auth" });
         return;
       }
+      const email = data.user.email?.toLowerCase();
+      if (email === "tarotbyriaa@gmail.com" || email === "taromayaexperts@gmail.com") {
+        navigate({ to: "/" });
+        return;
+      }
       const { data: profile } = await supabase
         .from("profiles")
         .select("terms_accepted_at")
