@@ -15,7 +15,7 @@ export function PageShell({
   return (
     <div className="relative">
       <StarField />
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 pt-8 lg:pt-12">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-10 pt-8 lg:pt-12">
         <header className="mb-8">
           {eyebrow && (
             <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
