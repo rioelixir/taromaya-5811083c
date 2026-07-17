@@ -13,6 +13,7 @@ import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as KundliRouteImport } from './routes/kundli'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as AstrologyRouteImport } from './routes/astrology'
@@ -37,6 +38,11 @@ const NumerologyRoute = NumerologyRouteImport.update({
 const KundliRoute = KundliRouteImport.update({
   id: '/kundli',
   path: '/kundli',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
+  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
+    | '/journal'
     | '/kundli'
     | '/numerology'
     | '/panchang'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
+    | '/journal'
     | '/kundli'
     | '/numerology'
     | '/panchang'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
+    | '/journal'
     | '/kundli'
     | '/numerology'
     | '/panchang'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   AstrologyRoute: typeof AstrologyRoute
   CompatibilityRoute: typeof CompatibilityRoute
   HoroscopeRoute: typeof HoroscopeRoute
+  JournalRoute: typeof JournalRoute
   KundliRoute: typeof KundliRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/kundli'
       fullPath: '/kundli'
       preLoaderRoute: typeof KundliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/horoscope': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   AstrologyRoute: AstrologyRoute,
   CompatibilityRoute: CompatibilityRoute,
   HoroscopeRoute: HoroscopeRoute,
+  JournalRoute: JournalRoute,
   KundliRoute: KundliRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
