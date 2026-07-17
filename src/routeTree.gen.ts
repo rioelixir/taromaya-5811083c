@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanchangRoute = PanchangRouteImport.update({
+  id: '/panchang',
+  path: '/panchang',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KundliRoute = KundliRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
   '/kundli': typeof KundliRoute
+  '/panchang': typeof PanchangRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
   '/kundli': typeof KundliRoute
+  '/panchang': typeof PanchangRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
   '/kundli': typeof KundliRoute
+  '/panchang': typeof PanchangRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/astrology' | '/kundli' | '/tarot'
+  fullPaths: '/' | '/astrology' | '/kundli' | '/panchang' | '/tarot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/astrology' | '/kundli' | '/tarot'
-  id: '__root__' | '/' | '/astrology' | '/kundli' | '/tarot'
+  to: '/' | '/astrology' | '/kundli' | '/panchang' | '/tarot'
+  id: '__root__' | '/' | '/astrology' | '/kundli' | '/panchang' | '/tarot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AstrologyRoute: typeof AstrologyRoute
   KundliRoute: typeof KundliRoute
+  PanchangRoute: typeof PanchangRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panchang': {
+      id: '/panchang'
+      path: '/panchang'
+      fullPath: '/panchang'
+      preLoaderRoute: typeof PanchangRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kundli': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AstrologyRoute: AstrologyRoute,
   KundliRoute: KundliRoute,
+  PanchangRoute: PanchangRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
