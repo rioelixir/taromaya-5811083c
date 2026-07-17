@@ -228,6 +228,11 @@ function KundliPage() {
             {tab === "yogas" && <YogasTab chart={chart} />}
             {tab === "doshas" && <DoshasTab chart={chart} />}
             {tab === "planets" && <PlanetTable chart={chart} />}
+            {tab === "ashtaka" && <AshtakavargaTab chart={chart} />}
+            {tab === "shadbala" && <ShadbalaTab chart={chart} />}
+            {tab === "kp" && <KPTab chart={chart} />}
+            {tab === "lalkitab" && <LalKitabTab chart={chart} />}
+            {tab === "gems" && <GemstonesTab chart={chart} />}
             {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
           </div>
         </div>
