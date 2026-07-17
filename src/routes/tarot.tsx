@@ -197,43 +197,26 @@ function TarotPage() {
       if (idx < 0) return prev;
       const card = prev[idx];
 
-      if (isFreestyle) {
-        // Just place & auto-flip; no lock needed
-        const next = [...prev];
-        next[idx] = { ...card, flipped: true, locked: true, slotIndex: null };
-        return next;
-      }
+      // Snap to a subtle grid so the board stays clean.
+      const GRID = 20;
+      const sx = Math.round(card.x / GRID) * GRID;
+      const sy = Math.round(card.y / GRID) * GRID;
 
-      // Find nearest empty slot within snap radius
-      const centerX = card.x + CARD_W / 2;
-      const centerY = card.y + CARD_H / 2;
-      const takenSlots = new Set(
-        prev.filter((p) => p.uid !== uid && p.slotIndex !== null).map((p) => p.slotIndex),
-      );
-      let best: { slot: Slot; d: number } | null = null;
-      for (const slot of slots) {
-        if (takenSlots.has(slot.index)) continue;
-        const sx = slot.x + CARD_W / 2;
-        const sy = slot.y + CARD_H / 2;
-        const d = Math.hypot(centerX - sx, centerY - sy);
-        if (!best || d < best.d) best = { slot, d };
-      }
-      if (best && best.d < 140) {
-        const next = [...prev];
-        next[idx] = {
-          ...card,
-          x: best.slot.x,
-          y: best.slot.y,
-          slotIndex: best.slot.index,
-          locked: true,
-          flipped: true,
-        };
-        return next;
-      }
+      // Keep card fully inside the canvas.
+      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
+      const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
+      const clampedX = Math.min(Math.max(0, sx), maxX);
+      const clampedY = Math.min(Math.max(0, sy), maxY);
 
-      // Not near any slot: leave as unlocked freestyle-position
       const next = [...prev];
-      next[idx] = { ...card, slotIndex: null, locked: false };
+      next[idx] = {
+        ...card,
+        x: clampedX,
+        y: clampedY,
+        flipped: true,
+        locked: true,
+        slotIndex: null,
+      };
       return next;
     });
   };
