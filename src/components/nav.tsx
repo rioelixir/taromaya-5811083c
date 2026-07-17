@@ -74,6 +74,7 @@ const groups: Group[] = [
   {
     label: "Account",
     items: [
+      { to: "/pricing", label: "Premium", icon: Crown },
       { to: "/profile", label: "Profile", icon: User },
       { to: "/settings", label: "Settings", icon: Settings },
     ],
