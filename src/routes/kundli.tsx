@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, type ReactNode } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -7,38 +7,50 @@ import {
   NAKSHATRAS, PLANET_SHORT, RASHIS, RASHI_LORDS,
   type KundliChart, type PlanetName,
 } from "@/lib/vedic";
+import {
+  computeVarga, computeVimshottari, detectYogas, detectDoshas,
+  VARGA_LABELS, fmtDate,
+  type VargaCode,
+} from "@/lib/vedic-extended";
 import { interpretKundli } from "@/lib/kundli.functions";
-import { Sparkles, Loader2, MapPin } from "lucide-react";
+import { saveKundli } from "@/lib/kundli-storage.functions";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  Sparkles, Loader2, MapPin, Save, Check, AlertTriangle,
+  CheckCircle2, XCircle,
+} from "lucide-react";
 
 export const Route = createFileRoute("/kundli")({
   component: KundliPage,
   head: () => ({
     meta: [
       { title: "Kundli — TAROMAYA" },
-      { name: "description", content: "Vedic birth chart with sidereal planetary positions, nakshatras, and AI interpretation. Runs privately in your browser." },
+      { name: "description", content: "Vedic birth chart with divisional charts (D1–D60), Vimshottari dasha, yogas, doshas, and AI interpretation." },
     ],
   }),
 });
 
 type FormState = {
-  name: string;
-  date: string; // yyyy-mm-dd
-  time: string; // HH:mm
-  tz: string;   // e.g. 5.5
-  lat: string;
-  lon: string;
-  place: string;
+  name: string; date: string; time: string; tz: string;
+  lat: string; lon: string; place: string;
 };
 
 const DEFAULTS: FormState = {
-  name: "",
-  date: "1995-06-15",
-  time: "07:45",
-  tz: "5.5",
-  lat: "28.6139",
-  lon: "77.2090",
+  name: "", date: "1995-06-15", time: "07:45",
+  tz: "5.5", lat: "28.6139", lon: "77.2090",
   place: "New Delhi, India",
 };
+
+type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "reading";
+const TABS: { id: TabId; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "vargas", label: "Divisional" },
+  { id: "dasha", label: "Dasha" },
+  { id: "yogas", label: "Yogas" },
+  { id: "doshas", label: "Doshas" },
+  { id: "planets", label: "Planets" },
+  { id: "reading", label: "AI Reading" },
+];
 
 function KundliPage() {
   const [form, setForm] = useState<FormState>(DEFAULTS);
@@ -46,26 +58,39 @@ function KundliPage() {
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const interpret = useServerFn(interpretKundli);
+  const [tab, setTab] = useState<TabId>("overview");
+  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const canSubmit = useMemo(() => {
-    return !!(form.date && form.time && form.tz && form.lat && form.lon);
-  }, [form]);
+  const interpret = useServerFn(interpretKundli);
+  const save = useServerFn(saveKundli);
+  const { user } = useAuth();
+
+  const canSubmit = useMemo(
+    () => !!(form.date && form.time && form.tz && form.lat && form.lon),
+    [form],
+  );
+
+  const birthDate = useMemo(() => {
+    if (!chart) return null;
+    const [y, m, d] = form.date.split("-").map(Number);
+    const [hh, mm] = form.time.split(":").map(Number);
+    const local = Date.UTC(y, m - 1, d, hh, mm);
+    return new Date(local - Number(form.tz) * 3600000);
+  }, [chart, form]);
 
   const compute = () => {
-    setError(null);
-    setReading(null);
+    setError(null); setReading(null);
     try {
       const [y, m, d] = form.date.split("-").map(Number);
       const [hh, mm] = form.time.split(":").map(Number);
       const c = computeKundli({
-        year: y, month: m, day: d,
-        hour: hh, minute: mm,
+        year: y, month: m, day: d, hour: hh, minute: mm,
         tzOffsetHours: Number(form.tz),
-        latitude: Number(form.lat),
-        longitude: Number(form.lon),
+        latitude: Number(form.lat), longitude: Number(form.lon),
       });
       setChart(c);
+      setTab("overview");
       void requestReading(c);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not compute chart.");
@@ -78,22 +103,15 @@ function KundliPage() {
       const res = await interpret({
         data: {
           name: form.name,
-          ascendant: {
-            rashi: RASHIS[c.ascendant.rashi],
-            degree: formatDegree(c.ascendant.degreeInRashi),
-          },
+          ascendant: { rashi: RASHIS[c.ascendant.rashi], degree: formatDegree(c.ascendant.degreeInRashi) },
           moonNakshatra: {
-            name: NAKSHATRAS[c.moonNakshatra.index],
-            pada: c.moonNakshatra.pada,
-            lord: c.moonNakshatra.lord,
+            name: NAKSHATRAS[c.moonNakshatra.index], pada: c.moonNakshatra.pada, lord: c.moonNakshatra.lord,
           },
           planets: c.planets.map((p) => ({
-            name: p.name,
-            rashi: RASHIS[p.rashi],
+            name: p.name, rashi: RASHIS[p.rashi],
             house: ((p.rashi - c.ascendant.rashi + 12) % 12) + 1,
             degree: formatDegree(p.degreeInRashi),
-            nakshatra: NAKSHATRAS[p.nakshatra],
-            retrograde: p.retrograde,
+            nakshatra: NAKSHATRAS[p.nakshatra], retrograde: p.retrograde,
           })),
         },
       });
@@ -108,62 +126,35 @@ function KundliPage() {
     }
   };
 
+  const onSave = async () => {
+    if (!user) return;
+    setSaving(true); setSaveMsg(null);
+    try {
+      await save({
+        data: {
+          name: form.name || form.place || "Untitled chart",
+          birthDate: form.date, birthTime: form.time,
+          tzOffset: Number(form.tz),
+          latitude: Number(form.lat), longitude: Number(form.lon),
+          place: form.place,
+        },
+      });
+      setSaveMsg("Saved to your library.");
+    } catch (e) {
+      setSaveMsg(e instanceof Error ? e.message : "Could not save.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <PageShell
       eyebrow="Vedic Kundli"
       title="Your birth chart"
-      subtitle="Sidereal Lahiri calculations, whole-sign houses. All math runs privately in your browser."
+      subtitle="Sidereal Lahiri calculations, whole-sign houses, divisional charts, Vimshottari dasha, yogas, and doshas — all computed privately in your browser."
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-        <GlassCard title="Birth details">
-          <div className="grid gap-3">
-            <Field label="Name (optional)">
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className={inputCls}
-                placeholder="Your name"
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Date">
-                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Time (24h)">
-                <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} />
-              </Field>
-            </div>
-            <Field label="Timezone offset (hours from UTC)">
-              <input value={form.tz} onChange={(e) => setForm({ ...form, tz: e.target.value })} className={inputCls} placeholder="5.5" inputMode="decimal" />
-            </Field>
-            <Field label="Place (for your reference)">
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input value={form.place} onChange={(e) => setForm({ ...form, place: e.target.value })} className={inputCls + " pl-9"} placeholder="City, Country" />
-              </div>
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Latitude">
-                <input value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} className={inputCls} inputMode="decimal" />
-              </Field>
-              <Field label="Longitude">
-                <input value={form.lon} onChange={(e) => setForm({ ...form, lon: e.target.value })} className={inputCls} inputMode="decimal" />
-              </Field>
-            </div>
-            <button
-              disabled={!canSubmit}
-              onClick={compute}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 hover:brightness-110 transition"
-            >
-              <Sparkles className="h-4 w-4" /> Compute chart
-            </button>
-            {error && (
-              <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-xs text-red-200">
-                {error}
-              </div>
-            )}
-          </div>
-        </GlassCard>
+        <BirthForm form={form} setForm={setForm} canSubmit={canSubmit} onCompute={compute} error={error} />
 
         <div className="space-y-6">
           {chart ? (
@@ -172,9 +163,29 @@ function KundliPage() {
                 <SouthIndianChart chart={chart} />
               </GlassCard>
               <ChartSummary chart={chart} />
+              {user ? (
+                <div className="glass rounded-2xl p-4 flex items-center justify-between gap-3">
+                  <div className="text-xs text-muted-foreground">
+                    {saveMsg ? saveMsg : "Save this chart to open it anytime."}
+                  </div>
+                  <button
+                    onClick={onSave}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-xs disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <div className="glass rounded-2xl p-4 text-xs text-muted-foreground flex items-center justify-between gap-3">
+                  Sign in to save charts and revisit them later.
+                  <Link to="/auth" className="text-gold hover:underline">Sign in</Link>
+                </div>
+              )}
             </>
           ) : (
-            <GlassCard title="Waiting for your details" desc="Enter your birth date, time, and coordinates. Whole-sign chart and AI reading will appear here.">
+            <GlassCard title="Waiting for your details" desc="Enter your birth date, time, and coordinates. Chart, dasha, yogas and doshas will appear here.">
               <div className="mt-4 aspect-square rounded-2xl border border-white/10 bg-black/20 grid place-items-center text-muted-foreground text-sm">
                 Chart preview
               </div>
@@ -183,24 +194,81 @@ function KundliPage() {
         </div>
       </div>
 
-      {chart && (
-        <GlassCard>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
-            <Sparkles className="h-3.5 w-3.5" /> AI Reading
+      {chart && birthDate && (
+        <div className="mt-8">
+          <div className="flex flex-wrap gap-2 border-b border-white/5 pb-1 overflow-x-auto">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`px-4 py-2 text-sm rounded-t-lg whitespace-nowrap transition ${
+                  tab === t.id
+                    ? "bg-gradient-to-b from-gold/15 to-transparent text-pearl gold-border border-b-0"
+                    : "text-muted-foreground hover:text-pearl"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
-          {loadingReading && !reading && (
-            <div className="mt-6 flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> Reading your chart…
-            </div>
-          )}
-          {reading && (
-            <div className="mt-4"><Markdown text={reading} /></div>
-          )}
-        </GlassCard>
-      )}
 
-      {chart && <PlanetTable chart={chart} />}
+          <div className="pt-6">
+            {tab === "overview" && <OverviewTab chart={chart} />}
+            {tab === "vargas" && <VargasTab chart={chart} />}
+            {tab === "dasha" && <DashaTab chart={chart} birthDate={birthDate} />}
+            {tab === "yogas" && <YogasTab chart={chart} />}
+            {tab === "doshas" && <DoshasTab chart={chart} />}
+            {tab === "planets" && <PlanetTable chart={chart} />}
+            {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
+          </div>
+        </div>
+      )}
     </PageShell>
+  );
+}
+
+// ── Birth form
+function BirthForm({
+  form, setForm, canSubmit, onCompute, error,
+}: {
+  form: FormState;
+  setForm: (f: FormState) => void;
+  canSubmit: boolean;
+  onCompute: () => void;
+  error: string | null;
+}) {
+  return (
+    <GlassCard title="Birth details">
+      <div className="grid gap-3">
+        <Field label="Name (optional)">
+          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your name" />
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Date"><input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} /></Field>
+          <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} /></Field>
+        </div>
+        <Field label="Timezone offset (hours from UTC)">
+          <input value={form.tz} onChange={(e) => setForm({ ...form, tz: e.target.value })} className={inputCls} placeholder="5.5" inputMode="decimal" />
+        </Field>
+        <Field label="Place (for your reference)">
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input value={form.place} onChange={(e) => setForm({ ...form, place: e.target.value })} className={inputCls + " pl-9"} placeholder="City, Country" />
+          </div>
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Latitude"><input value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
+          <Field label="Longitude"><input value={form.lon} onChange={(e) => setForm({ ...form, lon: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
+        </div>
+        <button
+          disabled={!canSubmit} onClick={onCompute}
+          className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 hover:brightness-110 transition"
+        >
+          <Sparkles className="h-4 w-4" /> Compute chart
+        </button>
+        {error && <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-xs text-red-200">{error}</div>}
+      </div>
+    </GlassCard>
   );
 }
 
@@ -210,20 +278,17 @@ const inputCls =
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-        {label}
-      </div>
+      <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
       {children}
     </label>
   );
 }
 
-// South Indian chart layout. Rashi position is fixed; planets move.
-// Grid indices → rashi index (0=Aries).
+// ── South Indian chart
 const CELL_TO_RASHI: Record<string, number> = {
   "0-0": 11, "0-1": 0, "0-2": 1, "0-3": 2,
-  "1-0": 10,               "1-3": 3,
-  "2-0": 9,                "2-3": 4,
+  "1-0": 10,                       "1-3": 3,
+  "2-0": 9,                        "2-3": 4,
   "3-0": 8, "3-1": 7, "3-2": 6, "3-3": 5,
 };
 
@@ -234,35 +299,23 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
     arr.push({ name: p.name, retrograde: p.retrograde });
     planetsByRashi.set(p.rashi, arr);
   }
-
   return (
     <div>
-      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-        Rashi Chart · South Indian
-      </div>
+      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">Rashi Chart · South Indian</div>
       <div className="grid grid-cols-4 grid-rows-4 aspect-square rounded-2xl overflow-hidden border border-gold/30 bg-black/40">
         {Array.from({ length: 16 }).map((_, i) => {
-          const r = Math.floor(i / 4);
-          const c = i % 4;
+          const r = Math.floor(i / 4); const c = i % 4;
           const key = `${r}-${c}`;
           const rashi = CELL_TO_RASHI[key];
           const isCenter = rashi === undefined;
           if (isCenter) {
-            // Draw center only once at cell (1,1); skip others.
             if (r === 1 && c === 1) {
               return (
-                <div
-                  key={i}
-                  className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/20 bg-gradient-to-br from-midnight/40 to-cosmic/60"
-                >
+                <div key={i} className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/20 bg-gradient-to-br from-midnight/40 to-cosmic/60">
                   <div>
                     <div className="text-[9px] uppercase tracking-widest text-gold/70">Lagna</div>
-                    <div className="font-display text-xl text-pearl mt-1">
-                      {RASHIS[chart.ascendant.rashi]}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground mt-1">
-                      {formatDegree(chart.ascendant.degreeInRashi)}
-                    </div>
+                    <div className="font-display text-xl text-pearl mt-1">{RASHIS[chart.ascendant.rashi]}</div>
+                    <div className="text-[11px] text-muted-foreground mt-1">{formatDegree(chart.ascendant.degreeInRashi)}</div>
                   </div>
                 </div>
               );
@@ -273,27 +326,14 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
           const planets = planetsByRashi.get(rashi) ?? [];
           const houseNo = ((rashi - chart.ascendant.rashi + 12) % 12) + 1;
           return (
-            <div
-              key={i}
-              className={`relative border border-white/10 p-1.5 text-[10px] ${
-                isAsc ? "bg-gold/[0.06]" : "bg-white/[0.015]"
-              }`}
-            >
+            <div key={i} className={`relative border border-white/10 p-1.5 text-[10px] ${isAsc ? "bg-gold/[0.06]" : "bg-white/[0.015]"}`}>
               <div className="flex items-start justify-between">
-                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
-                  {RASHIS[rashi].slice(0, 3)}
-                </span>
-                <span className={`text-[9px] ${isAsc ? "text-gold" : "text-muted-foreground/60"}`}>
-                  {isAsc ? "As · " : ""}H{houseNo}
-                </span>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{RASHIS[rashi].slice(0, 3)}</span>
+                <span className={`text-[9px] ${isAsc ? "text-gold" : "text-muted-foreground/60"}`}>{isAsc ? "As · " : ""}H{houseNo}</span>
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
                 {planets.map((p) => (
-                  <span
-                    key={p.name}
-                    className="inline-flex items-baseline rounded-md px-1 py-0.5 bg-white/5 text-pearl text-[10px]"
-                    title={p.name}
-                  >
+                  <span key={p.name} className="inline-flex items-baseline rounded-md px-1 py-0.5 bg-white/5 text-pearl text-[10px]" title={p.name}>
                     {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
                   </span>
                 ))}
@@ -322,13 +362,224 @@ function ChartSummary({ chart }: { chart: KundliChart }) {
     </div>
   );
 }
-
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="glass rounded-2xl p-4">
       <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="mt-1 font-display text-lg text-pearl">{value}</div>
       {sub && <div className="mt-1 text-[11px] text-muted-foreground">{sub}</div>}
+    </div>
+  );
+}
+
+// ── Tabs
+
+function OverviewTab({ chart }: { chart: KundliChart }) {
+  const yogas = detectYogas(chart).filter((y) => y.present);
+  const doshas = detectDoshas(chart).filter((d) => d.present);
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <GlassCard title="Auspicious yogas active" desc={`${yogas.length} detected`}>
+        <ul className="space-y-2 mt-2">
+          {yogas.length === 0 && <li className="text-xs text-muted-foreground">None among the detected set.</li>}
+          {yogas.slice(0, 6).map((y) => (
+            <li key={y.name} className="flex items-start gap-2 text-sm">
+              <CheckCircle2 className="h-4 w-4 text-gold shrink-0 mt-0.5" />
+              <div>
+                <div className="text-pearl">{y.name}</div>
+                <div className="text-xs text-muted-foreground">{y.detail}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+      <GlassCard title="Doshas present" desc={`${doshas.length} detected`}>
+        <ul className="space-y-2 mt-2">
+          {doshas.length === 0 && <li className="text-xs text-muted-foreground">No major doshas detected.</li>}
+          {doshas.map((d) => (
+            <li key={d.name} className="flex items-start gap-2 text-sm">
+              <AlertTriangle className="h-4 w-4 text-aurora shrink-0 mt-0.5" />
+              <div>
+                <div className="text-pearl">{d.name} <span className="text-[10px] text-muted-foreground">· {d.severity}</span></div>
+                <div className="text-xs text-muted-foreground">{d.detail}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+    </div>
+  );
+}
+
+function VargasTab({ chart }: { chart: KundliChart }) {
+  const codes: VargaCode[] = ["D1", "D2", "D3", "D7", "D9", "D10", "D60"];
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {codes.map((code) => {
+        const v = computeVarga(chart, code);
+        const label = VARGA_LABELS[code];
+        return (
+          <GlassCard key={code} title={`${code} · ${label.name}`} desc={label.theme}>
+            <VargaMini chart={chart} code={code} ascSign={v.ascendantSign} planets={v.planetSigns} />
+          </GlassCard>
+        );
+      })}
+    </div>
+  );
+}
+
+function VargaMini({
+  code, ascSign, planets,
+}: {
+  chart: KundliChart;
+  code: VargaCode;
+  ascSign: number;
+  planets: { name: PlanetName; sign: number; retrograde: boolean }[];
+}) {
+  const byRashi = new Map<number, typeof planets>();
+  planets.forEach((p) => {
+    const a = byRashi.get(p.sign) ?? [];
+    a.push(p);
+    byRashi.set(p.sign, a);
+  });
+  return (
+    <div className="mt-3">
+      <div className="grid grid-cols-4 grid-rows-4 aspect-square rounded-xl overflow-hidden border border-white/10 bg-black/30">
+        {Array.from({ length: 16 }).map((_, i) => {
+          const r = Math.floor(i / 4); const c = i % 4;
+          const rashi = CELL_TO_RASHI[`${r}-${c}`];
+          if (rashi === undefined) {
+            if (r === 1 && c === 1) return (
+              <div key={i} className="col-span-2 row-span-2 grid place-items-center border border-white/5 bg-cosmic/40">
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-widest text-gold/60">{code}</div>
+                  <div className="font-display text-sm text-pearl">{RASHIS[ascSign].slice(0, 3)}</div>
+                </div>
+              </div>
+            );
+            return null;
+          }
+          const isAsc = rashi === ascSign;
+          const list = byRashi.get(rashi) ?? [];
+          return (
+            <div key={i} className={`relative border border-white/5 p-1 text-[9px] ${isAsc ? "bg-gold/[0.08]" : ""}`}>
+              <div className="text-[8px] uppercase text-muted-foreground/70">{RASHIS[rashi].slice(0, 3)}</div>
+              <div className="mt-1 flex flex-wrap gap-0.5">
+                {list.map((p) => (
+                  <span key={p.name} className="inline-block rounded px-1 bg-white/5 text-pearl text-[9px]">
+                    {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DashaTab({ chart, birthDate }: { chart: KundliChart; birthDate: Date }) {
+  const NAK_SPAN = 360 / 27;
+  const moon = chart.planets[1];
+  const moonDegInNak = (moon.longitude % NAK_SPAN + NAK_SPAN) % NAK_SPAN;
+  const tree = computeVimshottari(birthDate, chart.moonNakshatra.index, moonDegInNak);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-2">
+        <GlassCard title="Current Mahadasha" desc={`${fmtDate(tree.currentMaha.start)} → ${fmtDate(tree.currentMaha.end)}`}>
+          <div className="mt-2 font-display text-2xl gold-text">{tree.currentMaha.lord}</div>
+        </GlassCard>
+        <GlassCard title="Current Antardasha" desc={`${fmtDate(tree.currentAntar.start)} → ${fmtDate(tree.currentAntar.end)}`}>
+          <div className="mt-2 font-display text-2xl gold-text">{tree.currentAntar.lord}</div>
+        </GlassCard>
+      </div>
+      <GlassCard title="Vimshottari timeline" desc="Full 120-year Mahadasha cycle with Antardasha (Bhukti) periods.">
+        <div className="mt-3 space-y-2 max-h-[500px] overflow-y-auto pr-2">
+          {tree.maha.map((m, idx) => {
+            const isCurrent = m.start <= new Date() && new Date() < m.end;
+            return (
+              <details key={idx} open={isCurrent} className="rounded-xl border border-white/10 bg-black/20 open:bg-black/30">
+                <summary className={`cursor-pointer px-3 py-2 flex items-center justify-between text-sm ${isCurrent ? "text-gold" : "text-pearl"}`}>
+                  <div className="flex items-center gap-2">
+                    {isCurrent && <span className="h-2 w-2 rounded-full bg-gold animate-twinkle" />}
+                    <span className="font-display">{m.lord} Mahadasha</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">
+                    {fmtDate(m.start)} → {fmtDate(m.end)}
+                  </span>
+                </summary>
+                <div className="border-t border-white/5">
+                  {m.antar.map((a, ai) => {
+                    const now = new Date();
+                    const isA = a.start <= now && now < a.end;
+                    return (
+                      <div key={ai} className={`px-4 py-1.5 flex items-center justify-between text-xs ${isA ? "text-gold" : "text-muted-foreground"}`}>
+                        <span>{a.lord}</span>
+                        <span className="text-[10px]">{fmtDate(a.start)} → {fmtDate(a.end)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+function YogasTab({ chart }: { chart: KundliChart }) {
+  const yogas = detectYogas(chart);
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {yogas.map((y) => (
+        <div key={y.name} className="glass rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            {y.present ? <CheckCircle2 className="h-5 w-5 text-gold shrink-0" /> : <XCircle className="h-5 w-5 text-muted-foreground/40 shrink-0" />}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <div className="font-display text-lg text-pearl">{y.name}</div>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{y.category}</span>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">{y.detail}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DoshasTab({ chart }: { chart: KundliChart }) {
+  const doshas = detectDoshas(chart);
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {doshas.map((d) => (
+        <div key={d.name} className={`glass rounded-2xl p-5 ${d.present ? "border-aurora/30" : ""}`}>
+          <div className="flex items-center justify-between">
+            <div className="font-display text-lg text-pearl">{d.name}</div>
+            {d.present ? (
+              <span className="text-[10px] uppercase tracking-widest text-aurora px-2 py-1 rounded-full border border-aurora/30 bg-aurora/10">
+                {d.severity ?? "Present"}
+              </span>
+            ) : (
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground px-2 py-1 rounded-full border border-white/10">
+                <Check className="inline h-3 w-3 mr-1" /> Clear
+              </span>
+            )}
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">{d.detail}</p>
+          {d.present && d.remedy && (
+            <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-3 text-xs">
+              <div className="text-[10px] uppercase tracking-widest text-gold mb-1">Remedy</div>
+              <div className="text-pearl/90">{d.remedy}</div>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -340,12 +591,9 @@ function PlanetTable({ chart }: { chart: KundliChart }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
-              <th className="py-2 pr-3">Planet</th>
-              <th className="py-2 pr-3">Rashi</th>
-              <th className="py-2 pr-3">Degree</th>
-              <th className="py-2 pr-3">House</th>
-              <th className="py-2 pr-3">Nakshatra</th>
-              <th className="py-2 pr-3">Motion</th>
+              <th className="py-2 pr-3">Planet</th><th className="py-2 pr-3">Rashi</th>
+              <th className="py-2 pr-3">Degree</th><th className="py-2 pr-3">House</th>
+              <th className="py-2 pr-3">Nakshatra</th><th className="py-2 pr-3">Motion</th>
             </tr>
           </thead>
           <tbody className="text-pearl/90">
@@ -371,34 +619,40 @@ function PlanetTable({ chart }: { chart: KundliChart }) {
   );
 }
 
+function ReadingTab({ reading, loading }: { reading: string | null; loading: boolean }) {
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
+        <Sparkles className="h-3.5 w-3.5" /> AI Reading
+      </div>
+      {loading && !reading && (
+        <div className="mt-6 flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Reading your chart…
+        </div>
+      )}
+      {reading && <div className="mt-4"><Markdown text={reading} /></div>}
+    </GlassCard>
+  );
+}
+
 function Markdown({ text }: { text: string }) {
   const lines = text.split("\n");
   return (
     <div className="space-y-2">
       {lines.map((ln, i) => {
-        if (ln.startsWith("### ")) {
-          return <h3 key={i} className="mt-4 font-display text-lg text-gold">{ln.slice(4)}</h3>;
-        }
-        if (ln.startsWith("- ")) {
-          return <p key={i} className="text-pearl/90 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-gold">{renderInline(ln.slice(2))}</p>;
-        }
+        if (ln.startsWith("### ")) return <h3 key={i} className="mt-4 font-display text-lg text-gold">{ln.slice(4)}</h3>;
+        if (ln.startsWith("- ")) return <p key={i} className="text-pearl/90 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-gold">{renderInline(ln.slice(2))}</p>;
         if (ln.trim() === "") return <div key={i} className="h-2" />;
         return <p key={i} className="text-pearl/90 leading-relaxed">{renderInline(ln)}</p>;
       })}
     </div>
   );
 }
-
 function renderInline(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((p, i) =>
-    p.startsWith("**") && p.endsWith("**") ? (
-      <strong key={i} className="text-pearl">{p.slice(2, -2)}</strong>
-    ) : (
-      <span key={i}>{p}</span>
-    ),
+    p.startsWith("**") && p.endsWith("**") ? <strong key={i} className="text-pearl">{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>,
   );
 }
 
-// Silence unused-import warning; keep import for potential future use.
 void lahiriAyanamsa;
