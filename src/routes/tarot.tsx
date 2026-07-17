@@ -631,12 +631,6 @@ function PlacedCardView({
           Reveal
         </button>
       )}
-
-      {slotLabel && (
-        <div className="absolute inset-x-0 -bottom-5 text-[10px] uppercase tracking-widest text-center text-gold/70">
-          {slotLabel}
-        </div>
-      )}
     </div>
   );
 }
