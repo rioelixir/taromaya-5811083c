@@ -373,6 +373,7 @@ function TarotPage() {
                 )
               }
               onRemove={() => removeCard(p.uid)}
+              onZoom={() => p.flipped && setZoomedUid(p.uid)}
               slotLabel={
                 p.slotIndex !== null && !isFreestyle ? spread.positions[p.slotIndex] : undefined
               }
