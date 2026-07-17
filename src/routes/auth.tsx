@@ -174,7 +174,7 @@ function AuthPage() {
             {msg && <div className="text-xs text-aurora bg-aurora/10 border border-aurora/20 rounded-lg px-3 py-2">{msg}</div>}
 
             <button
-              disabled={loading || (mode === "signup" && !agree)}
+              disabled={loading || (needsAgreement && !agree)}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
