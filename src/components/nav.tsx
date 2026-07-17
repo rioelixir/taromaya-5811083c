@@ -294,3 +294,26 @@ export function BottomNav() {
 
 // keep imports referenced (Users used in future groups)
 void Users;
+
+function AdminNavGroup({ pathname }: { pathname: string }) {
+  const { isAdmin } = useIsAdmin();
+  if (!isAdmin) return null;
+  const active = pathname === "/admin" || pathname.startsWith("/admin");
+  return (
+    <div className="pt-2 mt-2 border-t border-white/5">
+      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">Admin</div>
+      <Link
+        to="/admin"
+        className={[
+          "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all",
+          active
+            ? "bg-gradient-to-r from-gold/20 to-galaxy/15 text-pearl gold-border"
+            : "text-muted-foreground hover:text-pearl hover:bg-white/5",
+        ].join(" ")}
+      >
+        <Shield className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
+        <span>Control Room</span>
+      </Link>
+    </div>
+  );
+}
