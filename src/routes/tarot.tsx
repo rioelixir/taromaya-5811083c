@@ -236,22 +236,38 @@ function TarotPage() {
     });
   };
 
+  const shuffleAll = useCallback(() => {
+    setDecks((prev) => {
+      // Pool all remaining deck cards, reshuffle, redistribute across visible stacks.
+      const pool = prev.flat();
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      const out: TarotCard[][] = Array.from({ length: prev.length }, () => []);
+      pool.forEach((c, i) => out[i % prev.length].push(c));
+      return out;
+    });
+  }, []);
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
-  const readyToInterpret = isFreestyle
-    ? lockedCards.length >= 1
-    : lockedCards.length === spread.positions.length;
+  const requiredCount = isFreestyle ? 1 : spread.positions.length;
+  const readyToInterpret = lockedCards.length >= requiredCount;
 
   const requestReading = async () => {
     if (!readyToInterpret) return;
     setLoadingReading(true);
     setError(null);
     try {
+      // Order cards left-to-right by placement position on the canvas.
+      const sorted = [...lockedCards].sort((a, b) => a.x - b.x || a.y - b.y);
       const orderedForAI = isFreestyle
-        ? lockedCards.map((c, i) => ({ ...c, position: `Card ${i + 1}` }))
-        : [...lockedCards]
-            .sort((a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0))
-            .map((c) => ({ ...c, position: spread.positions[c.slotIndex!] }));
+        ? sorted.map((c, i) => ({ ...c, position: `Card ${i + 1}` }))
+        : sorted.slice(0, spread.positions.length).map((c, i) => ({
+            ...c,
+            position: spread.positions[i],
+          }));
 
       const res = await interpret({
         data: {
