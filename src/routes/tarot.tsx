@@ -233,7 +233,14 @@ function TarotPage() {
   const removeCard = (uid: string) => {
     setPlaced((prev) => {
       const removed = prev.find((p) => p.uid === uid);
-      if (removed) setDeck((d) => [...d, removed.card]);
+      if (removed) {
+        setDecks((prev) => {
+          // Return to the currently smallest stack.
+          let target = 0;
+          for (let i = 1; i < prev.length; i++) if (prev[i].length < prev[target].length) target = i;
+          return prev.map((d, i) => (i === target ? [...d, removed.card] : d));
+        });
+      }
       return prev.filter((p) => p.uid !== uid);
     });
   };
