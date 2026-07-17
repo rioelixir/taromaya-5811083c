@@ -126,12 +126,22 @@ About 350 words.`,
           ))}
         </div>
         <button
+          onClick={generateAll}
+          disabled={batchLoading !== null}
+          className="rounded-full bg-gradient-to-r from-gold to-gold-soft text-primary-foreground px-4 py-2 text-xs uppercase tracking-widest inline-flex items-center gap-2 disabled:opacity-60"
+        >
+          {batchLoading
+            ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {batchLoading === "all" ? "Starting…" : batchLoading}</>
+            : <><Sparkles className="w-3.5 h-3.5" /> Generate all 12</>}
+        </button>
+        <button
           onClick={() => setShowChinese(!showChinese)}
           className={`ml-auto rounded-full px-4 py-2 text-xs uppercase tracking-widest ${showChinese ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"}`}
         >
           {showChinese ? "Western" : "Chinese"} zodiac
         </button>
       </div>
+
 
       {!showChinese ? (
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
