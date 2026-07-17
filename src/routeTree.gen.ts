@@ -15,10 +15,12 @@ import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
+import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as JournalRouteImport } from './routes/journal'
@@ -63,6 +65,11 @@ const ReportsRoute = ReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RemediesRoute = RemediesRouteImport.update({
+  id: '/remedies',
+  path: '/remedies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressionsRoute = ProgressionsRouteImport.update({
   id: '/progressions',
   path: '/progressions',
@@ -81,6 +88,11 @@ const PanchangRoute = PanchangRouteImport.update({
 const NumerologyRoute = NumerologyRouteImport.update({
   id: '/numerology',
   path: '/numerology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuhuratRoute = MuhuratRouteImport.update({
+  id: '/muhurat',
+  path: '/muhurat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -160,10 +172,12 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -184,10 +198,12 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -210,10 +226,12 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -236,10 +254,12 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -260,10 +280,12 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -285,10 +307,12 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -311,10 +335,12 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
+  MuhuratRoute: typeof MuhuratRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
   ProgressionsRoute: typeof ProgressionsRoute
+  RemediesRoute: typeof RemediesRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -367,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/remedies': {
+      id: '/remedies'
+      path: '/remedies'
+      fullPath: '/remedies'
+      preLoaderRoute: typeof RemediesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progressions': {
       id: '/progressions'
       path: '/progressions'
@@ -393,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/numerology'
       fullPath: '/numerology'
       preLoaderRoute: typeof NumerologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/muhurat': {
+      id: '/muhurat'
+      path: '/muhurat'
+      fullPath: '/muhurat'
+      preLoaderRoute: typeof MuhuratRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -513,10 +553,12 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
+  MuhuratRoute: MuhuratRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
   ProgressionsRoute: ProgressionsRoute,
+  RemediesRoute: RemediesRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
