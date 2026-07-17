@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import {
   computeKundli, formatDegree, lahiriAyanamsa,
@@ -207,7 +207,7 @@ function KundliPage() {
 const inputCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
