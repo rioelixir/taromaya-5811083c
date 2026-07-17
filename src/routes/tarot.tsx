@@ -4,7 +4,15 @@ import { useState, useRef, useEffect, useCallback, type ReactNode } from "react"
 import { StarField } from "@/components/star-field";
 import { SPREADS, TAROT_DECK, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle } from "lucide-react";
+
+const DECK_META = [
+  { name: "Luna",    accent: "#C0C7FF", glyph: "☾" },
+  { name: "Solaris", accent: "#F5C56B", glyph: "☀" },
+  { name: "Aurora",  accent: "#7FE6C4", glyph: "✧" },
+  { name: "Vesper",  accent: "#E58CB4", glyph: "✦" },
+  { name: "Onyx",    accent: "#B79BFF", glyph: "❈" },
+];
 
 export const Route = createFileRoute("/tarot")({
   component: TarotPage,
