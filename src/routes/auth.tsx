@@ -188,7 +188,7 @@ function AuthPage() {
 
           <button
             onClick={onGoogle}
-            disabled={mode === "signup" && !agree}
+            disabled={needsAgreement && !agree}
             className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-pearl hover:bg-white/10 flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <GoogleIcon /> Continue with Google
