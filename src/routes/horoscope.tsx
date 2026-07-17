@@ -147,11 +147,12 @@ About 350 words.`,
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {SIGN_NAMES.map((s, i) => {
             const l = luck(s);
+            const cached = !!readings[cacheKey(s, period)];
             return (
               <button
                 key={s}
                 onClick={() => generateReading(s)}
-                className="glass rounded-2xl p-5 text-left transition-transform hover:-translate-y-0.5 hover:bg-white/[0.06]"
+                className={`glass rounded-2xl p-5 text-left transition-transform hover:-translate-y-0.5 hover:bg-white/[0.06] ${cached ? "gold-border" : ""}`}
               >
                 <div className="flex items-center justify-between">
                   <div>
