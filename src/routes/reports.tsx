@@ -171,7 +171,7 @@ function buildPdf(key: ReportKey, b: Birth) {
     year: Y, month: M, day: D, hour: hh, minute: mm,
     tzOffsetHours: Number(b.tz), latitude: Number(b.lat), longitude: Number(b.lon),
   });
-  const num = computePersonalNumerology({ fullName: b.name, birthDate: b.date });
+  const num = computeNumerology({ fullName: b.name, birthDate: b.date });
   const priorities = prioritiseRemedies(chart);
 
   const drawH = (label: string) => {
