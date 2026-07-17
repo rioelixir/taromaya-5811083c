@@ -19,6 +19,7 @@ import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
+import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
@@ -73,6 +74,11 @@ const CompatibilityRoute = CompatibilityRouteImport.update({
   path: '/compatibility',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookmarksRoute = BookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AstrologyRoute = AstrologyRouteImport.update({
   id: '/astrology',
   path: '/astrology',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/astrology'
+    | '/bookmarks'
     | '/compatibility'
     | '/history'
     | '/horoscope'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/astrology'
+    | '/bookmarks'
     | '/compatibility'
     | '/history'
     | '/horoscope'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai'
     | '/astrology'
+    | '/bookmarks'
     | '/compatibility'
     | '/history'
     | '/horoscope'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiRoute: typeof AiRoute
   AstrologyRoute: typeof AstrologyRoute
+  BookmarksRoute: typeof BookmarksRoute
   CompatibilityRoute: typeof CompatibilityRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompatibilityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bookmarks': {
+      id: '/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/astrology': {
       id: '/astrology'
       path: '/astrology'
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiRoute: AiRoute,
   AstrologyRoute: AstrologyRoute,
+  BookmarksRoute: BookmarksRoute,
   CompatibilityRoute: CompatibilityRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
