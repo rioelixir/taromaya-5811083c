@@ -45,7 +45,7 @@ const DEFAULTS: FormState = {
   place: "New Delhi, India",
 };
 
-type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "reading";
+type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "vargas", label: "Divisional" },
@@ -53,6 +53,11 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "yogas", label: "Yogas" },
   { id: "doshas", label: "Doshas" },
   { id: "planets", label: "Planets" },
+  { id: "ashtaka", label: "Ashtakavarga" },
+  { id: "shadbala", label: "Shadbala" },
+  { id: "kp", label: "KP Sub-Lords" },
+  { id: "lalkitab", label: "Lal Kitab" },
+  { id: "gems", label: "Gemstones" },
   { id: "reading", label: "AI Reading" },
 ];
 
