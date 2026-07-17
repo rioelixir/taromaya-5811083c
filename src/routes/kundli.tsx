@@ -670,3 +670,268 @@ function renderInline(text: string) {
 }
 
 void lahiriAyanamsa;
+
+// ─────────────────────────────────────────────────────────
+// Ashtakavarga
+// ─────────────────────────────────────────────────────────
+function AshtakavargaTab({ chart }: { chart: KundliChart }) {
+  const av = useMemo(() => computeAshtakavarga(chart), [chart]);
+  const asc = chart.ascendant.rashi;
+  const maxSarva = Math.max(...av.sarva);
+
+  return (
+    <div className="space-y-6">
+      <GlassCard
+        title="Sarvashtakavarga"
+        desc={`Total ${av.sarvaTotal} bindus · high-scoring signs are prosperous fields for the planet transiting them.`}
+      >
+        <div className="mt-4 grid grid-cols-6 md:grid-cols-12 gap-2">
+          {av.sarva.map((v, i) => {
+            const house = ((i - asc + 12) % 12) + 1;
+            const intensity = v / maxSarva;
+            return (
+              <div key={i} className="rounded-xl border border-white/10 p-2 text-center relative overflow-hidden">
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-gold/40 to-gold/5"
+                  style={{ opacity: intensity }}
+                />
+                <div className="relative">
+                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{RASHIS[i].slice(0,3)} · H{house}</div>
+                  <div className="mt-1 font-display text-2xl text-pearl">{v}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-3 text-[11px] text-muted-foreground">
+          Signs above 30 bindus are strong · below 25 need caution when transited by malefics.
+        </div>
+      </GlassCard>
+
+      <GlassCard title="Bhinna Ashtakavarga" desc="Individual bindu distribution for each of the seven planets.">
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                <th className="text-left py-2 pr-3">Planet</th>
+                {RASHIS.map((r) => <th key={r} className="py-2 px-1 text-center">{r.slice(0,3)}</th>)}
+                <th className="py-2 pl-3 text-right">Σ</th>
+              </tr>
+            </thead>
+            <tbody className="text-pearl/90">
+              {av.bhinna.map((row) => (
+                <tr key={row.planet} className="border-t border-white/5">
+                  <td className="py-2 pr-3 font-medium">{row.planet}</td>
+                  {row.bindus.map((b, i) => (
+                    <td key={i} className={`py-2 px-1 text-center ${b >= 5 ? "text-gold" : b <= 2 ? "text-muted-foreground/50" : ""}`}>{b}</td>
+                  ))}
+                  <td className="py-2 pl-3 text-right text-gold">{row.total}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Shadbala
+// ─────────────────────────────────────────────────────────
+function ShadbalaTab({ chart }: { chart: KundliChart }) {
+  const rows = useMemo(() => computeShadbala(chart), [chart]);
+  const maxTotal = Math.max(...rows.map((r) => r.total));
+
+  return (
+    <div className="space-y-4">
+      <GlassCard title="Six-fold planetary strength" desc="Sthana · Dig · Kala · Chesta · Naisargika · Drig — measured in Rupas.">
+        <div className="space-y-3 mt-4">
+          {rows.map((r) => {
+            const pct = (r.total / maxTotal) * 100;
+            const passes = r.ratio >= 1;
+            return (
+              <div key={r.planet} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-gold/80" />
+                    <span className="font-display text-lg text-pearl">{r.planet}</span>
+                    <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full ${passes ? "bg-gold/10 text-gold border border-gold/30" : "bg-aurora/10 text-aurora border border-aurora/30"}`}>
+                      {passes ? "Sufficient" : "Deficient"}
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {r.total.toFixed(2)} / {r.required.toFixed(2)} Rupas
+                    <span className="ml-2 text-pearl">({(r.ratio * 100).toFixed(0)}%)</span>
+                  </div>
+                </div>
+                <div className="h-1.5 rounded-full bg-white/5 overflow-hidden mb-3">
+                  <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${pct}%` }} />
+                </div>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-[10px]">
+                  {[
+                    ["Sthana", r.sthana],
+                    ["Dig", r.dig],
+                    ["Kala", r.kala],
+                    ["Chesta", r.chesta],
+                    ["Naisargika", r.naisargika],
+                    ["Drig", r.drig],
+                  ].map(([label, val]) => (
+                    <div key={label as string} className="rounded-lg bg-black/30 border border-white/5 p-2 text-center">
+                      <div className="uppercase tracking-widest text-muted-foreground">{label}</div>
+                      <div className="mt-1 font-display text-sm text-pearl">{(val as number).toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// KP
+// ─────────────────────────────────────────────────────────
+function KPTab({ chart }: { chart: KundliChart }) {
+  const rows = useMemo(() => computeKP(chart, NAKSHATRAS, RASHIS), [chart]);
+  return (
+    <GlassCard title="KP Sub-lords" desc="Krishnamurti Paddhati: Nakshatra star lord → Sub-lord → Sub-sub for precise cuspal analysis.">
+      <div className="overflow-x-auto mt-3">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
+              <th className="py-2 pr-3"><KeyRound className="inline h-3 w-3 mr-1" />Point</th>
+              <th className="py-2 pr-3">Sign</th>
+              <th className="py-2 pr-3">Nakshatra</th>
+              <th className="py-2 pr-3">Star Lord</th>
+              <th className="py-2 pr-3">Sub Lord</th>
+              <th className="py-2 pr-3">Sub-Sub</th>
+            </tr>
+          </thead>
+          <tbody className="text-pearl/90">
+            {rows.map((r) => (
+              <tr key={r.who} className="border-t border-white/5">
+                <td className="py-2 pr-3 font-medium">{r.who}</td>
+                <td className="py-2 pr-3">{r.sign}</td>
+                <td className="py-2 pr-3">{r.nakshatra}</td>
+                <td className="py-2 pr-3 text-gold">{r.starLord}</td>
+                <td className="py-2 pr-3 text-gold">{r.subLord}</td>
+                <td className="py-2 pr-3 text-muted-foreground">{r.subSubLord}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-4 text-[11px] text-muted-foreground">
+        In KP the sub-lord of a cusp or planet is the final significator — it decides whether the promise of the star lord fructifies.
+      </div>
+    </GlassCard>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Lal Kitab
+// ─────────────────────────────────────────────────────────
+function LalKitabTab({ chart }: { chart: KundliChart }) {
+  const rows = useMemo(() => computeLalKitab(chart, RASHIS), [chart]);
+  const badgeColor = (s: string) =>
+    s === "Strong" ? "bg-gold/10 text-gold border-gold/30"
+    : s === "Weak" ? "bg-aurora/10 text-aurora border-aurora/30"
+    : "bg-white/5 text-muted-foreground border-white/10";
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {rows.map((r) => (
+        <div key={r.planet} className="glass rounded-2xl p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Scroll className="h-4 w-4 text-gold/80" />
+              <div className="font-display text-lg text-pearl">{r.planet}</div>
+              <div className="text-[10px] text-muted-foreground">· H{r.house} · {r.rashi}</div>
+            </div>
+            <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${badgeColor(r.status)}`}>
+              {r.status}
+            </span>
+          </div>
+          <p className="mt-3 text-sm text-pearl/90 leading-relaxed">{r.reading}</p>
+          <div className="mt-3 rounded-xl bg-black/30 border border-white/5 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-gold mb-1">Upaya (Remedy)</div>
+            <div className="text-xs text-pearl/90 leading-relaxed">{r.remedy}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Gemstones
+// ─────────────────────────────────────────────────────────
+function GemstonesTab({ chart }: { chart: KundliChart }) {
+  const shad = useMemo(() => computeShadbala(chart), [chart]);
+  const rec = useMemo(() => recommendGemstones(chart, shad), [chart, shad]);
+
+  const Card = ({ tone, kind, data }: { tone: "primary" | "supporting"; kind: string; data: typeof rec.primary }) => (
+    <div className={`glass rounded-2xl p-5 relative overflow-hidden ${tone === "primary" ? "gold-border" : ""}`}>
+      <div className={`absolute -top-16 -right-16 h-40 w-40 rounded-full blur-3xl ${tone === "primary" ? "bg-gold/20" : "bg-aurora/15"}`} />
+      <div className="relative">
+        <div className="flex items-center gap-2">
+          <Gem className={`h-4 w-4 ${tone === "primary" ? "text-gold" : "text-aurora"}`} />
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{kind}</span>
+        </div>
+        <div className="mt-2 font-display text-2xl gold-text">{data.stone}</div>
+        <div className="mt-1 text-xs text-muted-foreground">For {data.for}</div>
+        <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
+          <Meta label="Metal" value={data.metal} />
+          <Meta label="Finger" value={data.finger} />
+          <Meta label="Day" value={data.day} />
+          <Meta label="Color" value={data.color} />
+        </div>
+        <div className="mt-3 rounded-xl bg-black/30 border border-white/5 p-3">
+          <div className="text-[10px] uppercase tracking-widest text-gold mb-1">Mantra (108×)</div>
+          <div className="font-display text-sm text-pearl">{data.mantra}</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card tone="primary" kind="Primary Ratna · Lagna Lord" data={rec.primary} />
+        <Card tone="supporting" kind="Supporting Ratna · Strongest Benefic" data={rec.supporting} />
+      </div>
+
+      <GlassCard title="Rudraksha" desc={`${rec.rudraksha.mukhi} for ${rec.rudraksha.for}`}>
+        <p className="mt-3 text-sm text-pearl/90 leading-relaxed">{rec.rudraksha.benefit}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Energise on the planet's day at sunrise with the primary mantra (108 repetitions), then wear on a red or black thread touching the chest.
+        </p>
+      </GlassCard>
+
+      <GlassCard title="Stones to avoid" desc="These planets are best not amplified for your Lagna.">
+        <div className="flex flex-wrap gap-2 mt-3">
+          {rec.avoid.map((p) => (
+            <span key={p} className="text-xs px-3 py-1 rounded-full border border-aurora/30 bg-aurora/5 text-aurora">
+              {p}
+            </span>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground">{rec.notes}</p>
+      </GlassCard>
+    </div>
+  );
+}
+
+function Meta({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-black/30 border border-white/5 p-2">
+      <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="mt-0.5 text-pearl">{value}</div>
+    </div>
+  );
+}
+
+void Grid3x3;
