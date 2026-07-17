@@ -443,6 +443,53 @@ function TarotPage() {
           </div>
         )}
       </div>
+
+      {/* Fullscreen zoom overlay */}
+      {zoomedUid && (() => {
+        const zc = placed.find((p) => p.uid === zoomedUid);
+        if (!zc) return null;
+        return (
+          <div
+            onClick={() => setZoomedUid(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 animate-in fade-in duration-300"
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); setZoomedUid(null); }}
+              className="absolute top-6 right-6 rounded-full bg-black/60 border border-white/20 p-2 hover:bg-white/10"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5 text-pearl" />
+            </button>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_120px_-20px_var(--gold)] p-6 flex flex-col items-center"
+              style={{
+                width: "min(90vw, 480px)",
+                height: "min(90vh, 740px)",
+                transform: zc.reversed ? "rotate(180deg)" : undefined,
+              }}
+            >
+              <div className="text-xs uppercase tracking-[0.4em] text-gold/70">
+                {zc.card.arcana === "major" ? "Major Arcana" : zc.card.suit}
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-[10rem] leading-none">{glyphFor(zc.card)}</div>
+              </div>
+              <div className="font-display text-3xl gold-text text-center">
+                {zc.card.name}
+              </div>
+              {zc.reversed && (
+                <div className="mt-2 text-[10px] uppercase tracking-[0.4em] text-gold/60">
+                  Reversed
+                </div>
+              )}
+              <div className="mt-4 text-xs text-pearl/70 text-center max-w-md leading-relaxed">
+                {(zc.reversed ? zc.card.keywordsReversed : zc.card.keywords).join(" · ")}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
