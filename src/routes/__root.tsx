@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Sidebar, BottomNav } from "@/components/nav";
 import { StarField } from "@/components/star-field";
+import { useBackgroundImage } from "@/hooks/use-background-image";
 
 function NotFoundComponent() {
   return (
