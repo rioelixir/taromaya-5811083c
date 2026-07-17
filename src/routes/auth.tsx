@@ -10,6 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — TAROMAYA" }] }),
 });
 
+const ADMIN_EMAILS = ["tarotbyriaa@gmail.com", "taromayaexperts@gmail.com"];
+const isAdminEmail = (email?: string | null) =>
+  !!email && ADMIN_EMAILS.includes(email.toLowerCase());
+
 async function markTermsAccepted(userId: string) {
   await supabase
     .from("profiles")
@@ -21,6 +25,10 @@ async function routeAfterAuth(navigate: ReturnType<typeof useNavigate>) {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
   if (!user) return;
+  if (isAdminEmail(user.email)) {
+    navigate({ to: "/" });
+    return;
+  }
   const { data: profile } = await supabase
     .from("profiles")
     .select("terms_accepted_at")
@@ -50,7 +58,8 @@ function AuthPage() {
   const onEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setMsg(null);
-    if (mode === "signup" && !agree) {
+    const signingUpAsAdmin = mode === "signup" && isAdminEmail(email);
+    if (mode === "signup" && !agree && !signingUpAsAdmin) {
       setErr("Please read and agree to the Terms & Conditions to continue.");
       return;
     }
@@ -86,9 +95,12 @@ function AuthPage() {
     }
   };
 
+  const adminSignup = mode === "signup" && isAdminEmail(email);
+  const needsAgreement = mode === "signup" && !adminSignup;
+
   const onGoogle = async () => {
     setErr(null);
-    if (mode === "signup" && !agree) {
+    if (needsAgreement && !agree) {
       setErr("Please agree to the Terms & Conditions before continuing with Google.");
       return;
     }
@@ -140,7 +152,7 @@ function AuthPage() {
               className={inputCls}
             />
 
-            {mode === "signup" && (
+            {needsAgreement && (
               <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -162,7 +174,7 @@ function AuthPage() {
             {msg && <div className="text-xs text-aurora bg-aurora/10 border border-aurora/20 rounded-lg px-3 py-2">{msg}</div>}
 
             <button
-              disabled={loading || (mode === "signup" && !agree)}
+              disabled={loading || (needsAgreement && !agree)}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
@@ -176,7 +188,7 @@ function AuthPage() {
 
           <button
             onClick={onGoogle}
-            disabled={mode === "signup" && !agree}
+            disabled={needsAgreement && !agree}
             className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-pearl hover:bg-white/10 flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <GoogleIcon /> Continue with Google
