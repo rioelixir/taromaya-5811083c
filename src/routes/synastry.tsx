@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,7 +11,7 @@ import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles, Heart } from "lucide-react";
 
 export const Route = createFileRoute("/synastry")({
-  component: SynastryPage,
+  component: () => (<PremiumGate featureName="Synastry"><SynastryPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Synastry — TAROMAYA" },

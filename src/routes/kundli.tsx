@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, type ReactNode } from "react";
@@ -25,7 +26,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/kundli")({
-  component: KundliPage,
+  component: () => (<PremiumGate featureName="Kundli"><KundliPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Kundli — TAROMAYA" },

@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import jsPDF from "jspdf";
@@ -8,7 +9,7 @@ import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { FileText, Download, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
-  component: ReportsPage,
+  component: () => (<PremiumGate featureName="Reports"><ReportsPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Premium Reports — TAROMAYA" },
