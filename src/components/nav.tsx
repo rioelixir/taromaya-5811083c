@@ -48,9 +48,9 @@ const groups: Group[] = [
   {
     label: "Advanced",
     items: [
-      { to: "/astrology", label: "Transits", icon: LineChart },
-      { to: "/astrology", label: "Progressions", icon: Compass },
-      { to: "/astrology", label: "Charts", icon: Stars },
+      { to: "/transits", label: "Transits", icon: LineChart },
+      { to: "/synastry", label: "Synastry", icon: Compass },
+      { to: "/astrology", label: "Natal Chart", icon: Stars },
       { to: "/reports", label: "Reports", icon: FileText },
     ],
   },

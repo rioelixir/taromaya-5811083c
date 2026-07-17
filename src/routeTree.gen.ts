@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
@@ -30,9 +32,19 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 
+const TransitsRoute = TransitsRouteImport.update({
+  id: '/transits',
+  path: '/transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SynastryRoute = SynastryRouteImport.update({
+  id: '/synastry',
+  path: '/synastry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -148,7 +160,9 @@ export interface FileRoutesByFullPath {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/transits': typeof TransitsRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRoutesByTo {
@@ -169,7 +183,9 @@ export interface FileRoutesByTo {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/transits': typeof TransitsRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRoutesById {
@@ -192,7 +208,9 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/transits': typeof TransitsRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRouteTypes {
@@ -215,7 +233,9 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/synastry'
     | '/tarot'
+    | '/transits'
     | '/saved'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -236,7 +256,9 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/synastry'
     | '/tarot'
+    | '/transits'
     | '/saved'
   id:
     | '__root__'
@@ -258,7 +280,9 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/synastry'
     | '/tarot'
+    | '/transits'
     | '/_authenticated/saved'
   fileRoutesById: FileRoutesById
 }
@@ -281,16 +305,32 @@ export interface RootRouteChildren {
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
+  TransitsRoute: typeof TransitsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transits': {
+      id: '/transits'
+      path: '/transits'
+      fullPath: '/transits'
+      preLoaderRoute: typeof TransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tarot': {
       id: '/tarot'
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/synastry': {
+      id: '/synastry'
+      path: '/synastry'
+      fullPath: '/synastry'
+      preLoaderRoute: typeof SynastryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -459,7 +499,9 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
+  TransitsRoute: TransitsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
