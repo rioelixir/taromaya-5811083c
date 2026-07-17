@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-admin";
+import { Shield } from "lucide-react";
 
 type Item = { to: string; label: string; icon: typeof Sparkles };
 type Group = { label: string; items: Item[]; defaultOpen?: boolean };

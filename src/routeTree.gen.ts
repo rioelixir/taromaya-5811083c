@@ -34,6 +34,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const TransitsRoute = TransitsRouteImport.update({
   id: '/transits',
@@ -159,6 +160,11 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/transits': typeof TransitsRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRoutesByTo {
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/transits': typeof TransitsRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRoutesById {
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/transits': typeof TransitsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
 }
 export interface FileRouteTypes {
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/transits'
+    | '/admin'
     | '/saved'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/transits'
+    | '/admin'
     | '/saved'
   id:
     | '__root__'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/transits'
+    | '/_authenticated/admin'
     | '/_authenticated/saved'
   fileRoutesById: FileRoutesById
 }
@@ -526,14 +538,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
