@@ -142,6 +142,7 @@ export function Sidebar() {
           {groups.map((g) => (
             <NavGroup key={g.label} group={g} pathname={pathname} />
           ))}
+          <AdminNavGroup pathname={pathname} />
         </nav>
 
         <AuthFooter />
