@@ -54,6 +54,7 @@ function TarotPage() {
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [zoomedUid, setZoomedUid] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
