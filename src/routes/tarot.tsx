@@ -329,6 +329,13 @@ function TarotPage() {
             className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
           />
           <button
+            onClick={shuffleAll}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+            title="Shuffle every visible deck"
+          >
+            <Shuffle className="h-4 w-4" /> Shuffle All
+          </button>
+          <button
             onClick={resetSpread}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
           >
@@ -346,8 +353,8 @@ function TarotPage() {
 
         <div className="mt-2 text-xs text-muted-foreground">
           {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you want.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} into the glowing slot${spread.positions.length > 1 ? "s" : ""}.`}
+            ? `${spread.blurb} Drop as many cards as you want — they snap to a clean grid.`
+            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} anywhere on the board; they snap into place.`}
         </div>
       </div>
 
