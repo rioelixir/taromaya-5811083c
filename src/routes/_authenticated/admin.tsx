@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "plan" | "subs" | "settings" | "kundlis";
+type Tab = "overview" | "users" | "plan" | "subs" | "settings" | "kundlis" | "assets";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
