@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -5,7 +6,7 @@ import { ACTIVITIES, scanMuhurats, type Activity, type MuhuratWindow } from "@/l
 import { Sparkles, CalendarClock, AlertTriangle, CheckCircle2, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/muhurat")({
-  component: MuhuratPage,
+  component: () => (<PremiumGate featureName="Muhurat"><MuhuratPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Muhurat Finder — TAROMAYA" },

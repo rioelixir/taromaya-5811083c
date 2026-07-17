@@ -1,9 +1,10 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { Send, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
 
 export const Route = createFileRoute("/ai")({
-  component: AiPage,
+  component: () => (<PremiumGate featureName="Ai"><AiPage /></PremiumGate>),
   head: () => ({ meta: [{ title: "AI Guide — TAROMAYA" }] }),
 });
 

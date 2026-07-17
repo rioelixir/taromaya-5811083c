@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -5,7 +6,7 @@ import { computePanchang, fmtTime, fmtRange, todaysFestivals } from "@/lib/panch
 import { Sun, Moon, Clock, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/panchang")({
-  component: PanchangPage,
+  component: () => (<PremiumGate featureName="Panchang"><PanchangPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Panchang — TAROMAYA" },
