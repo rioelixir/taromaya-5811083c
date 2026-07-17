@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,7 +11,7 @@ import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/transits")({
-  component: TransitsPage,
+  component: () => (<PremiumGate featureName="Transits"><TransitsPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Transits — TAROMAYA" },
