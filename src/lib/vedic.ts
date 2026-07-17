@@ -104,7 +104,9 @@ function meanNodeTropical(date: Date): number {
 }
 
 function tropicalLongitude(body: A.Body, date: Date): number {
-  return norm360(A.EclipticLongitude(body, date));
+  // Apparent geocentric ecliptic longitude (J2000 mean ecliptic).
+  const vec = A.GeoVector(body, date, true);
+  return norm360(A.Ecliptic(vec).elon);
 }
 
 function toParts(sidereal: number) {
