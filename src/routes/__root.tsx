@@ -154,7 +154,13 @@ function RootComponent() {
           if (!isPublic) router.navigate({ to: "/auth" });
           return;
         }
-        // Signed in — verify terms acceptance.
+        // Signed in — admins bypass terms acceptance.
+        const { data: isAdmin } = await supabase.rpc("has_role", {
+          _user_id: user.id,
+          _role: "admin",
+        });
+        if (isAdmin) return;
+        // Verify terms acceptance for non-admins.
         const { data: profile } = await supabase
           .from("profiles")
           .select("terms_accepted_at")
