@@ -66,10 +66,13 @@ function NumerologyPage() {
   );
 }
 
-function PersonalNumerology() {
-  const [fullName, setFullName] = useState("");
-  const [birthDate, setBirthDate] = useState("1995-06-15");
-  const [system, setSystem] = useState<"Pythagorean" | "Chaldean">("Pythagorean");
+function PersonalNumerology({
+  fullName, setFullName, birthDate, setBirthDate, system, setSystem,
+}: {
+  fullName: string; setFullName: (s: string) => void;
+  birthDate: string; setBirthDate: (s: string) => void;
+  system: "Pythagorean" | "Chaldean"; setSystem: (s: "Pythagorean" | "Chaldean") => void;
+}) {
   const [aiText, setAiText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const ai = useServerFn(aiReading);
