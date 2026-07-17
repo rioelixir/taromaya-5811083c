@@ -184,12 +184,12 @@ function PricingPage() {
             </div>
           </div>
 
-          <GlassCard title="What's free" desc="You can always use these without a subscription.">
+          <GlassCard title="Members-only access" desc="TAROMAYA is a premium membership. All modules unlock with your subscription.">
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Daily tarot pull & basic spreads</li>
-              <li>• Today's Panchang</li>
-              <li>• Basic horoscope</li>
-              <li>• Numerology core numbers</li>
+              <li>• Full tarot canvas & AI interpretations</li>
+              <li>• Complete Vedic Kundli & divisional charts</li>
+              <li>• Western natal, transits, synastry & progressions</li>
+              <li>• Panchang, Muhurat, Numerology, Remedies & PDF reports</li>
             </ul>
             <div className="mt-6 text-xs text-muted-foreground">
               Already a member?{" "}
