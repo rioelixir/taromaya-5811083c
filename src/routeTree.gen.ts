@@ -16,6 +16,7 @@ import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as AstrologyRouteImport } from './routes/astrology'
+import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TarotRoute = TarotRouteImport.update({
@@ -53,6 +54,11 @@ const AstrologyRoute = AstrologyRouteImport.update({
   path: '/astrology',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiRoute = AiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -61,6 +67,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/compatibility': typeof CompatibilityRoute
   '/horoscope': typeof HoroscopeRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai'
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai'
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai'
     | '/astrology'
     | '/compatibility'
     | '/horoscope'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiRoute: typeof AiRoute
   AstrologyRoute: typeof AstrologyRoute
   CompatibilityRoute: typeof CompatibilityRoute
   HoroscopeRoute: typeof HoroscopeRoute
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AstrologyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai': {
+      id: '/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiRoute: AiRoute,
   AstrologyRoute: AstrologyRoute,
   CompatibilityRoute: CompatibilityRoute,
   HoroscopeRoute: HoroscopeRoute,
