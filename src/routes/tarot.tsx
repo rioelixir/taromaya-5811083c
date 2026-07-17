@@ -371,28 +371,6 @@ function TarotPage() {
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
 
-          {/* Slots */}
-          {slots.map((s) => {
-            const taken = placed.some((p) => p.slotIndex === s.index && p.locked);
-            return (
-              <div
-                key={s.index}
-                className={`absolute rounded-2xl border-2 border-dashed flex items-end justify-center pb-2 transition-all ${
-                  taken
-                    ? "border-gold/0"
-                    : "border-gold/40 bg-gold/[0.03] shadow-[0_0_40px_-16px_var(--gold)]"
-                }`}
-                style={{ left: s.x, top: s.y, width: CARD_W, height: CARD_H }}
-              >
-                {!taken && (
-                  <div className="text-[10px] uppercase tracking-widest text-gold/70">
-                    {s.label}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
           {/* Placed cards */}
           {placed.map((p) => (
             <PlacedCardView
@@ -406,9 +384,6 @@ function TarotPage() {
               }
               onRemove={() => removeCard(p.uid)}
               onZoom={() => p.flipped && setZoomedUid(p.uid)}
-              slotLabel={
-                p.slotIndex !== null && !isFreestyle ? spread.positions[p.slotIndex] : undefined
-              }
             />
           ))}
 
