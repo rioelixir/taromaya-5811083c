@@ -199,7 +199,7 @@ const DEBILITATION: Partial<Record<PlanetKey, number>> = {
   Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0,
 };
 
-export function prioritiseRemedies(chart: VedicChart): RemedyPriority[] {
+export function prioritiseRemedies(chart: KundliChart): RemedyPriority[] {
   const asc = chart.ascendant.rashi;
   const scored: RemedyPriority[] = [];
   for (const p of chart.planets) {
@@ -210,11 +210,10 @@ export function prioritiseRemedies(chart: VedicChart): RemedyPriority[] {
     if (p.retrograde) { s += 1; reasons.push("Retrograde"); }
     if (DEBILITATION[p.name as PlanetKey] === p.rashi) { s += 3; reasons.push("Debilitated"); }
     if (p.name === "Sun") {
-      // combust check: any planet (except moon/rahu/ketu) within 8° of Sun
-      const sunLon = chart.planets.find(x => x.name === "Sun")?.longitude ?? 0;
-      const nearSun = chart.planets.filter(x => x.name !== "Sun" && x.name !== "Moon" && x.name !== "Rahu" && x.name !== "Ketu"
+      const sunLon = chart.planets.find((x: Planet) => x.name === "Sun")?.longitude ?? 0;
+      const nearSun = chart.planets.filter((x: Planet) => x.name !== "Sun" && x.name !== "Moon" && x.name !== "Rahu" && x.name !== "Ketu"
         && Math.abs(((x.longitude - sunLon + 540) % 360) - 180) > 172);
-      if (nearSun.length) { /* only reason for the combusted planets, not sun itself */ }
+      if (nearSun.length) { /* combusted planets handled elsewhere */ }
     }
     scored.push({ planet: p.name as PlanetKey, score: s, reasons });
   }
