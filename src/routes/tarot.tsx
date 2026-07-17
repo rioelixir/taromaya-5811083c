@@ -236,9 +236,10 @@ function ShuffleDeck() {
 function CardReveal({ drawn, index }: { drawn: DrawnCard; index: number }) {
   const [flipped, setFlipped] = useState(false);
   // Auto-flip in sequence
-  useState(() => {
-    setTimeout(() => setFlipped(true), 300 + index * 220);
-  });
+  useEffect(() => {
+    const t = setTimeout(() => setFlipped(true), 300 + index * 220);
+    return () => clearTimeout(t);
+  }, [index]);
   return (
     <div className="flex flex-col items-center">
       <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
@@ -308,7 +309,7 @@ function glyphFor(card: { arcana: string; suit?: string }) {
 function ReadingMarkdown({ text }: { text: string }) {
   // Lightweight markdown: headings (###), paragraphs, bold.
   const lines = text.split("\n");
-  const out: React.ReactNode[] = [];
+  const out: ReactNode[] = [];
   let para: string[] = [];
   const flush = (key: number) => {
     if (para.length) {
