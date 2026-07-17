@@ -10,6 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — TAROMAYA" }] }),
 });
 
+const ADMIN_EMAILS = ["tarotbyriaa@gmail.com", "taromayaexperts@gmail.com"];
+const isAdminEmail = (email?: string | null) =>
+  !!email && ADMIN_EMAILS.includes(email.toLowerCase());
+
 async function markTermsAccepted(userId: string) {
   await supabase
     .from("profiles")
@@ -21,6 +25,10 @@ async function routeAfterAuth(navigate: ReturnType<typeof useNavigate>) {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
   if (!user) return;
+  if (isAdminEmail(user.email)) {
+    navigate({ to: "/" });
+    return;
+  }
   const { data: profile } = await supabase
     .from("profiles")
     .select("terms_accepted_at")
