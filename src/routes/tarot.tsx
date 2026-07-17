@@ -539,14 +539,12 @@ function PlacedCardView({
   onFlip,
   onRemove,
   onZoom,
-  slotLabel,
 }: {
   card: PlacedCard;
   onPointerDown: (e: React.PointerEvent) => void;
   onFlip: () => void;
   onRemove: () => void;
   onZoom: () => void;
-  slotLabel?: string;
 }) {
   return (
     <div
