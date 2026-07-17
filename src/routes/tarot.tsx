@@ -272,7 +272,7 @@ function TarotPage() {
       <StarField />
 
       {/* Top control bar */}
-      <div className="relative z-20 mx-auto max-w-6xl px-4 sm:px-6 pt-6">
+      <div className="relative z-20 w-full px-4 sm:px-6 pt-6">
         <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
         <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Your Sacred Canvas</h1>
 
@@ -327,7 +327,7 @@ function TarotPage() {
       </div>
 
       {/* Canvas */}
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-40">
+      <div className="relative z-10 w-full px-4 sm:px-6 pt-6 pb-40">
         <div
           ref={canvasRef}
           onPointerMove={onPointerMove}
