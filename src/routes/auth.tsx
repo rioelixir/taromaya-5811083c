@@ -95,8 +95,7 @@ function AuthPage() {
     }
   };
 
-  const adminSignup = mode === "signup" && isAdminEmail(email);
-  const needsAgreement = mode === "signup" && !adminSignup;
+  const needsAgreement = mode === "signup";
 
   const onGoogle = async () => {
     setErr(null);
