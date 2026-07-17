@@ -62,12 +62,16 @@ function AdminPage() {
       <div className="mb-6 flex flex-wrap gap-2">
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
+        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plan & Price</TabBtn>
+        <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
       </div>
 
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
+      {tab === "plan" && <PlanTab />}
+      {tab === "subs" && <SubscriptionsTab />}
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
     </PageShell>
