@@ -46,12 +46,15 @@ const SCORE_KEYS = ["Love","Career","Health","Wealth","Emotions","Luck"] as cons
 function HoroscopePage() {
   const [period, setPeriod] = useState<Period>("Daily");
   const [sign, setSign] = useState<string | null>(null);
-  const [aiText, setAiText] = useState<string | null>(null);
+  const [readings, setReadings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [batchLoading, setBatchLoading] = useState<string | null>(null);
   const [showChinese, setShowChinese] = useState(false);
 
   const ai = useServerFn(aiReading);
   const today = useMemo(() => new Date(), []);
+
+  const cacheKey = (s: string, p: Period) => `${p}-${s}-${today.toDateString()}`;
 
   const luck = (s: string) => {
     const seed = seedFor(s, period, today);
@@ -67,22 +70,40 @@ function HoroscopePage() {
     };
   };
 
-  const generateReading = async (s: string) => {
-    setSign(s); setAiText(null); setLoading(true);
-    try {
-      const l = luck(s);
-      const res = await ai({
-        data: {
-          system: "You are a poetic modern astrologer. Write elegant, uplifting, specific horoscopes. Markdown allowed. Never hedged.",
-          prompt: `Write the ${period.toLowerCase()} horoscope for ${s} for ${today.toDateString()}.
+  const generateFor = async (s: string): Promise<string> => {
+    const key = cacheKey(s, period);
+    if (readings[key]) return readings[key];
+    const l = luck(s);
+    const res = await ai({
+      data: {
+        system: "You are a poetic modern astrologer. Write elegant, uplifting, specific horoscopes. Markdown allowed. Never hedged.",
+        prompt: `Write the ${period.toLowerCase()} horoscope for ${s} for ${today.toDateString()}.
 Include sections: Overview, Love & Relationships, Career & Money, Health & Wellbeing, Guidance.
 Reference: lucky number ${l.luckyNumber}, colour ${l.luckyColor}, direction ${l.direction}.
 About 350 words.`,
-        },
-      });
-      setAiText(res.text);
-    } finally { setLoading(false); }
+      },
+    });
+    setReadings((prev) => ({ ...prev, [key]: res.text }));
+    return res.text;
   };
+
+  const generateReading = async (s: string) => {
+    setSign(s); setLoading(true);
+    try { await generateFor(s); } finally { setLoading(false); }
+  };
+
+  const generateAll = async () => {
+    setBatchLoading("all");
+    try {
+      for (const s of SIGN_NAMES) {
+        setBatchLoading(s);
+        await generateFor(s);
+      }
+    } finally { setBatchLoading(null); }
+  };
+
+  const currentReading = sign ? readings[cacheKey(sign, period)] : null;
+
 
   return (
     <PageShell
@@ -105,6 +126,15 @@ About 350 words.`,
           ))}
         </div>
         <button
+          onClick={generateAll}
+          disabled={batchLoading !== null}
+          className="rounded-full bg-gradient-to-r from-gold to-gold-soft text-primary-foreground px-4 py-2 text-xs uppercase tracking-widest inline-flex items-center gap-2 disabled:opacity-60"
+        >
+          {batchLoading
+            ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {batchLoading === "all" ? "Starting…" : batchLoading}</>
+            : <><Sparkles className="w-3.5 h-3.5" /> Generate all 12</>}
+        </button>
+        <button
           onClick={() => setShowChinese(!showChinese)}
           className={`ml-auto rounded-full px-4 py-2 text-xs uppercase tracking-widest ${showChinese ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"}`}
         >
@@ -112,15 +142,17 @@ About 350 words.`,
         </button>
       </div>
 
+
       {!showChinese ? (
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {SIGN_NAMES.map((s, i) => {
             const l = luck(s);
+            const cached = !!readings[cacheKey(s, period)];
             return (
               <button
                 key={s}
                 onClick={() => generateReading(s)}
-                className="glass rounded-2xl p-5 text-left transition-transform hover:-translate-y-0.5 hover:bg-white/[0.06]"
+                className={`glass rounded-2xl p-5 text-left transition-transform hover:-translate-y-0.5 hover:bg-white/[0.06] ${cached ? "gold-border" : ""}`}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -169,8 +201,8 @@ About 350 words.`,
                 <Loader2 className="w-4 h-4 animate-spin" /> Aligning the stars…
               </div>
             )}
-            {aiText && (
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{aiText}</div>
+            {currentReading && (
+              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{currentReading}</div>
             )}
           </GlassCard>
         </div>
