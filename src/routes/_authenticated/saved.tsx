@@ -81,9 +81,6 @@ function SavedPage() {
             </div>
             <Link
               to="/kundli"
-              search={{
-                load: k.id,
-              } as never}
               className="mt-4 inline-flex items-center gap-2 text-xs text-gold hover:underline"
             >
               Open chart <Sparkles className="h-3 w-3" />
