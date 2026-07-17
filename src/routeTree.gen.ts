@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransitsRouteImport } from './routes/transits'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -40,6 +41,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 const TransitsRoute = TransitsRouteImport.update({
   id: '/transits',
   path: '/transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TarotRoute = TarotRouteImport.update({
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
+  '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/admin'
     | '/saved'
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/admin'
     | '/saved'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/synastry'
     | '/tarot'
+    | '/terms'
     | '/transits'
     | '/_authenticated/admin'
     | '/_authenticated/saved'
@@ -371,6 +383,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
+  TermsRoute: typeof TermsRoute
   TransitsRoute: typeof TransitsRoute
 }
 
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       path: '/transits'
       fullPath: '/transits'
       preLoaderRoute: typeof TransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tarot': {
@@ -606,6 +626,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
+  TermsRoute: TermsRoute,
   TransitsRoute: TransitsRoute,
 }
 export const routeTree = rootRouteImport
