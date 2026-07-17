@@ -268,7 +268,7 @@ function TarotPage() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
 
       {/* Top control bar */}
