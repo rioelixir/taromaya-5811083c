@@ -112,7 +112,7 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDeck(shuffledDeck());
+    setDecks(makeDecks());
   }, []);
 
   // Switch spread — clear the board
