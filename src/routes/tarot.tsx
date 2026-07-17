@@ -392,47 +392,70 @@ function TarotPage() {
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
               Decks · {decks.reduce((n, d) => n + d.length, 0)} cards
             </div>
-            <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2">
+            <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
               {decks.map((subDeck, di) => {
                 const empty = subDeck.length === 0;
+                const meta = DECK_META[di % DECK_META.length];
                 return (
                   <div
                     key={di}
-                    className="relative"
-                    style={{ width: MINI_W, height: MINI_H }}
+                    className="relative flex flex-col items-center"
+                    style={{ width: MINI_W }}
                   >
-                    {[0, 1, 2].map((i) => {
-                      const isTop = i === 0 && !empty;
-                      const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
-                      return (
-                        <div
-                          key={i}
-                          onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
-                          className={`absolute inset-0 rounded-xl border ${
-                            empty
-                              ? "border-white/10 bg-black/30"
-                              : "border-gold/40 bg-gradient-to-br from-midnight to-cosmic shadow-luxe"
-                          } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
-                          style={{
-                            transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
-                            zIndex: 10 - i,
-                          }}
-                        >
-                          {!empty && (
-                            <div className="absolute inset-1.5 rounded-lg border border-gold/20 flex items-center justify-center">
-                              <div className="text-gold/70 font-display text-lg">✦</div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                    <div className="absolute -bottom-4 inset-x-0 text-center text-[9px] text-muted-foreground">
+                    <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
+                      {[0, 1, 2].map((i) => {
+                        const isTop = i === 0 && !empty;
+                        const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
+                        return (
+                          <div
+                            key={i}
+                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
+                            className={`absolute inset-0 rounded-xl border ${
+                              empty
+                                ? "border-white/10 bg-black/30"
+                                : "bg-gradient-to-br from-midnight to-cosmic"
+                            } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
+                            style={{
+                              transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
+                              zIndex: 10 - i,
+                              borderColor: empty ? undefined : `${meta.accent}66`,
+                              boxShadow: empty || !isTop ? undefined : `0 8px 32px -12px ${meta.accent}80, inset 0 0 24px -12px ${meta.accent}`,
+                            }}
+                          >
+                            {!empty && (
+                              <div
+                                className="absolute inset-1.5 rounded-lg border flex items-center justify-center"
+                                style={{ borderColor: `${meta.accent}40` }}
+                              >
+                                <div
+                                  className="font-display text-lg"
+                                  style={{ color: `${meta.accent}` }}
+                                >
+                                  {meta.glyph}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium"
+                      style={{ color: meta.accent }}
+                    >
+                      {meta.name}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground leading-none">
                       {subDeck.length}
                     </div>
                   </div>
                 );
               })}
             </div>
+            <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
+              Drag from any deck onto the canvas
+            </div>
+          </div>
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-3">
               Drag from any deck onto the canvas
             </div>
