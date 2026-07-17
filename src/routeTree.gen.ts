@@ -33,6 +33,7 @@ import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as AiRouteImport } from './routes/ai'
+import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
@@ -158,6 +159,11 @@ const AiRoute = AiRouteImport.update({
   path: '/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcceptTermsRoute = AcceptTermsRouteImport.update({
+  id: '/accept-terms',
+  path: '/accept-terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -180,6 +186,7 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/accept-terms'
     | '/ai'
     | '/astrology'
     | '/auth'
@@ -361,6 +373,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AcceptTermsRoute: typeof AcceptTermsRoute
   AiRoute: typeof AiRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accept-terms': {
+      id: '/accept-terms'
+      path: '/accept-terms'
+      fullPath: '/accept-terms'
+      preLoaderRoute: typeof AcceptTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -604,6 +624,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AcceptTermsRoute: AcceptTermsRoute,
   AiRoute: AiRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
