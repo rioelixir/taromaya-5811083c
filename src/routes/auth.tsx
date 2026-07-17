@@ -95,9 +95,12 @@ function AuthPage() {
     }
   };
 
+  const adminSignup = mode === "signup" && isAdminEmail(email);
+  const needsAgreement = mode === "signup" && !adminSignup;
+
   const onGoogle = async () => {
     setErr(null);
-    if (mode === "signup" && !agree) {
+    if (needsAgreement && !agree) {
       setErr("Please agree to the Terms & Conditions before continuing with Google.");
       return;
     }
