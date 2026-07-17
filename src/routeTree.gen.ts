@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KundliRoute = KundliRouteImport.update({
+  id: '/kundli',
+  path: '/kundli',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AstrologyRoute = AstrologyRouteImport.update({
@@ -32,30 +38,34 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
+  '/kundli': typeof KundliRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
+  '/kundli': typeof KundliRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/astrology': typeof AstrologyRoute
+  '/kundli': typeof KundliRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/astrology' | '/tarot'
+  fullPaths: '/' | '/astrology' | '/kundli' | '/tarot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/astrology' | '/tarot'
-  id: '__root__' | '/' | '/astrology' | '/tarot'
+  to: '/' | '/astrology' | '/kundli' | '/tarot'
+  id: '__root__' | '/' | '/astrology' | '/kundli' | '/tarot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AstrologyRoute: typeof AstrologyRoute
+  KundliRoute: typeof KundliRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kundli': {
+      id: '/kundli'
+      path: '/kundli'
+      fullPath: '/kundli'
+      preLoaderRoute: typeof KundliRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/astrology': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AstrologyRoute: AstrologyRoute,
+  KundliRoute: KundliRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
