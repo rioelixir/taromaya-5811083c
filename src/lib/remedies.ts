@@ -2,7 +2,7 @@
 // Deterministic per-planet catalogue; combined with a chart's weak/afflicted planets to
 // produce a personalised remedy dossier.
 
-import type { VedicChart } from "./vedic";
+import type { KundliChart, Planet } from "./vedic";
 
 export type PlanetKey =
   | "Sun" | "Moon" | "Mars" | "Mercury" | "Jupiter"
