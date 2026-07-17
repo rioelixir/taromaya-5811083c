@@ -452,12 +452,14 @@ function PlacedCardView({
   onPointerDown,
   onFlip,
   onRemove,
+  onZoom,
   slotLabel,
 }: {
   card: PlacedCard;
   onPointerDown: (e: React.PointerEvent) => void;
   onFlip: () => void;
   onRemove: () => void;
+  onZoom: () => void;
   slotLabel?: string;
 }) {
   return (
@@ -467,7 +469,10 @@ function PlacedCardView({
     >
       <div
         onPointerDown={onPointerDown}
-        className={`relative w-full h-full ${card.locked ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"}`}
+        onClick={() => {
+          if (card.flipped && card.locked) onZoom();
+        }}
+        className={`relative w-full h-full ${card.locked ? "cursor-zoom-in" : "cursor-grab active:cursor-grabbing"}`}
         style={{ perspective: "1000px" }}
       >
         <div
