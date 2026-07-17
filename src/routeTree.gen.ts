@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AstrologyRoute = AstrologyRouteImport.update({
+  id: '/astrology',
+  path: '/astrology',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/astrology': typeof AstrologyRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/astrology': typeof AstrologyRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/astrology': typeof AstrologyRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tarot'
+  fullPaths: '/' | '/astrology' | '/tarot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tarot'
-  id: '__root__' | '/' | '/tarot'
+  to: '/' | '/astrology' | '/tarot'
+  id: '__root__' | '/' | '/astrology' | '/tarot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AstrologyRoute: typeof AstrologyRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/astrology': {
+      id: '/astrology'
+      path: '/astrology'
+      fullPath: '/astrology'
+      preLoaderRoute: typeof AstrologyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AstrologyRoute: AstrologyRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
