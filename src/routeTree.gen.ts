@@ -15,6 +15,7 @@ import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
@@ -61,6 +62,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RemediesRoute = RemediesRouteImport.update({
+  id: '/remedies',
+  path: '/remedies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressionsRoute = ProgressionsRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/progressions'
+    | '/remedies'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
   ProgressionsRoute: typeof ProgressionsRoute
+  RemediesRoute: typeof RemediesRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/remedies': {
+      id: '/remedies'
+      path: '/remedies'
+      fullPath: '/remedies'
+      preLoaderRoute: typeof RemediesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progressions': {
@@ -517,6 +537,7 @@ const rootRouteChildren: RootRouteChildren = {
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
   ProgressionsRoute: ProgressionsRoute,
+  RemediesRoute: RemediesRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
