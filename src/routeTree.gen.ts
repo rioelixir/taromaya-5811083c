@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as LearnRouteImport } from './routes/learn'
@@ -24,6 +25,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PanchangRoute = PanchangRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/learn': typeof LearnRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/reports': typeof ReportsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/reports': typeof ReportsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/learn': typeof LearnRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/reports': typeof ReportsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/numerology'
     | '/panchang'
+    | '/reports'
     | '/tarot'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/numerology'
     | '/panchang'
+    | '/reports'
     | '/tarot'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/numerology'
     | '/panchang'
+    | '/reports'
     | '/tarot'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   LearnRoute: typeof LearnRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
+  ReportsRoute: typeof ReportsRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/panchang': {
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnRoute: LearnRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
+  ReportsRoute: ReportsRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
