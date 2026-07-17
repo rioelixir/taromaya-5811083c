@@ -3,7 +3,7 @@ import { useState } from "react";
 import jsPDF from "jspdf";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
-import { computePersonalNumerology } from "@/lib/numerology";
+import { computeNumerology } from "@/lib/numerology";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { FileText, Download, Loader2 } from "lucide-react";
 
