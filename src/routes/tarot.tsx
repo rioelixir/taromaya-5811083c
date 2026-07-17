@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { SPREADS, shuffleAndDraw, type DrawnCard } from "@/lib/tarot-deck";
 import { interpretTarot } from "@/lib/tarot.functions";
