@@ -152,7 +152,7 @@ function AuthPage() {
               className={inputCls}
             />
 
-            {mode === "signup" && (
+            {needsAgreement && (
               <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-3 cursor-pointer">
                 <input
                   type="checkbox"
