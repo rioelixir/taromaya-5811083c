@@ -8,9 +8,7 @@ import {
   Hash,
   Heart,
   Bot,
-  ArrowRight,
   Flame,
-  Compass,
 } from "lucide-react";
 import { StarField } from "@/components/star-field";
 
@@ -36,7 +34,6 @@ function Home() {
         <Hero />
         <QuickGrid />
         <TodayGrid />
-        <ModulesGrid />
       </div>
     </div>
   );
