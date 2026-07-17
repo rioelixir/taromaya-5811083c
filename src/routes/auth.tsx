@@ -59,8 +59,7 @@ function AuthPage() {
   const onEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setMsg(null);
-    const signingUpAsAdmin = mode === "signup" && isAdminEmail(email);
-    if (mode === "signup" && !agree && !signingUpAsAdmin) {
+    if (mode === "signup" && !agree) {
       setErr("Please read and agree to the Terms & Conditions to continue.");
       return;
     }
