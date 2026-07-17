@@ -23,8 +23,11 @@ function AcceptTerms() {
         navigate({ to: "/auth" });
         return;
       }
-      const email = data.user.email?.toLowerCase();
-      if (email === "tarotbyriaa@gmail.com" || email === "taromayaexperts@gmail.com") {
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: data.user.id,
+        _role: "admin",
+      });
+      if (isAdmin) {
         navigate({ to: "/" });
         return;
       }

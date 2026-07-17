@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X } from "lucide-react";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon } from "lucide-react";
+import { AdminAssetsTab } from "@/components/admin-assets";
 import {
   adminListUsers,
   adminGrantRole,
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "plan" | "subs" | "settings" | "kundlis";
+type Tab = "overview" | "users" | "plan" | "subs" | "settings" | "kundlis" | "assets";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
@@ -66,6 +67,7 @@ function AdminPage() {
         <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
+        <TabBtn active={tab === "assets"} onClick={() => setTab("assets")} icon={<ImageIcon className="h-4 w-4" />}>Assets</TabBtn>
       </div>
 
       {tab === "overview" && <OverviewTab />}
@@ -74,6 +76,7 @@ function AdminPage() {
       {tab === "subs" && <SubscriptionsTab />}
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
+      {tab === "assets" && <AdminAssetsTab />}
     </PageShell>
   );
 }

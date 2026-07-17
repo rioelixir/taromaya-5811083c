@@ -10,9 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — TAROMAYA" }] }),
 });
 
-const ADMIN_EMAILS = ["tarotbyriaa@gmail.com", "taromayaexperts@gmail.com"];
-const isAdminEmail = (email?: string | null) =>
-  !!email && ADMIN_EMAILS.includes(email.toLowerCase());
+async function checkIsAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  return !!data;
+}
 
 async function markTermsAccepted(userId: string) {
   await supabase
@@ -25,7 +26,7 @@ async function routeAfterAuth(navigate: ReturnType<typeof useNavigate>) {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
   if (!user) return;
-  if (isAdminEmail(user.email)) {
+  if (await checkIsAdmin(user.id)) {
     navigate({ to: "/" });
     return;
   }
@@ -58,8 +59,7 @@ function AuthPage() {
   const onEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setMsg(null);
-    const signingUpAsAdmin = mode === "signup" && isAdminEmail(email);
-    if (mode === "signup" && !agree && !signingUpAsAdmin) {
+    if (mode === "signup" && !agree) {
       setErr("Please read and agree to the Terms & Conditions to continue.");
       return;
     }
@@ -95,8 +95,7 @@ function AuthPage() {
     }
   };
 
-  const adminSignup = mode === "signup" && isAdminEmail(email);
-  const needsAgreement = mode === "signup" && !adminSignup;
+  const needsAgreement = mode === "signup";
 
   const onGoogle = async () => {
     setErr(null);

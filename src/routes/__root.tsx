@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Sidebar, BottomNav } from "@/components/nav";
 import { StarField } from "@/components/star-field";
+import { useBackgroundImage } from "@/hooks/use-background-image";
 
 function NotFoundComponent() {
   return (
@@ -186,8 +187,19 @@ function RootComponent() {
     return () => { mounted = false; unsub?.(); };
   }, [router, queryClient]);
 
+  const bgUrl = useBackgroundImage();
+
   return (
     <QueryClientProvider client={queryClient}>
+      {bgUrl && (
+        <div
+          aria-hidden
+          className="fixed inset-0 -z-10 bg-cover bg-center opacity-70"
+          style={{ backgroundImage: `url(${bgUrl})` }}
+        >
+          <div className="absolute inset-0 bg-cosmic/70" />
+        </div>
+      )}
       <div className="relative min-h-dvh">
         <Sidebar />
         <div className="lg:pl-64">
