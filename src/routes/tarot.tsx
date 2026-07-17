@@ -4,7 +4,15 @@ import { useState, useRef, useEffect, useCallback, type ReactNode } from "react"
 import { StarField } from "@/components/star-field";
 import { SPREADS, TAROT_DECK, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle } from "lucide-react";
+
+const DECK_META = [
+  { name: "Luna",    accent: "#C0C7FF", glyph: "☾" },
+  { name: "Solaris", accent: "#F5C56B", glyph: "☀" },
+  { name: "Aurora",  accent: "#7FE6C4", glyph: "✧" },
+  { name: "Vesper",  accent: "#E58CB4", glyph: "✦" },
+  { name: "Onyx",    accent: "#B79BFF", glyph: "❈" },
+];
 
 export const Route = createFileRoute("/tarot")({
   component: TarotPage,
@@ -189,43 +197,26 @@ function TarotPage() {
       if (idx < 0) return prev;
       const card = prev[idx];
 
-      if (isFreestyle) {
-        // Just place & auto-flip; no lock needed
-        const next = [...prev];
-        next[idx] = { ...card, flipped: true, locked: true, slotIndex: null };
-        return next;
-      }
+      // Snap to a subtle grid so the board stays clean.
+      const GRID = 20;
+      const sx = Math.round(card.x / GRID) * GRID;
+      const sy = Math.round(card.y / GRID) * GRID;
 
-      // Find nearest empty slot within snap radius
-      const centerX = card.x + CARD_W / 2;
-      const centerY = card.y + CARD_H / 2;
-      const takenSlots = new Set(
-        prev.filter((p) => p.uid !== uid && p.slotIndex !== null).map((p) => p.slotIndex),
-      );
-      let best: { slot: Slot; d: number } | null = null;
-      for (const slot of slots) {
-        if (takenSlots.has(slot.index)) continue;
-        const sx = slot.x + CARD_W / 2;
-        const sy = slot.y + CARD_H / 2;
-        const d = Math.hypot(centerX - sx, centerY - sy);
-        if (!best || d < best.d) best = { slot, d };
-      }
-      if (best && best.d < 140) {
-        const next = [...prev];
-        next[idx] = {
-          ...card,
-          x: best.slot.x,
-          y: best.slot.y,
-          slotIndex: best.slot.index,
-          locked: true,
-          flipped: true,
-        };
-        return next;
-      }
+      // Keep card fully inside the canvas.
+      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
+      const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
+      const clampedX = Math.min(Math.max(0, sx), maxX);
+      const clampedY = Math.min(Math.max(0, sy), maxY);
 
-      // Not near any slot: leave as unlocked freestyle-position
       const next = [...prev];
-      next[idx] = { ...card, slotIndex: null, locked: false };
+      next[idx] = {
+        ...card,
+        x: clampedX,
+        y: clampedY,
+        flipped: true,
+        locked: true,
+        slotIndex: null,
+      };
       return next;
     });
   };
@@ -245,22 +236,38 @@ function TarotPage() {
     });
   };
 
+  const shuffleAll = useCallback(() => {
+    setDecks((prev) => {
+      // Pool all remaining deck cards, reshuffle, redistribute across visible stacks.
+      const pool = prev.flat();
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      const out: TarotCard[][] = Array.from({ length: prev.length }, () => []);
+      pool.forEach((c, i) => out[i % prev.length].push(c));
+      return out;
+    });
+  }, []);
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
-  const readyToInterpret = isFreestyle
-    ? lockedCards.length >= 1
-    : lockedCards.length === spread.positions.length;
+  const requiredCount = isFreestyle ? 1 : spread.positions.length;
+  const readyToInterpret = lockedCards.length >= requiredCount;
 
   const requestReading = async () => {
     if (!readyToInterpret) return;
     setLoadingReading(true);
     setError(null);
     try {
+      // Order cards left-to-right by placement position on the canvas.
+      const sorted = [...lockedCards].sort((a, b) => a.x - b.x || a.y - b.y);
       const orderedForAI = isFreestyle
-        ? lockedCards.map((c, i) => ({ ...c, position: `Card ${i + 1}` }))
-        : [...lockedCards]
-            .sort((a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0))
-            .map((c) => ({ ...c, position: spread.positions[c.slotIndex!] }));
+        ? sorted.map((c, i) => ({ ...c, position: `Card ${i + 1}` }))
+        : sorted.slice(0, spread.positions.length).map((c, i) => ({
+            ...c,
+            position: spread.positions[i],
+          }));
 
       const res = await interpret({
         data: {
@@ -322,6 +329,13 @@ function TarotPage() {
             className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
           />
           <button
+            onClick={shuffleAll}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+            title="Shuffle every visible deck"
+          >
+            <Shuffle className="h-4 w-4" /> Shuffle All
+          </button>
+          <button
             onClick={resetSpread}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
           >
@@ -339,8 +353,8 @@ function TarotPage() {
 
         <div className="mt-2 text-xs text-muted-foreground">
           {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you want.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} into the glowing slot${spread.positions.length > 1 ? "s" : ""}.`}
+            ? `${spread.blurb} Drop as many cards as you want — they snap to a clean grid.`
+            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} anywhere on the board; they snap into place.`}
         </div>
       </div>
 
@@ -357,28 +371,6 @@ function TarotPage() {
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
 
-          {/* Slots */}
-          {slots.map((s) => {
-            const taken = placed.some((p) => p.slotIndex === s.index && p.locked);
-            return (
-              <div
-                key={s.index}
-                className={`absolute rounded-2xl border-2 border-dashed flex items-end justify-center pb-2 transition-all ${
-                  taken
-                    ? "border-gold/0"
-                    : "border-gold/40 bg-gold/[0.03] shadow-[0_0_40px_-16px_var(--gold)]"
-                }`}
-                style={{ left: s.x, top: s.y, width: CARD_W, height: CARD_H }}
-              >
-                {!taken && (
-                  <div className="text-[10px] uppercase tracking-widest text-gold/70">
-                    {s.label}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
           {/* Placed cards */}
           {placed.map((p) => (
             <PlacedCardView
@@ -392,9 +384,6 @@ function TarotPage() {
               }
               onRemove={() => removeCard(p.uid)}
               onZoom={() => p.flipped && setZoomedUid(p.uid)}
-              slotLabel={
-                p.slotIndex !== null && !isFreestyle ? spread.positions[p.slotIndex] : undefined
-              }
             />
           ))}
 
@@ -403,48 +392,67 @@ function TarotPage() {
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
               Decks · {decks.reduce((n, d) => n + d.length, 0)} cards
             </div>
-            <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2">
+            <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
               {decks.map((subDeck, di) => {
                 const empty = subDeck.length === 0;
+                const meta = DECK_META[di % DECK_META.length];
                 return (
                   <div
                     key={di}
-                    className="relative"
-                    style={{ width: MINI_W, height: MINI_H }}
+                    className="relative flex flex-col items-center"
+                    style={{ width: MINI_W }}
                   >
-                    {[0, 1, 2].map((i) => {
-                      const isTop = i === 0 && !empty;
-                      const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
-                      return (
-                        <div
-                          key={i}
-                          onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
-                          className={`absolute inset-0 rounded-xl border ${
-                            empty
-                              ? "border-white/10 bg-black/30"
-                              : "border-gold/40 bg-gradient-to-br from-midnight to-cosmic shadow-luxe"
-                          } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
-                          style={{
-                            transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
-                            zIndex: 10 - i,
-                          }}
-                        >
-                          {!empty && (
-                            <div className="absolute inset-1.5 rounded-lg border border-gold/20 flex items-center justify-center">
-                              <div className="text-gold/70 font-display text-lg">✦</div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                    <div className="absolute -bottom-4 inset-x-0 text-center text-[9px] text-muted-foreground">
+                    <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
+                      {[0, 1, 2].map((i) => {
+                        const isTop = i === 0 && !empty;
+                        const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
+                        return (
+                          <div
+                            key={i}
+                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
+                            className={`absolute inset-0 rounded-xl border ${
+                              empty
+                                ? "border-white/10 bg-black/30"
+                                : "bg-gradient-to-br from-midnight to-cosmic"
+                            } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
+                            style={{
+                              transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
+                              zIndex: 10 - i,
+                              borderColor: empty ? undefined : `${meta.accent}66`,
+                              boxShadow: empty || !isTop ? undefined : `0 8px 32px -12px ${meta.accent}80, inset 0 0 24px -12px ${meta.accent}`,
+                            }}
+                          >
+                            {!empty && (
+                              <div
+                                className="absolute inset-1.5 rounded-lg border flex items-center justify-center"
+                                style={{ borderColor: `${meta.accent}40` }}
+                              >
+                                <div
+                                  className="font-display text-lg"
+                                  style={{ color: `${meta.accent}` }}
+                                >
+                                  {meta.glyph}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div
+                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium"
+                      style={{ color: meta.accent }}
+                    >
+                      {meta.name}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground leading-none">
                       {subDeck.length}
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-3">
+            <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
               Drag from any deck onto the canvas
             </div>
           </div>
@@ -531,14 +539,12 @@ function PlacedCardView({
   onFlip,
   onRemove,
   onZoom,
-  slotLabel,
 }: {
   card: PlacedCard;
   onPointerDown: (e: React.PointerEvent) => void;
   onFlip: () => void;
   onRemove: () => void;
   onZoom: () => void;
-  slotLabel?: string;
 }) {
   return (
     <div
@@ -624,12 +630,6 @@ function PlacedCardView({
         >
           Reveal
         </button>
-      )}
-
-      {slotLabel && (
-        <div className="absolute inset-x-0 -bottom-5 text-[10px] uppercase tracking-widest text-center text-gold/70">
-          {slotLabel}
-        </div>
       )}
     </div>
   );
