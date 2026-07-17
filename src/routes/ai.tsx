@@ -11,7 +11,7 @@ function AiPage() {
   return (
     <div className="relative min-h-dvh">
       <StarField />
-      <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 pt-8 lg:pt-12 pb-32">
+      <div className="relative z-10 w-full px-4 sm:px-6 pt-8 lg:pt-12 pb-32">
         <header className="text-center mb-8">
           <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-widest text-gold">
             <Sparkles className="h-3 w-3" /> Personal AI Guide
@@ -30,7 +30,7 @@ function AiPage() {
         </div>
 
         <div className="fixed inset-x-0 bottom-16 lg:bottom-6 lg:left-64 z-20">
-          <div className="mx-auto max-w-3xl px-4">
+          <div className="w-full px-4">
             <div className="glass rounded-full flex items-center gap-2 p-1.5">
               <input
                 placeholder="Ask about your day, your chart, a decision…"
