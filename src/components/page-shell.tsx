@@ -13,9 +13,9 @@ export function PageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="relative">
+    <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
-      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-10 pt-8 lg:pt-12">
+      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-8 lg:pt-12 pb-16">
         <header className="mb-8">
           {eyebrow && (
             <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
