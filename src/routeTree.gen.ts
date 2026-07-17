@@ -15,6 +15,7 @@ import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
@@ -60,6 +61,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressionsRoute = ProgressionsRouteImport.update({
+  id: '/progressions',
+  path: '/progressions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
+  '/progressions': typeof ProgressionsRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
+  '/progressions': typeof ProgressionsRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
+  '/progressions': typeof ProgressionsRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/panchang'
     | '/profile'
+    | '/progressions'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/panchang'
     | '/profile'
+    | '/progressions'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/panchang'
     | '/profile'
+    | '/progressions'
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
@@ -302,6 +314,7 @@ export interface RootRouteChildren {
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
+  ProgressionsRoute: typeof ProgressionsRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progressions': {
+      id: '/progressions'
+      path: '/progressions'
+      fullPath: '/progressions'
+      preLoaderRoute: typeof ProgressionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -496,6 +516,7 @@ const rootRouteChildren: RootRouteChildren = {
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
+  ProgressionsRoute: ProgressionsRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

@@ -18,18 +18,27 @@ export const Route = createFileRoute("/numerology")({
   }),
 });
 
-type Tab = "personal" | "mobile" | "compat";
+type Tab = "personal" | "timeline" | "mobile" | "compat";
+const TAB_LABEL: Record<Tab, string> = {
+  personal: "Personal",
+  timeline: "Timeline",
+  mobile: "Mobile Number",
+  compat: "Compatibility",
+};
 
 function NumerologyPage() {
   const [tab, setTab] = useState<Tab>("personal");
+  const [fullName, setFullName] = useState("");
+  const [birthDate, setBirthDate] = useState("1995-06-15");
+  const [system, setSystem] = useState<"Pythagorean" | "Chaldean">("Pythagorean");
   return (
     <PageShell
       eyebrow="Numerology"
       title="The vibration of numbers"
-      subtitle="Pythagorean and Chaldean systems, mobile-number analysis, and compatibility."
+      subtitle="Pythagorean and Chaldean systems, personal-year timelines, mobile-number analysis, and compatibility."
     >
       <div className="mb-6 flex flex-wrap gap-2">
-        {(["personal", "mobile", "compat"] as Tab[]).map((t) => (
+        {(Object.keys(TAB_LABEL) as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -37,11 +46,20 @@ function NumerologyPage() {
               tab === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"
             }`}
           >
-            {t === "personal" ? "Personal" : t === "mobile" ? "Mobile Number" : "Compatibility"}
+            {TAB_LABEL[t]}
           </button>
         ))}
       </div>
-      {tab === "personal" && <PersonalNumerology />}
+      {tab === "personal" && (
+        <PersonalNumerology
+          fullName={fullName} setFullName={setFullName}
+          birthDate={birthDate} setBirthDate={setBirthDate}
+          system={system} setSystem={setSystem}
+        />
+      )}
+      {tab === "timeline" && (
+        <TimelineNumerology fullName={fullName} birthDate={birthDate} system={system} />
+      )}
       {tab === "mobile" && <MobileNumerology />}
       {tab === "compat" && <CompatibilityNumerology />}
     </PageShell>
