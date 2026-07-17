@@ -20,6 +20,7 @@ import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
+import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as JournalRouteImport } from './routes/journal'
@@ -87,6 +88,11 @@ const PanchangRoute = PanchangRouteImport.update({
 const NumerologyRoute = NumerologyRouteImport.update({
   id: '/numerology',
   path: '/numerology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuhuratRoute = MuhuratRouteImport.update({
+  id: '/muhurat',
+  path: '/muhurat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/kundli'
     | '/learn'
+    | '/muhurat'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -323,6 +335,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
+  MuhuratRoute: typeof MuhuratRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/numerology'
       fullPath: '/numerology'
       preLoaderRoute: typeof NumerologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/muhurat': {
+      id: '/muhurat'
+      path: '/muhurat'
+      fullPath: '/muhurat'
+      preLoaderRoute: typeof MuhuratRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
+  MuhuratRoute: MuhuratRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
