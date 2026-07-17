@@ -456,10 +456,6 @@ function TarotPage() {
               Drag from any deck onto the canvas
             </div>
           </div>
-            <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-3">
-              Drag from any deck onto the canvas
-            </div>
-          </div>
         </div>
 
         {/* Reading */}
