@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X } from "lucide-react";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon } from "lucide-react";
+import { AdminAssetsTab } from "@/components/admin-assets";
 import {
   adminListUsers,
   adminGrantRole,
