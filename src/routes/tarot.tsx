@@ -130,11 +130,11 @@ function TarotPage() {
     fromDeck: boolean;
   }>({ uid: null, offsetX: 0, offsetY: 0, fromDeck: false });
 
-  const beginDragFromDeck = (e: React.PointerEvent) => {
-    if (deck.length === 0) return;
+  const beginDragFromDeck = (e: React.PointerEvent, deckIdx: number) => {
+    const source = decks[deckIdx];
+    if (!source || source.length === 0) return;
     const canvasRect = canvasRef.current!.getBoundingClientRect();
-    const card = deck[0];
-    const newDeck = deck.slice(1);
+    const card = source[0];
     const uid = `p_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const x = e.clientX - canvasRect.left - CARD_W / 2;
     const y = e.clientY - canvasRect.top - CARD_H / 2;
@@ -148,7 +148,7 @@ function TarotPage() {
       locked: false,
       flipped: false,
     };
-    setDeck(newDeck);
+    setDecks((prev) => prev.map((d, i) => (i === deckIdx ? d.slice(1) : d)));
     setPlaced((p) => [...p, newPlaced]);
     dragState.current = { uid, offsetX: CARD_W / 2, offsetY: CARD_H / 2, fromDeck: true };
     (e.target as Element).setPointerCapture?.(e.pointerId);
