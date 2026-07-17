@@ -18,6 +18,7 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
@@ -79,6 +80,11 @@ const ProgressionsRoute = ProgressionsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PanchangRoute = PanchangRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/remedies': typeof RemediesRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/remedies': typeof RemediesRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
+  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/remedies': typeof RemediesRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/muhurat'
     | '/numerology'
     | '/panchang'
+    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/remedies'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/muhurat'
     | '/numerology'
     | '/panchang'
+    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/remedies'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/muhurat'
     | '/numerology'
     | '/panchang'
+    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/remedies'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   MuhuratRoute: typeof MuhuratRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
+  PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ProgressionsRoute: typeof ProgressionsRoute
   RemediesRoute: typeof RemediesRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/panchang': {
@@ -577,6 +597,7 @@ const rootRouteChildren: RootRouteChildren = {
   MuhuratRoute: MuhuratRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
+  PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ProgressionsRoute: ProgressionsRoute,
   RemediesRoute: RemediesRoute,
