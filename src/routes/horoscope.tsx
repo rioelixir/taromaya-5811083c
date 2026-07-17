@@ -200,8 +200,8 @@ About 350 words.`,
                 <Loader2 className="w-4 h-4 animate-spin" /> Aligning the stars…
               </div>
             )}
-            {aiText && (
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{aiText}</div>
+            {currentReading && (
+              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{currentReading}</div>
             )}
           </GlassCard>
         </div>
