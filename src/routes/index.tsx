@@ -1,16 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Sparkles,
-  Stars,
-  Moon,
   Sun,
   CalendarDays,
-  Hash,
-  Heart,
   Bot,
   ArrowRight,
   Flame,
-  Compass,
 } from "lucide-react";
 import { StarField } from "@/components/star-field";
 
@@ -36,7 +31,6 @@ function Home() {
         <Hero />
         <QuickGrid />
         <TodayGrid />
-        <ModulesGrid />
       </div>
     </div>
   );
@@ -211,41 +205,3 @@ function PanchangToday() {
   );
 }
 
-const modules = [
-  { to: "/tarot", label: "Tarot", desc: "Unlimited spreads, AI meanings", icon: Sparkles },
-  { to: "/astrology", label: "Astrology", desc: "Charts, dashas, transits", icon: Stars },
-  { to: "/kundli", label: "Kundli", desc: "North & South Indian, D-charts", icon: Moon },
-  { to: "/numerology", label: "Numerology", desc: "Life path, destiny, luck", icon: Hash },
-  { to: "/compatibility", label: "Compatibility", desc: "Guna Milan · Synastry", icon: Heart },
-  { to: "/ai", label: "AI Guide", desc: "Voice · vision · memory", icon: Bot },
-];
-function ModulesGrid() {
-  return (
-    <section className="mt-8">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl gold-text">Explore</h2>
-        <Link to="/learn" className="text-xs text-muted-foreground hover:text-pearl inline-flex items-center gap-1">
-          Learning center <Compass className="h-3.5 w-3.5" />
-        </Link>
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {modules.map((m) => (
-          <Link
-            key={m.to}
-            to={m.to}
-            className="glass rounded-2xl p-5 flex items-center gap-4 hover:bg-white/[0.06] transition-all"
-          >
-            <div className="h-11 w-11 grid place-items-center rounded-xl bg-gradient-to-br from-gold/20 to-galaxy/15 gold-border">
-              <m.icon className="h-5 w-5 text-gold" />
-            </div>
-            <div className="min-w-0">
-              <div className="font-display text-lg text-pearl truncate">{m.label}</div>
-              <div className="text-xs text-muted-foreground truncate">{m.desc}</div>
-            </div>
-            <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground" />
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
