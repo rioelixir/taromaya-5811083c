@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
@@ -15,7 +16,7 @@ const DECK_META = [
 ];
 
 export const Route = createFileRoute("/tarot")({
-  component: TarotPage,
+  component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Tarot Canvas — TAROMAYA" },

@@ -1,3 +1,4 @@
+import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -6,7 +7,7 @@ import { REMEDY_CATALOG, prioritiseRemedies, type PlanetKey } from "@/lib/remedi
 import { Flame, Sparkles, Gem, Coins } from "lucide-react";
 
 export const Route = createFileRoute("/remedies")({
-  component: RemediesPage,
+  component: () => (<PremiumGate featureName="Remedies"><RemediesPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Vedic Remedies — TAROMAYA" },
