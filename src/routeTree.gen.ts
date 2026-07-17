@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
@@ -28,6 +29,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/reports'
+    | '/settings'
     | '/tarot'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/reports'
+    | '/settings'
     | '/tarot'
   id:
     | '__root__'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/panchang'
     | '/profile'
     | '/reports'
+    | '/settings'
     | '/tarot'
   fileRoutesById: FileRoutesById
 }
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRoute
+  SettingsRoute: typeof SettingsRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -350,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRoute,
+  SettingsRoute: SettingsRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
