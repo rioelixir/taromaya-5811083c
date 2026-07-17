@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -29,6 +30,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TarotRoute = TarotRouteImport.update({
   id: '/tarot',
   path: '/tarot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesByTo {
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRoutesById {
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sitemap.xml'
     | '/tarot'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sitemap.xml'
     | '/tarot'
   id:
     | '__root__'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reports'
     | '/settings'
+    | '/sitemap.xml'
     | '/tarot'
   fileRoutesById: FileRoutesById
 }
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TarotRoute: typeof TarotRoute
 }
 
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/tarot'
       fullPath: '/tarot'
       preLoaderRoute: typeof TarotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -371,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TarotRoute: TarotRoute,
 }
 export const routeTree = rootRouteImport
