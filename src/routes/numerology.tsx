@@ -6,6 +6,9 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import {
   computeNumerology, analyzeMobile, numerologyCompatibility, NUMBER_MEANINGS,
 } from "@/lib/numerology";
+import {
+  loShuGrid, nineStarKi, kabbalah, essenceTimeline, lifeCycles, analyseName,
+} from "@/lib/numerology-deep";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -14,17 +17,22 @@ export const Route = createFileRoute("/numerology")({
   head: () => ({
     meta: [
       { title: "Numerology — TAROMAYA" },
-      { name: "description", content: "Pythagorean, Chaldean, and Mobile Number numerology with 25+ calculations and AI readings." },
+      { name: "description", content: "Pythagorean, Chaldean, Kabbalah, Chinese Nine Star Ki, Lo Shu, Essence & Life Cycles with AI readings." },
     ],
   }),
 });
 
-type Tab = "personal" | "timeline" | "mobile" | "compat";
+type Tab = "personal" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   personal: "Personal",
   timeline: "Timeline",
-  mobile: "Mobile Number",
-  compat: "Compatibility",
+  loshu: "Lo Shu",
+  chinese: "Nine Star Ki",
+  kabbalah: "Kabbalah",
+  essence: "Essence",
+  name: "Name",
+  mobile: "Mobile",
+  compat: "Compat.",
 };
 
 function NumerologyPage() {
@@ -61,6 +69,11 @@ function NumerologyPage() {
       {tab === "timeline" && (
         <TimelineNumerology fullName={fullName} birthDate={birthDate} system={system} />
       )}
+      {tab === "loshu" && <LoShuTab birthDate={birthDate} setBirthDate={setBirthDate} />}
+      {tab === "chinese" && <NineStarKiTab birthDate={birthDate} setBirthDate={setBirthDate} />}
+      {tab === "kabbalah" && <KabbalahTab fullName={fullName} setFullName={setFullName} />}
+      {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
+      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} />}
       {tab === "mobile" && <MobileNumerology />}
       {tab === "compat" && <CompatibilityNumerology />}
     </PageShell>
@@ -429,3 +442,288 @@ function TimelineNumerology({
   );
 }
 
+
+// ═══════════════════════════════════════════════════════════════════
+// LO SHU GRID
+// ═══════════════════════════════════════════════════════════════════
+function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate: (s: string) => void }) {
+  const grid = useMemo(() => (birthDate ? loShuGrid(birthDate) : null), [birthDate]);
+  // Traditional Lo Shu square positions
+  const layout: number[][] = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
+  return (
+    <>
+      <GlassCard>
+        <label className="block max-w-xs">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+          <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+        </label>
+      </GlassCard>
+      {grid && (
+        <>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <BigNum label="Driver (Mulank)" n={grid.driver} />
+            <BigNum label="Conductor (Bhagyank)" n={grid.conductor} />
+            <GlassCard title="Karmic signature">
+              <div className="text-xs text-muted-foreground">Missing numbers</div>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {grid.missing.length === 0
+                  ? <span className="text-sm text-emerald-300">Complete grid — rare & blessed.</span>
+                  : grid.missing.map((n) => (
+                      <span key={n} className="rounded-full bg-red-500/10 border border-red-400/30 px-2 py-0.5 text-xs text-red-200">{n}</span>
+                    ))}
+              </div>
+              {grid.strong.length > 0 && (
+                <>
+                  <div className="mt-3 text-xs text-muted-foreground">Amplified</div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {grid.strong.map((n) => (
+                      <span key={n} className="rounded-full bg-gold/10 border border-gold/30 px-2 py-0.5 text-xs gold-text">{n}</span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </GlassCard>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <GlassCard title="Lo Shu magic square">
+              <div className="mx-auto grid max-w-sm grid-cols-3 gap-2">
+                {layout.flat().map((n) => {
+                  const c = grid.counts[n] ?? 0;
+                  return (
+                    <div key={n} className={`aspect-square rounded-xl flex flex-col items-center justify-center ${c === 0 ? "bg-white/5 border border-dashed border-white/10" : "gold-border bg-gold/10"}`}>
+                      <div className="text-[10px] text-muted-foreground">{n}</div>
+                      <div className="font-display text-2xl gold-text">
+                        {c > 0 ? String(n).repeat(c) : "—"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </GlassCard>
+            <GlassCard title="Planes (arrows)">
+              <div className="space-y-2 text-xs">
+                {Object.entries(grid.planes).map(([key, p]) => (
+                  <div key={key} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2">
+                    <div className="capitalize text-pearl">{key} plane</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">{p.line.join(" – ")}</span>
+                      <span className={p.complete ? "gold-text" : "text-red-300"}>
+                        {p.complete ? "✓ complete" : "✗ incomplete"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="mt-6">
+            <GlassCard title="Number-by-number interpretation">
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {grid.interpretation.map((r) => (
+                  <div key={r.number} className="rounded-xl bg-white/5 p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="font-display text-lg gold-text">{r.number}</div>
+                      <div className={`text-[10px] uppercase tracking-widest ${
+                        r.strength === "missing" ? "text-red-300" :
+                        r.strength === "strong"  ? "gold-text" :
+                        r.strength === "balanced"? "text-emerald-300" : "text-muted-foreground"
+                      }`}>{r.strength}</div>
+                    </div>
+                    <div className="mt-1 text-xs text-pearl">{r.note}</div>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NINE STAR KI
+// ═══════════════════════════════════════════════════════════════════
+function NineStarKiTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate: (s: string) => void }) {
+  const ki = useMemo(() => (birthDate ? nineStarKi(birthDate) : null), [birthDate]);
+  return (
+    <>
+      <GlassCard>
+        <label className="block max-w-xs">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+          <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+        </label>
+      </GlassCard>
+      {ki && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <GlassCard title="Principal (Year)">
+            <div className="font-display text-5xl gold-text">{ki.principal}</div>
+            <div className="mt-2 text-sm text-pearl">{ki.element} · {ki.direction} · {ki.season}</div>
+            <div className="mt-2 text-xs text-muted-foreground">{ki.yearNote}</div>
+          </GlassCard>
+          <GlassCard title="Character (Month)">
+            <div className="font-display text-5xl gold-text">{ki.character}</div>
+            <div className="mt-2 text-xs text-muted-foreground">Your inner emotional signature — the way you process feelings and act under stress.</div>
+          </GlassCard>
+          <GlassCard title="Energetic (This year)">
+            <div className="font-display text-5xl gold-text">{ki.energetic}</div>
+            <div className="mt-2 text-xs text-muted-foreground">The prevailing cosmic climate for the current solar year.</div>
+          </GlassCard>
+          <GlassCard title="Reading">
+            <div className="text-sm text-pearl">{ki.personality}</div>
+          </GlassCard>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// KABBALAH
+// ═══════════════════════════════════════════════════════════════════
+function KabbalahTab({ fullName, setFullName }: { fullName: string; setFullName: (s: string) => void }) {
+  const k = useMemo(() => (fullName ? kabbalah(fullName) : null), [fullName]);
+  return (
+    <>
+      <GlassCard>
+        <label className="block">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Full name</span>
+          <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your used name"
+            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+        </label>
+      </GlassCard>
+      {k && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <BigNum label="Kabbalah value" n={k.value} />
+          <BigNum label="Tree path (0–21)" n={k.path} />
+          <GlassCard title={k.name}>
+            <div className="text-sm text-pearl">{k.meaning}</div>
+            <div className="mt-2 text-xs text-muted-foreground">Path {k.path} of the 22 Major Arcana of the Tree of Life — the archetypal current shaping this incarnation.</div>
+          </GlassCard>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ESSENCE & LIFE CYCLES
+// ═══════════════════════════════════════════════════════════════════
+function EssenceTab({ fullName, birthDate }: { fullName: string; birthDate: string }) {
+  const rows = useMemo(() => (fullName && birthDate ? essenceTimeline(fullName, birthDate, 20) : []), [fullName, birthDate]);
+  const cyc = useMemo(() => (birthDate ? lifeCycles(birthDate) : null), [birthDate]);
+  const nowY = new Date().getFullYear();
+  if (!fullName || !birthDate) {
+    return (
+      <GlassCard>
+        <div className="text-sm text-muted-foreground">Enter your name and date of birth in the <span className="text-pearl">Personal</span> tab first.</div>
+      </GlassCard>
+    );
+  }
+  return (
+    <>
+      {cyc && (
+        <GlassCard title="Life Cycles">
+          <div className="grid gap-3 md:grid-cols-3">
+            {(["formative","productive","harvest"] as const).map((k) => {
+              const c = cyc[k];
+              return (
+                <div key={k} className="rounded-xl bg-white/5 p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{k}</div>
+                  <div className="mt-1 text-sm text-pearl">Age {c.from} – {c.to === 99 ? "∞" : c.to}</div>
+                  <div className="font-display text-3xl gold-text mt-1">{c.n}</div>
+                  <div className="mt-1 text-xs text-muted-foreground line-clamp-2">{NUMBER_MEANINGS[c.n] ?? ""}</div>
+                </div>
+              );
+            })}
+          </div>
+        </GlassCard>
+      )}
+      <div className="mt-6">
+        <GlassCard title="Essence & letter transits — next 20 years">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th className="text-left py-2">Year</th>
+                  <th className="text-left">Age</th>
+                  <th className="text-left">Active letters</th>
+                  <th className="text-right">Essence</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.year} className={`border-t border-white/5 ${r.year === nowY ? "bg-gold/10" : ""}`}>
+                    <td className="py-2 text-pearl">{r.year}</td>
+                    <td className="text-muted-foreground">{r.age}</td>
+                    <td className="tracking-widest text-pearl">{r.letters.join(" · ")}</td>
+                    <td className="text-right font-display text-lg gold-text">{r.essence}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </GlassCard>
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAME ANALYSIS — hidden passion, karmic lessons, balance, sub-conscious
+// ═══════════════════════════════════════════════════════════════════
+function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullName: (s: string) => void }) {
+  const a = useMemo(() => (fullName ? analyseName(fullName) : null), [fullName]);
+  return (
+    <>
+      <GlassCard>
+        <label className="block">
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Full name</span>
+          <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Enter your used name"
+            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+        </label>
+      </GlassCard>
+      {a && (
+        <>
+          <div className="mt-6 grid gap-4 lg:grid-cols-4">
+            <GlassCard title="Hidden passion">
+              <div className="font-display text-3xl gold-text">{a.hiddenPassion.join(" · ") || "—"}</div>
+              <div className="mt-1 text-xs text-muted-foreground">Most-repeated numbers in your name — your innate talents.</div>
+            </GlassCard>
+            <GlassCard title="Karmic lessons">
+              <div className="font-display text-3xl text-red-300">{a.karmicLessons.join(" · ") || "None"}</div>
+              <div className="mt-1 text-xs text-muted-foreground">Digits absent from your name — soul lessons to master.</div>
+            </GlassCard>
+            <GlassCard title="Balance number">
+              <div className="font-display text-3xl gold-text">{a.balance}</div>
+              <div className="mt-1 text-xs text-muted-foreground">How you regain composure under emotional stress.</div>
+            </GlassCard>
+            <GlassCard title="Sub-conscious self">
+              <div className="font-display text-3xl gold-text">{a.subconsciousSelf}<span className="text-lg text-muted-foreground">/9</span></div>
+              <div className="mt-1 text-xs text-muted-foreground">Your instinctive capacity in crisis (higher = more self-reliant).</div>
+            </GlassCard>
+          </div>
+          <div className="mt-6">
+            <GlassCard title="Digit frequency in name">
+              <div className="grid grid-cols-9 gap-2 text-center">
+                {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => {
+                  const c = a.frequency[n] ?? 0;
+                  return (
+                    <div key={n} className={`rounded-xl p-3 ${c === 0 ? "bg-red-500/5 border border-red-400/20" : "bg-white/5"}`}>
+                      <div className="text-[10px] text-muted-foreground">{n}</div>
+                      <div className={`font-display text-2xl mt-1 ${c === 0 ? "text-red-300" : "gold-text"}`}>{c}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </GlassCard>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
