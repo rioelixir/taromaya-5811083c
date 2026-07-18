@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/rashi-chart";
 import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
 import { StrengthsPanel } from "@/components/strengths-panel";
+import { YogasDoshasPanel } from "@/components/yogas-doshas-panel";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
@@ -111,6 +112,8 @@ function NewKundliPage() {
             )}
 
             <StrengthsPanel chart={chart} />
+
+            <YogasDoshasPanel chart={chart} />
 
             <VargaExplorer chart={chart} />
 
