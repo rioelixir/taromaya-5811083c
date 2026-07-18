@@ -271,6 +271,49 @@ function AcgPage() {
                   );
                 })}
 
+              {/* Local Space rays from pin */}
+              {showLocalSpace && pin && localSpace
+                .filter((l) => enabledPlanets.has(l.planet))
+                .map((l, i) => {
+                  // Split at date-line jumps
+                  const segs: Array<Array<[number, number]>> = [];
+                  let cur: Array<[number, number]> = [];
+                  for (const p of l.points) {
+                    if (cur.length && Math.abs(p[0] - cur[cur.length - 1][0]) > 180) {
+                      segs.push(cur); cur = [];
+                    }
+                    cur.push(p);
+                  }
+                  if (cur.length > 1) segs.push(cur);
+                  return segs.map((seg, k) => (
+                    <path
+                      key={`ls-${i}-${k}`}
+                      d={seg.map(([lon, lat], idx) => `${idx === 0 ? "M" : "L"} ${lonToX(lon).toFixed(1)} ${latToY(lat).toFixed(1)}`).join(" ")}
+                      fill="none"
+                      stroke={PLANET_COLORS[l.planet]}
+                      strokeWidth={0.9}
+                      strokeDasharray="1 3"
+                      opacity={0.7}
+                    />
+                  ));
+                })}
+
+              {/* Parans (line crossings) */}
+              {showParans && parans.map((p, i) => (
+                <g key={`paran-${i}`}>
+                  <circle
+                    cx={lonToX(p.lon)}
+                    cy={latToY(p.lat)}
+                    r={3.5}
+                    fill="none"
+                    stroke="#F5C542"
+                    strokeWidth={0.8}
+                    opacity={0.4 + 0.6 * p.strength}
+                  />
+                  <circle cx={lonToX(p.lon)} cy={latToY(p.lat)} r={1.4} fill="#F5C542" opacity={0.9} />
+                </g>
+              ))}
+
               {/* Anchor city dots */}
               {ACG_CITIES.map((c) => (
                 <g key={c.name}>
@@ -285,6 +328,7 @@ function AcgPage() {
                   <circle cx={lonToX(pin.lon)} cy={latToY(pin.lat)} r={2.4} fill="#F5C542" />
                 </g>
               )}
+
             </svg>
           </div>
 
