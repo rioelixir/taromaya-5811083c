@@ -378,6 +378,74 @@ const CELL_TO_RASHI: Record<string, number> = {
   "3-0": 8, "3-1": 7, "3-2": 6, "3-3": 5,
 };
 
+/** North-Indian diamond Lagna chart (houses are fixed, signs rotate). */
+function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
+  const S = 300;
+  const asc = chart.ascendant.rashi;
+  const planetsByHouse = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
+  for (const p of chart.planets) {
+    const h = ((p.rashi - asc + 12) % 12) + 1;
+    const arr = planetsByHouse.get(h) ?? [];
+    arr.push({ name: p.name, retrograde: p.retrograde });
+    planetsByHouse.set(h, arr);
+  }
+  // Anchor points for the 12 house cells in a North-Indian diamond.
+  const P: Record<number, [number, number]> = {
+    1:  [S*0.50, S*0.30], 2:  [S*0.25, S*0.15], 3:  [S*0.12, S*0.30],
+    4:  [S*0.30, S*0.50], 5:  [S*0.12, S*0.70], 6:  [S*0.25, S*0.85],
+    7:  [S*0.50, S*0.70], 8:  [S*0.75, S*0.85], 9:  [S*0.88, S*0.70],
+    10: [S*0.70, S*0.50], 11: [S*0.88, S*0.30], 12: [S*0.75, S*0.15],
+  };
+  const SIGN_OFFSET: Record<number, [number, number]> = {
+    1:  [0, -S*0.10], 2:  [0, -S*0.08], 3:  [-S*0.05, 0],
+    4:  [-S*0.10, 0], 5:  [-S*0.05, 0], 6:  [0,  S*0.08],
+    7:  [0,  S*0.10], 8:  [0,  S*0.08], 9:  [ S*0.05, 0],
+    10: [ S*0.10, 0], 11: [ S*0.05, 0], 12: [0, -S*0.08],
+  };
+
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">Lagna Chart · North Indian</div>
+      <div className="rounded-2xl border border-gold/30 bg-black/40 p-3">
+        <svg viewBox={`0 0 ${S} ${S}`} className="w-full">
+          <rect x={2} y={2} width={S-4} height={S-4} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+          <line x1={2} y1={2} x2={S-2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
+          <line x1={S-2} y1={2} x2={2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
+          <polygon points={`${S/2},2 ${S-2},${S/2} ${S/2},${S-2} 2,${S/2}`} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => {
+            const sign = (asc + h - 1) % 12;
+            const [cx, cy] = P[h];
+            const [ox, oy] = SIGN_OFFSET[h];
+            const planets = planetsByHouse.get(h) ?? [];
+            return (
+              <g key={h}>
+                <text x={cx + ox} y={cy + oy} textAnchor="middle" fontSize={S*0.036}
+                  className="fill-gold/80" fontFamily="serif">{RASHIS[sign].slice(0, 3)}</text>
+                {h === 1 && (
+                  <text x={cx} y={cy - S*0.05} textAnchor="middle" fontSize={S*0.028}
+                    className="fill-gold" fontFamily="serif">Lagna</text>
+                )}
+                {planets.map((p, idx) => (
+                  <text key={p.name} x={cx} y={cy + (idx + 1) * S * 0.038}
+                    textAnchor="middle" fontSize={S*0.038} className="fill-pearl">
+                    {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
+                  </text>
+                ))}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+        <div>Ascendant: <span className="text-pearl">{RASHIS[chart.ascendant.rashi]} {formatDegree(chart.ascendant.degreeInRashi)}</span></div>
+        <div>Lord: <span className="text-pearl">{RASHI_LORDS[chart.ascendant.rashi]}</span></div>
+      </div>
+    </div>
+  );
+}
+
+
+
 function SouthIndianChart({ chart }: { chart: KundliChart }) {
   const planetsByRashi = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
   for (const p of chart.planets) {
