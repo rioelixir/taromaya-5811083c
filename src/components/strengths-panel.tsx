@@ -109,35 +109,37 @@ export function StrengthsPanel({ chart }: { chart: unknown }) {
           <div className="pt-1 text-[10px] leading-relaxed text-muted-foreground">
             Six-fold strength in Rupas: Sthana · Dig · Kala · Chesta · Naisargika · Drig. Ratio ≥ 1× meets Parashari minimum.
           </div>
-          {/* Component breakdown */}
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[520px] text-[11px]">
-              <thead className="text-muted-foreground">
-                <tr className="border-b border-border/40">
-                  <th className="py-1 text-left font-normal">Planet</th>
-                  <th className="text-right font-normal">Sthana</th>
-                  <th className="text-right font-normal">Dig</th>
-                  <th className="text-right font-normal">Kala</th>
-                  <th className="text-right font-normal">Chesta</th>
-                  <th className="text-right font-normal">Naisar.</th>
-                  <th className="text-right font-normal">Drig</th>
-                </tr>
-              </thead>
-              <tbody className="font-mono">
-                {shad.map((r) => (
-                  <tr key={r.planet} className="border-b border-border/20">
-                    <td className="py-1">{r.planet}</td>
-                    <td className="text-right tabular-nums">{r.sthana.toFixed(2)}</td>
-                    <td className="text-right tabular-nums">{r.dig.toFixed(2)}</td>
-                    <td className="text-right tabular-nums">{r.kala.toFixed(2)}</td>
-                    <td className="text-right tabular-nums">{r.chesta.toFixed(2)}</td>
-                    <td className="text-right tabular-nums">{r.naisargika.toFixed(2)}</td>
-                    <td className="text-right tabular-nums">{r.drig.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Component breakdown — six mini bar charts per planet */}
+          <div className="mt-4 space-y-2">
+            {shad.map((r) => {
+              const parts: Array<[string, number]> = [
+                ["Sthana", r.sthana], ["Dig", r.dig], ["Kala", r.kala],
+                ["Chesta", r.chesta], ["Naisar.", r.naisargika], ["Drig", r.drig],
+              ];
+              const maxPart = Math.max(...parts.map((p) => p[1]), 1);
+              return (
+                <div key={r.planet} className="rounded-lg border border-border/40 bg-background/30 p-2">
+                  <div className="mb-1 flex items-baseline justify-between text-[11px]">
+                    <span className="font-medium">{r.planet}</span>
+                    <span className="font-mono text-muted-foreground">Σ {r.total.toFixed(2)}</span>
+                  </div>
+                  <div className="grid grid-cols-6 gap-1 items-end h-12">
+                    {parts.map(([label, val]) => {
+                      const h = (val / maxPart) * 100;
+                      return (
+                        <div key={label} className="flex flex-col items-center justify-end h-full" title={`${label}: ${val.toFixed(2)}`}>
+                          <div className="w-full rounded-t bg-gradient-to-t from-amber-300/80 to-amber-500/30" style={{ height: `${Math.max(6, h)}%` }} />
+                          <div className="mt-0.5 text-[8px] uppercase tracking-wider text-muted-foreground">{label}</div>
+                          <div className="text-[9px] font-mono tabular-nums">{val.toFixed(1)}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
         </div>
       )}
 
