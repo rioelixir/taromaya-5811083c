@@ -68,6 +68,8 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPrashnaRouteImport } from './routes/_authenticated/prashna'
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
+import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
+import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
@@ -366,6 +368,18 @@ const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDeepJyotishRoute =
+  AuthenticatedDeepJyotishRouteImport.update({
+    id: '/deep-jyotish',
+    path: '/deep-jyotish',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBirthDetailsRoute =
+  AuthenticatedBirthDetailsRouteImport.update({
+    id: '/birth-details',
+    path: '/birth-details',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -437,6 +451,8 @@ export interface FileRoutesByFullPath {
   '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
@@ -500,6 +516,8 @@ export interface FileRoutesByTo {
   '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
@@ -565,6 +583,8 @@ export interface FileRoutesById {
   '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/_authenticated/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/prashna': typeof AuthenticatedPrashnaRoute
@@ -630,6 +650,8 @@ export interface FileRouteTypes {
     | '/weather'
     | '/yantra'
     | '/admin'
+    | '/birth-details'
+    | '/deep-jyotish'
     | '/journal'
     | '/meditation'
     | '/prashna'
@@ -693,6 +715,8 @@ export interface FileRouteTypes {
     | '/weather'
     | '/yantra'
     | '/admin'
+    | '/birth-details'
+    | '/deep-jyotish'
     | '/journal'
     | '/meditation'
     | '/prashna'
@@ -757,6 +781,8 @@ export interface FileRouteTypes {
     | '/weather'
     | '/yantra'
     | '/_authenticated/admin'
+    | '/_authenticated/birth-details'
+    | '/_authenticated/deep-jyotish'
     | '/_authenticated/journal'
     | '/_authenticated/meditation'
     | '/_authenticated/prashna'
@@ -1240,6 +1266,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/deep-jyotish': {
+      id: '/_authenticated/deep-jyotish'
+      path: '/deep-jyotish'
+      fullPath: '/deep-jyotish'
+      preLoaderRoute: typeof AuthenticatedDeepJyotishRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/birth-details': {
+      id: '/_authenticated/birth-details'
+      path: '/birth-details'
+      fullPath: '/birth-details'
+      preLoaderRoute: typeof AuthenticatedBirthDetailsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -1266,6 +1306,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedBirthDetailsRoute: typeof AuthenticatedBirthDetailsRoute
+  AuthenticatedDeepJyotishRoute: typeof AuthenticatedDeepJyotishRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
   AuthenticatedPrashnaRoute: typeof AuthenticatedPrashnaRoute
@@ -1275,6 +1317,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedBirthDetailsRoute: AuthenticatedBirthDetailsRoute,
+  AuthenticatedDeepJyotishRoute: AuthenticatedDeepJyotishRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
   AuthenticatedPrashnaRoute: AuthenticatedPrashnaRoute,
