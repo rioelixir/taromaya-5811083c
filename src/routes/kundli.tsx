@@ -225,12 +225,6 @@ function KundliPage() {
                 </div>
               )}
               <KundliPdfSection chart={chart} form={form} birthDate={birthDate!} />
-              ) : (
-                <div className="glass rounded-2xl p-4 text-xs text-muted-foreground flex items-center justify-between gap-3">
-                  Sign in to save charts and revisit them later.
-                  <Link to="/auth" className="text-gold hover:underline">Sign in</Link>
-                </div>
-              )}
             </>
           ) : (
             <GlassCard title="Waiting for your details" desc="Enter your birth date, time, and coordinates. Chart, dasha, yogas and doshas will appear here.">
