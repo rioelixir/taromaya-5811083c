@@ -409,8 +409,24 @@ function buildPdf(key: ReportKey, b: Birth) {
     }
   }
 
-  // ============ 12-month transits (for yearly / life / career) ============
-  if (key === "yearly" || key === "life" || key === "career") {
+  // ============ Ashtakavarga (Sarva bindus) ============
+  if (key === "grand" || key === "life" || key === "wealth") {
+    newPage();
+    drawH("Ashtakavarga · Sarva Bindus");
+    drawP("The Sarvashtakavarga totals combined-strength points per sign (max 337). Signs with 30+ bindus are areas of favor; below 25 need protection.");
+    try {
+      const av = computeAshtakavarga(chart);
+      drawTable(
+        ["Sign", "Bindus", "Notes"],
+        av.sarva.map((v, i) => [RASHIS[i], String(v), v >= 30 ? "Strong" : v >= 25 ? "Balanced" : "Fragile"]),
+        [140, 100, 230],
+      );
+      drawP(`Total: ${av.sarvaTotal} bindus.`);
+    } catch { drawP("Ashtakavarga computation unavailable."); }
+  }
+
+  // ============ 12-month transits (yearly / life / career / grand) ============
+  if (key === "yearly" || key === "life" || key === "career" || key === "grand") {
     newPage();
     const from = new Date();
     const to = new Date(from.getTime() + 365 * 86400000);
@@ -445,6 +461,53 @@ function buildPdf(key: ReportKey, b: Birth) {
       );
     } else drawP("None in window.");
   }
+
+  // ============ Live Gochara + Sade Sati ============
+  if (key === "yearly" || key === "grand" || key === "career") {
+    try {
+      newPage();
+      drawH("Live Sky · Gochara from Moon");
+      const report = computeVedicTransits(chart, Number(b.lat), Number(b.lon), null, new Date());
+      const ss = computeSadeSati(moon.rashi, new Date());
+      drawKV([
+        ["Sade Sati", ss.active
+          ? `ACTIVE — ${ss.phase} phase (${ss.intensity}) · ~${ss.yearsRemaining.toFixed(1)}y remaining`
+          : "Not active"],
+        ["Dasha-lord transits", report.dashaResonance.length
+          ? report.dashaResonance.map(r => `${r.planet} · h${r.houseFromMoon}`).join(", ")
+          : "None currently"],
+      ]);
+      drawSub("Transiting Grahas");
+      drawTable(
+        ["Planet", "Sign", "House(Moon)", "Verdict", "AV"],
+        report.transits.map(t => [
+          t.planet + (t.retrograde ? " (R)" : ""),
+          RASHIS[t.transitRashi],
+          `H${t.houseFromMoon}`,
+          t.favorable ? (t.vedhaBy ? `Vedha by ${t.vedhaBy}` : "Favorable") : "Testing",
+          String(t.bindus ?? "—"),
+        ]),
+        [90, 120, 90, 130, 50],
+      );
+    } catch { /* ignore */ }
+  }
+
+  // ============ Lo Shu Grid ============
+  if (key === "grand" || key === "life" || key === "wealth") {
+    try {
+      newPage();
+      drawH("Lo Shu · Birth Grid");
+      drawP("The 3x3 Lo Shu grid maps your birthdate's numbers onto ancient Chinese magic-square positions. Missing numbers reveal karmic lessons; repeated numbers reveal strengths.");
+      const grid = loShuGrid(b.date);
+      const gx = (w - 220) / 2;
+      const gy = y;
+      drawLoShu(pdf, gx, gy, 220, grid);
+      y += 260;
+      if (grid.missing?.length) drawP(`Missing: ${grid.missing.join(", ")} — karmic focus areas.`);
+      if (grid.strong?.length) drawP(`Repeated: ${grid.strong.map(s => `${s.digit}×${s.count}`).join(", ")} — natural strengths.`);
+    } catch { /* ignore */ }
+  }
+
 
   // ============ Report-specific interpretation ============
   newPage();
