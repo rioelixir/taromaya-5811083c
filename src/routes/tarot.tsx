@@ -367,11 +367,6 @@ function TarotPage() {
           </button>
         </div>
 
-        <div className="mt-2 text-xs text-muted-foreground">
-          {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you like.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} onto the board.`}
-        </div>
       </div>
 
 
