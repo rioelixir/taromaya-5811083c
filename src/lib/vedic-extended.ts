@@ -228,64 +228,136 @@ export type DashaPeriod = {
   years: number;
 };
 
+export type AntarPeriod = DashaPeriod & { pratyantar: DashaPeriod[] };
+export type MahaPeriod = DashaPeriod & { antar: AntarPeriod[] };
+
 export type DashaTree = {
-  maha: (DashaPeriod & { antar: DashaPeriod[] })[];
-  currentMaha: DashaPeriod & { antar: DashaPeriod[] };
-  currentAntar: DashaPeriod;
+  maha: MahaPeriod[];
+  currentMaha: MahaPeriod;
+  currentAntar: AntarPeriod;
+  currentPratyantar: DashaPeriod;
 };
 
-// Given birth date and Moon's nakshatra + fraction into nakshatra
-// (0..1), compute the Vimshottari dasha timeline.
+const yearsMs = (y: number) => y * 365.2425 * 86400_000;
+
+/** Build a 3-level dasha tree (Maha → Antar → Pratyantar) for any 9-lord cycle. */
+function buildDashaTree(
+  birth: Date,
+  seq: { lord: string; years: number }[],
+  totalYears: number,
+  startingIndex: number,
+  fractionElapsed: number,
+): DashaTree {
+  const now = new Date();
+  const startOfFirstMaha = new Date(
+    birth.getTime() - yearsMs(seq[startingIndex].years * fractionElapsed),
+  );
+
+  const maha: MahaPeriod[] = [];
+  let cursor = startOfFirstMaha;
+  const L = seq.length;
+  for (let i = 0; i < L; i++) {
+    const d = seq[(startingIndex + i) % L];
+    if (d.years <= 0) { continue; }
+    const mahaEnd = new Date(cursor.getTime() + yearsMs(d.years));
+    const antar: AntarPeriod[] = [];
+    let ac = cursor;
+    const antarStartIdx = seq.findIndex((x) => x.lord === d.lord && x.years > 0);
+    let placed = 0;
+    for (let j = 0; placed < L && j < L * 2; j++) {
+      const a = seq[(antarStartIdx + j) % L];
+      if (a.years <= 0) { continue; }
+      placed++;
+      const antarYears = (d.years * a.years) / totalYears;
+      const antarEnd = new Date(ac.getTime() + yearsMs(antarYears));
+      const pratStartIdx = seq.findIndex((x) => x.lord === a.lord && x.years > 0);
+      const pratyantar: DashaPeriod[] = [];
+      let pc = ac;
+      let pPlaced = 0;
+      for (let k = 0; pPlaced < L && k < L * 2; k++) {
+        const pr = seq[(pratStartIdx + k) % L];
+        if (pr.years <= 0) { continue; }
+        pPlaced++;
+        const pyrs = (antarYears * pr.years) / totalYears;
+        const pend = new Date(pc.getTime() + yearsMs(pyrs));
+        pratyantar.push({ lord: pr.lord, years: pyrs, start: pc, end: pend });
+        pc = pend;
+      }
+      antar.push({ lord: a.lord, years: antarYears, start: ac, end: antarEnd, pratyantar });
+      ac = antarEnd;
+    }
+    maha.push({ lord: d.lord, years: d.years, start: cursor, end: mahaEnd, antar });
+    cursor = mahaEnd;
+  }
+
+  const currentMaha = maha.find((m) => now >= m.start && now < m.end) ?? maha[0];
+  const currentAntar =
+    currentMaha.antar.find((a) => now >= a.start && now < a.end) ?? currentMaha.antar[0];
+  const currentPratyantar =
+    currentAntar.pratyantar.find((p) => now >= p.start && now < p.end) ??
+    currentAntar.pratyantar[0];
+
+  return { maha, currentMaha, currentAntar, currentPratyantar };
+}
+
+/** Vimshottari — 120y cycle, nakshatra-based. */
 export function computeVimshottari(
   birth: Date,
   moonNakshatraIndex: number,
-  moonDegInNak: number, // 0..(360/27)
+  moonDegInNak: number,
 ): DashaTree {
   const NAK_SPAN = 360 / 27;
-  const fraction = moonDegInNak / NAK_SPAN; // portion of nakshatra elapsed
-  // Nakshatra lord sequence repeats every 9 nakshatras aligned with DASHA_SEQUENCE
+  const fraction = moonDegInNak / NAK_SPAN;
   const lordIndex = moonNakshatraIndex % 9;
-  const startingMaha = DASHA_SEQUENCE[lordIndex];
-  const remainingYears = startingMaha.years * (1 - fraction);
+  return buildDashaTree(birth, DASHA_SEQUENCE, DASHA_TOTAL_YEARS, lordIndex, fraction);
+}
 
-  const now = new Date();
+/** Ashtottari — 108-year, 8 lords (traditional Krittika-onward mapping). */
+export const ASHTOTTARI_SEQUENCE: { lord: string; years: number }[] = [
+  { lord: "Sun", years: 6 },
+  { lord: "Moon", years: 15 },
+  { lord: "Mars", years: 8 },
+  { lord: "Mercury", years: 17 },
+  { lord: "Saturn", years: 10 },
+  { lord: "Jupiter", years: 19 },
+  { lord: "Rahu", years: 12 },
+  { lord: "Venus", years: 21 },
+];
+export const ASHTOTTARI_TOTAL_YEARS = 108;
 
-  // Anchor: the birth moment is at `fraction` into starting mahadasha.
-  // So the "true start" of the starting mahadasha = birth - fraction*years.
-  const yearsMs = (y: number) => y * 365.2425 * 86400_000;
-  const startOfFirstMaha = new Date(birth.getTime() - yearsMs(startingMaha.years * fraction));
+export function computeAshtottari(
+  birth: Date,
+  moonNakshatraIndex: number,
+  moonDegInNak: number,
+): DashaTree {
+  const NAK_SPAN = 360 / 27;
+  const fraction = moonDegInNak / NAK_SPAN;
+  const lordIndex = moonNakshatraIndex % 8;
+  return buildDashaTree(birth, ASHTOTTARI_SEQUENCE, ASHTOTTARI_TOTAL_YEARS, lordIndex, fraction);
+}
 
-  const maha: (DashaPeriod & { antar: DashaPeriod[] })[] = [];
-  let cursor = startOfFirstMaha;
-  for (let i = 0; i < 9; i++) {
-    const d = DASHA_SEQUENCE[(lordIndex + i) % 9];
-    const end = new Date(cursor.getTime() + yearsMs(d.years));
-    // Antar dashas within this maha: same 9-cycle order starting from d.lord
-    const antarStartIdx = DASHA_SEQUENCE.findIndex((x) => x.lord === d.lord);
-    const antar: DashaPeriod[] = [];
-    let ac = cursor;
-    for (let j = 0; j < 9; j++) {
-      const a = DASHA_SEQUENCE[(antarStartIdx + j) % 9];
-      const antarYears = (d.years * a.years) / DASHA_TOTAL_YEARS;
-      const ae = new Date(ac.getTime() + yearsMs(antarYears));
-      antar.push({ lord: a.lord, years: antarYears, start: ac, end: ae });
-      ac = ae;
-    }
-    maha.push({ lord: d.lord, years: d.years, start: cursor, end, antar });
-    cursor = end;
-  }
+/** Yogini — 36-year, 8 yoginis; starting yogini = (moonNak + 1) % 8. */
+export const YOGINI_SEQUENCE: { lord: string; years: number }[] = [
+  { lord: "Mangala (Moon)", years: 1 },
+  { lord: "Pingala (Sun)", years: 2 },
+  { lord: "Dhanya (Jupiter)", years: 3 },
+  { lord: "Bhramari (Mars)", years: 4 },
+  { lord: "Bhadrika (Mercury)", years: 5 },
+  { lord: "Ulka (Saturn)", years: 6 },
+  { lord: "Siddha (Venus)", years: 7 },
+  { lord: "Sankata (Rahu)", years: 8 },
+];
+export const YOGINI_TOTAL_YEARS = 36;
 
-  // Find current
-  const currentMaha =
-    maha.find((m) => now >= m.start && now < m.end) ?? maha[0];
-  const currentAntar =
-    currentMaha.antar.find((a) => now >= a.start && now < a.end) ??
-    currentMaha.antar[0];
-
-  // Also expose remaining years for first maha (useful info)
-  void remainingYears;
-
-  return { maha, currentMaha, currentAntar };
+export function computeYogini(
+  birth: Date,
+  moonNakshatraIndex: number,
+  moonDegInNak: number,
+): DashaTree {
+  const NAK_SPAN = 360 / 27;
+  const fraction = moonDegInNak / NAK_SPAN;
+  const lordIndex = (moonNakshatraIndex + 1) % 8;
+  return buildDashaTree(birth, YOGINI_SEQUENCE, YOGINI_TOTAL_YEARS, lordIndex, fraction);
 }
 
 // ─────────────────────────────────────────────────────────────
