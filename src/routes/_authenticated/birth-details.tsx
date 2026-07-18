@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/birth-details")({
   component: () => (
-    <PremiumGate feature="Birth Details">
+    <PremiumGate featureName="Birth Details">
       <BirthDetailsPage />
     </PremiumGate>
   ),
