@@ -295,3 +295,51 @@ function MiniChart({ chart }: { chart: ReturnType<typeof computeKundli> }) {
   );
 }
 void formatDegree;
+
+function KootaRadar({ kootas }: { kootas: { name: string; score: number; max: number }[] }) {
+  const size = 260;
+  const cx = size / 2, cy = size / 2;
+  const rMax = size / 2 - 32;
+  const n = kootas.length;
+  const angleFor = (i: number) => (i / n) * Math.PI * 2 - Math.PI / 2;
+  const point = (i: number, frac: number) => {
+    const a = angleFor(i);
+    return [cx + Math.cos(a) * rMax * frac, cy + Math.sin(a) * rMax * frac] as const;
+  };
+  const gridLevels = [0.25, 0.5, 0.75, 1];
+  const dataPath = kootas.map((k, i) => {
+    const [x, y] = point(i, k.score / k.max);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ") + " Z";
+
+  return (
+    <div className="flex justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[280px]">
+        {gridLevels.map((lv) => (
+          <polygon
+            key={lv}
+            points={kootas.map((_, i) => point(i, lv).join(",")).join(" ")}
+            fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"
+          />
+        ))}
+        {kootas.map((_, i) => {
+          const [x, y] = point(i, 1);
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />;
+        })}
+        <path d={dataPath} fill="rgba(212,175,55,0.25)" stroke="hsl(45 80% 60%)" strokeWidth="1.5" />
+        {kootas.map((k, i) => {
+          const [x, y] = point(i, k.score / k.max);
+          return <circle key={i} cx={x} cy={y} r="3" fill="hsl(45 80% 60%)" />;
+        })}
+        {kootas.map((k, i) => {
+          const [x, y] = point(i, 1.18);
+          return (
+            <text key={k.name} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fill="rgba(240,235,220,0.75)" fontSize="9" fontFamily="ui-sans-serif">
+              {k.name} {k.score}/{k.max}
+            </text>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
