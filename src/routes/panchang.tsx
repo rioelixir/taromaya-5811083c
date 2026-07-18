@@ -4,9 +4,11 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computePanchang, fmtTime, fmtRange, todaysFestivals } from "@/lib/panchang";
 import { classifyPanchaka, bhadraInfo, tithiQuality, nakshatraCharacter, yogaQuality } from "@/lib/panchang-deep";
+import { computeMonthAlmanac, chaughadiyaSummary, type AlmanacDay } from "@/lib/panchang-month";
 import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
 import { scanFestivals } from "@/lib/festivals";
 import { Sun, Moon, Clock, MapPin, Sparkles, CalendarDays, ShieldAlert, Flame } from "lucide-react";
+
 
 export const Route = createFileRoute("/panchang")({
   component: () => (<PremiumGate featureName="Panchang"><PanchangPage /></PremiumGate>),
@@ -195,6 +197,14 @@ function PanchangPage() {
       {/* Deep attributes: Panchaka, Bhadra, Tithi quality, Yoga quality, Nakshatra character */}
       <DeepAttributes p={p} weekdayNum={new Date(date).getDay()} />
 
+      {/* Month Almanac — 30-day quality ledger */}
+      <MonthAlmanac date={date} lat={Number(lat)} lon={Number(lon)} />
+
+      {/* Today's chaughadiya heatmap summary */}
+      <div className="mt-6">
+        <ChaughadiyaSummaryCard p={p} />
+      </div>
+
       {/* Festival Calendar */}
       <div className="mt-6">
         <GlassCard title="Festival Calendar — next 60 days">
@@ -355,3 +365,167 @@ function KV({ k, v }: { k: string; v: string }) {
     </div>
   );
 }
+
+function MonthAlmanac({ date, lat, lon }: { date: string; lat: number; lon: number }) {
+  const [days, setDays] = useState(30);
+  const almanac = useMemo(() => {
+    const [y, m, d] = date.split("-").map(Number);
+    const start = new Date(y, m - 1, d);
+    start.setHours(0, 0, 0, 0);
+    return computeMonthAlmanac({ startDate: start, days, latitude: lat, longitude: lon });
+  }, [date, lat, lon, days]);
+
+  const bandColor = (q: AlmanacDay["quality"]) =>
+    q === "Excellent" ? "from-emerald-400/70 to-gold/70" :
+    q === "Good"      ? "from-gold/70 to-gold-soft/60" :
+    q === "Fair"      ? "from-white/25 to-white/10" :
+                        "from-red-500/70 to-red-500/30";
+
+  return (
+    <div className="mt-6">
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-4">
+          <CalendarDays className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Almanac · next {days} days
+          </div>
+          <div className="ml-auto flex gap-1">
+            {[15, 30, 60].map((n) => (
+              <button
+                key={n}
+                onClick={() => setDays(n)}
+                className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                  days === n ? "border-gold/60 bg-gold/10 text-gold" : "border-white/10 text-muted-foreground"
+                }`}
+              >
+                {n}d
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Heatstrip */}
+        <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${Math.min(days, 30)}, minmax(0,1fr))` }}>
+          {almanac.slice(0, 30).map((a, i) => (
+            <div
+              key={i}
+              title={`${a.date.toDateString()} · ${a.quality} · ${a.score}`}
+              className={`h-8 rounded-md bg-gradient-to-b ${bandColor(a.quality)} border border-white/5 flex items-end justify-center text-[9px] text-cosmic/90 font-medium pb-0.5`}
+            >
+              {a.date.getDate()}
+            </div>
+          ))}
+        </div>
+
+        {/* Second row for days > 30 */}
+        {days > 30 && (
+          <div className="mt-1 grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${days - 30}, minmax(0,1fr))` }}>
+            {almanac.slice(30).map((a, i) => (
+              <div
+                key={i}
+                title={`${a.date.toDateString()} · ${a.quality} · ${a.score}`}
+                className={`h-8 rounded-md bg-gradient-to-b ${bandColor(a.quality)} border border-white/5 flex items-end justify-center text-[9px] text-cosmic/90 font-medium pb-0.5`}
+              >
+                {a.date.getDate()}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-3 flex flex-wrap gap-3 text-[10px] text-muted-foreground">
+          <Legend color="from-emerald-400/70 to-gold/70" label="Excellent" />
+          <Legend color="from-gold/70 to-gold-soft/60" label="Good" />
+          <Legend color="from-white/25 to-white/10" label="Fair" />
+          <Legend color="from-red-500/70 to-red-500/30" label="Avoid" />
+        </div>
+
+        {/* Detailed list */}
+        <div className="mt-5 space-y-2 max-h-[420px] overflow-y-auto pr-1">
+          {almanac.map((a, i) => (
+            <AlmanacRow key={i} a={a} />
+          ))}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+function AlmanacRow({ a }: { a: AlmanacDay }) {
+  const badge =
+    a.quality === "Excellent" ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200" :
+    a.quality === "Good"      ? "border-gold/40 bg-gold/10 text-gold" :
+    a.quality === "Fair"      ? "border-white/15 bg-white/5 text-pearl/80" :
+                                 "border-red-500/40 bg-red-500/10 text-red-200";
+  return (
+    <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 flex flex-wrap items-center gap-3">
+      <div className="w-28 font-mono text-xs text-muted-foreground">
+        {a.date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+      </div>
+      <div className="text-xs text-pearl">
+        {a.paksha} · {a.tithi}
+      </div>
+      <div className="text-xs text-muted-foreground">
+        <span className="text-pearl/80">{a.nakshatra}</span> · {a.yoga}
+      </div>
+      <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-wrap gap-1">
+          {a.tags.slice(0, 4).map((t, j) => (
+            <span
+              key={j}
+              className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+                t.kind === "good" ? "border-emerald-400/30 text-emerald-300 bg-emerald-500/5"
+                  : t.kind === "bad" ? "border-red-400/30 text-red-300 bg-red-500/5"
+                  : "border-white/10 text-muted-foreground"
+              }`}
+            >
+              {t.label}
+            </span>
+          ))}
+        </div>
+        <span className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${badge}`}>
+          {a.quality} · {a.score}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className={`inline-block h-3 w-6 rounded bg-gradient-to-b ${color}`} />
+      {label}
+    </span>
+  );
+}
+
+function ChaughadiyaSummaryCard({ p }: { p: ReturnType<typeof computePanchang> }) {
+  const s = chaughadiyaSummary(p);
+  const all = [...p.chaughadiyaDay, ...p.chaughadiyaNight];
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 mb-3">
+        <Flame className="w-4 h-4 text-gold" />
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          Chaughadiya today · {s.good} good · {s.bad} avoid · {s.neutral} neutral
+        </div>
+      </div>
+      <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${Math.max(all.length, 1)}, minmax(0,1fr))` }}>
+        {all.map((c, i) => {
+          const col = c.nature === "good" ? "bg-emerald-500/40"
+            : c.nature === "bad" ? "bg-red-500/40"
+            : "bg-white/10";
+          const isNight = i >= p.chaughadiyaDay.length;
+          return (
+            <div key={i} title={`${c.name} · ${c.nature}`}
+              className={`h-10 rounded-md ${col} border ${isNight ? "border-pearl/10" : "border-gold/10"} flex flex-col items-center justify-center`}>
+              <div className="text-[9px] text-pearl/90">{c.name.slice(0, 4)}</div>
+              <div className="text-[8px] text-muted-foreground">{fmtTime(c.from)}</div>
+            </div>
+          );
+        })}
+      </div>
+    </GlassCard>
+  );
+}
+
