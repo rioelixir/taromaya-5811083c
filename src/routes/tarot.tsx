@@ -712,16 +712,3 @@ function renderInline(text: string) {
     ),
   );
 }
-
-function DetailBlock({ label, children, muted = false }: { label: string; children: ReactNode; muted?: boolean }) {
-  return (
-    <div>
-      <div className={`text-[10px] uppercase tracking-[0.3em] mb-1 ${muted ? "text-pearl/50" : "text-gold/80"}`}>
-        {label}
-      </div>
-      <div className={`text-sm leading-relaxed ${muted ? "text-pearl/70" : "text-pearl"}`}>
-        {children}
-      </div>
-    </div>
-  );
-}
