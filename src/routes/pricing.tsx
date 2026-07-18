@@ -124,6 +124,21 @@ function PricingPage() {
     }
   };
 
+  if (subState.isAdmin) {
+    return (
+      <PageShell hideAI eyebrow="Admin" title="Unlimited access" subtitle="Admins bypass membership — every module is unlocked for you.">
+        <GlassCard>
+          <div className="flex items-center gap-2 text-sm text-pearl">
+            <Crown className="h-4 w-4 text-gold" /> You have full admin access. No subscription needed.
+          </div>
+          <Link to="/admin" className="mt-4 inline-flex items-center gap-2 rounded-full gold-border bg-gold/10 px-5 py-2 text-sm text-gold hover:bg-gold/20">
+            Open admin panel
+          </Link>
+        </GlassCard>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell hideAI
       eyebrow="Membership"
