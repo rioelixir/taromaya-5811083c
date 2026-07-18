@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computePanchang, fmtTime, fmtRange, todaysFestivals } from "@/lib/panchang";
-import { Sun, Moon, Clock, MapPin } from "lucide-react";
+import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
+import { scanFestivals } from "@/lib/festivals";
+import { Sun, Moon, Clock, MapPin, Sparkles, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/panchang")({
   component: () => (<PremiumGate featureName="Panchang"><PanchangPage /></PremiumGate>),
