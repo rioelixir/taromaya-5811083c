@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, type KundliChart } from "@/lib/vedic";
 import { REMEDY_CATALOG, prioritiseRemedies, type PlanetKey } from "@/lib/remedies";
-import { Flame, Sparkles, Gem, Coins } from "lucide-react";
+import { prescribeGemstone, rudrakshaFor, yantraFor, planJapa, GRAMS_PER_RATTI } from "@/lib/remedies-deep";
+import { Flame, Sparkles, Gem, Coins, Circle, ScrollText } from "lucide-react";
 
 export const Route = createFileRoute("/remedies")({
   component: () => (<PremiumGate featureName="Remedies"><RemediesPage /></PremiumGate>),
