@@ -302,71 +302,88 @@ function TarotPage() {
 
       {/* Top control bar */}
       <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
-          <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
+            {!headerCollapsed && (
+              <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+            )}
+          </div>
+          <button
+            onClick={() => setHeaderCollapsed((v) => !v)}
+            className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-pearl hover:bg-white/5"
+            aria-label={headerCollapsed ? "Expand controls" : "Collapse controls"}
+          >
+            {headerCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+            {headerCollapsed ? "Show" : "Hide"}
+          </button>
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
-            const active = k === spreadKey;
-            return (
+        {!headerCollapsed && (
+          <>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
+                const active = k === spreadKey;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => setSpreadKey(k)}
+                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
+                      active
+                        ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
+                        : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
+                    }`}
+                  >
+                    {SPREADS[k].label}
+                  </button>
+                );
+              })}
               <button
-                key={k}
-                onClick={() => setSpreadKey(k)}
-                className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
-                  active
+                onClick={() => setCourtOnly((v) => !v)}
+                className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
+                  courtOnly
                     ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
                     : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
                 }`}
+                title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
               >
-                {SPREADS[k].label}
+                <Crown className="h-3.5 w-3.5" /> Court Cards Only
               </button>
-            );
-          })}
-          <button
-            onClick={() => setCourtOnly((v) => !v)}
-            className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
-              courtOnly
-                ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
-                : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
-            }`}
-            title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
-          >
-            <Crown className="h-3.5 w-3.5" /> Court Cards Only
-          </button>
-        </div>
+            </div>
 
-        <div className="mt-2 flex flex-wrap gap-2 items-center">
-          <input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            maxLength={200}
-            placeholder="What's on your mind? (optional)"
-            className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
-          />
-          <button
-            onClick={shuffleAll}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-            title="Shuffle every deck"
-          >
-            <Shuffle className="h-4 w-4" /> Shuffle
-          </button>
-          <button
-            onClick={resetSpread}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-          >
-            <RotateCcw className="h-4 w-4" /> Start over
-          </button>
-          <button
-            onClick={requestReading}
-            disabled={!readyToInterpret || loadingReading}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Read the cards
-          </button>
-        </div>
+            <div className="mt-2 flex flex-wrap gap-2 items-center">
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                maxLength={200}
+                placeholder="What's on your mind? (optional)"
+                className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
+              />
+              <button
+                onClick={shuffleAll}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+                title="Shuffle every deck"
+              >
+                <Shuffle className="h-4 w-4" /> Shuffle
+              </button>
+              <button
+                onClick={resetSpread}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+              >
+                <RotateCcw className="h-4 w-4" /> Start over
+              </button>
+              <button
+                onClick={requestReading}
+                disabled={!readyToInterpret || loadingReading}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Read the cards
+              </button>
+            </div>
+          </>
+        )}
+
 
       </div>
 
