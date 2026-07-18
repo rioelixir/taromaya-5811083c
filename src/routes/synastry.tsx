@@ -6,9 +6,12 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { BiWheelChart } from "@/components/bi-wheel-chart";
 import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { synastryAspects, houseOverlay, compositeChart, synastryScore } from "@/lib/synastry";
-import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
+import { computeKundli, formatDegree, PLANET_GLYPHS, type PlanetName } from "@/lib/vedic";
+import { ashtakootMilan } from "@/lib/ashtakoot";
+import { findAspectHits, fmtDay } from "@/lib/transits-timeline";
 import { aiReading } from "@/lib/ai-reading.functions";
-import { Loader2, Sparkles, Heart } from "lucide-react";
+import { Loader2, Sparkles, Heart, Flame, Zap } from "lucide-react";
+
 
 export const Route = createFileRoute("/synastry")({
   component: () => (<PremiumGate featureName="Synastry"><SynastryPage /></PremiumGate>),
