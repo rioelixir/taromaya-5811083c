@@ -8,7 +8,8 @@ import { ashtakootMilan } from "@/lib/ashtakoot";
 import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { synastryAspects, compositeChart, synastryScore } from "@/lib/synastry";
 import { aiReading } from "@/lib/ai-reading.functions";
-import { Loader2, Sparkles, Heart, CheckCircle2, XCircle } from "lucide-react";
+import { deepCompat } from "@/lib/compat-deep";
+import { Loader2, Sparkles, Heart, CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/compatibility")({
   component: () => (<PremiumGate featureName="Compatibility"><CompatibilityPage /></PremiumGate>),
@@ -58,7 +59,8 @@ function CompatibilityPage() {
     const synHits = synastryAspects(westA, westB);
     const synScore = synastryScore(synHits);
     const composite = compositeChart(westA, westB);
-    return { chartA, chartB, milan, synHits, synScore, composite };
+    const deep = deepCompat(chartA, chartB);
+    return { chartA, chartB, milan, synHits, synScore, composite, deep };
   }
 
 
@@ -154,6 +156,10 @@ Structure: Overall Compatibility, Emotional & Mental (Gana, Bhakoot), Physical &
               </div>
             </GlassCard>
           </div>
+
+          <DeepCompatPanel deep={result.deep} />
+
+
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <GlassCard title="Ashtakoot radar">
@@ -340,6 +346,40 @@ function KootaRadar({ kootas }: { kootas: { name: string; score: number; max: nu
           );
         })}
       </svg>
+    </div>
+  );
+}
+
+function DeepCompatPanel({ deep }: { deep: import("@/lib/compat-deep").DeepCompat }) {
+  const items: { title: string; ok: boolean; body: React.ReactNode }[] = [
+    { title: "Stree-Dirgha", ok: deep.streeDirgha.ok, body: deep.streeDirgha.note },
+    { title: "Mahendra yoga", ok: deep.mahendra.ok, body: deep.mahendra.note },
+    { title: "Vedha dosha", ok: !deep.vedha.present, body: deep.vedha.note },
+    { title: `Rajju — ${deep.rajju.part}/${deep.rajju.girlPart}`, ok: !deep.rajju.present, body: deep.rajju.note },
+    { title: "Nadi dosha (deep)", ok: !deep.nadi.doshaPresent || deep.nadi.cancelled, body: deep.nadi.notes.join(" ") },
+    { title: "Manglik parihara", ok: !deep.manglik.boyM && !deep.manglik.girlM ? true : deep.manglik.cancelled,
+      body: deep.manglik.reasons.length ? deep.manglik.reasons.join(" ") :
+        (deep.manglik.boyM || deep.manglik.girlM) ? "Manglik present without classical cancellation." : "Neither chart is Manglik." },
+    { title: `Papasamya (${deep.papasamya.boy}·${deep.papasamya.girl})`, ok: deep.papasamya.balanced, body: deep.papasamya.note },
+  ];
+  return (
+    <div className="mt-6">
+      <GlassCard title="Deep Vedic compatibility — parihara & yogas">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((it) => (
+            <div key={it.title} className={`rounded-xl p-3 border ${it.ok ? "bg-emerald-500/10 border-emerald-400/20" : "bg-red-500/10 border-red-400/30"}`}>
+              <div className="flex items-center gap-2 text-xs">
+                {it.ok ? <ShieldCheck className="w-4 h-4 text-emerald-300" /> : <ShieldAlert className="w-4 h-4 text-red-300" />}
+                <span className="uppercase tracking-widest text-muted-foreground">{it.title}</span>
+              </div>
+              <div className="mt-1 text-xs text-pearl leading-relaxed">{it.body}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 text-[11px] text-muted-foreground">
+          Classical parihara (cancellation) rules override raw Ashtakoot scores — read this panel alongside the 36-point total.
+        </div>
+      </GlassCard>
     </div>
   );
 }
