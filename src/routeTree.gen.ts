@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as YantraRouteImport } from './routes/yantra'
 import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as VedicTransitsRouteImport } from './routes/vedic-transits'
 import { Route as VastuRouteImport } from './routes/vastu'
@@ -21,6 +22,7 @@ import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SadesatiRouteImport } from './routes/sadesati'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as RectificationRouteImport } from './routes/rectification'
@@ -36,10 +38,12 @@ import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
+import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FestivalsRouteImport } from './routes/festivals'
 import { Route as DreamsRouteImport } from './routes/dreams'
+import { Route as DharmaRouteImport } from './routes/dharma'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as ChakraRouteImport } from './routes/chakra'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
@@ -61,6 +65,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
 
+const YantraRoute = YantraRouteImport.update({
+  id: '/yantra',
+  path: '/yantra',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WeatherRoute = WeatherRouteImport.update({
   id: '/weather',
   path: '/weather',
@@ -119,6 +128,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SadesatiRoute = SadesatiRouteImport.update({
+  id: '/sadesati',
+  path: '/sadesati',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -196,6 +210,11 @@ const KarmaRoute = KarmaRouteImport.update({
   path: '/karma',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KaalsarpRoute = KaalsarpRouteImport.update({
+  id: '/kaalsarp',
+  path: '/kaalsarp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
   id: '/horoscope',
   path: '/horoscope',
@@ -214,6 +233,11 @@ const FestivalsRoute = FestivalsRouteImport.update({
 const DreamsRoute = DreamsRouteImport.update({
   id: '/dreams',
   path: '/dreams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DharmaRoute = DharmaRouteImport.update({
+  id: '/dharma',
+  path: '/dharma',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompatibilityRoute = CompatibilityRouteImport.update({
@@ -328,10 +352,12 @@ export interface FileRoutesByFullPath {
   '/bookmarks': typeof BookmarksRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
+  '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
@@ -347,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
+  '/sadesati': typeof SadesatiRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -359,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
+  '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -380,10 +408,12 @@ export interface FileRoutesByTo {
   '/bookmarks': typeof BookmarksRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
+  '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
@@ -399,6 +429,7 @@ export interface FileRoutesByTo {
   '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
+  '/sadesati': typeof SadesatiRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -411,6 +442,7 @@ export interface FileRoutesByTo {
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
+  '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -434,10 +466,12 @@ export interface FileRoutesById {
   '/bookmarks': typeof BookmarksRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
+  '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
@@ -453,6 +487,7 @@ export interface FileRoutesById {
   '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
+  '/sadesati': typeof SadesatiRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
@@ -465,6 +500,7 @@ export interface FileRoutesById {
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
+  '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
@@ -488,10 +524,12 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/chakra'
     | '/compatibility'
+    | '/dharma'
     | '/dreams'
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
@@ -507,6 +545,7 @@ export interface FileRouteTypes {
     | '/rectification'
     | '/remedies'
     | '/reports'
+    | '/sadesati'
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
@@ -519,6 +558,7 @@ export interface FileRouteTypes {
     | '/vastu'
     | '/vedic-transits'
     | '/weather'
+    | '/yantra'
     | '/admin'
     | '/journal'
     | '/meditation'
@@ -540,10 +580,12 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/chakra'
     | '/compatibility'
+    | '/dharma'
     | '/dreams'
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
@@ -559,6 +601,7 @@ export interface FileRouteTypes {
     | '/rectification'
     | '/remedies'
     | '/reports'
+    | '/sadesati'
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
@@ -571,6 +614,7 @@ export interface FileRouteTypes {
     | '/vastu'
     | '/vedic-transits'
     | '/weather'
+    | '/yantra'
     | '/admin'
     | '/journal'
     | '/meditation'
@@ -593,10 +637,12 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/chakra'
     | '/compatibility'
+    | '/dharma'
     | '/dreams'
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
@@ -612,6 +658,7 @@ export interface FileRouteTypes {
     | '/rectification'
     | '/remedies'
     | '/reports'
+    | '/sadesati'
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
@@ -624,6 +671,7 @@ export interface FileRouteTypes {
     | '/vastu'
     | '/vedic-transits'
     | '/weather'
+    | '/yantra'
     | '/_authenticated/admin'
     | '/_authenticated/journal'
     | '/_authenticated/meditation'
@@ -647,10 +695,12 @@ export interface RootRouteChildren {
   BookmarksRoute: typeof BookmarksRoute
   ChakraRoute: typeof ChakraRoute
   CompatibilityRoute: typeof CompatibilityRoute
+  DharmaRoute: typeof DharmaRoute
   DreamsRoute: typeof DreamsRoute
   FestivalsRoute: typeof FestivalsRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
+  KaalsarpRoute: typeof KaalsarpRoute
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
@@ -666,6 +716,7 @@ export interface RootRouteChildren {
   RectificationRoute: typeof RectificationRoute
   RemediesRoute: typeof RemediesRoute
   ReportsRoute: typeof ReportsRoute
+  SadesatiRoute: typeof SadesatiRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
@@ -678,12 +729,20 @@ export interface RootRouteChildren {
   VastuRoute: typeof VastuRoute
   VedicTransitsRoute: typeof VedicTransitsRoute
   WeatherRoute: typeof WeatherRoute
+  YantraRoute: typeof YantraRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/yantra': {
+      id: '/yantra'
+      path: '/yantra'
+      fullPath: '/yantra'
+      preLoaderRoute: typeof YantraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/weather': {
       id: '/weather'
       path: '/weather'
@@ -766,6 +825,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sadesati': {
+      id: '/sadesati'
+      path: '/sadesati'
+      fullPath: '/sadesati'
+      preLoaderRoute: typeof SadesatiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -873,6 +939,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KarmaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kaalsarp': {
+      id: '/kaalsarp'
+      path: '/kaalsarp'
+      fullPath: '/kaalsarp'
+      preLoaderRoute: typeof KaalsarpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/horoscope': {
       id: '/horoscope'
       path: '/horoscope'
@@ -899,6 +972,13 @@ declare module '@tanstack/react-router' {
       path: '/dreams'
       fullPath: '/dreams'
       preLoaderRoute: typeof DreamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dharma': {
+      id: '/dharma'
+      path: '/dharma'
+      fullPath: '/dharma'
+      preLoaderRoute: typeof DharmaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compatibility': {
@@ -1078,10 +1158,12 @@ const rootRouteChildren: RootRouteChildren = {
   BookmarksRoute: BookmarksRoute,
   ChakraRoute: ChakraRoute,
   CompatibilityRoute: CompatibilityRoute,
+  DharmaRoute: DharmaRoute,
   DreamsRoute: DreamsRoute,
   FestivalsRoute: FestivalsRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
+  KaalsarpRoute: KaalsarpRoute,
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
@@ -1097,6 +1179,7 @@ const rootRouteChildren: RootRouteChildren = {
   RectificationRoute: RectificationRoute,
   RemediesRoute: RemediesRoute,
   ReportsRoute: ReportsRoute,
+  SadesatiRoute: SadesatiRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,
@@ -1109,6 +1192,7 @@ const rootRouteChildren: RootRouteChildren = {
   VastuRoute: VastuRoute,
   VedicTransitsRoute: VedicTransitsRoute,
   WeatherRoute: WeatherRoute,
+  YantraRoute: YantraRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
