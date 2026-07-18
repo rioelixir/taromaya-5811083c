@@ -15,14 +15,14 @@ export function PageShell({
   return (
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
-      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-8 lg:pt-12 pb-16">
-        <header className="mb-8">
+      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-16 lg:pt-12 pb-16">
+        <header className="mb-6 sm:mb-8">
           {eyebrow && (
-            <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+            <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] text-muted-foreground">
               {eyebrow}
             </div>
           )}
-          <h1 className="mt-2 font-display text-4xl sm:text-5xl leading-tight">
+          <h1 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl leading-tight break-words">
             <span className="gold-text">{title}</span>
           </h1>
           {subtitle && (

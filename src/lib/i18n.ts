@@ -52,7 +52,12 @@ const DICT: Record<string, Entry> = {
 
   // Nav items
   "Dashboard":       { en: "Dashboard",       hi: "डैशबोर्ड",       hr: "Dashboard" },
+  "Life Dashboard":  { en: "Life Dashboard",  hi: "जीवन डैशबोर्ड",  hr: "Life Dashboard" },
   "AI Guide":        { en: "AI Guide",        hi: "एआई मार्गदर्शक", hr: "AI Guide" },
+  "Career":          { en: "Career",          hi: "करियर",         hr: "Career" },
+  "Finance":         { en: "Finance",         hi: "धन",            hr: "Dhan" },
+  "Health":          { en: "Health",          hi: "स्वास्थ्य",      hr: "Swasthya" },
+  "Mangal Dosha":    { en: "Mangal Dosha",    hi: "मंगल दोष",      hr: "Mangal Dosha" },
   "Horoscope":       { en: "Horoscope",       hi: "राशिफल",       hr: "Rashifal" },
   "Kundli":          { en: "Kundli",          hi: "कुंडली",        hr: "Kundli" },
   "Astrology":       { en: "Astrology",       hi: "ज्योतिष",       hr: "Jyotish" },
