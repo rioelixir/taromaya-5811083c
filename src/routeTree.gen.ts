@@ -63,6 +63,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTranslateRouteImport } from './routes/api/translate'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
@@ -344,6 +345,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTranslateRoute = ApiTranslateRouteImport.update({
+  id: '/api/translate',
+  path: '/api/translate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -465,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -531,6 +538,7 @@ export interface FileRoutesByTo {
   '/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -599,6 +607,7 @@ export interface FileRoutesById {
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -667,6 +676,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/translate'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
@@ -733,6 +743,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/translate'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   id:
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/_authenticated/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/translate'
     | '/_authenticated/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
@@ -861,6 +873,7 @@ export interface RootRouteChildren {
   YantraRoute: typeof YantraRoute
   ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiTranslateRoute: typeof ApiTranslateRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1244,6 +1257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/translate': {
+      id: '/api/translate'
+      path: '/api/translate'
+      fullPath: '/api/translate'
+      preLoaderRoute: typeof ApiTranslateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -1406,6 +1426,7 @@ const rootRouteChildren: RootRouteChildren = {
   YantraRoute: YantraRoute,
   ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiTranslateRoute: ApiTranslateRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport
