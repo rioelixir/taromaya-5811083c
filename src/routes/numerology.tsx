@@ -209,24 +209,32 @@ Structure: Core Signature, Life Path & Destiny, Inner Self (Soul Urge & Personal
   );
 }
 
-function MobileNumerology() {
+function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setBirthDate: (s: string) => void }) {
   const [num, setNum] = useState("");
   const analysis = useMemo(() => (num ? analyzeMobile(num) : null), [num]);
+  const match = useMemo(() => (num && birthDate ? mobileDobMatch(num, birthDate) : null), [num, birthDate]);
   return (
     <>
       <GlassCard>
-        <label className="block">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile number</span>
-          <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile number</span>
+            <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          </label>
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+            <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          </label>
+        </div>
       </GlassCard>
       {analysis && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <BigNum label="Reduced" n={analysis.reduced} />
           <BigNum label="Total" n={analysis.total} />
           <GlassCard title="Signature">
-            <div className={`text-sm ${analysis.favorable ? "text-emerald-300" : "text-orange-300"}`}>
+            <div className={`text-sm ${analysis.favorable ? "text-emerald-600" : "text-orange-600"}`}>
               {analysis.favorable ? "Favourable vibration" : "Requires balance"}
             </div>
             <div className="mt-1 text-xs text-muted-foreground">Ruler: {analysis.planetRuler}</div>
@@ -244,9 +252,61 @@ function MobileNumerology() {
           </GlassCard>
         </div>
       )}
+
+      {match && (
+        <div className="mt-6">
+          <GlassCard title="Mobile ↔ Date of Birth frequency match">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="rounded-xl bg-white/5 p-4 text-center">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Match score</div>
+                <div className={`font-display text-5xl mt-2 ${
+                  match.score >= 80 ? "text-emerald-600" :
+                  match.score >= 60 ? "gold-text" :
+                  match.score >= 40 ? "text-orange-600" : "text-red-600"
+                }`}>{match.score}%</div>
+                <div className="mt-2 text-xs text-pearl">{match.verdict}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile vibration</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.reducedMobile}</div>
+                <div className="text-xs text-muted-foreground">Planet: {match.planetMobile}</div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Sum {match.totalMobile}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Life-Path vibration</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.conductorDob}</div>
+                <div className="text-xs text-muted-foreground">Planet: {match.planetDob}</div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Driver (Mulank) {match.driverDob}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Digit overlap</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.digitOverlap}<span className="text-lg text-muted-foreground">/10</span></div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {match.overlapDigits.map((d) => (
+                    <span key={d} className="rounded-full bg-gold/10 border border-gold/30 px-2 py-0.5 text-xs gold-text">{d}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-2 md:grid-cols-3 text-xs">
+              <div className={`rounded-lg px-3 py-2 ${match.matchesLifePath ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.matchesLifePath ? "✓" : "✗"} Reduces to your Life-Path number
+              </div>
+              <div className={`rounded-lg px-3 py-2 ${match.matchesDriver ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.matchesDriver ? "✓" : "✗"} Reduces to your Driver (Mulank)
+              </div>
+              <div className={`rounded-lg px-3 py-2 ${match.compatible ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.compatible ? "✓" : "✗"} Planet-compatible with your DOB
+              </div>
+            </div>
+            <div className="mt-4 rounded-xl bg-white/5 p-3 text-sm text-pearl">{match.advice}</div>
+          </GlassCard>
+        </div>
+      )}
     </>
   );
 }
+
 
 function CompatibilityNumerology() {
   const [a, setA] = useState({ name: "", date: "1995-06-15" });
