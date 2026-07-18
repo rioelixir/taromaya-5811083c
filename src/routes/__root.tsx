@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Sidebar } from "@/components/nav";
 import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
+import { AutoTranslator } from "@/components/auto-translator";
 
 function NotFoundComponent() {
   return (
@@ -204,6 +205,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AutoTranslator />
+
       {bgUrl && (
         <div
           aria-hidden
