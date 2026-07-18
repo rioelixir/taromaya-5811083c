@@ -9,6 +9,10 @@ import {
 import {
   loShuGrid, nineStarKi, kabbalah, essenceTimeline, lifeCycles, analyseName,
 } from "@/lib/numerology-deep";
+import {
+  spellingCheck, nameDeepMeaning, missingAlphabets, spellingVariants,
+  mobileDobMatch,
+} from "@/lib/name-spelling";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles } from "lucide-react";
 
