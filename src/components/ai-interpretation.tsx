@@ -112,10 +112,17 @@ export function AIInterpretation({
       )}
 
       {text && (
-        <article className="prose prose-sm sm:prose-base mt-6 max-w-none text-foreground
-          prose-headings:font-display prose-headings:text-foreground
-          prose-strong:text-primary prose-p:text-foreground/90 prose-li:text-foreground/90
-          prose-a:text-primary">
+        <article className="mt-6 space-y-3 text-foreground leading-relaxed
+          [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
+          [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-xl [&_h2]:text-primary
+          [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-lg
+          [&_p]:text-foreground/90
+          [&_strong]:text-primary [&_strong]:font-semibold
+          [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1
+          [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1
+          [&_li]:text-foreground/90
+          [&_a]:text-primary [&_a]:underline
+          [&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-4 [&_blockquote]:italic">
           <ReactMarkdown>{text}</ReactMarkdown>
         </article>
       )}
