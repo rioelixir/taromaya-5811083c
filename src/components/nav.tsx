@@ -74,6 +74,7 @@ const groups: Group[] = [
     label: "Advanced",
     items: [
       { to: "/transits", label: "Transits", icon: LineChart },
+      { to: "/vedic-transits", label: "Vedic Transits", icon: Moon },
       { to: "/progressions", label: "Progressions", icon: LineChart },
       { to: "/synastry", label: "Synastry", icon: Compass },
       { to: "/astrology", label: "Natal Chart", icon: Stars },
