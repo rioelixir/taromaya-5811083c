@@ -73,11 +73,19 @@ export type MuhuratWindow = {
     yoga: string;
     weekday: string;
   };
+  hora?: { lord: HoraLord; isDay: boolean };
+  moonRashi?: string;
 };
 
 function inRange(t: Date, r: [Date, Date] | null) {
   if (!r) return false;
   return t.getTime() >= r[0].getTime() && t.getTime() <= r[1].getTime();
+}
+
+// Approximate Moon rashi from nakshatra index (each nakshatra = 13°20').
+function nakToRashi(nakIndex: number): string {
+  const deg = (nakIndex + 0.5) * (360 / 27); // midpoint of nakshatra
+  return RASHIS[Math.floor(deg / 30) % 12];
 }
 
 export function scanMuhurats(opts: {
@@ -87,6 +95,7 @@ export function scanMuhurats(opts: {
   latitude: number;
   longitude: number;
   sliceMinutes?: number;
+  birth?: BirthContext;
 }): MuhuratWindow[] {
   const slice = opts.sliceMinutes ?? 30;
   const results: MuhuratWindow[] = [];
@@ -106,6 +115,20 @@ export function scanMuhurats(opts: {
       longitude: opts.longitude,
     });
 
+    // Next-day sunrise for hora night bracket.
+    const nextDay = new Date(day); nextDay.setDate(nextDay.getDate() + 1);
+    const nextP = computePanchang({
+      date: new Date(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate(), 12, 0, 0),
+      latitude: opts.latitude,
+      longitude: opts.longitude,
+    });
+    const weekdayNum = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getDay();
+    const horas = (p.sunrise && p.sunset && nextP.sunrise)
+      ? computeHoras(p.sunrise, p.sunset, nextP.sunrise, weekdayNum)
+      : [];
+
+    const moonRashi = nakToRashi(p.nakshatra.index);
+
     // Score core day-level factors
     let dayScore = 40;
     const dayReasons: string[] = [];
@@ -117,6 +140,17 @@ export function scanMuhurats(opts: {
     if (goodDay.has(p.weekday)) { dayScore += 10; dayReasons.push(`${p.weekday} is favourable`); }
     if (BAD_YOGAS.includes(p.yoga.name)) { dayScore -= 20; dayWarn.push(`${p.yoga.name} yoga — inauspicious`); }
     else dayReasons.push(`${p.yoga.name} yoga is benign`);
+
+    // Electional depth (Tarabala + Chandrabala + Panchaka) — day-level.
+    const elect = scoreElectional({
+      activity: opts.activity,
+      currentNakshatra: p.nakshatra.name,
+      currentMoonRashi: moonRashi,
+      birth: opts.birth,
+    });
+    dayScore += elect.delta;
+    dayReasons.push(...elect.reasons);
+    dayWarn.push(...elect.warnings);
 
     // Slice through daytime (sunrise → sunset+2h)
     if (!p.sunrise || !p.sunset) continue;
@@ -144,6 +178,22 @@ export function scanMuhurats(opts: {
         if (cha.nature === "bad")  { score -= 12; warnings.push(`${cha.name} chaughadiya (avoid)`); }
       }
 
+      // Hora affinity (per slice)
+      const hora = horas.find(h => from.getTime() >= h.from.getTime() && from.getTime() < h.to.getTime());
+      if (hora) {
+        const horaElect = scoreElectional({
+          activity: opts.activity,
+          currentNakshatra: p.nakshatra.name,
+          currentMoonRashi: moonRashi,
+          horaLord: hora.lord,
+        });
+        // hora-only delta (subtract already-applied day-level electional)
+        const horaDelta = horaElect.delta - elect.delta;
+        score += horaDelta;
+        const horaReasons = horaElect.reasons.filter(r => !elect.reasons.includes(r));
+        reasons.push(...horaReasons);
+      }
+
       score = Math.max(0, Math.min(100, score));
       const quality =
         score >= 85 ? "Excellent" :
@@ -158,6 +208,8 @@ export function scanMuhurats(opts: {
           yoga: p.yoga.name,
           weekday: p.weekday,
         },
+        hora: hora ? { lord: hora.lord, isDay: hora.isDay } : undefined,
+        moonRashi,
       });
     }
   }
@@ -165,3 +217,4 @@ export function scanMuhurats(opts: {
   results.sort((a, b) => b.score - a.score);
   return results;
 }
+
