@@ -324,6 +324,17 @@ function TarotPage() {
               </button>
             );
           })}
+          <button
+            onClick={() => setCourtOnly((v) => !v)}
+            className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
+              courtOnly
+                ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
+                : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
+            }`}
+            title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
+          >
+            <Crown className="h-3.5 w-3.5" /> Court Cards Only
+          </button>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2 items-center">
