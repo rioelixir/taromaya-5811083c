@@ -42,6 +42,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
 
 const VarshphalRoute = VarshphalRouteImport.update({
@@ -208,6 +209,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedKundliNewRoute = AuthenticatedKundliNewRouteImport.update({
+  id: '/kundli/new',
+  path: '/kundli/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicHooksSkyAlertsRoute = ApiPublicHooksSkyAlertsRouteImport.update({
   id: '/api/public/hooks/sky-alerts',
   path: '/api/public/hooks/sky-alerts',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -356,6 +365,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/saved'
     | '/api/chat'
+    | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/saved'
     | '/api/chat'
+    | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -427,6 +438,7 @@ export interface FileRouteTypes {
     | '/_authenticated/meditation'
     | '/_authenticated/saved'
     | '/api/chat'
+    | '/_authenticated/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -696,6 +708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/kundli/new': {
+      id: '/_authenticated/kundli/new'
+      path: '/kundli/new'
+      fullPath: '/kundli/new'
+      preLoaderRoute: typeof AuthenticatedKundliNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hooks/sky-alerts': {
       id: '/api/public/hooks/sky-alerts'
       path: '/api/public/hooks/sky-alerts'
@@ -711,6 +730,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
+  AuthenticatedKundliNewRoute: typeof AuthenticatedKundliNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -718,6 +738,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
+  AuthenticatedKundliNewRoute: AuthenticatedKundliNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
