@@ -109,35 +109,8 @@ async function translatePage(lang: Lang) {
   if (running) return;
   running = true;
   try {
-    if (lang === "en") {
-      // Restore originals
-      document.querySelectorAll(`[${ATTR_ORIG}]`).forEach((el) => {
-        try {
-          const orig = JSON.parse(el.getAttribute(ATTR_ORIG) || "{}") as Record<string, string>;
-          Object.entries(orig).forEach(([k, v]) => {
-            if (k === "__text") {
-              // handled per-text-node below via original text mapping — skip
-            } else if (v != null) {
-              el.setAttribute(k, v);
-            }
-          });
-        } catch { /* ignore */ }
-      });
-      // Text nodes: we stored originals in cache; simplest is to just reload the page for full fidelity.
-      // Instead, walk and reset from a per-node original if present.
-      document.querySelectorAll("[data-i18n-text]").forEach((el) => {
-        const originals = (el as HTMLElement & { __i18nOriginals?: Record<string, string> }).__i18nOriginals;
-        if (originals) {
-          el.childNodes.forEach((c) => {
-            if (c.nodeType === 3) {
-              const key = (c as Text & { __i18nKey?: string }).__i18nKey;
-              if (key && originals[key]) c.nodeValue = originals[key];
-            }
-          });
-        }
-      });
-      return;
-    }
+    if (lang === "en") return;
+
 
     const cache = loadCache(lang);
     const root = document.querySelector("main") || document.body;
