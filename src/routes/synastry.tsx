@@ -231,6 +231,65 @@ Structure: ### The bond, ### How you meet each other (Sun/Moon/Venus/Mars), ### 
             </GlassCard>
           </div>
 
+          {ashtakoot && (
+            <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+              <GlassCard title="Ashtakoot Guna Milan" desc="Vedic Moon-nakshatra compatibility, 36 point system.">
+                <div className="text-center">
+                  <div className="font-display text-6xl gold-text">{ashtakoot.total}<span className="text-2xl">/36</span></div>
+                  <div className="mt-2 text-pearl text-sm">{ashtakoot.interpretation}</div>
+                  {(ashtakoot.manglik.boy || ashtakoot.manglik.girl) && (
+                    <div className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs ${ashtakoot.manglik.cancelled ? "bg-emerald-500/10 text-emerald-200 border border-emerald-500/30" : "bg-red-500/10 text-red-200 border border-red-500/30"}`}>
+                      <Flame className="w-3 h-3" />
+                      {ashtakoot.manglik.cancelled
+                        ? "Manglik present — mutually cancelled"
+                        : `Manglik: ${ashtakoot.manglik.boy ? "You" : ""}${ashtakoot.manglik.boy && ashtakoot.manglik.girl ? " & " : ""}${ashtakoot.manglik.girl ? "Partner" : ""}`}
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+              <GlassCard title="Kootas">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {ashtakoot.kootas.map((k) => (
+                    <div key={k.name} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-pearl font-medium">{k.name}</span>
+                        <span className="gold-text font-mono">{k.score}/{k.max}</span>
+                      </div>
+                      <div className="mt-1 text-[10px] text-muted-foreground">{k.boy} · {k.girl}</div>
+                      <div className="mt-1 text-[11px] text-muted-foreground leading-snug">{k.detail}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {relTransits.length > 0 && (
+            <div className="mt-6">
+              <GlassCard title="Relationship transits — next 12 months" desc="Slow-planet transits hitting your composite chart. These are the seasons that stress or nourish the bond.">
+                <ol className="relative border-l border-white/10 pl-6 space-y-2 max-h-[420px] overflow-y-auto">
+                  {relTransits.slice(0, 60).map((h, i) => {
+                    const glyph: Record<string, string> = { conjunction: "☌", opposition: "☍", square: "□", trine: "△", sextile: "✶" };
+                    const good = h.type === "trine" || h.type === "sextile" || (h.type === "conjunction" && (h.transit === "Jupiter"));
+                    const past = h.date < new Date();
+                    return (
+                      <li key={i} className={`relative ${past ? "opacity-50" : ""}`}>
+                        <span className={`absolute -left-[29px] top-2 h-2 w-2 rounded-full shadow-[0_0_10px_var(--gold)] ${good ? "bg-emerald-300" : "bg-gold"}`} />
+                        <div className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                          <span className="font-mono text-[11px] text-muted-foreground w-24 shrink-0">{fmtDay(h.date)}</span>
+                          <Zap className={`h-3 w-3 ${good ? "text-emerald-300" : "text-gold"}`} />
+                          <span className="text-pearl"><b>{h.transit}</b> {glyph[h.type] ?? h.type} composite <b>{h.natal as PlanetName}</b></span>
+                          <span className="text-muted-foreground text-[10px]">{h.type}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </GlassCard>
+            </div>
+          )}
+
+
           <div className="mt-6">
             <GlassCard title="AI synastry reading">
               {!aiText && !loading && (
