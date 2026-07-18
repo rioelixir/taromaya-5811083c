@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Moon, RotateCcw, Sparkles, ArrowRightLeft } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Moon, RotateCcw, Sparkles, ArrowRightLeft, MapPin } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { liveSkySnapshot, signName } from "@/lib/live-sky";
 import { PLANET_GLYPHS, RASHIS, type PlanetName } from "@/lib/vedic";
+import { SkyAlertPrefs, type SkyLocation } from "@/components/sky-alert-prefs";
 
 export const Route = createFileRoute("/sky")({
   component: SkyPage,
