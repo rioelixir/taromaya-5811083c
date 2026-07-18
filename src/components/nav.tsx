@@ -78,6 +78,7 @@ const groups: Group[] = [
       { to: "/synastry", label: "Synastry", icon: Compass },
       { to: "/astrology", label: "Natal Chart", icon: Stars },
       { to: "/timeline", label: "Timeline", icon: CalendarClock },
+      { to: "/rectification", label: "Rectification", icon: Target },
       { to: "/reports", label: "Reports", icon: FileText },
 
     ],
