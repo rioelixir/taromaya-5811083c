@@ -132,6 +132,29 @@
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
+    color: oklch(0.05 0 0);
+    font-weight: 700;
+  }
+
+  p, span, li, label, div, a, button {
+    text-shadow: 0 1px 0 oklch(1 0 0 / 0.35);
+  }
+
+  /* Boost readability: neutralize low-contrast opacity utilities */
+  .text-white\/60, .text-white\/70, .text-white\/80, .text-white\/50,
+  .text-foreground\/60, .text-foreground\/70, .text-foreground\/80 {
+    color: oklch(0.10 0.02 295) !important;
+  }
+  .text-muted-foreground {
+    color: oklch(0.18 0.04 290) !important;
+  }
+
+  input, textarea, select {
+    color: oklch(0.05 0 0);
+  }
+  input::placeholder, textarea::placeholder {
+    color: oklch(0.32 0.04 290);
+    opacity: 1;
   }
 }
 
