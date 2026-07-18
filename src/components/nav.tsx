@@ -117,10 +117,8 @@ export function Sidebar() {
       >
         <div className="px-6 pt-6 pb-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="relative h-9 w-9 rounded-full gold-border grid place-items-center">
-              <Sparkles className="h-4 w-4 text-gold" />
-              <div className="absolute inset-0 rounded-full animate-twinkle bg-gold/10" />
-            </div>
+            <BrandMark />
+          </Link>
             <div>
               <div className="font-display text-xl tracking-widest gold-text leading-none">
                 TAROMAYA
