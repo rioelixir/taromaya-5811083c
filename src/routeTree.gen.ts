@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as VedicTransitsRouteImport } from './routes/vedic-transits'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TimelineRouteImport } from './routes/timeline'
@@ -56,6 +57,11 @@ import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public
 const WeatherRoute = WeatherRouteImport.update({
   id: '/weather',
   path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VedicTransitsRoute = VedicTransitsRouteImport.update({
+  id: '/vedic-transits',
+  path: '/vedic-transits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VarshphalRoute = VarshphalRouteImport.update({
@@ -302,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByTo {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
@@ -438,6 +447,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vedic-transits'
     | '/weather'
     | '/admin'
     | '/journal'
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vedic-transits'
     | '/weather'
     | '/admin'
     | '/journal'
@@ -527,6 +538,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vedic-transits'
     | '/weather'
     | '/_authenticated/admin'
     | '/_authenticated/journal'
@@ -573,6 +585,7 @@ export interface RootRouteChildren {
   TimelineRoute: typeof TimelineRoute
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
+  VedicTransitsRoute: typeof VedicTransitsRoute
   WeatherRoute: typeof WeatherRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
@@ -585,6 +598,13 @@ declare module '@tanstack/react-router' {
       path: '/weather'
       fullPath: '/weather'
       preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vedic-transits': {
+      id: '/vedic-transits'
+      path: '/vedic-transits'
+      fullPath: '/vedic-transits'
+      preLoaderRoute: typeof VedicTransitsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/varshphal': {
@@ -940,6 +960,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimelineRoute: TimelineRoute,
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
+  VedicTransitsRoute: VedicTransitsRoute,
   WeatherRoute: WeatherRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
