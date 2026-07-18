@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Orbit, Moon, RotateCcw, Sparkles, ArrowRightLeft } from "lucide-react";
+import { Moon, RotateCcw, Sparkles, ArrowRightLeft } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
-import { StarField } from "@/components/star-field";
 import { liveSkySnapshot, signName } from "@/lib/live-sky";
 import { PLANET_GLYPHS, RASHIS, type PlanetName } from "@/lib/vedic";
 
@@ -40,7 +39,6 @@ function SkyPage() {
       subtitle={`${now.toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · updates every 30 seconds`}
     >
       <div className="flex w-full flex-col gap-6">
-        <div className="hidden"><Orbit /></div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="glass rounded-3xl p-4 sm:p-8">
