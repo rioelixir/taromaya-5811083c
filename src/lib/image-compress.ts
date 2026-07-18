@@ -62,35 +62,30 @@ export async function compressImage(file: File, opts: CompressOpts): Promise<Fil
   return new File([blob], `${base}.${ext}`, { type: mime, lastModified: Date.now() });
 }
 
-async function loadBitmap(file: File): Promise<ImageBitmap & { close?: () => void }> {
+type LoadedBitmap = { width: number; height: number; source: CanvasImageSource; close: () => void };
+
+async function loadBitmap(file: File): Promise<LoadedBitmap> {
   if (typeof createImageBitmap === "function") {
     try {
-      return (await createImageBitmap(file)) as ImageBitmap & { close?: () => void };
+      const bmp = await createImageBitmap(file);
+      return { width: bmp.width, height: bmp.height, source: bmp, close: () => bmp.close?.() };
     } catch {
       /* fall through */
     }
   }
-  // Fallback via HTMLImageElement
   const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = reject;
-      el.src = url;
-    });
-    // Wrap as bitmap-ish
-    return {
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      // drawImage accepts HTMLImageElement, but our typed signature expects ImageBitmap.
-      // Cast is safe because canvas accepts both.
-      ...(img as unknown as ImageBitmap),
-    } as ImageBitmap & { close?: () => void };
-  } finally {
-    // Revoked after draw would be safer, but browsers keep the decoded frame.
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-  }
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = reject;
+    el.src = url;
+  });
+  return {
+    width: img.naturalWidth,
+    height: img.naturalHeight,
+    source: img,
+    close: () => URL.revokeObjectURL(url),
+  };
 }
 
 export const PRESETS = {
