@@ -12,6 +12,7 @@ import {
 } from "@/lib/transits-timeline";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-reading.functions";
+import { ForecastStrip } from "@/components/forecast-strip";
 import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
 
 export const Route = createFileRoute("/transits")({
@@ -207,7 +208,7 @@ function TransitTimeline({ natalPlanets }: { natalPlanets: { name: import("@/lib
   const ingresses = useMemo<Ingress[]>(() => findIngresses(now, end), [now, end]);
   const eclipses = useMemo<EclipseEvent[]>(() => findEclipses(now, end), [now, end]);
   const hits = useMemo<TimelineHit[]>(
-    () => findAspectHits(natalPlanets, now, end),
+    () => findAspectHits(natalPlanets, now, end, ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"]),
     [natalPlanets, now, end],
   );
 
@@ -230,6 +231,12 @@ function TransitTimeline({ natalPlanets }: { natalPlanets: { name: import("@/lib
           </div>
         </div>
       </GlassCard>
+
+      <ForecastStrip
+        start={now} end={end}
+        hits={hits} stations={stations} ingresses={ingresses} eclipses={eclipses}
+      />
+
 
       <div className="grid gap-6 lg:grid-cols-2">
         <GlassCard title="Retrograde stations">
