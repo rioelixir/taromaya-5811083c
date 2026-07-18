@@ -202,7 +202,171 @@ function RemediesPage() {
           </div>
         </GlassCard>
       </div>
+
+      <DeepRemedyPanel planet={selected} />
     </PageShell>
+  );
+}
+
+function DeepRemedyPanel({ planet }: { planet: PlanetKey }) {
+  const [bodyWeight, setBodyWeight] = useState<number>(65);
+  const [deficit, setDeficit] = useState<number>(0.5);
+  const [dailyMalas, setDailyMalas] = useState<number>(2);
+
+  const gem = useMemo(
+    () => prescribeGemstone(planet, { bodyWeightKg: bodyWeight, deficit }),
+    [planet, bodyWeight, deficit],
+  );
+  const rudras = useMemo(() => rudrakshaFor(planet), [planet]);
+  const yantra = useMemo(() => yantraFor(planet), [planet]);
+  const japa = useMemo(
+    () =>
+      planJapa({
+        totalJapa: yantra?.japaCount ?? 11000,
+        dailyMalas,
+        planet,
+      }),
+    [yantra, dailyMalas, planet],
+  );
+
+  return (
+    <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      {/* Gemstone Ratti */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Gem className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Gemstone · Ratti Calculator
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+              Body weight (kg): {bodyWeight}
+            </div>
+            <input
+              type="range" min={30} max={140} value={bodyWeight}
+              onChange={(e) => setBodyWeight(Number(e.target.value))}
+              className="w-full accent-gold"
+            />
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+              Planetary deficit: {(deficit * 100).toFixed(0)}%
+            </div>
+            <input
+              type="range" min={0} max={1} step={0.05} value={deficit}
+              onChange={(e) => setDeficit(Number(e.target.value))}
+              className="w-full accent-gold"
+            />
+          </div>
+        </div>
+        <div className="rounded-2xl border border-gold/30 bg-gold/5 p-4">
+          <div className="text-lg font-semibold text-pearl">{gem.gem}</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {gem.metal} · {gem.finger} finger · {gem.day} · {gem.time}
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Mini label="Ratti" value={String(gem.ratti)} />
+            <Mini label="Carats" value={String(gem.carats)} />
+            <Mini label="Grams" value={String(gem.grams)} />
+          </div>
+          <div className="mt-2 text-[10px] text-muted-foreground">
+            Classical range {gem.minRatti}-{gem.maxRatti} ratti · 1 ratti = {GRAMS_PER_RATTI} g
+          </div>
+          <div className="mt-4">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+              Activation
+            </div>
+            <ol className="text-sm text-pearl/85 space-y-1 list-decimal list-inside">
+              {gem.activationRitual.map((r, i) => <li key={i}>{r}</li>)}
+            </ol>
+            <div className="mt-2 text-xs text-gold/90 font-mono">
+              {gem.mantra} × {gem.mantraCount}
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Rudraksha */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Circle className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Rudraksha · Mukhi Mapping
+          </div>
+        </div>
+        <div className="space-y-3">
+          {rudras.map((r) => (
+            <div key={r.mukhi} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="flex items-baseline gap-2">
+                <div className="text-lg text-pearl font-semibold">{r.mukhi}-Mukhi</div>
+                <div className="text-xs text-muted-foreground">{r.ruling}</div>
+                <div className="ml-auto text-[10px] uppercase tracking-widest text-gold">
+                  {r.wearOn}
+                </div>
+              </div>
+              <div className="mt-1 text-sm text-pearl/85">{r.benefit}</div>
+              <div className="mt-2 text-xs font-mono text-gold/90">
+                {r.mantra} × {r.count}
+              </div>
+            </div>
+          ))}
+          {rudras.length === 0 && (
+            <div className="text-sm text-muted-foreground">No specific mukhi mapped.</div>
+          )}
+        </div>
+      </GlassCard>
+
+      {/* Yantra */}
+      {yantra && (
+        <GlassCard>
+          <div className="flex items-center gap-2 mb-3">
+            <ScrollText className="w-4 h-4 text-gold" />
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
+              Yantra
+            </div>
+          </div>
+          <div className="text-lg text-pearl font-semibold">{yantra.name}</div>
+          <div className="text-sm text-pearl/85 mt-1">{yantra.purpose}</div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Mini label="Metal" value={yantra.metal} />
+            <Mini label="Face" value={yantra.faceDirection} />
+            <Mini label="Install" value={yantra.installOn} />
+            <Mini label="Japa" value={yantra.japaCount.toLocaleString()} />
+          </div>
+          <div className="mt-3 text-xs font-mono text-gold/90">
+            {yantra.activationMantra}
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Japa scheduler */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Japa Sadhana Plan
+          </div>
+        </div>
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+          Daily malas (108 beads each): {dailyMalas}
+        </div>
+        <input
+          type="range" min={1} max={16} value={dailyMalas}
+          onChange={(e) => setDailyMalas(Number(e.target.value))}
+          className="w-full accent-gold"
+        />
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <Mini label="Total japa" value={japa.totalJapa.toLocaleString()} />
+          <Mini label="Daily japa" value={japa.dailyJapa.toLocaleString()} />
+          <Mini label="Days to complete" value={String(japa.daysToComplete)} />
+          <Mini label="Minutes / day" value={`~${japa.minutesPerDay}`} />
+          <Mini label="Best time" value={japa.bestTime} />
+          <Mini label="Face" value={japa.bestDirection} />
+        </div>
+      </GlassCard>
+    </div>
   );
 }
 
