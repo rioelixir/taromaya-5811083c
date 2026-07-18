@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
+import { useLang } from "@/lib/i18n";
 
 function profileToRow(p: BirthProfile): SavedKundliRow {
   return {
