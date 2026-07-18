@@ -39,6 +39,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FestivalsRouteImport } from './routes/festivals'
 import { Route as DreamsRouteImport } from './routes/dreams'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
+import { Route as ChakraRouteImport } from './routes/chakra'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BabyNamesRouteImport } from './routes/baby-names'
 import { Route as AyurvedaRouteImport } from './routes/ayurveda'
@@ -208,6 +209,11 @@ const CompatibilityRoute = CompatibilityRouteImport.update({
   path: '/compatibility',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChakraRoute = ChakraRouteImport.update({
+  id: '/chakra',
+  path: '/chakra',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookmarksRoute = BookmarksRouteImport.update({
   id: '/bookmarks',
   path: '/bookmarks',
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
@@ -357,6 +364,7 @@ export interface FileRoutesByTo {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
@@ -408,6 +416,7 @@ export interface FileRoutesById {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
@@ -459,6 +468,7 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/chakra'
     | '/compatibility'
     | '/dreams'
     | '/festivals'
@@ -508,6 +518,7 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/chakra'
     | '/compatibility'
     | '/dreams'
     | '/festivals'
@@ -558,6 +569,7 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/chakra'
     | '/compatibility'
     | '/dreams'
     | '/festivals'
@@ -609,6 +621,7 @@ export interface RootRouteChildren {
   AyurvedaRoute: typeof AyurvedaRoute
   BabyNamesRoute: typeof BabyNamesRoute
   BookmarksRoute: typeof BookmarksRoute
+  ChakraRoute: typeof ChakraRoute
   CompatibilityRoute: typeof CompatibilityRoute
   DreamsRoute: typeof DreamsRoute
   FestivalsRoute: typeof FestivalsRoute
@@ -855,6 +868,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompatibilityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chakra': {
+      id: '/chakra'
+      path: '/chakra'
+      fullPath: '/chakra'
+      preLoaderRoute: typeof ChakraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bookmarks': {
       id: '/bookmarks'
       path: '/bookmarks'
@@ -1016,6 +1036,7 @@ const rootRouteChildren: RootRouteChildren = {
   AyurvedaRoute: AyurvedaRoute,
   BabyNamesRoute: BabyNamesRoute,
   BookmarksRoute: BookmarksRoute,
+  ChakraRoute: ChakraRoute,
   CompatibilityRoute: CompatibilityRoute,
   DreamsRoute: DreamsRoute,
   FestivalsRoute: FestivalsRoute,
