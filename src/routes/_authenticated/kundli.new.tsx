@@ -125,6 +125,8 @@ function NewKundliPage() {
               return <JaiminiPanel chart={chart} birthDate={utcMs !== null ? new Date(utcMs) : null} />;
             })()}
 
+            <KPPanel chart={chart} />
+
             <VargaExplorer chart={chart} />
 
 
