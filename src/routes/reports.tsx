@@ -693,6 +693,54 @@ function drawSouthIndianChart(
   pdf.text(`Lagna: ${RASHIS[chart.ascendant.rashi]}  ·  Moon: ${NAKSHATRAS[chart.moonNakshatra.index]}`, x + size / 2, y + size + 14, { align: "center" });
 }
 
+function drawLoShu(pdf: jsPDF, x: number, y: number, size: number, grid: ReturnType<typeof loShuGrid>) {
+  const cell = size / 3;
+  // Traditional Lo Shu magic square layout
+  const layout = [
+    [4, 9, 2],
+    [3, 5, 7],
+    [8, 1, 6],
+  ];
+  pdf.setFillColor(...CARD);
+  pdf.rect(x, y, size, size, "F");
+  pdf.setDrawColor(...GOLD);
+  pdf.setLineWidth(0.8);
+  pdf.rect(x, y, size, size);
+  pdf.setDrawColor(...LINE);
+  pdf.setLineWidth(0.4);
+  for (let i = 1; i < 3; i++) {
+    pdf.line(x + i * cell, y, x + i * cell, y + size);
+    pdf.line(x, y + i * cell, x + size, y + i * cell);
+  }
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const n = layout[r][c];
+      const count = grid.counts[n] ?? 0;
+      const cx = x + c * cell + cell / 2;
+      const cy = y + r * cell + cell / 2;
+      pdf.setTextColor(...MUTED);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+      pdf.text(String(n), x + c * cell + 5, y + r * cell + 10);
+      if (count > 0) {
+        pdf.setTextColor(...GOLD);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text(String(n).repeat(count), cx, cy + 4, { align: "center" });
+      } else {
+        pdf.setTextColor(...MUTED);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(18);
+        pdf.text("·", cx, cy + 6, { align: "center" });
+      }
+    }
+  }
+  pdf.setTextColor(...MUTED);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.text(`Driver: ${grid.driver}  ·  Conductor: ${grid.conductor}`, x + size / 2, y + size + 14, { align: "center" });
+}
+
 function drawStar(pdf: jsPDF, cx: number, cy: number, r: number) {
   pdf.setDrawColor(...GOLD);
   pdf.setLineWidth(0.6);
