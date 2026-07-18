@@ -11,12 +11,22 @@ export function useBirthProfile() {
   });
 }
 
+export type BirthProfileInput = {
+  full_name: string;
+  gender?: string | null;
+  birth_date: string;
+  birth_time: string;
+  tz_offset_hours: number;
+  place: string;
+  latitude: number;
+  longitude: number;
+};
+
 export function useSaveBirthProfile() {
   const qc = useQueryClient();
   const saveFn = useServerFn(saveBirthProfile);
-  return useMutation({
-    mutationFn: (input: Parameters<typeof saveFn>[0] extends { data: infer D } ? D : never) =>
-      saveFn({ data: input as never }),
+  return useMutation<BirthProfile, Error, BirthProfileInput>({
+    mutationFn: (input) => saveFn({ data: input }),
     onSuccess: (data) => {
       qc.setQueryData(["birth-profile"], data);
     },
