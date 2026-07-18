@@ -41,13 +41,26 @@ function CompatibilityPage() {
         tzOffsetHours: Number(p.tz), latitude: Number(p.lat), longitude: Number(p.lon),
       });
     };
+    const toWest = (p: Person) => {
+      const [y, m, d] = p.date.split("-").map(Number);
+      const [hh, mm] = p.time.split(":").map(Number);
+      return computeWesternChart({
+        year: y, month: m, day: d, hour: hh, minute: mm,
+        tzOffsetHours: Number(p.tz), latitude: Number(p.lat), longitude: Number(p.lon),
+      });
+    };
     const chartA = toChart(a), chartB = toChart(b);
+    const westA = toWest(a), westB = toWest(b);
     const milan = ashtakootMilan(
       { chart: chartA, name: a.name || "Boy", gender: "male" },
       { chart: chartB, name: b.name || "Girl", gender: "female" },
     );
-    return { chartA, chartB, milan };
+    const synHits = synastryAspects(westA, westB);
+    const synScore = synastryScore(synHits);
+    const composite = compositeChart(westA, westB);
+    return { chartA, chartB, milan, synHits, synScore, composite };
   }
+
 
   const onCalc = () => { setResult(compute()); setAiText(null); };
 
