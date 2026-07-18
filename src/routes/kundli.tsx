@@ -36,14 +36,18 @@ export const Route = createFileRoute("/kundli")({
 });
 
 type FormState = {
-  name: string; date: string; time: string; tz: string;
+  name: string; date: string; time: string; seconds: string; tz: string;
   lat: string; lon: string; place: string;
+  ayanamsa: string; houseSystem: string; nodeType: string;
+  elevation: string; unknownTime: boolean;
 };
 
 const DEFAULTS: FormState = {
-  name: "", date: "1995-06-15", time: "07:45",
+  name: "", date: "1995-06-15", time: "07:45", seconds: "0",
   tz: "5.5", lat: "28.6139", lon: "77.2090",
   place: "New Delhi, India",
+  ayanamsa: "lahiri", houseSystem: "whole-sign", nodeType: "true",
+  elevation: "0", unknownTime: false,
 };
 
 type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
