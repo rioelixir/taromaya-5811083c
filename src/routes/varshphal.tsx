@@ -59,28 +59,28 @@ function VarshphalPage() {
       <GlassCard>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Name">
-            <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Native" className="input" />
+            <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Native" className={inputCls} />
           </Field>
           <Field label="Birth date">
-            <input type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} className="input" />
+            <input type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Birth time">
-            <input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} className="input" />
+            <input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Timezone (h east of UTC)">
-            <input value={f.tz} onChange={(e) => setF({ ...f, tz: e.target.value })} className="input" />
+            <input value={f.tz} onChange={(e) => setF({ ...f, tz: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Latitude">
-            <input value={f.lat} onChange={(e) => setF({ ...f, lat: e.target.value })} className="input" />
+            <input value={f.lat} onChange={(e) => setF({ ...f, lat: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Longitude">
-            <input value={f.lon} onChange={(e) => setF({ ...f, lon: e.target.value })} className="input" />
+            <input value={f.lon} onChange={(e) => setF({ ...f, lon: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Place (label)">
-            <input value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })} className="input" />
+            <input value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })} className={inputCls} />
           </Field>
           <Field label="Target year">
-            <input value={f.year} onChange={(e) => setF({ ...f, year: e.target.value })} className="input" />
+            <input value={f.year} onChange={(e) => setF({ ...f, year: e.target.value })} className={inputCls} />
           </Field>
         </div>
         <div className="mt-4 flex items-center gap-3">
