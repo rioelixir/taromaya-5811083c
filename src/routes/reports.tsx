@@ -1,7 +1,10 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
 import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
@@ -11,7 +14,8 @@ import { computeNumerology } from "@/lib/numerology";
 import { loShuGrid } from "@/lib/numerology-deep";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
+import { FileText, Download, Loader2, Infinity as InfIcon } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
   component: () => (<PremiumGate featureName="Reports"><ReportsPage /></PremiumGate>),
