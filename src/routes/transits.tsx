@@ -12,6 +12,7 @@ import {
 } from "@/lib/transits-timeline";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-reading.functions";
+import { ForecastStrip } from "@/components/forecast-strip";
 import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
 
 export const Route = createFileRoute("/transits")({
