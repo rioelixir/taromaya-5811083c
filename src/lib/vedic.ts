@@ -112,6 +112,22 @@ function meanNodeTropical(date: Date): number {
   return norm360(125.04452 - 1934.136261 * T + 0.0020708 * T * T);
 }
 
+// True (apparent) node — mean node with the dominant perturbation term
+// applied. Accurate to a few arc-minutes, plenty for astrological use.
+function trueNodeTropical(date: Date, sunLong: number, moonLong: number): number {
+  const mean = meanNodeTropical(date);
+  const D = deg2rad(norm360(moonLong - sunLong)); // lunar elongation
+  const correction = -1.4979 * Math.sin(2 * D);
+  return norm360(mean + correction);
+}
+
+/** Resolve the ayanamsa in degrees for a given date + configured system. */
+export function resolveAyanamsa(date: Date, ayanamsa: Ayanamsa): number {
+  if (ayanamsa === "tropical") return 0;
+  const base = lahiriAyanamsa(date);
+  return base + AYANAMSA_OFFSET_FROM_LAHIRI[ayanamsa];
+}
+
 function tropicalLongitude(body: A.Body, date: Date): number {
   // Apparent geocentric ecliptic longitude in ecliptic-of-date (true equinox) frame.
   const gvec = A.GeoVector(body, date, true);
