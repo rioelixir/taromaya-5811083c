@@ -12,7 +12,7 @@ const topics = [
 export const Route = createFileRoute("/learn")({
   component: () => (
     <PremiumGate featureName="Learning">
-      <PageShell
+      <PageShell hideAI
         eyebrow="Learning"
         title="Ancient wisdom, modern lens"
         subtitle="Structured courses on tarot, astrology, numerology, and Vedic time — from novice to advanced."

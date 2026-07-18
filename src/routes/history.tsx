@@ -5,7 +5,7 @@ import { PremiumGate } from "@/components/premium-gate";
 export const Route = createFileRoute("/history")({
   component: () => (
     <PremiumGate featureName="History">
-      <PageShell eyebrow="History" title="Your cosmic timeline" subtitle="Every reading, every chart, every question.">
+      <PageShell hideAI eyebrow="History" title="Your cosmic timeline" subtitle="Every reading, every chart, every question.">
         <GlassCard title="Nothing here yet" desc="Your readings and conversations will appear here." />
       </PageShell>
     </PremiumGate>

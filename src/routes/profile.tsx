@@ -9,7 +9,7 @@ export const Route = createFileRoute("/profile")({
 
 function ProfilePage() {
   return (
-    <PageShell eyebrow="Profile" title="Your cosmic identity" subtitle="Manage your birth details, preferences, and subscription.">
+    <PageShell hideAI eyebrow="Profile" title="Your cosmic identity" subtitle="Manage your birth details, preferences, and subscription.">
       <div className="grid gap-4 md:grid-cols-3">
         <GlassCard>
           <div className="flex items-center gap-4">
