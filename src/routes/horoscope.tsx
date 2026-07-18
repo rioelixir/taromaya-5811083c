@@ -7,6 +7,7 @@ import { SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { CHINESE_ANIMALS, chineseSign, CHINESE_TRAITS, CHINESE_COMPATIBLE } from "@/lib/chinese-zodiac";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles } from "lucide-react";
+import { tarotCardOfTheDay, cardGuidance, moonPhaseInfo, sunSign, moonSign } from "@/lib/horoscope";
 
 export const Route = createFileRoute("/horoscope")({
   component: () => (<PremiumGate featureName="Horoscope"><HoroscopePage /></PremiumGate>),
