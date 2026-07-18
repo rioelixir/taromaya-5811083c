@@ -25,12 +25,15 @@ export const Route = createFileRoute("/reports")({
 
 type ReportKey = "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
 
+type ReportKey = "grand" | "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
+
 const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: string[] }> = {
-  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Yogas & Doshas","Guiding Themes"] },
-  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Action Plan"] },
+  grand:   { title: "Grand Cosmic Blueprint", desc: "The complete dossier — Vedic + Western + Numerology + live transits.", sections: ["Rashi Chart","Planet & House Tables","Vimshottari (live)","Ashtakavarga","Live Gochara & Sade Sati","Yogas & Doshas","Numerology + Lo Shu","12-Month Transits","Remedies"] },
+  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Ashtakavarga","Yogas & Doshas","Lo Shu Grid","Guiding Themes"] },
+  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Live Transits","Action Plan"] },
   love:    { title: "Love & Union",     desc: "The heart's chart — attraction, patterns, partnership.", sections: ["Rashi Chart","7th House & Venus","Soul Urge Number","Manglik Status","Guidance"] },
-  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Personal Year","Dhana Yogas","Wealth Rituals"] },
-  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Monthly Themes"] },
+  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Sarvashtakavarga","Personal Year","Lo Shu Grid","Wealth Rituals"] },
+  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Live Gochara","Monthly Themes"] },
   remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Rashi Chart","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
 };
 
