@@ -52,9 +52,11 @@ function collectTextNodes(root: Node, out: Text[]) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       if (isInSkipTree(node.parentNode)) return NodeFilter.FILTER_REJECT;
+      if ((node as Text & { __i18nDone?: boolean }).__i18nDone) return NodeFilter.FILTER_REJECT;
       if (!shouldTranslate((node as Text).nodeValue ?? "")) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
+
   });
   let n = walker.nextNode();
   while (n) {
