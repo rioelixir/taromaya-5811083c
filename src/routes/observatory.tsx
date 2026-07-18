@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Telescope, Eclipse, RotateCcw, ArrowRightLeft, Sparkles } from "lucide-react";
-import { PageShell } from "@/components/page-shell";
+import { StarField } from "@/components/star-field";
 import {
   findEclipses,
   findStations,
@@ -86,7 +86,8 @@ function ObservatoryPage() {
   }, [stations]);
 
   return (
-    <PageShell>
+    <div className="relative flex min-h-dvh w-full flex-col">
+      <StarField />
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
         <header className="text-center space-y-3">
           <div className="mx-auto h-14 w-14 grid place-items-center rounded-full gold-border bg-gold/10">
