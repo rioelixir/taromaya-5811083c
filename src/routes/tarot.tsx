@@ -67,7 +67,7 @@ function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [decks, setDecks] = useState<TarotCard[][]>(() => makeDecks());
+  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks());
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +102,6 @@ function TarotPage() {
     if (n === 1) {
       return [{ index: 0, label: spread.positions[0], x: canvasSize.w / 2 - CARD_W / 2, y: cy }];
     }
-    // Spread horizontally centered
     const gap = 40;
     const totalW = n * CARD_W + (n - 1) * gap;
     const startX = canvasSize.w / 2 - totalW / 2;
@@ -118,10 +117,9 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDecks());
+    setDecks(makeDeckStacks());
   }, []);
 
-  // Switch spread — clear the board
   useEffect(() => {
     setPlaced([]);
     setReading(null);
@@ -136,8 +134,8 @@ function TarotPage() {
     fromDeck: boolean;
   }>({ uid: null, offsetX: 0, offsetY: 0, fromDeck: false });
 
-  const beginDragFromDeck = (e: React.PointerEvent, deckIdx: number) => {
-    const source = decks[deckIdx];
+  const beginDragFromDeck = (e: React.PointerEvent, deckKey: DeckKey) => {
+    const source = decks[deckKey];
     if (!source || source.length === 0) return;
     const canvasRect = canvasRef.current!.getBoundingClientRect();
     const card = source[0];
@@ -147,6 +145,7 @@ function TarotPage() {
     const newPlaced: PlacedCard = {
       uid,
       card,
+      deckKey,
       reversed: randomReversed(),
       x,
       y,
@@ -154,7 +153,7 @@ function TarotPage() {
       locked: false,
       flipped: false,
     };
-    setDecks((prev) => prev.map((d, i) => (i === deckIdx ? d.slice(1) : d)));
+    setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].slice(1) }));
     setPlaced((p) => [...p, newPlaced]);
     dragState.current = { uid, offsetX: CARD_W / 2, offsetY: CARD_H / 2, fromDeck: true };
     (e.target as Element).setPointerCapture?.(e.pointerId);
@@ -195,12 +194,10 @@ function TarotPage() {
       if (idx < 0) return prev;
       const card = prev[idx];
 
-      // Snap to a subtle grid so the board stays clean.
       const GRID = 20;
       const sx = Math.round(card.x / GRID) * GRID;
       const sy = Math.round(card.y / GRID) * GRID;
 
-      // Keep card fully inside the canvas.
       const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
       const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
       const clampedX = Math.min(Math.max(0, sx), maxX);
@@ -223,12 +220,7 @@ function TarotPage() {
     setPlaced((prev) => {
       const removed = prev.find((p) => p.uid === uid);
       if (removed) {
-        setDecks((prev) => {
-          // Return to the currently smallest stack.
-          let target = 0;
-          for (let i = 1; i < prev.length; i++) if (prev[i].length < prev[target].length) target = i;
-          return prev.map((d, i) => (i === target ? [...d, removed.card] : d));
-        });
+        setDecks((d) => ({ ...d, [removed.deckKey]: [...d[removed.deckKey], removed.card] }));
       }
       return prev.filter((p) => p.uid !== uid);
     });
@@ -236,17 +228,12 @@ function TarotPage() {
 
   const shuffleAll = useCallback(() => {
     setDecks((prev) => {
-      // Pool all remaining deck cards, reshuffle, redistribute across visible stacks.
-      const pool = prev.flat();
-      for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-      const out: TarotCard[][] = Array.from({ length: prev.length }, () => []);
-      pool.forEach((c, i) => out[i % prev.length].push(c));
+      const out = { ...prev };
+      (Object.keys(out) as DeckKey[]).forEach((k) => { out[k] = shuffle(out[k]); });
       return out;
     });
   }, []);
+
 
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
