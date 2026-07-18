@@ -128,6 +128,14 @@ function NewKundliPage() {
 
             <KPPanel chart={chart} />
 
+            {(() => {
+              const utcMs = birth
+                ? Date.UTC(birth.year, birth.month - 1, birth.day, birth.hour, birth.minute, birth.seconds ?? 0)
+                    - birth.tzOffsetHours * 3600 * 1000
+                : null;
+              return <LalKitabPanel chart={chart} birthDate={utcMs !== null ? new Date(utcMs) : null} />;
+            })()}
+
             <VargaExplorer chart={chart} />
 
 
