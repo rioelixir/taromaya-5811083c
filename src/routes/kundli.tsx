@@ -1221,7 +1221,7 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
     pdf.text("No major yogas detected.", margin, y); y += 14;
   } else {
     yogas.slice(0, 8).forEach((yg) => {
-      const lines = pdf.splitTextToSize(`• ${yg.name} — ${yg.description}`, w - margin * 2) as string[];
+      const lines = pdf.splitTextToSize(`• ${yg.name} — ${yg.detail}`, w - margin * 2) as string[];
       lines.forEach((ln) => { pdf.text(ln, margin, y); y += 12; });
     });
   }
