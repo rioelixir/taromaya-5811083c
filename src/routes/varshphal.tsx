@@ -4,7 +4,12 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { formatDegree, RASHIS, PLANET_SHORT, type KundliInput } from "@/lib/vedic";
 import { computeVarshphal, planetHouse, type VarshphalChart } from "@/lib/varshphal";
-import { Sparkles, Loader2, CalendarClock, Crown, Sun } from "lucide-react";
+import {
+  computeTajikaAspects, detectTajikaYogas, detectKambool, munthaVarsheshLink,
+  computeHarshaBala,
+} from "@/lib/varshphal-deep";
+import { Sparkles, Loader2, CalendarClock, Crown, Sun, ArrowRight, Zap, CheckCircle2, XCircle } from "lucide-react";
+
 
 const inputCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
@@ -185,9 +190,225 @@ function VarshphalView({ v }: { v: VarshphalChart }) {
           ))}
         </div>
       </GlassCard>
+
+      <TajikaDeepPanel v={v} />
     </div>
   );
 }
+
+function TajikaDeepPanel({ v }: { v: VarshphalChart }) {
+  const aspects = useMemo(() => computeTajikaAspects(v.chart), [v]);
+  const yogas = useMemo(() => detectTajikaYogas(aspects), [aspects]);
+  const kambool = useMemo(() => detectKambool(aspects), [aspects]);
+  const harsha = useMemo(() => computeHarshaBala(v.chart), [v]);
+  const mv = useMemo(
+    () => munthaVarsheshLink(v.chart, v.muntha.longitude, v.varshesh),
+    [v],
+  );
+
+  const topAspects = aspects.slice(0, 10);
+  const applyingYogas = yogas.filter((y) => y.name.startsWith("Ithasala")).slice(0, 8);
+  const separating = yogas.filter((y) => y.name.startsWith("Isarapha")).slice(0, 6);
+  const harshaSorted = [...harsha].sort((a, b) => b.total - a.total);
+
+  const quality = (q: "benefic" | "malefic" | "neutral") =>
+    q === "benefic" ? "text-emerald-300 border-emerald-400/30 bg-emerald-500/5"
+      : q === "malefic" ? "text-red-300 border-red-400/30 bg-red-500/5"
+      : "text-pearl/80 border-white/10 bg-white/[0.02]";
+
+  return (
+    <div className="space-y-6">
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Tajika aspects · Deeptamsha orb
+          </div>
+          <div className="ml-auto text-[10px] text-muted-foreground">
+            {aspects.length} active
+          </div>
+        </div>
+        {topAspects.length === 0 ? (
+          <div className="text-sm text-muted-foreground">
+            No planets within combined deeptamsha orb this year — an unusually
+            quiet annual chart.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                <tr>
+                  <th className="text-left py-2">Fast</th>
+                  <th className="text-left"></th>
+                  <th className="text-left">Slow</th>
+                  <th className="text-left">Aspect</th>
+                  <th className="text-left">Orb</th>
+                  <th className="text-left">Status</th>
+                  <th className="text-left">Strength</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topAspects.map((a, i) => (
+                  <tr key={i} className="border-t border-white/5">
+                    <td className="py-1.5 text-pearl">{PLANET_SHORT[a.from]} {a.from}</td>
+                    <td className="text-muted-foreground"><ArrowRight className="inline w-3 h-3" /></td>
+                    <td className="text-pearl">{PLANET_SHORT[a.to]} {a.to}</td>
+                    <td>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] border ${
+                        a.nature === "friend" ? "border-emerald-400/30 text-emerald-300"
+                          : a.nature === "enemy" ? "border-red-400/30 text-red-300"
+                          : "border-white/10 text-pearl/80"
+                      }`}>{a.aspect}</span>
+                    </td>
+                    <td className="text-xs text-muted-foreground">{a.orbDeg.toFixed(1)}°</td>
+                    <td>
+                      <span className={`text-[10px] uppercase tracking-widest ${
+                        a.applying ? "text-gold" : "text-muted-foreground"
+                      }`}>
+                        {a.applying ? "Applying" : "Separating"}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="w-20 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-gold to-gold-soft"
+                          style={{ width: `${(a.strength * 100).toFixed(0)}%` }} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </GlassCard>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <GlassCard>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            Ithasala — approaching results
+          </div>
+          {applyingYogas.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No applying Tajika yogas this year.</div>
+          ) : (
+            <ul className="space-y-2">
+              {applyingYogas.map((y, i) => (
+                <li key={i} className={`rounded-xl border p-3 ${quality(y.quality)}`}>
+                  <div className="text-sm text-pearl flex items-center gap-1.5">
+                    {PLANET_SHORT[y.planets[0]]} {y.planets[0]}
+                    <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                    {PLANET_SHORT[y.planets[1]]} {y.planets[1]}
+                    <span className="ml-auto text-[10px] text-muted-foreground">{y.aspect}</span>
+                  </div>
+                  <div className="mt-1 text-xs text-pearl/80">{y.description}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+
+        <GlassCard>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
+            Isarapha — matters already past · Kambool
+          </div>
+          {separating.length > 0 && (
+            <ul className="space-y-2 mb-4">
+              {separating.map((y, i) => (
+                <li key={i} className={`rounded-xl border p-3 ${quality(y.quality)}`}>
+                  <div className="text-sm text-pearl">
+                    {PLANET_SHORT[y.planets[0]]} {y.planets[0]} — {PLANET_SHORT[y.planets[1]]} {y.planets[1]}
+                    <span className="ml-2 text-[10px] text-muted-foreground">{y.aspect}</span>
+                  </div>
+                  <div className="mt-1 text-xs text-pearl/80">{y.description}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="text-[10px] uppercase tracking-widest text-gold/80 mb-2">Kambool (Moon yogas)</div>
+          {kambool.length === 0 ? (
+            <div className="text-sm text-muted-foreground">Moon is unconnected — a self-directed year.</div>
+          ) : (
+            <ul className="space-y-2">
+              {kambool.map((k, i) => (
+                <li key={i} className={`rounded-xl border p-3 ${quality(k.quality)}`}>
+                  <div className="text-sm text-pearl">Kambool with {k.planets[1]} · {k.aspect}</div>
+                  <div className="mt-1 text-xs text-pearl/80">{k.description}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+      </div>
+
+      <GlassCard>
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Muntha ↔ Varshesh linkage
+          </div>
+          <div className="text-[10px] text-muted-foreground">Muntha in {RASHIS[v.muntha.rashi]} · H{v.muntha.house}</div>
+        </div>
+        <div className="rounded-xl border border-white/10 p-4 text-sm">
+          {mv.aspect ? (
+            <>
+              <div className="text-pearl">
+                Varshesh <span className="text-gold">{v.varshesh}</span> forms a{" "}
+                <span className={
+                  mv.nature === "friend" ? "text-emerald-300"
+                    : mv.nature === "enemy" ? "text-red-300"
+                    : "text-pearl"
+                }>{mv.aspect}</span> with Muntha
+                <span className="text-muted-foreground"> (arc {mv.angleDeg.toFixed(1)}°)</span>.
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                {mv.nature === "friend"
+                  ? "The year's ruling planet supports Muntha's house theme — that department of life flourishes."
+                  : mv.nature === "enemy"
+                  ? "The Varshesh strains the Muntha — this year's central story hits obstacles in that house."
+                  : "A neutral link — the theme is present but not amplified."}
+              </div>
+            </>
+          ) : (
+            <div className="text-muted-foreground">
+              Varshesh {v.varshesh} does not form a tight Tajika aspect with Muntha
+              (arc {mv.angleDeg.toFixed(1)}°). The year's story unfolds independent of the Muntha theme.
+            </div>
+          )}
+        </div>
+      </GlassCard>
+
+      <GlassCard>
+        <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+          Harsha Bala · Five joys of the planets (max 25)
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {harshaSorted.map((h) => (
+            <div key={h.planet} className="rounded-xl border border-white/10 p-3">
+              <div className="flex items-center gap-2">
+                <span className="text-pearl font-medium">{PLANET_SHORT[h.planet]} {h.planet}</span>
+                <span className="ml-auto text-sm text-gold">{h.total}/25</span>
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-gold to-gold-soft"
+                  style={{ width: `${(h.total / 25) * 100}%` }} />
+              </div>
+              <ul className="mt-2 space-y-1">
+                {h.sources.map((s, i) => (
+                  <li key={i} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    {s.hit
+                      ? <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      : <XCircle className="w-3 h-3 text-white/20" />}
+                    <span className={s.hit ? "text-pearl/90" : ""}>{s.label}</span>
+                    <span className="ml-auto">{s.points}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
