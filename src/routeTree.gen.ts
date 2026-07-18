@@ -39,6 +39,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
@@ -191,6 +192,11 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMeditationRoute = AuthenticatedMeditationRouteImport.update({
+  id: '/meditation',
+  path: '/meditation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
   id: '/journal',
   path: '/journal',
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
+  '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
+  '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/varshphal': typeof VarshphalRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
+  '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/admin'
     | '/journal'
+    | '/meditation'
     | '/saved'
     | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/admin'
     | '/journal'
+    | '/meditation'
     | '/saved'
     | '/api/chat'
   id:
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/_authenticated/admin'
     | '/_authenticated/journal'
+    | '/_authenticated/meditation'
     | '/_authenticated/saved'
     | '/api/chat'
   fileRoutesById: FileRoutesById
@@ -650,6 +662,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/meditation': {
+      id: '/_authenticated/meditation'
+      path: '/meditation'
+      fullPath: '/meditation'
+      preLoaderRoute: typeof AuthenticatedMeditationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/journal': {
       id: '/_authenticated/journal'
       path: '/journal'
@@ -670,12 +689,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
+  AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
+  AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
