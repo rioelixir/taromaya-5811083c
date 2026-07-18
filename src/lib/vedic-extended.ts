@@ -12,73 +12,150 @@ import { RASHIS } from "./vedic";
 
 const norm12 = (n: number) => ((n % 12) + 12) % 12;
 
-export type VargaCode = "D1" | "D2" | "D3" | "D7" | "D9" | "D10" | "D60";
+export type VargaCode =
+  | "D1" | "D2" | "D3" | "D4" | "D7" | "D9" | "D10" | "D12"
+  | "D16" | "D20" | "D24" | "D27" | "D30" | "D40" | "D45" | "D60";
 
 export const VARGA_LABELS: Record<VargaCode, { name: string; theme: string }> = {
-  D1:  { name: "Rashi",       theme: "Overall life · body · self" },
-  D2:  { name: "Hora",        theme: "Wealth · assets" },
-  D3:  { name: "Drekkana",    theme: "Siblings · courage" },
-  D7:  { name: "Saptamsha",   theme: "Children · progeny" },
-  D9:  { name: "Navamsa",     theme: "Marriage · dharma · fortune" },
-  D10: { name: "Dashamsha",   theme: "Career · profession · fame" },
-  D60: { name: "Shashtiamsha", theme: "Karmic essence · past life" },
+  D1:  { name: "Rashi",         theme: "Overall life · body · self" },
+  D2:  { name: "Hora",          theme: "Wealth · assets" },
+  D3:  { name: "Drekkana",      theme: "Siblings · courage" },
+  D4:  { name: "Chaturthamsha", theme: "Home · fortune · property" },
+  D7:  { name: "Saptamsha",     theme: "Children · progeny" },
+  D9:  { name: "Navamsa",       theme: "Marriage · dharma · fortune" },
+  D10: { name: "Dashamsha",     theme: "Career · profession · fame" },
+  D12: { name: "Dwadashamsha",  theme: "Parents · ancestry" },
+  D16: { name: "Shodashamsha",  theme: "Vehicles · comforts · pleasures" },
+  D20: { name: "Vimshamsha",    theme: "Spiritual life · sadhana" },
+  D24: { name: "Chaturvimshamsha", theme: "Education · learning" },
+  D27: { name: "Nakshatramsha", theme: "Strength · weakness (Bhamsha)" },
+  D30: { name: "Trimshamsha",   theme: "Misfortunes · evils" },
+  D40: { name: "Khavedamsha",   theme: "Maternal legacy · auspicious effects" },
+  D45: { name: "Akshavedamsha", theme: "Paternal legacy · overall character" },
+  D60: { name: "Shashtiamsha",  theme: "Karmic essence · past life" },
 };
 
-function d1(rashi: number): number { return rashi; }
+/** Mode index: 0=movable (Aries/Cancer/Libra/Capricorn), 1=fixed, 2=dual. */
+const mode = (r: number) => r % 3;
+const isOdd = (r: number) => r % 2 === 0; // Aries=0 counts as odd
+const FIRE  = new Set([0, 4, 8]);   // Aries, Leo, Sagittarius
+const EARTH = new Set([1, 5, 9]);   // Taurus, Virgo, Capricorn
+const AIR   = new Set([2, 6, 10]);  // Gemini, Libra, Aquarius
+const WATER = new Set([3, 7, 11]);  // Cancer, Scorpio, Pisces
 
-function d2(rashi: number, deg: number): number {
-  // Odd signs: 0-15 → Leo (4), 15-30 → Cancer (3)
-  // Even signs: 0-15 → Cancer (3), 15-30 → Leo (4)
-  const odd = rashi % 2 === 0; // Aries=0 is odd
-  if (deg < 15) return odd ? 4 : 3;
-  return odd ? 3 : 4;
+function d1(r: number): number { return r; }
+
+// D2 Hora — odd 0-15°→Leo, 15-30°→Cancer; even reversed.
+function d2(r: number, d: number): number {
+  if (isOdd(r)) return d < 15 ? 4 : 3;
+  return d < 15 ? 3 : 4;
 }
 
-function d3(rashi: number, deg: number): number {
-  if (deg < 10) return rashi;
-  if (deg < 20) return norm12(rashi + 4);
-  return norm12(rashi + 8);
+// D3 Drekkana — 10° parts, jumps of 4.
+function d3(r: number, d: number): number {
+  if (d < 10) return r;
+  if (d < 20) return norm12(r + 4);
+  return norm12(r + 8);
 }
 
-function d7(rashi: number, deg: number): number {
-  const part = Math.floor(deg / (30 / 7)); // 0..6
-  const odd = rashi % 2 === 0;
-  const start = odd ? rashi : norm12(rashi + 6);
+// D4 Chaturthamsha — 7.5° parts, jumps of 3.
+function d4(r: number, d: number): number {
+  const part = Math.floor(d / 7.5); // 0..3
+  return norm12(r + part * 3);
+}
+
+// D7 Saptamsha — 7 parts; odd starts same, even starts +6.
+function d7(r: number, d: number): number {
+  const part = Math.floor(d / (30 / 7));
+  return norm12((isOdd(r) ? r : r + 6) + part);
+}
+
+// D9 Navamsa — 9 parts; movable=same, fixed=+8, dual=+4.
+function d9(r: number, d: number): number {
+  const part = Math.floor(d / (30 / 9));
+  const m = mode(r);
+  const start = m === 0 ? r : m === 1 ? r + 8 : r + 4;
   return norm12(start + part);
 }
 
-function d9(rashi: number, deg: number): number {
-  const part = Math.floor(deg / (30 / 9)); // 0..8
-  // Movable (0,3,6,9): starts from same
-  // Fixed (1,4,7,10): starts from 9th = +8
-  // Dual (2,5,8,11): starts from 5th = +4
-  const mod = rashi % 3;
-  const start = mod === 0 ? rashi : mod === 1 ? norm12(rashi + 8) : norm12(rashi + 4);
+// D10 Dashamsha — 10 parts of 3°; odd starts same, even starts +8.
+function d10(r: number, d: number): number {
+  const part = Math.floor(d / 3);
+  return norm12((isOdd(r) ? r : r + 8) + part);
+}
+
+// D12 Dwadashamsha — 12 parts of 2.5°, starts from same sign.
+function d12(r: number, d: number): number {
+  const part = Math.floor(d / 2.5);
+  return norm12(r + part);
+}
+
+// Generic "start-sign by mode" divisional (D16/D20/D45 etc).
+function byMode(r: number, d: number, div: number, movable: number, fixed: number, dual: number) {
+  const part = Math.floor(d / (30 / div));
+  const m = mode(r);
+  const start = m === 0 ? movable : m === 1 ? fixed : dual;
   return norm12(start + part);
 }
 
-function d10(rashi: number, deg: number): number {
-  const part = Math.floor(deg / 3); // 0..9
-  const odd = rashi % 2 === 0;
-  const start = odd ? rashi : norm12(rashi + 8);
+// D16 Shodashamsha — movable→Aries, fixed→Leo, dual→Sagittarius.
+function d16(r: number, d: number): number { return byMode(r, d, 16, 0, 4, 8); }
+
+// D20 Vimshamsha — movable→Aries, fixed→Sagittarius, dual→Leo.
+function d20(r: number, d: number): number { return byMode(r, d, 20, 0, 8, 4); }
+
+// D24 Chaturvimshamsha — odd→Leo, even→Cancer.
+function d24(r: number, d: number): number {
+  const part = Math.floor(d / (30 / 24));
+  return norm12((isOdd(r) ? 4 : 3) + part);
+}
+
+// D27 Nakshatramsha — Fire→Aries, Earth→Cancer, Air→Libra, Water→Capricorn.
+function d27(r: number, d: number): number {
+  const part = Math.floor(d / (30 / 27));
+  const start = FIRE.has(r) ? 0 : EARTH.has(r) ? 3 : AIR.has(r) ? 6 : 9;
+  void WATER; // referenced for symmetry
   return norm12(start + part);
 }
 
-function d60(rashi: number, deg: number): number {
-  // Simplified Parashari: each 0.5° = one part; sign = (rashi + part) mod 12.
-  const part = Math.floor(deg * 2); // 0..59
-  return norm12(rashi + part);
+// D30 Trimshamsha — non-uniform Parashari allocation.
+function d30(r: number, d: number): number {
+  if (isOdd(r)) {
+    if (d < 5)  return 0;  // Mars → Aries
+    if (d < 10) return 10; // Saturn → Aquarius
+    if (d < 18) return 8;  // Jupiter → Sagittarius
+    if (d < 25) return 2;  // Mercury → Gemini
+    return 6;              // Venus → Libra
+  }
+  if (d < 5)  return 1;  // Venus → Taurus
+  if (d < 12) return 5;  // Mercury → Virgo
+  if (d < 20) return 11; // Jupiter → Pisces
+  if (d < 25) return 9;  // Saturn → Capricorn
+  return 7;              // Mars → Scorpio
 }
 
-const VARGA_FNS: Record<VargaCode, (rashi: number, deg: number) => number> = {
-  D1: d1,
-  D2: (r, d) => d2(r, d),
-  D3: (r, d) => d3(r, d),
-  D7: (r, d) => d7(r, d),
-  D9: (r, d) => d9(r, d),
-  D10: (r, d) => d10(r, d),
-  D60: (r, d) => d60(r, d),
+// D40 Khavedamsha — odd→Aries, even→Libra.
+function d40(r: number, d: number): number {
+  const part = Math.floor(d / (30 / 40));
+  return norm12((isOdd(r) ? 0 : 6) + part);
+}
+
+// D45 Akshavedamsha — movable→Aries, fixed→Leo, dual→Sagittarius.
+function d45(r: number, d: number): number { return byMode(r, d, 45, 0, 4, 8); }
+
+// D60 Shashtiamsha — (rashi + part) mod 12 with part = floor(deg*2).
+function d60(r: number, d: number): number {
+  return norm12(r + Math.floor(d * 2));
+}
+
+const VARGA_FNS: Record<VargaCode, (r: number, d: number) => number> = {
+  D1: d1, D2: d2, D3: d3, D4: d4, D7: d7, D9: d9, D10: d10, D12: d12,
+  D16: d16, D20: d20, D24: d24, D27: d27, D30: d30, D40: d40, D45: d45, D60: d60,
 };
+
+export const VARGA_ORDER: VargaCode[] = [
+  "D1","D2","D3","D4","D7","D9","D10","D12","D16","D20","D24","D27","D30","D40","D45","D60",
+];
 
 export type VargaChart = {
   code: VargaCode;
@@ -95,6 +172,35 @@ export function computeVarga(chart: KundliChart, code: VargaCode): VargaChart {
     retrograde: p.retrograde,
   }));
   return { code, ascendantSign, planetSigns };
+}
+
+/** Compute the full Shodashavarga (all 16 divisional charts). */
+export function computeAllVargas(chart: KundliChart): Record<VargaCode, VargaChart> {
+  return Object.fromEntries(
+    VARGA_ORDER.map((code) => [code, computeVarga(chart, code)]),
+  ) as Record<VargaCode, VargaChart>;
+}
+
+/**
+ * Vimshopaka Bala (Shadvarga weighting) — planet's positional strength across
+ * the 6 main divisions weighted by classical Parashari weights (sum = 20).
+ * Returns 0..20 per planet based on how many "friendly" placements the planet
+ * holds relative to its D1 sign (same sign counts, adjacent friendly signs half).
+ */
+const SHADVARGA_WEIGHTS: Partial<Record<VargaCode, number>> = {
+  D1: 6, D2: 2, D3: 4, D9: 5, D12: 2, D30: 1,
+};
+export function vimshopakaBala(chart: KundliChart): { name: PlanetName; score: number }[] {
+  return chart.planets.map((p) => {
+    let score = 0;
+    for (const [code, w] of Object.entries(SHADVARGA_WEIGHTS) as [VargaCode, number][]) {
+      const v = computeVarga(chart, code);
+      const s = v.planetSigns.find((x) => x.name === p.name)!.sign;
+      if (s === p.rashi) score += w;
+      else if (mode(s) === mode(p.rashi)) score += w * 0.5;
+    }
+    return { name: p.name, score: Math.round(score * 10) / 10 };
+  });
 }
 
 // ─────────────────────────────────────────────────────────────

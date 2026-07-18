@@ -10,7 +10,7 @@ import {
 } from "@/lib/vedic";
 import {
   computeVarga, computeVimshottari, detectYogas, detectDoshas,
-  VARGA_LABELS, fmtDate,
+  VARGA_LABELS, VARGA_ORDER, fmtDate,
   type VargaCode,
 } from "@/lib/vedic-extended";
 import {
@@ -487,7 +487,7 @@ function OverviewTab({ chart }: { chart: KundliChart }) {
 }
 
 function VargasTab({ chart }: { chart: KundliChart }) {
-  const codes: VargaCode[] = ["D1", "D2", "D3", "D7", "D9", "D10", "D60"];
+  const codes: VargaCode[] = VARGA_ORDER;
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {codes.map((code) => {
