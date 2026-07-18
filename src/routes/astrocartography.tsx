@@ -11,9 +11,17 @@ import {
   type AcgResult,
   type AcgLineKind,
 } from "@/lib/astrocartography";
+import {
+  computeParans,
+  computeLocalSpace,
+  recommendCities,
+  INTENTION_LABEL,
+  type Intention,
+} from "@/lib/astrocartography-deep";
 import type { BirthInput } from "@/lib/progressions";
 import type { PlanetName } from "@/lib/vedic";
-import { Globe2, MapPin, Sparkles } from "lucide-react";
+import { Globe2, MapPin, Sparkles, Crosshair, Compass, Trophy } from "lucide-react";
+
 
 export const Route = createFileRoute("/astrocartography")({
   component: () => (
@@ -54,8 +62,27 @@ function AcgPage() {
   );
   const [enabledKinds, setEnabledKinds] = useState<Set<AcgLineKind>>(new Set(KINDS));
   const [pin, setPin] = useState<{ lat: number; lon: number; name?: string } | null>(null);
+  const [intent, setIntent] = useState<Intention>("love");
+  const [showParans, setShowParans] = useState(true);
+  const [showLocalSpace, setShowLocalSpace] = useState(false);
 
   const result: AcgResult = useMemo(() => computeAstrocartography(birth), [birth]);
+  const parans = useMemo(
+    () =>
+      computeParans(result).filter(
+        (p) =>
+          enabledPlanets.has(p.a.planet) &&
+          enabledPlanets.has(p.b.planet) &&
+          enabledKinds.has(p.a.kind) &&
+          enabledKinds.has(p.b.kind),
+      ),
+    [result, enabledPlanets, enabledKinds],
+  );
+  const localSpace = useMemo(
+    () => (pin && showLocalSpace ? computeLocalSpace(birth, { lat: pin.lat, lon: pin.lon }) : []),
+    [birth, pin, showLocalSpace],
+  );
+  const bestCities = useMemo(() => recommendCities(result, ACG_CITIES, intent, 5), [result, intent]);
 
   const influences = useMemo(() => {
     if (!pin) return [];
@@ -63,6 +90,7 @@ function AcgPage() {
       (h) => enabledPlanets.has(h.planet) && enabledKinds.has(h.kind),
     );
   }, [pin, result, enabledPlanets, enabledKinds]);
+
 
   const togglePlanet = (p: PlanetName) => {
     setEnabledPlanets((s) => { const n = new Set(s); n.has(p) ? n.delete(p) : n.add(p); return n; });
@@ -243,6 +271,49 @@ function AcgPage() {
                   );
                 })}
 
+              {/* Local Space rays from pin */}
+              {showLocalSpace && pin && localSpace
+                .filter((l) => enabledPlanets.has(l.planet))
+                .map((l, i) => {
+                  // Split at date-line jumps
+                  const segs: Array<Array<[number, number]>> = [];
+                  let cur: Array<[number, number]> = [];
+                  for (const p of l.points) {
+                    if (cur.length && Math.abs(p[0] - cur[cur.length - 1][0]) > 180) {
+                      segs.push(cur); cur = [];
+                    }
+                    cur.push(p);
+                  }
+                  if (cur.length > 1) segs.push(cur);
+                  return segs.map((seg, k) => (
+                    <path
+                      key={`ls-${i}-${k}`}
+                      d={seg.map(([lon, lat], idx) => `${idx === 0 ? "M" : "L"} ${lonToX(lon).toFixed(1)} ${latToY(lat).toFixed(1)}`).join(" ")}
+                      fill="none"
+                      stroke={PLANET_COLORS[l.planet]}
+                      strokeWidth={0.9}
+                      strokeDasharray="1 3"
+                      opacity={0.7}
+                    />
+                  ));
+                })}
+
+              {/* Parans (line crossings) */}
+              {showParans && parans.map((p, i) => (
+                <g key={`paran-${i}`}>
+                  <circle
+                    cx={lonToX(p.lon)}
+                    cy={latToY(p.lat)}
+                    r={3.5}
+                    fill="none"
+                    stroke="#F5C542"
+                    strokeWidth={0.8}
+                    opacity={0.4 + 0.6 * p.strength}
+                  />
+                  <circle cx={lonToX(p.lon)} cy={latToY(p.lat)} r={1.4} fill="#F5C542" opacity={0.9} />
+                </g>
+              ))}
+
               {/* Anchor city dots */}
               {ACG_CITIES.map((c) => (
                 <g key={c.name}>
@@ -257,12 +328,28 @@ function AcgPage() {
                   <circle cx={lonToX(pin.lon)} cy={latToY(pin.lat)} r={2.4} fill="#F5C542" />
                 </g>
               )}
+
             </svg>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><span className="inline-block h-[2px] w-6 bg-white/60" /> Solid = MC / ASC (angular)</span>
-            <span className="inline-flex items-center gap-1"><span className="inline-block h-[2px] w-6 bg-white/30" style={{ borderTop: "2px dashed rgba(255,255,255,0.6)" }} /> Dashed = IC / DSC</span>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1"><span className="inline-block h-[2px] w-6 bg-white/60" /> Solid = MC / ASC</span>
+            <span className="inline-flex items-center gap-1"><span className="inline-block h-[2px] w-6" style={{ borderTop: "2px dashed rgba(255,255,255,0.6)" }} /> Dashed = IC / DSC</span>
+            <span className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => setShowParans((v) => !v)}
+                className={`rounded-full border px-2 py-1 text-[10px] uppercase tracking-widest ${showParans ? "border-gold/60 text-gold bg-gold/10" : "border-white/10 text-muted-foreground"}`}
+              >
+                <Crosshair className="inline h-3 w-3 mr-1" /> Parans
+              </button>
+              <button
+                onClick={() => setShowLocalSpace((v) => !v)}
+                disabled={!pin}
+                className={`rounded-full border px-2 py-1 text-[10px] uppercase tracking-widest disabled:opacity-40 ${showLocalSpace ? "border-gold/60 text-gold bg-gold/10" : "border-white/10 text-muted-foreground"}`}
+              >
+                <Compass className="inline h-3 w-3 mr-1" /> Local Space
+              </button>
+            </span>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -273,15 +360,97 @@ function AcgPage() {
               </p>
             </div>
             <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm">
-              <div className="font-medium text-pearl mb-1">Orb</div>
-              <p className="text-muted-foreground">A location within ~3° of a line still feels its pull; the closer, the sharper. Multiple planets crossing near one place is called a "power spot".</p>
+              <div className="font-medium text-pearl mb-1">Parans & Local Space</div>
+              <p className="text-muted-foreground">Golden dots mark <em>parans</em>: latitudes where two planetary lines cross — power spots where two themes merge. Local-space rays fan out from your pin along each planet's azimuth from that place.</p>
             </div>
           </div>
+        </GlassCard>
+      </div>
+
+      {/* Deep panel: intent-based city recommender + parans list */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <GlassCard
+          title="Best cities for your intention"
+          desc="Weighted match of your natal lines against a preset weighting for each life theme. Within ~5° orb."
+        >
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {(Object.keys(INTENTION_LABEL) as Intention[]).map((k) => (
+              <button
+                key={k}
+                onClick={() => setIntent(k)}
+                className={`text-[11px] px-2.5 py-1 rounded-full border ${intent === k ? "border-gold/70 bg-gold/10 text-gold" : "border-white/10 text-pearl/80 hover:bg-white/5"}`}
+              >
+                {INTENTION_LABEL[k]}
+              </button>
+            ))}
+          </div>
+          <ol className="space-y-2">
+            {bestCities.slice(0, 8).map((c, i) => (
+              <li key={c.name} className="rounded-2xl border border-white/5 bg-white/[0.03] p-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gold/10 text-gold text-[11px] font-medium">{i + 1}</span>
+                  <button
+                    onClick={() => setPin({ lat: c.lat, lon: c.lon, name: c.name })}
+                    className="font-medium text-pearl hover:underline"
+                  >
+                    {c.name}
+                  </button>
+                  <span className="ml-auto flex items-center gap-1 text-[11px] text-gold/90">
+                    <Trophy className="h-3 w-3" /> {c.score.toFixed(2)}
+                  </span>
+                </div>
+                {(c.positives.length > 0 || c.cautions.length > 0) && (
+                  <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px]">
+                    {c.positives.slice(0, 4).map((p, k) => (
+                      <span key={`p-${k}`} className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-1.5 py-0.5 text-emerald-300">
+                        {p.planet} {p.kind}
+                      </span>
+                    ))}
+                    {c.cautions.slice(0, 3).map((p, k) => (
+                      <span key={`c-${k}`} className="rounded-full border border-red-400/30 bg-red-500/10 px-1.5 py-0.5 text-red-300">
+                        {p.planet} {p.kind}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+        </GlassCard>
+
+        <GlassCard
+          title="Parans · line crossings"
+          desc="Latitudes where two planetary lines meet — Jim Lewis's classic 'power lines'. Any location on the same latitude carries the crossing's theme."
+        >
+          {parans.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No parans within selected filters.</div>
+          ) : (
+            <ul className="space-y-1.5 max-h-[420px] overflow-y-auto pr-1">
+              {parans.slice(0, 24).map((p, i) => (
+                <li key={i} className="flex items-center gap-2 text-xs rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: PLANET_COLORS[p.a.planet] }} />
+                  <span className="text-pearl/90">{p.a.planet}</span>
+                  <span className="text-[10px] text-gold/80 uppercase tracking-widest">{p.a.kind}</span>
+                  <span className="text-muted-foreground">×</span>
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: PLANET_COLORS[p.b.planet] }} />
+                  <span className="text-pearl/90">{p.b.planet}</span>
+                  <span className="text-[10px] text-gold/80 uppercase tracking-widest">{p.b.kind}</span>
+                  <button
+                    onClick={() => setPin({ lat: p.lat, lon: p.lon })}
+                    className="ml-auto text-[10px] rounded-full border border-white/10 px-2 py-0.5 hover:bg-white/5 text-pearl/80"
+                  >
+                    {p.lat >= 0 ? `${p.lat.toFixed(1)}°N` : `${(-p.lat).toFixed(1)}°S`}, {p.lon >= 0 ? `${p.lon.toFixed(1)}°E` : `${(-p.lon).toFixed(1)}°W`}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </GlassCard>
       </div>
     </PageShell>
   );
 }
+
 
 function BirthForm({ value, onChange }: { value: BirthInput; onChange: (v: BirthInput) => void }) {
   const set = <K extends keyof BirthInput>(k: K, v: BirthInput[K]) => onChange({ ...value, [k]: v });
