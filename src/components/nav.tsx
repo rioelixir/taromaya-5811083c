@@ -297,6 +297,7 @@ const bottomNav = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { t } = useT();
   return (
     <nav
       className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-white/5 bg-cosmic/85 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]"
