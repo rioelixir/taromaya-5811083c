@@ -75,6 +75,13 @@ function Hero() {
             Live Sky
           </Link>
           <Link
+            to="/meditation"
+            className="inline-flex items-center gap-2 rounded-full glass px-5 py-2.5 text-sm text-pearl hover:bg-white/10"
+          >
+            <Sparkles className="h-4 w-4 text-gold" />
+            Mantra Studio
+          </Link>
+          <Link
             to="/ai"
             className="inline-flex items-center gap-2 rounded-full glass px-5 py-2.5 text-sm text-pearl hover:bg-white/10"
           >
