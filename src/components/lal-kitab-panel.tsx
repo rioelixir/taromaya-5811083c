@@ -58,32 +58,21 @@ export function LalKitabPanel({ chart, birthDate }: Props) {
       </div>
 
       {tab === "houses" && (
-        <div className="overflow-hidden rounded-lg border border-border/40">
-          <table className="w-full text-xs">
-            <thead className="bg-background/40 text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 text-left">Planet</th>
-                <th className="px-3 py-2 text-right">House</th>
-                <th className="px-3 py-2 text-left">Status</th>
-                <th className="px-3 py-2 text-left">Reading</th>
-              </tr>
-            </thead>
-            <tbody className="font-mono">
-              {houses.map((r) => (
-                <tr key={r.planet} className="border-t border-border/30 align-top">
-                  <td className="px-3 py-2 text-primary">{r.planet}</td>
-                  <td className="px-3 py-2 text-right">{r.house}</td>
-                  <td className={`px-3 py-2 ${statusColor(r.status)}`}>{r.status}</td>
-                  <td className="px-3 py-2 font-sans text-muted-foreground">
-                    <div>{r.reading}</div>
-                    <div className="mt-1 text-[11px] text-primary/80">Remedy: {r.remedy}</div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {houses.map((r) => (
+            <div key={r.planet} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
+              <div className="flex items-baseline justify-between">
+                <span className="font-display text-sm text-primary">{r.planet}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">House {r.house}</span>
+              </div>
+              <div className={`mt-1 text-[11px] uppercase tracking-wider ${statusColor(r.status)}`}>{r.status}</div>
+              <div className="mt-1 text-muted-foreground">{r.reading}</div>
+              <div className="mt-1 text-primary/80">Remedy: {r.remedy}</div>
+            </div>
+          ))}
         </div>
       )}
+
 
       {tab === "rins" && (
         <div className="space-y-2">
