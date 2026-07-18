@@ -171,6 +171,16 @@ function RootComponent() {
           if (path !== "/accept-terms" && path !== "/terms") {
             router.navigate({ to: "/accept-terms" });
           }
+          return;
+        }
+        // Subscription enforcement — this app is fully subscription-based.
+        const { data: isPremium } = await supabase.rpc("is_premium", { _user_id: user.id });
+        const SUBSCRIPTION_ALLOWED = ["/pricing", "/profile", "/terms", "/accept-terms"];
+        const allowedForNonPremium = SUBSCRIPTION_ALLOWED.some(
+          (p) => path === p || path.startsWith(p + "/"),
+        );
+        if (!isPremium && !allowedForNonPremium) {
+          router.navigate({ to: "/pricing" });
         }
       };
 
