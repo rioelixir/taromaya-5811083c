@@ -235,6 +235,15 @@ function RectificationPage() {
         </div>
       )}
 
+      {result && result.best && (
+        <JaiminiCrossCheck
+          entered={birth}
+          best={result.best.birth}
+          events={validEvents}
+        />
+      )}
+
+
       {result && !result.best && (
         <div className="mt-8 text-center text-sm text-muted-foreground">
           Add at least one dated life event to score candidates.
