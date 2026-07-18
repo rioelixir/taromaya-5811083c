@@ -68,7 +68,7 @@ function BirthDetailsPage() {
   return (
     <PageShell
       title="Your Birth Details"
-      description="Entered once. Used everywhere. Private to you — even we won't show it to another user."
+      subtitle="Entered once. Used everywhere. Private to you — even we won't show it to another user."
     >
       <div className="max-w-2xl">
         <GlassCard>
