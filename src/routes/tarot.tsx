@@ -5,8 +5,9 @@ import { useState, useRef, useEffect, useCallback, type ReactNode } from "react"
 import { StarField } from "@/components/star-field";
 import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
+import { getCardDetails, isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
@@ -52,9 +53,13 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 // Build the initial per-deck stacks, each independently shuffled.
-function makeDeckStacks(): Record<DeckKey, TarotCard[]> {
+// When courtOnly is on, Rider-Waite is filtered to its 16 court cards.
+function makeDeckStacks(courtOnly = false): Record<DeckKey, TarotCard[]> {
+  const rw = courtOnly
+    ? DECKS["rider-waite"].filter(isCourtCard)
+    : DECKS["rider-waite"];
   return {
-    "rider-waite": shuffle(DECKS["rider-waite"]),
+    "rider-waite": shuffle(rw),
     "nakshatra":   shuffle(DECKS["nakshatra"]),
     "health":      shuffle(DECKS["health"]),
     "lost-found":  shuffle(DECKS["lost-found"]),
@@ -67,7 +72,8 @@ function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks());
+  const [courtOnly, setCourtOnly] = useState(false);
+  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks(false));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,8 +123,20 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks());
-  }, []);
+    setDecks(makeDeckStacks(courtOnly));
+  }, [courtOnly]);
+
+  // Rebuild the Rider-Waite stack whenever the Court-Only toggle changes.
+  useEffect(() => {
+    setDecks((prev) => ({
+      ...prev,
+      "rider-waite": shuffle(
+        courtOnly
+          ? DECKS["rider-waite"].filter(isCourtCard)
+          : DECKS["rider-waite"],
+      ),
+    }));
+  }, [courtOnly]);
 
   useEffect(() => {
     setPlaced([]);
@@ -306,6 +324,17 @@ function TarotPage() {
               </button>
             );
           })}
+          <button
+            onClick={() => setCourtOnly((v) => !v)}
+            className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
+              courtOnly
+                ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
+                : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
+            }`}
+            title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
+          >
+            <Crown className="h-3.5 w-3.5" /> Court Cards Only
+          </button>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2 items-center">
@@ -480,43 +509,94 @@ function TarotPage() {
       {zoomedUid && (() => {
         const zc = placed.find((p) => p.uid === zoomedUid);
         if (!zc) return null;
+        const d = getCardDetails(zc.card);
+        const court = isCourtCard(zc.card);
         return (
           <div
             onClick={() => setZoomedUid(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-6 animate-in fade-in duration-300"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300 overflow-y-auto"
           >
             <button
               onClick={(e) => { e.stopPropagation(); setZoomedUid(null); }}
-              className="absolute top-6 right-6 rounded-full bg-black/60 border border-white/20 p-2 hover:bg-white/10"
+              className="fixed top-4 right-4 z-10 rounded-full bg-black/70 border border-white/20 p-2 hover:bg-white/10"
               aria-label="Close"
             >
               <X className="h-5 w-5 text-pearl" />
             </button>
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_120px_-20px_var(--gold)] p-6 flex flex-col items-center"
-              style={{
-                width: "min(90vw, 480px)",
-                height: "min(90vh, 740px)",
-                transform: zc.reversed ? "rotate(180deg)" : undefined,
-              }}
+              className="relative my-6 rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_120px_-20px_var(--gold)] p-6 sm:p-8 grid gap-6 md:grid-cols-[220px_1fr]"
+              style={{ width: "min(94vw, 780px)" }}
             >
-              <div className="text-xs uppercase tracking-[0.4em] text-gold/70">
-                {zc.card.arcana === "major" ? "Major Arcana" : zc.card.suit}
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-[10rem] leading-none">{glyphFor(zc.card)}</div>
-              </div>
-              <div className="font-display text-3xl gold-text text-center">
-                {zc.card.name}
-              </div>
-              {zc.reversed && (
-                <div className="mt-2 text-[10px] uppercase tracking-[0.4em] text-gold/60">
-                  Reversed
+              {/* Card face */}
+              <div className="flex flex-col items-center">
+                <div
+                  className="relative rounded-2xl border border-gold/50 bg-gradient-to-b from-cosmic to-black p-4 flex flex-col items-center"
+                  style={{
+                    width: 200,
+                    height: 300,
+                    transform: zc.reversed ? "rotate(180deg)" : undefined,
+                  }}
+                >
+                  <div className="text-[9px] uppercase tracking-[0.35em] text-gold/70">
+                    {zc.card.arcana === "major" ? "Major Arcana" : zc.card.suit}
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-[6rem] leading-none">{glyphFor(zc.card)}</div>
+                  </div>
+                  <div className="font-display text-lg gold-text text-center leading-tight">
+                    {zc.card.name}
+                  </div>
                 </div>
-              )}
-              <div className="mt-4 text-xs text-pearl/70 text-center max-w-md leading-relaxed">
-                {(zc.reversed ? zc.card.keywordsReversed : zc.card.keywords).join(" · ")}
+                <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
+                  {court && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
+                      <Crown className="h-3 w-3" /> Court
+                    </span>
+                  )}
+                  {zc.reversed && (
+                    <span className="rounded-full bg-black/60 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold/80">
+                      Reversed
+                    </span>
+                  )}
+                  {d.element && (
+                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
+                      {d.element}
+                    </span>
+                  )}
+                  {d.astrology && (
+                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
+                      {d.astrology}
+                    </span>
+                  )}
+                  {d.yesNo && (
+                    <span className="rounded-full bg-gold/10 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
+                      {d.yesNo}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="text-pearl/90 text-sm leading-relaxed space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <div>
+                  <div className="font-display text-2xl gold-text">{zc.card.name}</div>
+                  <div className="mt-1 text-xs text-pearl/70 italic">{d.headline}</div>
+                </div>
+                <DetailBlock label={zc.reversed ? "Reversed meaning" : "Upright meaning"}>
+                  {zc.reversed ? d.reversed : d.upright}
+                </DetailBlock>
+                <DetailBlock label={zc.reversed ? "Upright meaning" : "Reversed meaning"} muted>
+                  {zc.reversed ? d.upright : d.reversed}
+                </DetailBlock>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <DetailBlock label="Love">{d.love}</DetailBlock>
+                  <DetailBlock label="Career">{d.career}</DetailBlock>
+                  <DetailBlock label="Spiritual">{d.spiritual}</DetailBlock>
+                </div>
+                <DetailBlock label="Keywords" muted>
+                  {(zc.reversed ? zc.card.keywordsReversed : zc.card.keywords).join(" · ")}
+                </DetailBlock>
               </div>
             </div>
           </div>
@@ -679,5 +759,18 @@ function renderInline(text: string) {
     ) : (
       <span key={i}>{p}</span>
     ),
+  );
+}
+
+function DetailBlock({ label, children, muted = false }: { label: string; children: ReactNode; muted?: boolean }) {
+  return (
+    <div>
+      <div className={`text-[10px] uppercase tracking-[0.3em] mb-1 ${muted ? "text-pearl/50" : "text-gold/80"}`}>
+        {label}
+      </div>
+      <div className={`text-sm leading-relaxed ${muted ? "text-pearl/70" : "text-pearl"}`}>
+        {children}
+      </div>
+    </div>
   );
 }
