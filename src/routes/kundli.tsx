@@ -201,9 +201,13 @@ function KundliPage() {
           {chart ? (
             <>
               <GlassCard>
-                <SouthIndianChart chart={chart} />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <NorthIndianLagnaChart chart={chart} />
+                  <SouthIndianChart chart={chart} />
+                </div>
               </GlassCard>
               <ChartSummary chart={chart} />
+
               {user ? (
                 <div className="glass rounded-2xl p-4 flex items-center justify-between gap-3">
                   <div className="text-xs text-muted-foreground">
