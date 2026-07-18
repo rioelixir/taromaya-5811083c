@@ -33,6 +33,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as ObservatoryRouteImport } from './routes/observatory'
 import { Route as NumerologyRouteImport } from './routes/numerology'
+import { Route as NakshatraLocationRouteImport } from './routes/nakshatra-location'
 import { Route as NakshatraRouteImport } from './routes/nakshatra'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
@@ -191,6 +192,11 @@ const ObservatoryRoute = ObservatoryRouteImport.update({
 const NumerologyRoute = NumerologyRouteImport.update({
   id: '/numerology',
   path: '/numerology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NakshatraLocationRoute = NakshatraLocationRouteImport.update({
+  id: '/nakshatra-location',
+  path: '/nakshatra-location',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NakshatraRoute = NakshatraRouteImport.update({
@@ -419,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
+  '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
@@ -483,6 +490,7 @@ export interface FileRoutesByTo {
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
+  '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
@@ -549,6 +557,7 @@ export interface FileRoutesById {
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
+  '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
@@ -615,6 +624,7 @@ export interface FileRouteTypes {
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
+    | '/nakshatra-location'
     | '/numerology'
     | '/observatory'
     | '/panchang'
@@ -679,6 +689,7 @@ export interface FileRouteTypes {
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
+    | '/nakshatra-location'
     | '/numerology'
     | '/observatory'
     | '/panchang'
@@ -744,6 +755,7 @@ export interface FileRouteTypes {
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
+    | '/nakshatra-location'
     | '/numerology'
     | '/observatory'
     | '/panchang'
@@ -810,6 +822,7 @@ export interface RootRouteChildren {
   MoonCalendarRoute: typeof MoonCalendarRoute
   MuhuratRoute: typeof MuhuratRoute
   NakshatraRoute: typeof NakshatraRoute
+  NakshatraLocationRoute: typeof NakshatraLocationRoute
   NumerologyRoute: typeof NumerologyRoute
   ObservatoryRoute: typeof ObservatoryRoute
   PanchangRoute: typeof PanchangRoute
@@ -1006,6 +1019,13 @@ declare module '@tanstack/react-router' {
       path: '/numerology'
       fullPath: '/numerology'
       preLoaderRoute: typeof NumerologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nakshatra-location': {
+      id: '/nakshatra-location'
+      path: '/nakshatra-location'
+      fullPath: '/nakshatra-location'
+      preLoaderRoute: typeof NakshatraLocationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nakshatra': {
@@ -1339,6 +1359,7 @@ const rootRouteChildren: RootRouteChildren = {
   MoonCalendarRoute: MoonCalendarRoute,
   MuhuratRoute: MuhuratRoute,
   NakshatraRoute: NakshatraRoute,
+  NakshatraLocationRoute: NakshatraLocationRoute,
   NumerologyRoute: NumerologyRoute,
   ObservatoryRoute: ObservatoryRoute,
   PanchangRoute: PanchangRoute,
