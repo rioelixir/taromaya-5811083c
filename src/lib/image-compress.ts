@@ -30,9 +30,9 @@ export async function compressImage(file: File, opts: CompressOpts): Promise<Fil
     opts.skipIfUnder != null &&
     file.size <= opts.skipIfUnder &&
     scale === 1 &&
-    (file.type === mime);
+    file.type === mime;
   if (alreadySmall) {
-    bitmap.close?.();
+    bitmap.close();
     return file;
   }
 
@@ -41,13 +41,13 @@ export async function compressImage(file: File, opts: CompressOpts): Promise<Fil
   canvas.height = dh;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
-    bitmap.close?.();
+    bitmap.close();
     return file;
   }
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(bitmap, 0, 0, dw, dh);
-  bitmap.close?.();
+  ctx.drawImage(bitmap.source, 0, 0, dw, dh);
+  bitmap.close();
 
   const blob: Blob | null = await new Promise((res) =>
     canvas.toBlob((b) => res(b), mime, quality),
