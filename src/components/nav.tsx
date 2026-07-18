@@ -178,6 +178,9 @@ export function Sidebar() {
           <AdminNavGroup pathname={pathname} />
         </nav>
 
+        <div className="px-3 pb-2">
+          <LanguageSwitcher />
+        </div>
         <AuthFooter />
       </aside>
     </>
