@@ -242,12 +242,15 @@ export type Database = {
           birth_seconds: number
           birth_time: string
           chart_config: Json
+          chart_style: string
           created_at: string
           elevation_m: number
           engine_version: string
+          gender: string
           house_system: string
           id: string
           is_primary: boolean
+          language: string
           latitude: number
           longitude: number
           name: string
@@ -256,6 +259,7 @@ export type Database = {
           tz_offset: number
           unknown_time: boolean
           user_id: string
+          zodiac: string
         }
         Insert: {
           ayanamsa?: string
@@ -263,12 +267,15 @@ export type Database = {
           birth_seconds?: number
           birth_time: string
           chart_config?: Json
+          chart_style?: string
           created_at?: string
           elevation_m?: number
           engine_version?: string
+          gender?: string
           house_system?: string
           id?: string
           is_primary?: boolean
+          language?: string
           latitude: number
           longitude: number
           name: string
@@ -277,6 +284,7 @@ export type Database = {
           tz_offset: number
           unknown_time?: boolean
           user_id: string
+          zodiac?: string
         }
         Update: {
           ayanamsa?: string
@@ -284,12 +292,15 @@ export type Database = {
           birth_seconds?: number
           birth_time?: string
           chart_config?: Json
+          chart_style?: string
           created_at?: string
           elevation_m?: number
           engine_version?: string
+          gender?: string
           house_system?: string
           id?: string
           is_primary?: boolean
+          language?: string
           latitude?: number
           longitude?: number
           name?: string
@@ -298,6 +309,7 @@ export type Database = {
           tz_offset?: number
           unknown_time?: boolean
           user_id?: string
+          zodiac?: string
         }
         Relationships: []
       }
