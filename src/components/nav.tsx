@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Shield } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
+import { useT } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 function BrandMark() {
   const logo = useAppLogo();
