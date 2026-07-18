@@ -9,6 +9,7 @@ import { StrengthsPanel } from "@/components/strengths-panel";
 import { YogasDoshasPanel } from "@/components/yogas-doshas-panel";
 import { JaiminiPanel } from "@/components/jaimini-panel";
 import { KPPanel } from "@/components/kp-panel";
+import { LalKitabPanel } from "@/components/lal-kitab-panel";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
