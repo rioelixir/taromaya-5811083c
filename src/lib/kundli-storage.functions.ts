@@ -10,6 +10,14 @@ const SaveInput = z.object({
   latitude: z.number(),
   longitude: z.number(),
   place: z.string().max(120).optional().default(""),
+  chartConfig: z.record(z.string(), z.unknown()).optional().default({}),
+  engineVersion: z.string().max(80).optional().default("taromaya-ephem@1.0.0"),
+  ayanamsa: z.string().max(20).optional().default("lahiri"),
+  houseSystem: z.string().max(20).optional().default("whole-sign"),
+  nodeType: z.string().max(10).optional().default("true"),
+  birthSeconds: z.number().int().min(0).max(59).optional().default(0),
+  elevationMeters: z.number().optional().default(0),
+  unknownTime: z.boolean().optional().default(false),
 });
 
 export const saveKundli = createServerFn({ method: "POST" })
@@ -28,6 +36,14 @@ export const saveKundli = createServerFn({ method: "POST" })
         latitude: data.latitude,
         longitude: data.longitude,
         place: data.place,
+        chart_config: data.chartConfig,
+        engine_version: data.engineVersion,
+        ayanamsa: data.ayanamsa,
+        house_system: data.houseSystem,
+        node_type: data.nodeType,
+        birth_seconds: data.birthSeconds,
+        elevation_m: data.elevationMeters,
+        unknown_time: data.unknownTime,
       })
       .select()
       .single();
