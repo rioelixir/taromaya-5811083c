@@ -300,7 +300,7 @@ function TarotPage() {
       <StarField />
 
       {/* Top control bar */}
-      <div className="relative z-20 w-full px-4 sm:px-6 pt-6">
+      <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
         <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
         <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Pick a deck. Pull a card.</h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
