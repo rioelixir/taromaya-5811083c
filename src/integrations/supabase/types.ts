@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      accuracy_reference_charts: {
+        Row: {
+          birth_input: Json
+          category: string
+          chart_config: Json
+          created_at: string
+          expected: Json
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_input: Json
+          category?: string
+          chart_config: Json
+          created_at?: string
+          expected: Json
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_input?: Json
+          category?: string
+          chart_config?: Json
+          created_at?: string
+          expected?: Json
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -34,6 +70,44 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      chart_calculations: {
+        Row: {
+          chart_id: string | null
+          config_hash: string
+          created_at: string
+          engine_version: string
+          id: string
+          payload: Json
+          user_id: string
+        }
+        Insert: {
+          chart_id?: string | null
+          config_hash: string
+          created_at?: string
+          engine_version: string
+          id?: string
+          payload: Json
+          user_id: string
+        }
+        Update: {
+          chart_id?: string | null
+          config_hash?: string
+          created_at?: string
+          engine_version?: string
+          id?: string
+          payload?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_calculations_chart_id_fkey"
+            columns: ["chart_id"]
+            isOneToOne: false
+            referencedRelation: "saved_kundlis"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -67,42 +141,66 @@ export type Database = {
       }
       saved_kundlis: {
         Row: {
+          ayanamsa: string
           birth_date: string
+          birth_seconds: number
           birth_time: string
+          chart_config: Json
           created_at: string
+          elevation_m: number
+          engine_version: string
+          house_system: string
           id: string
           is_primary: boolean
           latitude: number
           longitude: number
           name: string
+          node_type: string
           place: string | null
           tz_offset: number
+          unknown_time: boolean
           user_id: string
         }
         Insert: {
+          ayanamsa?: string
           birth_date: string
+          birth_seconds?: number
           birth_time: string
+          chart_config?: Json
           created_at?: string
+          elevation_m?: number
+          engine_version?: string
+          house_system?: string
           id?: string
           is_primary?: boolean
           latitude: number
           longitude: number
           name: string
+          node_type?: string
           place?: string | null
           tz_offset: number
+          unknown_time?: boolean
           user_id: string
         }
         Update: {
+          ayanamsa?: string
           birth_date?: string
+          birth_seconds?: number
           birth_time?: string
+          chart_config?: Json
           created_at?: string
+          elevation_m?: number
+          engine_version?: string
+          house_system?: string
           id?: string
           is_primary?: boolean
           latitude?: number
           longitude?: number
           name?: string
+          node_type?: string
           place?: string | null
           tz_offset?: number
+          unknown_time?: boolean
           user_id?: string
         }
         Relationships: []
