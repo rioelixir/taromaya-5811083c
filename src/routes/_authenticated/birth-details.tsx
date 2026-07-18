@@ -66,7 +66,7 @@ function BirthDetailsPage() {
   };
 
   return (
-    <PageShell
+    <PageShell hideAI
       title="Your Birth Details"
       subtitle="Entered once. Used everywhere. Private to you — even we won't show it to another user."
     >

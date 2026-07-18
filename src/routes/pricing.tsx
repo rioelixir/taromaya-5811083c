@@ -115,7 +115,7 @@ function PricingPage() {
   };
 
   return (
-    <PageShell
+    <PageShell hideAI
       eyebrow="Membership"
       title="TAROMAYA Premium"
       subtitle="A single membership that unlocks the deepest layer of the cosmos."

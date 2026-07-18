@@ -10,7 +10,7 @@ const groups = [
 
 export const Route = createFileRoute("/settings")({
   component: () => (
-    <PageShell eyebrow="Settings" title="Preferences" subtitle="Tune TAROMAYA to feel like yours.">
+    <PageShell hideAI eyebrow="Settings" title="Preferences" subtitle="Tune TAROMAYA to feel like yours.">
       <div className="grid gap-4 md:grid-cols-2">
         {groups.map((g) => (
           <GlassCard key={g.title} title={g.title}>
