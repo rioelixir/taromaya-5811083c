@@ -68,32 +68,19 @@ export function JaiminiPanel({ chart, birthDate }: Props) {
             Ranked by advancement within sign (Rahu reversed). The Atmakaraka (AK) is
             the soul-signifier of the chart.
           </p>
-          <div className="overflow-hidden rounded-lg border border-border/40">
-            <table className="w-full text-xs">
-              <thead className="bg-background/40 text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left">Role</th>
-                  <th className="px-3 py-2 text-left">Planet</th>
-                  <th className="px-3 py-2 text-left">Sign</th>
-                  <th className="px-3 py-2 text-right">Degree</th>
-                  <th className="px-3 py-2 text-left">Meaning</th>
-                </tr>
-              </thead>
-              <tbody className="font-mono">
-                {karakas.map((k) => (
-                  <tr key={k.karaka} className="border-t border-border/30">
-                    <td className="px-3 py-2 text-primary">{k.karaka}</td>
-                    <td className="px-3 py-2">{k.planet}</td>
-                    <td className="px-3 py-2">{RASHIS[k.rashi]}</td>
-                    <td className="px-3 py-2 text-right">{k.degree.toFixed(2)}°</td>
-                    <td className="px-3 py-2 text-muted-foreground font-sans">
-                      {KARAKA_MEANING[k.karaka as CharaKaraka]}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {karakas.map((k) => (
+              <div key={k.karaka} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-primary text-sm">{k.karaka}</span>
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{k.planet}</span>
+                </div>
+                <div className="mt-1 font-mono">{RASHIS[k.rashi]} · {k.degree.toFixed(2)}°</div>
+                <div className="mt-1 text-muted-foreground">{KARAKA_MEANING[k.karaka as CharaKaraka]}</div>
+              </div>
+            ))}
           </div>
+
         </div>
       )}
 
