@@ -189,29 +189,27 @@ export function StrengthsPanel({ chart }: { chart: unknown }) {
             </div>
           </div>
 
-          {/* Bhinna table */}
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] text-[11px]">
-              <thead className="text-muted-foreground">
-                <tr className="border-b border-border/40">
-                  <th className="py-1 text-left font-normal">Planet</th>
-                  {RASHIS.map((r) => <th key={r} className="text-center font-normal">{r}</th>)}
-                  <th className="text-right font-normal">Total</th>
-                </tr>
-              </thead>
-              <tbody className="font-mono">
-                {av.bhinna.map((row) => (
-                  <tr key={row.planet} className="border-b border-border/20">
-                    <td className="py-1">{row.planet}</td>
-                    {row.bindus.map((b, i) => (
-                      <td key={i} className="text-center tabular-nums" style={{ background: heatCell(b, 8) }}>{b}</td>
-                    ))}
-                    <td className="text-right tabular-nums">{row.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Bhinna bar chart per planet */}
+          <div className="space-y-2">
+            {av.bhinna.map((row) => (
+              <div key={row.planet} className="rounded-lg border border-border/40 bg-background/30 p-2">
+                <div className="mb-1 flex items-baseline justify-between text-[11px]">
+                  <span className="font-medium">{row.planet}</span>
+                  <span className="font-mono text-muted-foreground">Σ {row.total}</span>
+                </div>
+                <div className="grid grid-cols-12 gap-0.5 items-end h-10">
+                  {row.bindus.map((b, i) => (
+                    <div key={i} className="flex flex-col items-center justify-end h-full" title={`${RASHIS[i]}: ${b}`}>
+                      <div className="w-full rounded-t" style={{ height: `${Math.max(8, (b / 8) * 100)}%`, background: heatCell(b, 8) }} />
+                      <div className="mt-0.5 text-[7px] uppercase text-muted-foreground">{RASHIS[i].slice(0,2)}</div>
+                      <div className="text-[8px] font-mono">{b}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
+
           <div className="text-[10px] leading-relaxed text-muted-foreground">
             Bhinnashtakavarga per planet ({PLANETS7.join(" · ")}) plus Lagna contributor; Sarva is the sum across all seven.
           </div>
