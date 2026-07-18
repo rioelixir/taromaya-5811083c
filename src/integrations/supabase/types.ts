@@ -469,6 +469,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_birth_profile: {
+        Row: {
+          birth_date: string
+          birth_time: string
+          created_at: string
+          full_name: string
+          gender: string | null
+          id: string
+          latitude: number
+          longitude: number
+          place: string
+          tz_offset_hours: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          birth_date: string
+          birth_time: string
+          created_at?: string
+          full_name: string
+          gender?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          place: string
+          tz_offset_hours: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          birth_date?: string
+          birth_time?: string
+          created_at?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          place?: string
+          tz_offset_hours?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
