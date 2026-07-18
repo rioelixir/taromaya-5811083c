@@ -6,9 +6,13 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { BiWheelChart } from "@/components/bi-wheel-chart";
 import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { computeCurrentSky, transitAspects, transitHouses, keyTransits } from "@/lib/transits";
+import {
+  findStations, findIngresses, findEclipses, findAspectHits, fmtDay,
+  type Station, type Ingress, type EclipseEvent, type TimelineHit,
+} from "@/lib/transits-timeline";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-reading.functions";
-import { Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
 
 export const Route = createFileRoute("/transits")({
   component: () => (<PremiumGate featureName="Transits"><TransitsPage /></PremiumGate>),
