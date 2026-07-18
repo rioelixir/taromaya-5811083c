@@ -3,9 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import jsPDF from "jspdf";
 import { PageShell, GlassCard } from "@/components/page-shell";
-import { computeKundli } from "@/lib/vedic";
+import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
+import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
 import { computeNumerology } from "@/lib/numerology";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
+import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
 import { FileText, Download, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
@@ -13,7 +15,7 @@ export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
       { title: "Premium Reports — TAROMAYA" },
-      { name: "description", content: "Luxury downloadable PDF reports — Life, Career, Love, Wealth, and Yearly — combining Vedic, Western, and Numerology insight." },
+      { name: "description", content: "Luxury downloadable PDF reports — Life, Career, Love, Wealth, and Yearly — with vector charts, dashas, transits, and remedies." },
     ],
   }),
 });
@@ -21,12 +23,12 @@ export const Route = createFileRoute("/reports")({
 type ReportKey = "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
 
 const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: string[] }> = {
-  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Birth Snapshot","Lagna & Moon","Life Path Number","Priority Grahas","Guiding Themes"] },
-  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Birth Snapshot","10th House & Sun","Destiny Number","Strengths","Action Plan"] },
-  love:    { title: "Love & Union",     desc: "The heart's chart — attraction, patterns, partnership.", sections: ["Birth Snapshot","7th House & Venus","Soul Urge Number","Manglik Status","Guidance"] },
-  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Birth Snapshot","2nd & 11th Houses","Personal Year","Dhana Yogas","Wealth Rituals"] },
-  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose.", sections: ["Birth Snapshot","Personal Year","Key Transits","Auspicious Windows","Monthly Themes"] },
-  remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Birth Snapshot","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
+  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Yogas & Doshas","Guiding Themes"] },
+  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Action Plan"] },
+  love:    { title: "Love & Union",     desc: "The heart's chart — attraction, patterns, partnership.", sections: ["Rashi Chart","7th House & Venus","Soul Urge Number","Manglik Status","Guidance"] },
+  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Personal Year","Dhana Yogas","Wealth Rituals"] },
+  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Monthly Themes"] },
+  remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Rashi Chart","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
 };
 
 function todayIso() { return new Date().toISOString().slice(0, 10); }
@@ -53,7 +55,7 @@ function ReportsPage() {
     <PageShell
       eyebrow="Premium Reports"
       title="Downloadable PDF reports"
-      subtitle="Luxury dossiers with charts, remedies, and prose — computed live from your birth data."
+      subtitle="Luxury dossiers with vector rashi charts, dashas, transits, and remedies — computed live from your birth data."
     >
       <GlassCard title="Your details">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -115,56 +117,25 @@ function Field({ label, value, onChange, type = "text" }: { label: string; value
   );
 }
 
-/* ---------- PDF renderer ---------- */
+/* ================= PDF renderer ================= */
 
 type Birth = { name: string; date: string; time: string; tz: string; lat: string; lon: string; place: string };
+
+// Palette (midnight + gold)
+const BG:      [number, number, number] = [12, 13, 28];
+const CARD:    [number, number, number] = [17, 19, 38];
+const GOLD:    [number, number, number] = [212, 175, 55];
+const GOLD_SOFT: [number, number, number] = [235, 210, 130];
+const PEARL:   [number, number, number] = [240, 235, 220];
+const MUTED:   [number, number, number] = [160, 155, 140];
+const LINE:    [number, number, number] = [70, 65, 90];
 
 function buildPdf(key: ReportKey, b: Birth) {
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
   const margin = 48;
-  let y = margin;
-
-  // Cover background — deep midnight rectangle
-  pdf.setFillColor(9, 10, 24);
-  pdf.rect(0, 0, w, h, "F");
-  // Gold hairlines
-  pdf.setDrawColor(212, 175, 55);
-  pdf.setLineWidth(0.6);
-  pdf.line(margin, 120, w - margin, 120);
-  pdf.line(margin, h - 120, w - margin, h - 120);
-
-  pdf.setTextColor(212, 175, 55);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(10);
-  pdf.text("TAROMAYA · COSMIC INTELLIGENCE", margin, 96, { charSpace: 3 });
-
-  pdf.setTextColor(240, 235, 220);
-  pdf.setFontSize(34);
-  pdf.text(REPORT_META[key].title, margin, 200);
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(12);
-  pdf.setTextColor(180, 175, 160);
-  pdf.text(REPORT_META[key].desc, margin, 232, { maxWidth: w - margin * 2 });
-
-  pdf.setTextColor(240, 235, 220);
-  pdf.setFontSize(11);
-  pdf.text(`Prepared for  ${b.name}`, margin, h - 168);
-  pdf.text(`${b.date}  ·  ${b.time}  ·  ${b.place}`, margin, h - 150);
-  pdf.text(`Generated  ${new Date().toLocaleDateString()}`, margin, h - 132);
-
-  // ---- Content pages ----
-  pdf.addPage();
-  y = margin;
-  pdf.setFillColor(15, 16, 32);
-  pdf.rect(0, 0, w, h, "F");
-  pdf.setTextColor(212, 175, 55);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(9);
-  pdf.text("TAROMAYA", margin, 30, { charSpace: 3 });
-  pdf.text(REPORT_META[key].title.toUpperCase(), w - margin, 30, { align: "right", charSpace: 3 });
+  const meta = REPORT_META[key];
 
   const [Y, M, D] = b.date.split("-").map(Number);
   const [hh, mm] = b.time.split(":").map(Number);
@@ -174,112 +145,360 @@ function buildPdf(key: ReportKey, b: Birth) {
   });
   const num = computeNumerology({ fullName: b.name, birthDate: b.date });
   const priorities = prioritiseRemedies(chart);
+  const yogas = detectYogas(chart);
+  const doshas = detectDoshas(chart);
 
-  const drawH = (label: string) => {
-    if (y > h - 100) { pdf.addPage(); pdf.setFillColor(15, 16, 32); pdf.rect(0, 0, w, h, "F"); y = margin; }
-    pdf.setTextColor(212, 175, 55);
+  const moon = chart.planets.find(p => p.name === "Moon")!;
+  const NAK_SPAN = 360 / 27;
+  const moonDegInNak = moon.longitude - chart.moonNakshatra.index * NAK_SPAN;
+  const birthDate = new Date(Date.UTC(Y, (M - 1), D, hh - Number(b.tz), mm));
+  const dasha = computeVimshottari(birthDate, chart.moonNakshatra.index, moonDegInNak);
+
+  // ---------- cursor state ----------
+  let y = margin;
+  const setBG = () => { pdf.setFillColor(...BG); pdf.rect(0, 0, w, h, "F"); };
+  const newPage = () => {
+    pdf.addPage();
+    setBG();
+    // running header
+    pdf.setTextColor(...GOLD);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
-    pdf.text(label.toUpperCase(), margin, y, { charSpace: 3 });
-    pdf.setDrawColor(212, 175, 55);
-    pdf.setLineWidth(0.4);
-    pdf.line(margin, y + 4, margin + 60, y + 4);
-    y += 26;
+    pdf.text("TAROMAYA", margin, 30, { charSpace: 3 });
+    pdf.text(meta.title.toUpperCase(), w - margin, 30, { align: "right", charSpace: 3 });
+    pdf.setDrawColor(...LINE);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, 40, w - margin, 40);
+    y = 72;
+  };
+  const ensureRoom = (need = 60) => {
+    if (y > h - need) newPage();
   };
 
-  const drawP = (text: string, size = 11) => {
+  const drawH = (label: string) => {
+    ensureRoom(80);
+    pdf.setTextColor(...GOLD);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.text(label.toUpperCase(), margin, y, { charSpace: 3 });
+    pdf.setDrawColor(...GOLD);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, y + 5, margin + 72, y + 5);
+    y += 28;
+  };
+  const drawSub = (label: string) => {
+    ensureRoom(40);
+    pdf.setTextColor(...GOLD_SOFT);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.text(label.toUpperCase(), margin, y, { charSpace: 2 });
+    y += 16;
+  };
+  const drawP = (text: string, size = 10.5) => {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(230, 225, 210);
     const lines = pdf.splitTextToSize(text, w - margin * 2) as string[];
     for (const ln of lines) {
-      if (y > h - 60) { pdf.addPage(); pdf.setFillColor(15, 16, 32); pdf.rect(0, 0, w, h, "F"); y = margin; }
+      ensureRoom(size + 12);
       pdf.text(ln, margin, y);
       y += size + 4;
     }
     y += 6;
   };
-
-  const drawKV = (rows: [string, string][]) => {
+  const drawKV = (rows: [string, string][], keyWidth = 170) => {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     for (const [k, v] of rows) {
-      if (y > h - 60) { pdf.addPage(); pdf.setFillColor(15, 16, 32); pdf.rect(0, 0, w, h, "F"); y = margin; }
-      pdf.setTextColor(160, 155, 140);
+      ensureRoom(24);
+      pdf.setTextColor(...MUTED);
       pdf.text(k, margin, y);
-      pdf.setTextColor(240, 235, 220);
-      pdf.text(v, margin + 160, y, { maxWidth: w - margin * 2 - 160 });
+      pdf.setTextColor(...PEARL);
+      const lines = pdf.splitTextToSize(v, w - margin * 2 - keyWidth) as string[];
+      lines.forEach((ln, i) => {
+        if (i > 0) { ensureRoom(20); y += 14; }
+        pdf.text(ln, margin + keyWidth, y);
+      });
       y += 16;
     }
-    y += 8;
+    y += 6;
+  };
+  const drawTable = (headers: string[], rows: string[][], colWidths?: number[]) => {
+    const totalW = w - margin * 2;
+    const cols = colWidths ?? headers.map(() => totalW / headers.length);
+    ensureRoom(30 + rows.length * 16);
+    // header
+    pdf.setFillColor(...CARD);
+    pdf.rect(margin, y - 12, totalW, 22, "F");
+    pdf.setTextColor(...GOLD);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    let x = margin + 8;
+    headers.forEach((h, i) => { pdf.text(h.toUpperCase(), x, y + 2, { charSpace: 1 }); x += cols[i]; });
+    y += 18;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9.5);
+    rows.forEach((r, idx) => {
+      ensureRoom(20);
+      if (idx % 2 === 0) {
+        pdf.setFillColor(20, 22, 44);
+        pdf.rect(margin, y - 10, totalW, 16, "F");
+      }
+      pdf.setTextColor(...PEARL);
+      let cx = margin + 8;
+      r.forEach((cell, ci) => {
+        const cellLines = pdf.splitTextToSize(cell ?? "", cols[ci] - 12) as string[];
+        pdf.text(cellLines[0] ?? "", cx, y + 2);
+        cx += cols[ci];
+      });
+      y += 16;
+    });
+    y += 10;
   };
 
-  y = 80;
+  // ============ COVER ============
+  setBG();
+  // gold ornamental hairlines
+  pdf.setDrawColor(...GOLD);
+  pdf.setLineWidth(0.8);
+  pdf.line(margin, 120, w - margin, 120);
+  pdf.line(margin, h - 140, w - margin, h - 140);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, 128, w - margin, 128);
+  pdf.line(margin, h - 148, w - margin, h - 148);
+
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.text("TAROMAYA · COSMIC INTELLIGENCE", margin, 96, { charSpace: 4 });
+
+  pdf.setTextColor(...PEARL);
+  pdf.setFontSize(40);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(meta.title, margin, 220);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(13);
+  pdf.setTextColor(200, 195, 180);
+  pdf.text(meta.desc, margin, 252, { maxWidth: w - margin * 2 });
+
+  // ornament star
+  drawStar(pdf, w - margin - 40, 190, 24);
+
+  // Prepared for
+  pdf.setTextColor(...GOLD);
+  pdf.setFontSize(9);
+  pdf.text("PREPARED FOR", margin, h - 200, { charSpace: 3 });
+  pdf.setTextColor(...PEARL);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(22);
+  pdf.text(b.name, margin, h - 180);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.setTextColor(200, 195, 180);
+  pdf.text(`${b.date}  ·  ${b.time}  ·  ${b.place}`, margin, h - 162);
+  pdf.setTextColor(...MUTED);
+  pdf.setFontSize(9);
+  pdf.text(`Generated ${new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`, margin, h - 100);
+  pdf.text("taromaya.app", w - margin, h - 100, { align: "right" });
+
+  // ============ PAGE 2: Snapshot + Chart ============
+  newPage();
   drawH("Birth Snapshot");
   drawKV([
     ["Name", b.name],
-    ["Date & Time", `${b.date} · ${b.time}`],
-    ["Place", `${b.place} (${b.lat}, ${b.lon})`],
-    ["Ascendant (Lagna)", `${chart.ascendant.degreeInRashi.toFixed(2)}° in rashi ${chart.ascendant.rashi + 1}`],
-    ["Moon Nakshatra", `${chart.moonNakshatra.index + 1} · pada ${chart.moonNakshatra.pada} · lord ${chart.moonNakshatra.lord}`],
-    ["Life Path", String(num.lifePath)],
-    ["Destiny", String(num.destiny)],
-    ["Soul Urge", String(num.soulUrge)],
+    ["Date & Time", `${b.date} · ${b.time} (UTC${Number(b.tz) >= 0 ? "+" : ""}${b.tz})`],
+    ["Place", `${b.place}  (${b.lat}°, ${b.lon}°)`],
+    ["Ayanamsa (Lahiri)", `${chart.ayanamsa.toFixed(4)}°`],
+    ["Ascendant (Lagna)", `${RASHIS[chart.ascendant.rashi]} · ${formatDegree(chart.ascendant.degreeInRashi)}`],
+    ["Moon Nakshatra", `${NAKSHATRAS[chart.moonNakshatra.index]} · pada ${chart.moonNakshatra.pada} · lord ${chart.moonNakshatra.lord}`],
+    ["Life Path / Destiny / Soul", `${num.lifePath}  ·  ${num.destiny}  ·  ${num.soulUrge}`],
   ]);
 
-  // Sections per report type
-  if (key === "life") {
-    drawH("Guiding Themes");
-    drawP(`Your Life Path ${num.lifePath} sets the meta-arc of this lifetime. Combined with a ${labelRashi(chart.ascendant.rashi)} Lagna and a Moon in ${chart.moonNakshatra.index + 1}th nakshatra, you carry an unusual signature: rooted, yet drawn upward. This report follows that thread across body, mind, and destiny.`);
-    drawP("The way in is patience. The way through is practice. The way forward is service.");
-    drawH("Priority Grahas");
-    for (const p of priorities.slice(0, 3)) {
-      drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus for this life."]]);
+  drawH("Rashi Chart · South Indian");
+  const chartSize = Math.min(w - margin * 2, 320);
+  const cx = (w - chartSize) / 2;
+  ensureRoom(chartSize + 40);
+  drawSouthIndianChart(pdf, cx, y, chartSize, chart);
+  y += chartSize + 18;
+
+  // ============ PAGE 3: Planet Table ============
+  newPage();
+  drawH("Planet Positions");
+  const planetRows = chart.planets.map((p) => {
+    const houseNumber = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
+    return [
+      p.name,
+      RASHIS[p.rashi],
+      formatDegree(p.degreeInRashi),
+      `H${houseNumber}`,
+      p.retrograde ? "R" : "—",
+    ];
+  });
+  drawTable(
+    ["Planet", "Sign", "Degree", "House", "Motion"],
+    planetRows,
+    [90, 120, 100, 60, 70],
+  );
+
+  // Houses table
+  drawH("Bhava Chart (Whole-Sign)");
+  const houseRows = chart.houses.map((rashiIdx, i) => {
+    const occupants = chart.planets.filter(p => p.rashi === rashiIdx).map(p => p.name).join(", ");
+    return [`H${i + 1}`, RASHIS[rashiIdx], occupants || "—"];
+  });
+  drawTable(["House", "Sign", "Planets"], houseRows, [80, 130, 240]);
+
+  // ============ Vimshottari Dasha ============
+  newPage();
+  drawH("Vimshottari Dasha · Live Status");
+  const cm = dasha.currentMaha, ca = dasha.currentAntar, cp = dasha.currentPratyantar;
+  if (cm && ca) {
+    drawKV([
+      ["Current Mahadasha", `${cm.lord}   (${fmtDate(cm.start)} → ${fmtDate(cm.end)})`],
+      ["Current Antardasha", `${ca.lord}   (${fmtDate(ca.start)} → ${fmtDate(ca.end)})`],
+      ...(cp ? ([["Current Pratyantar", `${cp.lord}   (${fmtDate(cp.start)} → ${fmtDate(cp.end)})`]] as [string, string][]) : []),
+    ]);
+  }
+
+  drawSub("Upcoming Mahadasha Sequence");
+  const now = new Date();
+  const upcoming = dasha.maha.filter(m => m.end > now).slice(0, 5);
+  drawTable(
+    ["Lord", "Start", "End", "Years"],
+    upcoming.map(m => [
+      m.lord, fmtDate(m.start), fmtDate(m.end),
+      ((m.end.getTime() - m.start.getTime()) / (365.25 * 86400000)).toFixed(1),
+    ]),
+    [120, 130, 130, 70],
+  );
+
+  // Current antar breakdown
+  if (cm) {
+    drawSub(`${cm.lord} Mahadasha · Antardashas`);
+    drawTable(
+      ["Antar", "Start", "End"],
+      cm.antar.slice(0, 9).map(a => [a.lord, fmtDate(a.start), fmtDate(a.end)]),
+      [120, 170, 170],
+    );
+  }
+
+  // ============ Yogas / Doshas ============
+  if (yogas.length || doshas.length) {
+    newPage();
+    if (yogas.length) {
+      drawH("Yogas Detected");
+      for (const yg of yogas.slice(0, 10)) {
+        drawSub(`${yg.name}  ·  ${yg.polarity ?? ""}`);
+        drawP(yg.description ?? "");
+      }
+    }
+    if (doshas.length) {
+      drawH("Doshas Flagged");
+      for (const d of doshas.slice(0, 8)) {
+        drawSub(d.name);
+        drawP(d.description ?? "");
+        if (d.remedies?.length) drawP(`Remedies: ${d.remedies.join("; ")}`);
+      }
     }
   }
 
+  // ============ 12-month transits (for yearly / life / career) ============
+  if (key === "yearly" || key === "life" || key === "career") {
+    newPage();
+    const from = new Date();
+    const to = new Date(from.getTime() + 365 * 86400000);
+    drawH("12-Month Transit Highlights");
+    drawSub("Retrograde Stations");
+    const stations = findStations(from, to);
+    if (stations.length) {
+      drawTable(
+        ["Planet", "Date", "Kind", "Sign"],
+        stations.map(s => [s.planet, fmtDay(s.date), s.kind, s.sign]),
+        [90, 130, 130, 130],
+      );
+    } else drawP("None in window.");
+
+    drawSub("Sign Ingresses (outer planets)");
+    const ing = findIngresses(from, to).filter(x => ["Mars","Jupiter","Saturn"].includes(x.planet));
+    if (ing.length) {
+      drawTable(
+        ["Planet", "Date", "From → To"],
+        ing.map(i => [i.planet, fmtDay(i.date), `${i.fromSign} → ${i.toSign}`]),
+        [100, 150, 230],
+      );
+    } else drawP("None in window.");
+
+    drawSub("Eclipses");
+    const ec = findEclipses(from, to);
+    if (ec.length) {
+      drawTable(
+        ["Date", "Kind", "Variety"],
+        ec.map(e => [fmtDay(e.date), e.kind, e.variety]),
+        [150, 100, 230],
+      );
+    } else drawP("None in window.");
+  }
+
+  // ============ Report-specific interpretation ============
+  newPage();
+  drawH("Interpretation");
+
+  if (key === "life") {
+    drawSub("Guiding Themes");
+    drawP(`Your Life Path ${num.lifePath} sets the meta-arc of this incarnation. Combined with a ${RASHIS[chart.ascendant.rashi]} Lagna and Moon in ${NAKSHATRAS[chart.moonNakshatra.index]}, you carry an unusual signature: rooted, yet drawn upward. The Dasha of ${cm?.lord ?? "—"} colours the current chapter — its themes are the doorway.`);
+    drawP("The way in is patience. The way through is practice. The way forward is service.");
+    drawSub("Priority Grahas");
+    for (const p of priorities.slice(0, 3)) drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus for this life."]]);
+  }
+
   if (key === "career") {
-    drawH("The 10th House & Sun");
-    drawP(`Your Sun sits in rashi ${(chart.planets.find(p=>p.name==="Sun")?.rashi ?? 0) + 1}, shaping the ambition profile. Your Destiny Number ${num.destiny} names the outer contribution — the work the world will remember you for.`);
-    drawH("Action Plan");
+    drawSub("The 10th House & Sun");
+    const sun = chart.planets.find(p => p.name === "Sun")!;
+    drawP(`Your Sun sits in ${RASHIS[sun.rashi]} at ${formatDegree(sun.degreeInRashi)}, shaping the ambition profile. Your Destiny Number ${num.destiny} names the outer contribution — the work the world will remember you for. The current Mahadasha of ${cm?.lord ?? "—"} sets the tone of your professional weather for years to come.`);
+    drawSub("Action Plan");
     drawP("• Choose one project that expresses your Destiny Number this quarter.\n• Track a weekly ritual on the day of your strongest planet.\n• Once a year, review with your chart, not your peers.");
   }
 
   if (key === "love") {
-    drawH("The 7th House & Venus");
-    const venus = chart.planets.find(p => p.name === "Venus");
-    drawP(`Venus sits in rashi ${(venus?.rashi ?? 0) + 1} at ${(venus?.degreeInRashi ?? 0).toFixed(1)}° — this is the tone of your love language. Your Soul Urge is ${num.soulUrge}: the private, unspoken longing that must be met.`);
-    drawH("Guidance");
+    drawSub("The 7th House & Venus");
+    const venus = chart.planets.find(p => p.name === "Venus")!;
+    drawP(`Venus sits in ${RASHIS[venus.rashi]} at ${formatDegree(venus.degreeInRashi)} — this is the tone of your love language. Your Soul Urge is ${num.soulUrge}: the private, unspoken longing that must be met.`);
+    const manglik = doshas.find(d => /manglik|mangal/i.test(d.name));
+    drawKV([["Manglik Status", manglik ? "Present — see remedies" : "Not detected"]]);
+    drawSub("Guidance");
     drawP("Love wants a witness, not a fixer. Ask for what the Soul Urge wants; give what the 7th house offers.");
   }
 
   if (key === "wealth") {
-    drawH("Wealth Houses");
-    drawP(`Rashi of the 2nd from Lagna: ${(chart.ascendant.rashi + 1) % 12 + 1}. Rashi of the 11th: ${(chart.ascendant.rashi + 10) % 12 + 1}. Money follows attention placed on both — earning (2nd) and networks (11th).`);
-    drawH("Personal Year");
+    drawSub("Wealth Houses");
+    const h2 = chart.houses[1], h11 = chart.houses[10];
+    drawP(`Rashi of the 2nd from Lagna: ${RASHIS[h2]}. Rashi of the 11th: ${RASHIS[h11]}. Money follows attention placed on both — earning (2nd) and networks (11th).`);
+    drawSub("Personal Year");
     drawP(`Your Personal Year is ${num.personalYear}. ${personalYearNote(num.personalYear)}`);
-    drawH("Wealth Rituals");
+    drawSub("Wealth Rituals");
     drawP("• Friday evening — light a ghee lamp before Lakshmi.\n• Weekly — donate one item you have loved but no longer need.\n• Monthly — write your 3 top clients or supporters a gratitude note.");
   }
 
   if (key === "yearly") {
-    drawH("Personal Year Overview");
+    drawSub("Personal Year Overview");
     drawP(`You are in Personal Year ${num.personalYear}. ${personalYearNote(num.personalYear)}`);
-    drawH("Monthly Themes");
+    drawSub("Monthly Themes");
+    const monthRows: string[][] = [];
     for (let mo = 1; mo <= 12; mo++) {
       const pm = ((num.personalYear + mo - 1 - 1) % 9) + 1;
-      drawKV([[`Month ${mo}`, `Personal Month ${pm} — ${monthNote(pm)}`]]);
+      monthRows.push([`Month ${mo}`, `PM ${pm}`, monthNote(pm)]);
     }
+    drawTable(["Month", "Personal Month", "Theme"], monthRows, [100, 130, 250]);
   }
 
   if (key === "remedy") {
-    drawH("Priority Planets");
-    for (const p of priorities.slice(0, 4)) {
-      drawKV([[p.planet, p.reasons.join(" · ") || "Universal upaya recommended."]]);
-    }
+    drawSub("Priority Planets");
+    for (const p of priorities.slice(0, 4)) drawKV([[p.planet, p.reasons.join(" · ") || "Universal upaya recommended."]]);
     for (const p of priorities.slice(0, 3)) {
       const r = REMEDY_CATALOG[p.planet];
-      drawH(`${p.planet} · ${r.deity}`);
+      if (!r) continue;
+      drawSub(`${p.planet}  ·  ${r.deity}`);
       drawKV([
         ["Beej Mantra", `${r.beejMantra}  (${r.beejCount.toLocaleString()}× · ${r.duration})`],
         ["Gemstone", `${r.gemstone.primary} · ${r.gemstone.metal} · ${r.gemstone.finger} finger`],
@@ -297,15 +516,117 @@ function buildPdf(key: ReportKey, b: Birth) {
     pdf.setPage(i);
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(8);
-    pdf.setTextColor(120, 118, 108);
+    pdf.setTextColor(...MUTED);
     pdf.text(`Page ${i - 1} of ${pages - 1}`, w - margin, h - 24, { align: "right" });
     pdf.text("TAROMAYA · taromaya.app", margin, h - 24);
+    pdf.setDrawColor(...LINE);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, h - 36, w - margin, h - 36);
   }
   return pdf;
 }
 
-const RASHI_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
-function labelRashi(i: number) { return RASHI_NAMES[i % 12] ?? "—"; }
+/* ---------- Vector rashi chart (South Indian) ---------- */
+
+function drawSouthIndianChart(
+  pdf: jsPDF, x: number, y: number, size: number,
+  chart: ReturnType<typeof computeKundli>,
+) {
+  const cell = size / 4;
+
+  // background card
+  pdf.setFillColor(...CARD);
+  pdf.rect(x, y, size, size, "F");
+  pdf.setDrawColor(...GOLD);
+  pdf.setLineWidth(0.8);
+  pdf.rect(x, y, size, size);
+
+  // grid — outer 4x4, inner 2x2 hollow (South Indian style)
+  pdf.setDrawColor(...LINE);
+  pdf.setLineWidth(0.4);
+  // vertical lines at 1 and 3 cells from left; horizontal at 1 and 3 from top
+  pdf.line(x + cell,     y,           x + cell,     y + size);
+  pdf.line(x + 3 * cell, y,           x + 3 * cell, y + size);
+  pdf.line(x,            y + cell,    x + size,     y + cell);
+  pdf.line(x,            y + 3 * cell,x + size,     y + 3 * cell);
+
+  // South Indian: sign positions are FIXED (Pisces top-left, Aries top-second, clockwise)
+  // Layout of 12 signs on 4x4 border (row, col) with 0-index:
+  // row0: Pisces(11) Aries(0) Taurus(1) Gemini(2)
+  // row1: Aquarius(10)                     Cancer(3)
+  // row2: Capricorn(9)                     Leo(4)
+  // row3: Sagittarius(8) Scorpio(7) Libra(6) Virgo(5)
+  const signCells: Record<number, [number, number]> = {
+    11: [0, 0], 0: [0, 1], 1: [0, 2], 2: [0, 3],
+    10: [1, 0], 3: [1, 3],
+    9:  [2, 0], 4: [2, 3],
+    8:  [3, 0], 7: [3, 1], 6: [3, 2], 5: [3, 3],
+  };
+
+  const shortSign = ["Ar","Ta","Ge","Cn","Le","Vi","Li","Sc","Sg","Cp","Aq","Pi"];
+  const shortPlanet: Record<string, string> = {
+    Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me",
+    Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke",
+  };
+
+  for (let sign = 0; sign < 12; sign++) {
+    const [r, c] = signCells[sign];
+    const cx = x + c * cell;
+    const cy = y + r * cell;
+
+    // sign label
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    pdf.setTextColor(...MUTED);
+    pdf.text(shortSign[sign], cx + 4, cy + 9);
+
+    // Lagna marker
+    if (sign === chart.ascendant.rashi) {
+      pdf.setDrawColor(...GOLD);
+      pdf.setLineWidth(0.8);
+      // small "AS" corner mark
+      pdf.setTextColor(...GOLD);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      pdf.text("As", cx + cell - 14, cy + 9);
+      pdf.line(cx + 2, cy + 12, cx + 14, cy + 12);
+    }
+
+    // planets in this sign
+    const occ = chart.planets.filter(p => p.rashi === sign);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(...PEARL);
+    occ.forEach((p, i) => {
+      const px = cx + 4 + (i % 3) * (cell - 8) / 3;
+      const py = cy + 22 + Math.floor(i / 3) * 11;
+      const label = shortPlanet[p.name] ?? p.name.slice(0, 2);
+      pdf.text(p.retrograde ? `${label}\u2094` : label, px, py);
+    });
+  }
+
+  // caption
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...MUTED);
+  pdf.text(`Lagna: ${RASHIS[chart.ascendant.rashi]}  ·  Moon: ${NAKSHATRAS[chart.moonNakshatra.index]}`, x + size / 2, y + size + 14, { align: "center" });
+}
+
+function drawStar(pdf: jsPDF, cx: number, cy: number, r: number) {
+  pdf.setDrawColor(...GOLD);
+  pdf.setLineWidth(0.6);
+  const pts: [number, number][] = [];
+  for (let i = 0; i < 10; i++) {
+    const rad = i % 2 === 0 ? r : r * 0.42;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    pts.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a)]);
+  }
+  for (let i = 0; i < pts.length; i++) {
+    const [x1, y1] = pts[i];
+    const [x2, y2] = pts[(i + 1) % pts.length];
+    pdf.line(x1, y1, x2, y2);
+  }
+}
 
 function personalYearNote(n: number): string {
   const m: Record<number, string> = {
