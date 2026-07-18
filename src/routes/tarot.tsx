@@ -344,6 +344,9 @@ function TarotPage() {
             ? `${spread.blurb} Drop as many cards as you like.`
             : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} onto the board.`}
         </div>
+      </div>
+
+
 
 
       {/* Canvas */}
