@@ -107,7 +107,16 @@ function NewKundliPage() {
                   <span className="text-muted-foreground">Moon age</span><span>{panchang.moonAge.toFixed(2)} days · {(panchang.moonIllumination * 100).toFixed(0)}% lit</span>
                 </div>
               </Card>
-            )}
+
+            <VargaExplorer chart={chart} />
+
+            {(() => {
+              const moon = chart.planets.find((p) => p.name === "Moon");
+              if (!moon || !birth) return null;
+              const utcMs = Date.UTC(birth.year, birth.month - 1, birth.day, birth.hour, birth.minute, birth.seconds ?? 0)
+                - birth.tzOffsetHours * 3600 * 1000;
+              return <DashaTimeline birthDate={new Date(utcMs)} moonLongitude={moon.longitude} />;
+            })()}
           </div>
         )}
       </div>
