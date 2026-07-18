@@ -384,21 +384,23 @@ function buildPdf(key: ReportKey, b: Birth) {
   }
 
   // ============ Yogas / Doshas ============
-  if (yogas.length || doshas.length) {
+  const yogasPresent = yogas.filter(y => y.present);
+  const doshasPresent = doshas.filter(d => d.present);
+  if (yogasPresent.length || doshasPresent.length) {
     newPage();
-    if (yogas.length) {
+    if (yogasPresent.length) {
       drawH("Yogas Detected");
-      for (const yg of yogas.slice(0, 10)) {
-        drawSub(`${yg.name}  ·  ${yg.polarity ?? ""}`);
-        drawP(yg.description ?? "");
+      for (const yg of yogasPresent.slice(0, 10)) {
+        drawSub(`${yg.name}  ·  ${yg.category}`);
+        drawP(yg.detail ?? "");
       }
     }
-    if (doshas.length) {
+    if (doshasPresent.length) {
       drawH("Doshas Flagged");
-      for (const d of doshas.slice(0, 8)) {
-        drawSub(d.name);
-        drawP(d.description ?? "");
-        if (d.remedies?.length) drawP(`Remedies: ${d.remedies.join("; ")}`);
+      for (const d of doshasPresent.slice(0, 8)) {
+        drawSub(`${d.name}${d.severity ? "  ·  " + d.severity : ""}`);
+        drawP(d.detail ?? "");
+        if (d.remedy) drawP(`Remedy: ${d.remedy}`);
       }
     }
   }
