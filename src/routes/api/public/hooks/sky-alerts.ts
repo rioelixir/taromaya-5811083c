@@ -110,12 +110,23 @@ async function sendAlertEmail(
       </div>
     </div>`;
 
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
+  const from = process.env.SKY_ALERT_FROM || "Taromaya Sky <sky@taromaya.app>";
+  const text = events.map((e) => `${e.title}\n${e.body}`).join("\n\n");
+
   try {
-    await sendLovableEmail({
-      to,
-      subject: events.length === 1 ? events[0].title : `${events.length} sky events approaching`,
-      html,
-    });
+    await sendLovableEmail(
+      {
+        to,
+        from,
+        subject: events.length === 1 ? events[0].title : `${events.length} sky events approaching`,
+        html,
+        text,
+        purpose: "sky-alert",
+      },
+      { apiKey },
+    );
   } catch (e) {
     if (e instanceof EmailAPIError) {
       console.error(`[sky-alerts] email error ${e.code}: ${e.message}`);
