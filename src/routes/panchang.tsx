@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computePanchang, fmtTime, fmtRange, todaysFestivals } from "@/lib/panchang";
-import { Sun, Moon, Clock, MapPin } from "lucide-react";
+import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
+import { scanFestivals } from "@/lib/festivals";
+import { Sun, Moon, Clock, MapPin, Sparkles, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/panchang")({
   component: () => (<PremiumGate featureName="Panchang"><PanchangPage /></PremiumGate>),
@@ -36,6 +38,28 @@ function PanchangPage() {
     const [y, m, d] = date.split("-").map(Number);
     return todaysFestivals(p, new Date(y, m - 1, d));
   }, [p, date]);
+
+  const horas = useMemo<HoraSlot[]>(() => {
+    const [y, m, d] = date.split("-").map(Number);
+    if (!p.sunrise || !p.sunset) return [];
+    // Next sunrise: recompute panchang for the following day.
+    const next = computePanchang({
+      date: new Date(y, m - 1, d + 1, 12, 0, 0),
+      latitude: Number(lat),
+      longitude: Number(lon),
+    });
+    if (!next.sunrise) return [];
+    return computeHoras(p.sunrise, p.sunset, next.sunrise, new Date(y, m - 1, d).getDay());
+  }, [p, date, lat, lon]);
+
+  const nowHora = useMemo(() => currentHora(horas), [horas]);
+
+  const festivalCalendar = useMemo(() => {
+    const [y, m, d] = date.split("-").map(Number);
+    const start = new Date(y, m - 1, d);
+    const end = new Date(y, m - 1, d + 60);
+    return scanFestivals(start, end, Number(lat), Number(lon));
+  }, [date, lat, lon]);
 
   return (
     <PageShell
@@ -145,7 +169,79 @@ function PanchangPage() {
           <div className="text-xs text-muted-foreground mt-1">Sun–Moon elongation: <span className="text-pearl">{(p.tithi.number - 1) * 12 + "°"}</span></div>
         </GlassCard>
       </div>
+
+      {/* Hora — Planetary Hours */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <GlassCard title="Hora — Day (Sunrise → Sunset)">
+          <HoraTable rows={horas.filter(h => h.isDay)} nowIdx={nowHora?.index ?? -1} />
+        </GlassCard>
+        <GlassCard title="Hora — Night (Sunset → Sunrise)">
+          <HoraTable rows={horas.filter(h => !h.isDay)} nowIdx={nowHora?.index ?? -1} />
+        </GlassCard>
+      </div>
+
+      {nowHora && (
+        <div className="mt-4 glass rounded-3xl p-4 flex items-center gap-3">
+          <Clock className="w-5 h-5 text-gold" />
+          <div className="text-sm">
+            <span className="text-muted-foreground">Now </span>
+            <span className="text-pearl font-medium">{nowHora.lord} Hora</span>
+            <span className="text-muted-foreground"> · {HORA_NATURE[nowHora.lord].best}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Festival Calendar */}
+      <div className="mt-6">
+        <GlassCard title="Festival Calendar — next 60 days">
+          {festivalCalendar.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No major festivals found in this window.</div>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {festivalCalendar.slice(0, 30).map((f, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-xl bg-white/5 border border-white/5 px-3 py-2">
+                  <div className="mt-0.5">
+                    {f.category === "major" ? <Sparkles className="w-4 h-4 text-gold" /> : <CalendarDays className="w-4 h-4 text-pearl/60" />}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs text-muted-foreground font-mono">
+                      {f.date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                    </div>
+                    <div className="text-sm text-pearl">{f.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{f.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </GlassCard>
+      </div>
     </PageShell>
+  );
+}
+
+function HoraTable({ rows, nowIdx }: { rows: HoraSlot[]; nowIdx: number }) {
+  if (rows.length === 0) return <div className="text-sm text-muted-foreground">—</div>;
+  return (
+    <div className="space-y-1 text-xs">
+      {rows.map((r) => {
+        const nature = HORA_NATURE[r.lord].nature;
+        const cls = nature === "benefic" ? "text-emerald-200 bg-emerald-500/10"
+          : nature === "malefic" ? "text-red-200 bg-red-500/10"
+          : "text-muted-foreground bg-white/5";
+        const isNow = r.index === nowIdx;
+        return (
+          <div key={r.index} className={`flex items-center justify-between rounded-lg px-3 py-1.5 ${cls} ${isNow ? "ring-1 ring-gold" : ""}`}>
+            <span className="flex items-center gap-2">
+              <span className="w-4 text-right text-[10px] opacity-60">{r.index}</span>
+              <span className="text-pearl">{r.lord}</span>
+              {isNow && <span className="text-[9px] uppercase tracking-widest text-gold">now</span>}
+            </span>
+            <span className="font-mono">{fmtTime(r.from)} – {fmtTime(r.to)}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
