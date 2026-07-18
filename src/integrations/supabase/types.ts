@@ -148,6 +148,63 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_presets: {
+        Row: {
+          ambient: string
+          ambient_volume: number
+          created_at: string
+          exhale_ms: number
+          guided: boolean
+          hold_in_ms: number
+          hold_out_ms: number
+          id: string
+          inhale_ms: number
+          loop_mantra: boolean
+          mantra_volume: number
+          name: string
+          planet: string
+          target_reps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ambient?: string
+          ambient_volume?: number
+          created_at?: string
+          exhale_ms?: number
+          guided?: boolean
+          hold_in_ms?: number
+          hold_out_ms?: number
+          id?: string
+          inhale_ms?: number
+          loop_mantra?: boolean
+          mantra_volume?: number
+          name: string
+          planet: string
+          target_reps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ambient?: string
+          ambient_volume?: number
+          created_at?: string
+          exhale_ms?: number
+          guided?: boolean
+          hold_in_ms?: number
+          hold_out_ms?: number
+          id?: string
+          inhale_ms?: number
+          loop_mantra?: boolean
+          mantra_volume?: number
+          name?: string
+          planet?: string
+          target_reps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
