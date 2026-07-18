@@ -16,7 +16,7 @@ export type AspectEvent = {
   tone: "harmonious" | "tense" | "neutral" | "fusion";
 };
 
-const TONE: Record<AspectType, AspectEvent["tone"]> = {
+const TONE: Partial<Record<AspectType, AspectEvent["tone"]>> = {
   conjunction: "fusion",
   sextile: "harmonious",
   square: "tense",
