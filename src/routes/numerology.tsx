@@ -69,6 +69,11 @@ function NumerologyPage() {
       {tab === "timeline" && (
         <TimelineNumerology fullName={fullName} birthDate={birthDate} system={system} />
       )}
+      {tab === "loshu" && <LoShuTab birthDate={birthDate} setBirthDate={setBirthDate} />}
+      {tab === "chinese" && <NineStarKiTab birthDate={birthDate} setBirthDate={setBirthDate} />}
+      {tab === "kabbalah" && <KabbalahTab fullName={fullName} setFullName={setFullName} />}
+      {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
+      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} />}
       {tab === "mobile" && <MobileNumerology />}
       {tab === "compat" && <CompatibilityNumerology />}
     </PageShell>
