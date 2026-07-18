@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
   BookOpen, GraduationCap, FileText, History, Bookmark, User, Settings,
   Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
-  Flame, CalendarClock, Crown,
+  Flame, CalendarClock, Crown, Target,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
