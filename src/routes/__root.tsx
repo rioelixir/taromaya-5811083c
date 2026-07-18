@@ -11,7 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Sidebar, BottomNav } from "@/components/nav";
+import { Sidebar } from "@/components/nav";
 import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
 
@@ -203,11 +203,13 @@ function RootComponent() {
       <div className="relative min-h-dvh">
         <Sidebar />
         <div className="lg:pl-64">
-          <main className="relative min-h-dvh pb-24 lg:pb-8">
+          <main className="relative min-h-dvh pb-8 lg:pb-12">
             <Outlet />
           </main>
+          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm">
+            <p>2026 • Taromaya. App created by Riaa. Reference from theplanetstoday.com</p>
+          </footer>
         </div>
-        <BottomNav />
       </div>
     </QueryClientProvider>
   );
