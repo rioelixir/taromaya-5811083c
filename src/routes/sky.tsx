@@ -366,9 +366,6 @@ function Cell({ label, value }: { label: string; value: string }) {
   );
 }
 
-function fmtDate(d: Date) {
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
 
 function fmtDateTz(d: Date, tz: string) {
   return fmtLocal(d, tz, { month: "short", day: "numeric" });
