@@ -59,7 +59,8 @@ function CompatibilityPage() {
     const synHits = synastryAspects(westA, westB);
     const synScore = synastryScore(synHits);
     const composite = compositeChart(westA, westB);
-    return { chartA, chartB, milan, synHits, synScore, composite };
+    const deep = deepCompat(chartA, chartB);
+    return { chartA, chartB, milan, synHits, synScore, composite, deep };
   }
 
 
