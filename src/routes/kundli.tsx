@@ -201,9 +201,13 @@ function KundliPage() {
           {chart ? (
             <>
               <GlassCard>
-                <SouthIndianChart chart={chart} />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <NorthIndianLagnaChart chart={chart} />
+                  <SouthIndianChart chart={chart} />
+                </div>
               </GlassCard>
               <ChartSummary chart={chart} />
+
               {user ? (
                 <div className="glass rounded-2xl p-4 flex items-center justify-between gap-3">
                   <div className="text-xs text-muted-foreground">
@@ -373,6 +377,74 @@ const CELL_TO_RASHI: Record<string, number> = {
   "2-0": 9,                        "2-3": 4,
   "3-0": 8, "3-1": 7, "3-2": 6, "3-3": 5,
 };
+
+/** North-Indian diamond Lagna chart (houses are fixed, signs rotate). */
+function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
+  const S = 300;
+  const asc = chart.ascendant.rashi;
+  const planetsByHouse = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
+  for (const p of chart.planets) {
+    const h = ((p.rashi - asc + 12) % 12) + 1;
+    const arr = planetsByHouse.get(h) ?? [];
+    arr.push({ name: p.name, retrograde: p.retrograde });
+    planetsByHouse.set(h, arr);
+  }
+  // Anchor points for the 12 house cells in a North-Indian diamond.
+  const P: Record<number, [number, number]> = {
+    1:  [S*0.50, S*0.30], 2:  [S*0.25, S*0.15], 3:  [S*0.12, S*0.30],
+    4:  [S*0.30, S*0.50], 5:  [S*0.12, S*0.70], 6:  [S*0.25, S*0.85],
+    7:  [S*0.50, S*0.70], 8:  [S*0.75, S*0.85], 9:  [S*0.88, S*0.70],
+    10: [S*0.70, S*0.50], 11: [S*0.88, S*0.30], 12: [S*0.75, S*0.15],
+  };
+  const SIGN_OFFSET: Record<number, [number, number]> = {
+    1:  [0, -S*0.10], 2:  [0, -S*0.08], 3:  [-S*0.05, 0],
+    4:  [-S*0.10, 0], 5:  [-S*0.05, 0], 6:  [0,  S*0.08],
+    7:  [0,  S*0.10], 8:  [0,  S*0.08], 9:  [ S*0.05, 0],
+    10: [ S*0.10, 0], 11: [ S*0.05, 0], 12: [0, -S*0.08],
+  };
+
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">Lagna Chart · North Indian</div>
+      <div className="rounded-2xl border border-gold/30 bg-black/40 p-3">
+        <svg viewBox={`0 0 ${S} ${S}`} className="w-full">
+          <rect x={2} y={2} width={S-4} height={S-4} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+          <line x1={2} y1={2} x2={S-2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
+          <line x1={S-2} y1={2} x2={2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
+          <polygon points={`${S/2},2 ${S-2},${S/2} ${S/2},${S-2} 2,${S/2}`} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => {
+            const sign = (asc + h - 1) % 12;
+            const [cx, cy] = P[h];
+            const [ox, oy] = SIGN_OFFSET[h];
+            const planets = planetsByHouse.get(h) ?? [];
+            return (
+              <g key={h}>
+                <text x={cx + ox} y={cy + oy} textAnchor="middle" fontSize={S*0.036}
+                  className="fill-gold/80" fontFamily="serif">{RASHIS[sign].slice(0, 3)}</text>
+                {h === 1 && (
+                  <text x={cx} y={cy - S*0.05} textAnchor="middle" fontSize={S*0.028}
+                    className="fill-gold" fontFamily="serif">Lagna</text>
+                )}
+                {planets.map((p, idx) => (
+                  <text key={p.name} x={cx} y={cy + (idx + 1) * S * 0.038}
+                    textAnchor="middle" fontSize={S*0.038} className="fill-pearl">
+                    {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
+                  </text>
+                ))}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+        <div>Ascendant: <span className="text-pearl">{RASHIS[chart.ascendant.rashi]} {formatDegree(chart.ascendant.degreeInRashi)}</span></div>
+        <div>Lord: <span className="text-pearl">{RASHI_LORDS[chart.ascendant.rashi]}</span></div>
+      </div>
+    </div>
+  );
+}
+
+
 
 function SouthIndianChart({ chart }: { chart: KundliChart }) {
   const planetsByRashi = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
@@ -717,37 +789,37 @@ function DoshasTab({ chart }: { chart: KundliChart }) {
 function PlanetTable({ chart }: { chart: KundliChart }) {
   return (
     <GlassCard title="Planetary positions" desc="Sidereal longitudes, whole-sign house, nakshatra, and motion.">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
-              <th className="py-2 pr-3">Planet</th><th className="py-2 pr-3">Rashi</th>
-              <th className="py-2 pr-3">Degree</th><th className="py-2 pr-3">House</th>
-              <th className="py-2 pr-3">Nakshatra</th><th className="py-2 pr-3">Motion</th>
-            </tr>
-          </thead>
-          <tbody className="text-pearl/90">
-            {chart.planets.map((p) => {
-              const house = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
-              return (
-                <tr key={p.name} className="border-t border-white/5">
-                  <td className="py-2 pr-3">{p.name}</td>
-                  <td className="py-2 pr-3">{RASHIS[p.rashi]}</td>
-                  <td className="py-2 pr-3">{formatDegree(p.degreeInRashi)}</td>
-                  <td className="py-2 pr-3">{house}</td>
-                  <td className="py-2 pr-3">{NAKSHATRAS[p.nakshatra]} · {p.pada}</td>
-                  <td className="py-2 pr-3">
-                    {p.retrograde ? <span className="text-aurora">Retrograde</span> : <span className="text-muted-foreground">Direct</span>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {chart.planets.map((p) => {
+          const house = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
+          const pct = (p.degreeInRashi / 30) * 100;
+          return (
+            <div key={p.name} className="rounded-xl border border-white/10 bg-black/20 p-3">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-base text-pearl">{p.name}</span>
+                  {p.retrograde && <span className="text-[10px] uppercase tracking-widest text-aurora">℞</span>}
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-gold/80">H{house}</span>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {RASHIS[p.rashi]} · {NAKSHATRAS[p.nakshatra]} · pada {p.pada}
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${pct}%` }} />
+              </div>
+              <div className="mt-1 flex justify-between font-mono text-[10px] text-muted-foreground">
+                <span>{formatDegree(p.degreeInRashi)}</span>
+                <span>{p.retrograde ? "Retrograde" : "Direct"}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </GlassCard>
   );
 }
+
 
 function ReadingTab({ reading, loading }: { reading: string | null; loading: boolean }) {
   return (
@@ -824,30 +896,32 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
         </div>
       </GlassCard>
 
-      <GlassCard title="Bhinna Ashtakavarga" desc="Individual bindu distribution for each of the seven planets.">
-        <div className="overflow-x-auto mt-3">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                <th className="text-left py-2 pr-3">Planet</th>
-                {RASHIS.map((r) => <th key={r} className="py-2 px-1 text-center">{r.slice(0,3)}</th>)}
-                <th className="py-2 pl-3 text-right">Σ</th>
-              </tr>
-            </thead>
-            <tbody className="text-pearl/90">
-              {av.bhinna.map((row) => (
-                <tr key={row.planet} className="border-t border-white/5">
-                  <td className="py-2 pr-3 font-medium">{row.planet}</td>
-                  {row.bindus.map((b, i) => (
-                    <td key={i} className={`py-2 px-1 text-center ${b >= 5 ? "text-gold" : b <= 2 ? "text-muted-foreground/50" : ""}`}>{b}</td>
-                  ))}
-                  <td className="py-2 pl-3 text-right text-gold">{row.total}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <GlassCard title="Bhinna Ashtakavarga" desc="Individual bindu distribution — bar height shows relative strength per sign (max 8).">
+        <div className="mt-4 space-y-3">
+          {av.bhinna.map((row) => (
+            <div key={row.planet}>
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="text-sm font-medium text-pearl">{row.planet}</span>
+                <span className="text-[10px] uppercase tracking-widest text-gold">Σ {row.total}</span>
+              </div>
+              <div className="grid grid-cols-12 gap-1 items-end h-16">
+                {row.bindus.map((b, i) => {
+                  const h = (b / 8) * 100;
+                  const tone = b >= 5 ? "from-gold to-gold-soft" : b <= 2 ? "from-white/10 to-white/5" : "from-gold/40 to-gold/10";
+                  return (
+                    <div key={i} className="flex flex-col items-center justify-end h-full" title={`${RASHIS[i]}: ${b}`}>
+                      <div className={`w-full rounded-t bg-gradient-to-t ${tone}`} style={{ height: `${Math.max(6, h)}%` }} />
+                      <div className="mt-1 text-[8px] text-muted-foreground">{RASHIS[i].slice(0,2)}</div>
+                      <div className="text-[9px] font-mono text-pearl">{b}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </GlassCard>
+
     </div>
   );
 }
@@ -915,32 +989,26 @@ function KPTab({ chart }: { chart: KundliChart }) {
   const rows = useMemo(() => computeKP(chart, NAKSHATRAS, RASHIS), [chart]);
   return (
     <GlassCard title="KP Sub-lords" desc="Krishnamurti Paddhati: Nakshatra star lord → Sub-lord → Sub-sub for precise cuspal analysis.">
-      <div className="overflow-x-auto mt-3">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
-              <th className="py-2 pr-3"><KeyRound className="inline h-3 w-3 mr-1" />Point</th>
-              <th className="py-2 pr-3">Sign</th>
-              <th className="py-2 pr-3">Nakshatra</th>
-              <th className="py-2 pr-3">Star Lord</th>
-              <th className="py-2 pr-3">Sub Lord</th>
-              <th className="py-2 pr-3">Sub-Sub</th>
-            </tr>
-          </thead>
-          <tbody className="text-pearl/90">
-            {rows.map((r) => (
-              <tr key={r.who} className="border-t border-white/5">
-                <td className="py-2 pr-3 font-medium">{r.who}</td>
-                <td className="py-2 pr-3">{r.sign}</td>
-                <td className="py-2 pr-3">{r.nakshatra}</td>
-                <td className="py-2 pr-3 text-gold">{r.starLord}</td>
-                <td className="py-2 pr-3 text-gold">{r.subLord}</td>
-                <td className="py-2 pr-3 text-muted-foreground">{r.subSubLord}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {rows.map((r) => (
+          <div key={r.who} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 font-display text-sm text-pearl">
+                <KeyRound className="h-3 w-3 text-gold" />{r.who}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{r.sign} · {r.nakshatra}</span>
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[11px]">
+              <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 font-mono text-gold">{r.starLord}</span>
+              <span className="text-muted-foreground">→</span>
+              <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 font-mono text-gold">{r.subLord}</span>
+              <span className="text-muted-foreground">→</span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-muted-foreground">{r.subSubLord}</span>
+            </div>
+          </div>
+        ))}
       </div>
+
       <div className="mt-4 text-[11px] text-muted-foreground">
         In KP the sub-lord of a cusp or planet is the final significator — it decides whether the promise of the star lord fructifies.
       </div>
