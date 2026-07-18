@@ -197,6 +197,14 @@ function PanchangPage() {
       {/* Deep attributes: Panchaka, Bhadra, Tithi quality, Yoga quality, Nakshatra character */}
       <DeepAttributes p={p} weekdayNum={new Date(date).getDay()} />
 
+      {/* Month Almanac — 30-day quality ledger */}
+      <MonthAlmanac date={date} lat={Number(lat)} lon={Number(lon)} />
+
+      {/* Today's chaughadiya heatmap summary */}
+      <div className="mt-6">
+        <ChaughadiyaSummaryCard p={p} />
+      </div>
+
       {/* Festival Calendar */}
       <div className="mt-6">
         <GlassCard title="Festival Calendar — next 60 days">
