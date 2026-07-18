@@ -10,7 +10,7 @@ import {
 } from "@/lib/vedic";
 import {
   computeVarga, computeVimshottari, detectYogas, detectDoshas,
-  VARGA_LABELS, fmtDate,
+  VARGA_LABELS, VARGA_ORDER, fmtDate,
   type VargaCode,
 } from "@/lib/vedic-extended";
 import {
