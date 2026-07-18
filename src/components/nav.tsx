@@ -41,7 +41,9 @@ const groups: Group[] = [
     defaultOpen: true,
     items: [
       { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/birth-details", label: "Birth Details", icon: Lock },
       { to: "/life-dashboard", label: "Life Dashboard", icon: LayoutGrid },
+      { to: "/deep-jyotish", label: "Deep Jyotish", icon: Stars },
       { to: "/ai", label: "AI Guide", icon: Bot },
     ],
   },
