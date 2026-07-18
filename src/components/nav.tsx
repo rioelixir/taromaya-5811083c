@@ -58,6 +58,7 @@ const groups: Group[] = [
     items: [
       { to: "/kundli", label: "Kundli", icon: Moon },
       { to: "/avakhada", label: "Avakhada", icon: Stars },
+      { to: "/strength", label: "Shadbala & AV", icon: Gauge },
       { to: "/astrology", label: "Astrology", icon: Stars },
       { to: "/panchang", label: "Panchang", icon: CalendarDays },
       { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
