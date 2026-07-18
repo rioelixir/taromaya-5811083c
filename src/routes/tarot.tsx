@@ -53,9 +53,13 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 // Build the initial per-deck stacks, each independently shuffled.
-function makeDeckStacks(): Record<DeckKey, TarotCard[]> {
+// When courtOnly is on, Rider-Waite is filtered to its 16 court cards.
+function makeDeckStacks(courtOnly = false): Record<DeckKey, TarotCard[]> {
+  const rw = courtOnly
+    ? DECKS["rider-waite"].filter(isCourtCard)
+    : DECKS["rider-waite"];
   return {
-    "rider-waite": shuffle(DECKS["rider-waite"]),
+    "rider-waite": shuffle(rw),
     "nakshatra":   shuffle(DECKS["nakshatra"]),
     "health":      shuffle(DECKS["health"]),
     "lost-found":  shuffle(DECKS["lost-found"]),
