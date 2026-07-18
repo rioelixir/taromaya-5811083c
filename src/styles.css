@@ -165,6 +165,44 @@
     font-weight: 500;
   }
 
+  /* Common Tailwind color utilities used in muhurat/panchang/chart panels —
+     force strong, saturated, dark values so times/labels remain readable
+     on light lavender cards. */
+  [class*="text-emerald-"], [class*="text-green-"], [class*="text-teal-"],
+  [class*="text-lime-"] {
+    color: oklch(0.42 0.16 155) !important;
+    font-weight: 600;
+  }
+  [class*="text-rose-"], [class*="text-red-"], [class*="text-pink-"],
+  [class*="text-orange-"] {
+    color: oklch(0.46 0.20 25) !important;
+    font-weight: 600;
+  }
+  [class*="text-amber-"], [class*="text-yellow-"] {
+    color: oklch(0.48 0.15 78) !important;
+    font-weight: 600;
+  }
+  [class*="text-sky-"], [class*="text-blue-"], [class*="text-indigo-"],
+  [class*="text-cyan-"] {
+    color: oklch(0.42 0.18 250) !important;
+    font-weight: 600;
+  }
+  [class*="text-violet-"], [class*="text-purple-"], [class*="text-fuchsia-"] {
+    color: oklch(0.38 0.20 300) !important;
+    font-weight: 600;
+  }
+
+  /* Faded opacity utilities on text should not disappear */
+  .opacity-40, .opacity-50, .opacity-60, .opacity-70 {
+    opacity: 1 !important;
+  }
+
+  /* SVG text inside charts (Lagna / Vargas / wheels) */
+  svg text {
+    fill: oklch(0.10 0.02 295);
+    font-weight: 600;
+  }
+
   /* Form labels + helper text: high-contrast, same as body */
   label, .form-label, [data-slot="form-label"] {
     color: oklch(0.08 0.02 295) !important;
