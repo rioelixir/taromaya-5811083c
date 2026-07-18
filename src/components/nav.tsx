@@ -118,7 +118,6 @@ export function Sidebar() {
         <div className="px-6 pt-6 pb-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <BrandMark />
-          </Link>
             <div>
               <div className="font-display text-xl tracking-widest gold-text leading-none">
                 TAROMAYA
