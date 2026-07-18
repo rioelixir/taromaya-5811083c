@@ -113,6 +113,8 @@ function NewKundliPage() {
 
             <StrengthsPanel chart={chart} />
 
+            <YogasDoshasPanel chart={chart} />
+
             <VargaExplorer chart={chart} />
 
 
