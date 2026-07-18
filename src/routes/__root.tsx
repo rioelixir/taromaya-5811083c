@@ -206,8 +206,10 @@ function RootComponent() {
           <main className="relative min-h-dvh pb-8 lg:pb-12">
             <Outlet />
           </main>
-          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm">
-            <p>2026 • Taromaya. App created by Riaa. Reference from theplanetstoday.com</p>
+          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm space-y-1">
+            <p>2026 • Taromaya.</p>
+            <p>App created by Riaa.</p>
+            <p>Reference from theplanetstoday.com</p>
           </footer>
         </div>
       </div>
