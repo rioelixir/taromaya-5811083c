@@ -34,6 +34,7 @@ import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
+import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FestivalsRouteImport } from './routes/festivals'
@@ -184,6 +185,11 @@ const KundliRoute = KundliRouteImport.update({
   path: '/kundli',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KarmaRoute = KarmaRouteImport.update({
+  id: '/karma',
+  path: '/karma',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
   id: '/horoscope',
   path: '/horoscope',
@@ -320,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -370,6 +377,7 @@ export interface FileRoutesByTo {
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -422,6 +430,7 @@ export interface FileRoutesById {
   '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -474,6 +483,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/karma'
     | '/kundli'
     | '/learn'
     | '/moon-calendar'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/karma'
     | '/kundli'
     | '/learn'
     | '/moon-calendar'
@@ -575,6 +586,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/history'
     | '/horoscope'
+    | '/karma'
     | '/kundli'
     | '/learn'
     | '/moon-calendar'
@@ -627,6 +639,7 @@ export interface RootRouteChildren {
   FestivalsRoute: typeof FestivalsRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
+  KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
   MoonCalendarRoute: typeof MoonCalendarRoute
@@ -831,6 +844,13 @@ declare module '@tanstack/react-router' {
       path: '/kundli'
       fullPath: '/kundli'
       preLoaderRoute: typeof KundliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/karma': {
+      id: '/karma'
+      path: '/karma'
+      fullPath: '/karma'
+      preLoaderRoute: typeof KarmaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/horoscope': {
@@ -1042,6 +1062,7 @@ const rootRouteChildren: RootRouteChildren = {
   FestivalsRoute: FestivalsRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
+  KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
   MoonCalendarRoute: MoonCalendarRoute,
