@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { GlassCard } from "@/components/page-shell";
 import { Loader2, Upload, Trash2, Image as ImageIcon, Check } from "lucide-react";
+import { compressImage, PRESETS } from "@/lib/image-compress";
 
 const BUCKET = "app-assets";
 
@@ -49,10 +50,11 @@ function LogoEditor() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const onUpload = async (file: File) => {
+  const onUpload = async (raw: File) => {
     setErr(null); setUploading(true);
     try {
-      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const file = await compressImage(raw, PRESETS.logo);
+      const ext = file.type === "image/webp" ? "webp" : (file.name.split(".").pop() || "png").toLowerCase();
       const key = `logo/logo-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(key, file, { upsert: true, contentType: file.type });
       if (error) throw error;
@@ -143,10 +145,11 @@ function BackgroundEditor() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const onUpload = async (file: File) => {
+  const onUpload = async (raw: File) => {
     setErr(null); setUploading(true);
     try {
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const file = await compressImage(raw, PRESETS.background);
+      const ext = file.type === "image/webp" ? "webp" : (file.name.split(".").pop() || "jpg").toLowerCase();
       const key = `background/bg-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(key, file, { upsert: true, contentType: file.type });
       if (error) throw error;
@@ -257,9 +260,10 @@ function DeckEditor({ deckKey, label, expected }: { deckKey: string; label: stri
     try {
       const uploaded: DeckCard[] = [];
       for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const ext = (file.name.split(".").pop() || "png").toLowerCase();
-        const clean = file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]+/g, "-").slice(0, 40);
+        const raw = files[i];
+        const file = await compressImage(raw, PRESETS.card);
+        const ext = file.type === "image/webp" ? "webp" : (file.name.split(".").pop() || "png").toLowerCase();
+        const clean = raw.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]+/g, "-").slice(0, 40);
         const key = `decks/${deckKey}/${Date.now()}-${i}-${clean}.${ext}`;
         const { error } = await supabase.storage.from(BUCKET).upload(key, file, { contentType: file.type });
         if (error) throw error;
