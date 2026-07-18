@@ -35,17 +35,22 @@ import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as NakshatraRouteImport } from './routes/nakshatra'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
+import { Route as MangalDoshaRouteImport } from './routes/mangal-dosha'
+import { Route as LifeDashboardRouteImport } from './routes/life-dashboard'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as HealthRouteImport } from './routes/health'
+import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as FestivalsRouteImport } from './routes/festivals'
 import { Route as DreamsRouteImport } from './routes/dreams'
 import { Route as DharmaRouteImport } from './routes/dharma'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as ChakraRouteImport } from './routes/chakra'
+import { Route as CareerRouteImport } from './routes/career'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BabyNamesRouteImport } from './routes/baby-names'
 import { Route as AyurvedaRouteImport } from './routes/ayurveda'
@@ -195,6 +200,16 @@ const MoonCalendarRoute = MoonCalendarRouteImport.update({
   path: '/moon-calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MangalDoshaRoute = MangalDoshaRouteImport.update({
+  id: '/mangal-dosha',
+  path: '/mangal-dosha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LifeDashboardRoute = LifeDashboardRouteImport.update({
+  id: '/life-dashboard',
+  path: '/life-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
@@ -225,6 +240,16 @@ const HistoryRoute = HistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceRoute = FinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FestivalsRoute = FestivalsRouteImport.update({
   id: '/festivals',
   path: '/festivals',
@@ -248,6 +273,11 @@ const CompatibilityRoute = CompatibilityRouteImport.update({
 const ChakraRoute = ChakraRouteImport.update({
   id: '/chakra',
   path: '/chakra',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerRoute = CareerRouteImport.update({
+  id: '/career',
+  path: '/career',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookmarksRoute = BookmarksRouteImport.update({
@@ -350,17 +380,22 @@ export interface FileRoutesByFullPath {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
+  '/finance': typeof FinanceRoute
+  '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/life-dashboard': typeof LifeDashboardRoute
+  '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
@@ -406,17 +441,22 @@ export interface FileRoutesByTo {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
+  '/finance': typeof FinanceRoute
+  '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/life-dashboard': typeof LifeDashboardRoute
+  '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
@@ -464,17 +504,22 @@ export interface FileRoutesById {
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
+  '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
   '/festivals': typeof FestivalsRoute
+  '/finance': typeof FinanceRoute
+  '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/life-dashboard': typeof LifeDashboardRoute
+  '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/nakshatra': typeof NakshatraRoute
@@ -522,17 +567,22 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
     | '/festivals'
+    | '/finance'
+    | '/health'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
+    | '/life-dashboard'
+    | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
@@ -578,17 +628,22 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
     | '/festivals'
+    | '/finance'
+    | '/health'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
+    | '/life-dashboard'
+    | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
@@ -635,17 +690,22 @@ export interface FileRouteTypes {
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
+    | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
     | '/festivals'
+    | '/finance'
+    | '/health'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
     | '/learn'
+    | '/life-dashboard'
+    | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
     | '/nakshatra'
@@ -693,17 +753,22 @@ export interface RootRouteChildren {
   AyurvedaRoute: typeof AyurvedaRoute
   BabyNamesRoute: typeof BabyNamesRoute
   BookmarksRoute: typeof BookmarksRoute
+  CareerRoute: typeof CareerRoute
   ChakraRoute: typeof ChakraRoute
   CompatibilityRoute: typeof CompatibilityRoute
   DharmaRoute: typeof DharmaRoute
   DreamsRoute: typeof DreamsRoute
   FestivalsRoute: typeof FestivalsRoute
+  FinanceRoute: typeof FinanceRoute
+  HealthRoute: typeof HealthRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
   KaalsarpRoute: typeof KaalsarpRoute
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
+  LifeDashboardRoute: typeof LifeDashboardRoute
+  MangalDoshaRoute: typeof MangalDoshaRoute
   MoonCalendarRoute: typeof MoonCalendarRoute
   MuhuratRoute: typeof MuhuratRoute
   NakshatraRoute: typeof NakshatraRoute
@@ -918,6 +983,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoonCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mangal-dosha': {
+      id: '/mangal-dosha'
+      path: '/mangal-dosha'
+      fullPath: '/mangal-dosha'
+      preLoaderRoute: typeof MangalDoshaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/life-dashboard': {
+      id: '/life-dashboard'
+      path: '/life-dashboard'
+      fullPath: '/life-dashboard'
+      preLoaderRoute: typeof LifeDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/learn': {
       id: '/learn'
       path: '/learn'
@@ -960,6 +1039,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/finance': {
+      id: '/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof FinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/festivals': {
       id: '/festivals'
       path: '/festivals'
@@ -993,6 +1086,13 @@ declare module '@tanstack/react-router' {
       path: '/chakra'
       fullPath: '/chakra'
       preLoaderRoute: typeof ChakraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career': {
+      id: '/career'
+      path: '/career'
+      fullPath: '/career'
+      preLoaderRoute: typeof CareerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookmarks': {
@@ -1156,17 +1256,22 @@ const rootRouteChildren: RootRouteChildren = {
   AyurvedaRoute: AyurvedaRoute,
   BabyNamesRoute: BabyNamesRoute,
   BookmarksRoute: BookmarksRoute,
+  CareerRoute: CareerRoute,
   ChakraRoute: ChakraRoute,
   CompatibilityRoute: CompatibilityRoute,
   DharmaRoute: DharmaRoute,
   DreamsRoute: DreamsRoute,
   FestivalsRoute: FestivalsRoute,
+  FinanceRoute: FinanceRoute,
+  HealthRoute: HealthRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
   KaalsarpRoute: KaalsarpRoute,
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
+  LifeDashboardRoute: LifeDashboardRoute,
+  MangalDoshaRoute: MangalDoshaRoute,
   MoonCalendarRoute: MoonCalendarRoute,
   MuhuratRoute: MuhuratRoute,
   NakshatraRoute: NakshatraRoute,
