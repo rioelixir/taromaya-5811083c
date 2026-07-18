@@ -5,7 +5,10 @@ import jsPDF from "jspdf";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
 import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
+import { computeAshtakavarga } from "@/lib/vedic-deep";
+import { computeVedicTransits, computeSadeSati } from "@/lib/vedic-transits";
 import { computeNumerology } from "@/lib/numerology";
+import { loShuGrid } from "@/lib/numerology-deep";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
 import { FileText, Download, Loader2 } from "lucide-react";
@@ -20,14 +23,15 @@ export const Route = createFileRoute("/reports")({
   }),
 });
 
-type ReportKey = "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
+type ReportKey = "grand" | "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
 
 const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: string[] }> = {
-  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Yogas & Doshas","Guiding Themes"] },
-  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Action Plan"] },
+  grand:   { title: "Grand Cosmic Blueprint", desc: "The complete dossier — Vedic + Western + Numerology + live transits.", sections: ["Rashi Chart","Planet & House Tables","Vimshottari (live)","Ashtakavarga","Live Gochara & Sade Sati","Yogas & Doshas","Numerology + Lo Shu","12-Month Transits","Remedies"] },
+  life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Ashtakavarga","Yogas & Doshas","Lo Shu Grid","Guiding Themes"] },
+  career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Live Transits","Action Plan"] },
   love:    { title: "Love & Union",     desc: "The heart's chart — attraction, patterns, partnership.", sections: ["Rashi Chart","7th House & Venus","Soul Urge Number","Manglik Status","Guidance"] },
-  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Personal Year","Dhana Yogas","Wealth Rituals"] },
-  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Monthly Themes"] },
+  wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Sarvashtakavarga","Personal Year","Lo Shu Grid","Wealth Rituals"] },
+  yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Live Gochara","Monthly Themes"] },
   remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Rashi Chart","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
 };
 
@@ -405,8 +409,24 @@ function buildPdf(key: ReportKey, b: Birth) {
     }
   }
 
-  // ============ 12-month transits (for yearly / life / career) ============
-  if (key === "yearly" || key === "life" || key === "career") {
+  // ============ Ashtakavarga (Sarva bindus) ============
+  if (key === "grand" || key === "life" || key === "wealth") {
+    newPage();
+    drawH("Ashtakavarga · Sarva Bindus");
+    drawP("The Sarvashtakavarga totals combined-strength points per sign (max 337). Signs with 30+ bindus are areas of favor; below 25 need protection.");
+    try {
+      const av = computeAshtakavarga(chart);
+      drawTable(
+        ["Sign", "Bindus", "Notes"],
+        av.sarva.map((v, i) => [RASHIS[i], String(v), v >= 30 ? "Strong" : v >= 25 ? "Balanced" : "Fragile"]),
+        [140, 100, 230],
+      );
+      drawP(`Total: ${av.sarvaTotal} bindus.`);
+    } catch { drawP("Ashtakavarga computation unavailable."); }
+  }
+
+  // ============ 12-month transits (yearly / life / career / grand) ============
+  if (key === "yearly" || key === "life" || key === "career" || key === "grand") {
     newPage();
     const from = new Date();
     const to = new Date(from.getTime() + 365 * 86400000);
@@ -441,6 +461,53 @@ function buildPdf(key: ReportKey, b: Birth) {
       );
     } else drawP("None in window.");
   }
+
+  // ============ Live Gochara + Sade Sati ============
+  if (key === "yearly" || key === "grand" || key === "career") {
+    try {
+      newPage();
+      drawH("Live Sky · Gochara from Moon");
+      const report = computeVedicTransits(chart, Number(b.lat), Number(b.lon), null, new Date());
+      const ss = computeSadeSati(moon.rashi, new Date());
+      drawKV([
+        ["Sade Sati", ss.active
+          ? `ACTIVE — ${ss.phase} phase (${ss.intensity}) · ~${ss.yearsRemaining.toFixed(1)}y remaining`
+          : "Not active"],
+        ["Dasha-lord transits", report.dashaResonance.length
+          ? report.dashaResonance.map(r => `${r.planet} · h${r.houseFromMoon}`).join(", ")
+          : "None currently"],
+      ]);
+      drawSub("Transiting Grahas");
+      drawTable(
+        ["Planet", "Sign", "House(Moon)", "Verdict", "AV"],
+        report.transits.map(t => [
+          t.planet + (t.retrograde ? " (R)" : ""),
+          RASHIS[t.transitRashi],
+          `H${t.houseFromMoon}`,
+          t.favorable ? (t.vedhaBy ? `Vedha by ${t.vedhaBy}` : "Favorable") : "Testing",
+          String(t.bindus ?? "—"),
+        ]),
+        [90, 120, 90, 130, 50],
+      );
+    } catch { /* ignore */ }
+  }
+
+  // ============ Lo Shu Grid ============
+  if (key === "grand" || key === "life" || key === "wealth") {
+    try {
+      newPage();
+      drawH("Lo Shu · Birth Grid");
+      drawP("The 3x3 Lo Shu grid maps your birthdate's numbers onto ancient Chinese magic-square positions. Missing numbers reveal karmic lessons; repeated numbers reveal strengths.");
+      const grid = loShuGrid(b.date);
+      const gx = (w - 220) / 2;
+      const gy = y;
+      drawLoShu(pdf, gx, gy, 220, grid);
+      y += 260;
+      if (grid.missing?.length) drawP(`Missing: ${grid.missing.join(", ")} — karmic focus areas.`);
+      if (grid.strong?.length) drawP(`Repeated: ${grid.strong.map(n => `${n}×${grid.counts[n]}`).join(", ")} — natural strengths.`);
+    } catch { /* ignore */ }
+  }
+
 
   // ============ Report-specific interpretation ============
   newPage();
@@ -511,6 +578,18 @@ function buildPdf(key: ReportKey, b: Birth) {
       ]);
     }
   }
+
+  if (key === "grand") {
+    const sun = chart.planets.find(p => p.name === "Sun")!;
+    const venus = chart.planets.find(p => p.name === "Venus")!;
+    drawSub("Overview");
+    drawP(`This dossier weaves your Vedic architecture (${RASHIS[chart.ascendant.rashi]} Lagna · Moon in ${NAKSHATRAS[chart.moonNakshatra.index]}) with Western sensitivities (Sun in ${RASHIS[sun.rashi]} · Venus in ${RASHIS[venus.rashi]}) and your numerology signature (Life Path ${num.lifePath}, Destiny ${num.destiny}, Soul Urge ${num.soulUrge}). The current Mahadasha of ${cm?.lord ?? "—"} and Antardasha of ${ca?.lord ?? "—"} colour the present chapter.`);
+    drawSub("Priority Focus");
+    for (const p of priorities.slice(0, 4)) drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus."]]);
+    drawSub("Guidance");
+    drawP("Read this dossier three times: once for information, once for pattern, once for silence. What repeats is what matters.");
+  }
+
 
   // Footer on every content page
   const pages = pdf.getNumberOfPages();
@@ -612,6 +691,54 @@ function drawSouthIndianChart(
   pdf.setFontSize(8);
   pdf.setTextColor(...MUTED);
   pdf.text(`Lagna: ${RASHIS[chart.ascendant.rashi]}  ·  Moon: ${NAKSHATRAS[chart.moonNakshatra.index]}`, x + size / 2, y + size + 14, { align: "center" });
+}
+
+function drawLoShu(pdf: jsPDF, x: number, y: number, size: number, grid: ReturnType<typeof loShuGrid>) {
+  const cell = size / 3;
+  // Traditional Lo Shu magic square layout
+  const layout = [
+    [4, 9, 2],
+    [3, 5, 7],
+    [8, 1, 6],
+  ];
+  pdf.setFillColor(...CARD);
+  pdf.rect(x, y, size, size, "F");
+  pdf.setDrawColor(...GOLD);
+  pdf.setLineWidth(0.8);
+  pdf.rect(x, y, size, size);
+  pdf.setDrawColor(...LINE);
+  pdf.setLineWidth(0.4);
+  for (let i = 1; i < 3; i++) {
+    pdf.line(x + i * cell, y, x + i * cell, y + size);
+    pdf.line(x, y + i * cell, x + size, y + i * cell);
+  }
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const n = layout[r][c];
+      const count = grid.counts[n] ?? 0;
+      const cx = x + c * cell + cell / 2;
+      const cy = y + r * cell + cell / 2;
+      pdf.setTextColor(...MUTED);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+      pdf.text(String(n), x + c * cell + 5, y + r * cell + 10);
+      if (count > 0) {
+        pdf.setTextColor(...GOLD);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text(String(n).repeat(count), cx, cy + 4, { align: "center" });
+      } else {
+        pdf.setTextColor(...MUTED);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(18);
+        pdf.text("·", cx, cy + 6, { align: "center" });
+      }
+    }
+  }
+  pdf.setTextColor(...MUTED);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.text(`Driver: ${grid.driver}  ·  Conductor: ${grid.conductor}`, x + size / 2, y + size + 14, { align: "center" });
 }
 
 function drawStar(pdf: jsPDF, cx: number, cy: number, r: number) {
