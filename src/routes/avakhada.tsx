@@ -52,8 +52,7 @@ function AvakhadaPage() {
   return (
     <PageShell
       title="Avakhada Chakra"
-      description="Classical natal summary — Varna, Vashya, Yoni, Gana, Nadi, Tatva, Paya, and name syllable"
-      icon={<Sparkles className="h-6 w-6 text-primary" />}
+      subtitle="Classical natal summary — Varna, Vashya, Yoni, Gana, Nadi, Tatva, Paya, and name syllable"
     >
       <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
         <GlassCard>

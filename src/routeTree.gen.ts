@@ -54,6 +54,7 @@ import { Route as CareerRouteImport } from './routes/career'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BabyNamesRouteImport } from './routes/baby-names'
 import { Route as AyurvedaRouteImport } from './routes/ayurveda'
+import { Route as AvakhadaRouteImport } from './routes/avakhada'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as AstrocartographyRouteImport } from './routes/astrocartography'
@@ -295,6 +296,11 @@ const AyurvedaRoute = AyurvedaRouteImport.update({
   path: '/ayurveda',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AvakhadaRoute = AvakhadaRouteImport.update({
+  id: '/avakhada',
+  path: '/avakhada',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
@@ -438,6 +445,7 @@ export interface FileRoutesByTo {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
@@ -501,6 +509,7 @@ export interface FileRoutesById {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
@@ -564,6 +573,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
@@ -625,6 +635,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
@@ -687,6 +698,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
     | '/bookmarks'
@@ -750,6 +762,7 @@ export interface RootRouteChildren {
   AstrocartographyRoute: typeof AstrocartographyRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
+  AvakhadaRoute: typeof AvakhadaRoute
   AyurvedaRoute: typeof AyurvedaRoute
   BabyNamesRoute: typeof BabyNamesRoute
   BookmarksRoute: typeof BookmarksRoute
@@ -1116,6 +1129,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AyurvedaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/avakhada': {
+      id: '/avakhada'
+      path: '/avakhada'
+      fullPath: '/avakhada'
+      preLoaderRoute: typeof AvakhadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -1253,6 +1273,7 @@ const rootRouteChildren: RootRouteChildren = {
   AstrocartographyRoute: AstrocartographyRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
+  AvakhadaRoute: AvakhadaRoute,
   AyurvedaRoute: AyurvedaRoute,
   BabyNamesRoute: BabyNamesRoute,
   BookmarksRoute: BookmarksRoute,
