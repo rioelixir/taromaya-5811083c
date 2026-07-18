@@ -306,7 +306,7 @@ function TarotPage() {
           <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
             const active = k === spreadKey;
             return (
