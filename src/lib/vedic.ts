@@ -161,6 +161,7 @@ function ascendantTropical(date: Date, lat: number, lonEast: number): number {
 }
 
 export function computeKundli(input: KundliInput): KundliChart {
+  const cfg = { ...DEFAULT_CHART_CONFIG, ...(input.config ?? {}) };
   // Convert local birth time → UTC Date.
   const localMs = Date.UTC(
     input.year,
@@ -168,15 +169,16 @@ export function computeKundli(input: KundliInput): KundliChart {
     input.day,
     input.hour,
     input.minute,
-    0,
+    input.seconds ?? 0,
   );
   const utcMs = localMs - input.tzOffsetHours * 3600 * 1000;
   const date = new Date(utcMs);
 
-  const ayan = lahiriAyanamsa(date);
+  const ayan = resolveAyanamsa(date, cfg.ayanamsa);
 
   // Planets (Sun..Saturn) — tropical, then sidereal.
   const bodies: PlanetName[] = ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn"];
+  let sunTrop = 0, moonTrop = 0;
   const planets: Planet[] = bodies.map((name) => {
     const b = AE_BODY[name as Exclude<PlanetName,"Rahu"|"Ketu">];
     const tropNow = tropicalLongitude(b, date);
@@ -185,6 +187,8 @@ export function computeKundli(input: KundliInput): KundliChart {
     const retrograde = name !== "Sun" && name !== "Moon" && delta < 0;
     const sid = norm360(tropNow - ayan);
     const parts = toParts(sid);
+    if (name === "Sun") sunTrop = tropNow;
+    if (name === "Moon") moonTrop = tropNow;
     return {
       name,
       longitude: sid,
@@ -196,8 +200,10 @@ export function computeKundli(input: KundliInput): KundliChart {
     };
   });
 
-  // Rahu (mean node) — always retrograde in mean-node model. Ketu = Rahu + 180.
-  const rahuTrop = meanNodeTropical(date);
+  // Rahu/Ketu — Mean or True node depending on config.
+  const rahuTrop = cfg.nodeType === "true"
+    ? trueNodeTropical(date, sunTrop, moonTrop)
+    : meanNodeTropical(date);
   const rahuSid = norm360(rahuTrop - ayan);
   const ketuSid = norm360(rahuSid + 180);
   const rahuParts = toParts(rahuSid);
