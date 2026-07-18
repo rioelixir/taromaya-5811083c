@@ -369,3 +369,12 @@ function Cell({ label, value }: { label: string; value: string }) {
 function fmtDate(d: Date) {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
+
+function fmtDateTz(d: Date, tz: string) {
+  return fmtLocal(d, tz, { month: "short", day: "numeric" });
+}
+
+function fmtLocal(d: Date, tz: string, opts: Intl.DateTimeFormatOptions) {
+  try { return d.toLocaleString(undefined, { ...opts, timeZone: tz }); }
+  catch { return d.toLocaleString(undefined, opts); }
+}
