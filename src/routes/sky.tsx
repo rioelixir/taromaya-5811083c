@@ -201,7 +201,7 @@ function deconflict(lons: number[]): number[] {
   return out;
 }
 
-function MoonCard({ moon }: { moon: ReturnType<typeof liveSkySnapshot>["moon"] }) {
+function MoonCard({ moon, tz }: { moon: ReturnType<typeof liveSkySnapshot>["moon"]; tz: string }) {
   const pct = Math.round(moon.illumination * 100);
   return (
     <div className="glass rounded-3xl p-5">
@@ -216,8 +216,8 @@ function MoonCard({ moon }: { moon: ReturnType<typeof liveSkySnapshot>["moon"] }
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2 text-[11px]">
-        <Cell label="Next New" value={fmtDate(moon.nextNew)} />
-        <Cell label="Next Full" value={fmtDate(moon.nextFull)} />
+        <Cell label="Next New" value={fmtDateTz(moon.nextNew, tz)} />
+        <Cell label="Next Full" value={fmtDateTz(moon.nextFull, tz)} />
       </div>
     </div>
   );
