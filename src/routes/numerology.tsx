@@ -6,6 +6,9 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import {
   computeNumerology, analyzeMobile, numerologyCompatibility, NUMBER_MEANINGS,
 } from "@/lib/numerology";
+import {
+  loShuGrid, nineStarKi, kabbalah, essenceTimeline, lifeCycles, analyseName,
+} from "@/lib/numerology-deep";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -14,17 +17,22 @@ export const Route = createFileRoute("/numerology")({
   head: () => ({
     meta: [
       { title: "Numerology — TAROMAYA" },
-      { name: "description", content: "Pythagorean, Chaldean, and Mobile Number numerology with 25+ calculations and AI readings." },
+      { name: "description", content: "Pythagorean, Chaldean, Kabbalah, Chinese Nine Star Ki, Lo Shu, Essence & Life Cycles with AI readings." },
     ],
   }),
 });
 
-type Tab = "personal" | "timeline" | "mobile" | "compat";
+type Tab = "personal" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   personal: "Personal",
   timeline: "Timeline",
-  mobile: "Mobile Number",
-  compat: "Compatibility",
+  loshu: "Lo Shu",
+  chinese: "Nine Star Ki",
+  kabbalah: "Kabbalah",
+  essence: "Essence",
+  name: "Name",
+  mobile: "Mobile",
+  compat: "Compat.",
 };
 
 function NumerologyPage() {
