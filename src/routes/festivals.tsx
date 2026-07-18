@@ -35,7 +35,7 @@ function FestivalsPage() {
   const [filter, setFilter] = useState<FestivalKind | "all">("all");
 
   const scan = useMemo(
-    () => scanFestivals(startDate, days, Number(lat) || 0, Number(lon) || 0),
+    () => scanFestivalCalendar(startDate, days, Number(lat) || 0, Number(lon) || 0),
     [startDate, days, lat, lon]
   );
 
