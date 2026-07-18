@@ -107,7 +107,7 @@ const NAK_TABLE: NakChar[] = [
   { name:"Vishakha",          deity:"Indra & Agni",       symbol:"Triumphal arch",       gana:"Rakshasa",  yoni:"Tiger",     guna:"Sattva",  tatva:"Fire",  nature:"Mishra",  caste:"Brahmin"  },
   { name:"Anuradha",          deity:"Mitra",              symbol:"Lotus / staff",        gana:"Deva",      yoni:"Deer",      guna:"Sattva",  tatva:"Fire",  nature:"Mridu",   caste:"Shudra"   },
   { name:"Jyeshtha",          deity:"Indra",              symbol:"Umbrella / earring",   gana:"Rakshasa",  yoni:"Deer",      guna:"Sattva",  tatva:"Air",   nature:"Tikshna", caste:"Shudra"   },
-  { name:"Moola",             deity:"Nirriti",            symbol:"Bunch of roots",       gana:"Rakshasa",  yoni:"Dog",       guna:"Tamas",   tatva:"Air",   nature:"Tikshna", caste:"Shudra"   },
+  { name:"Mula",              deity:"Nirriti",            symbol:"Bunch of roots",       gana:"Rakshasa",  yoni:"Dog",       guna:"Tamas",   tatva:"Air",   nature:"Tikshna", caste:"Shudra"   },
   { name:"Purva Ashadha",     deity:"Apas",               symbol:"Elephant tusk / fan",  gana:"Manushya",  yoni:"Monkey",    guna:"Rajas",   tatva:"Air",   nature:"Ugra",    caste:"Brahmin"  },
   { name:"Uttara Ashadha",    deity:"Vishvedevas",        symbol:"Elephant tusk (2)",    gana:"Manushya",  yoni:"Mongoose",  guna:"Rajas",   tatva:"Air",   nature:"Sthira",  caste:"Kshatriya"},
   { name:"Shravana",          deity:"Vishnu",             symbol:"Ear / three footsteps",gana:"Deva",      yoni:"Monkey",    guna:"Rajas",   tatva:"Air",   nature:"Chara",   caste:"Shudra"   },
