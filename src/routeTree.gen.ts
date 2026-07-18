@@ -19,6 +19,7 @@ import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as SynastryRouteImport } from './routes/synastry'
+import { Route as StrengthRouteImport } from './routes/strength'
 import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -119,6 +120,11 @@ const TarotRoute = TarotRouteImport.update({
 const SynastryRoute = SynastryRouteImport.update({
   id: '/synastry',
   path: '/synastry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StrengthRoute = StrengthRouteImport.update({
+  id: '/strength',
+  path: '/strength',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SkyRoute = SkyRouteImport.update({
@@ -419,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/strength': typeof StrengthRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -481,6 +488,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/strength': typeof StrengthRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -545,6 +553,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
+  '/strength': typeof StrengthRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -609,6 +618,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
+    | '/strength'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -671,6 +681,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
+    | '/strength'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -734,6 +745,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/sky'
+    | '/strength'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -798,6 +810,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
+  StrengthRoute: typeof StrengthRoute
   SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
   TermsRoute: typeof TermsRoute
@@ -882,6 +895,13 @@ declare module '@tanstack/react-router' {
       path: '/synastry'
       fullPath: '/synastry'
       preLoaderRoute: typeof SynastryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strength': {
+      id: '/strength'
+      path: '/strength'
+      fullPath: '/strength'
+      preLoaderRoute: typeof StrengthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sky': {
@@ -1309,6 +1329,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,
+  StrengthRoute: StrengthRoute,
   SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
   TermsRoute: TermsRoute,
