@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TimelineRouteImport } from './routes/timeline'
@@ -50,6 +51,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
 
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VarshphalRoute = VarshphalRouteImport.update({
   id: '/varshphal',
   path: '/varshphal',
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -323,6 +330,7 @@ export interface FileRoutesByTo {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/weather': typeof WeatherRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
@@ -409,6 +418,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/weather'
     | '/admin'
     | '/journal'
     | '/meditation'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/weather'
     | '/admin'
     | '/journal'
     | '/meditation'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/weather'
     | '/_authenticated/admin'
     | '/_authenticated/journal'
     | '/_authenticated/meditation'
@@ -535,12 +547,20 @@ export interface RootRouteChildren {
   TimelineRoute: typeof TimelineRoute
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
+  WeatherRoute: typeof WeatherRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/varshphal': {
       id: '/varshphal'
       path: '/varshphal'
@@ -878,6 +898,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimelineRoute: TimelineRoute,
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
+  WeatherRoute: WeatherRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
