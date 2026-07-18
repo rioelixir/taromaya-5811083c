@@ -58,6 +58,7 @@ const groups: Group[] = [
       { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
       { to: "/remedies", label: "Remedies", icon: Flame },
       { to: "/compatibility", label: "Matching", icon: Heart },
+      { to: "/varshphal", label: "Varshphal", icon: Sun },
     ],
   },
   {
