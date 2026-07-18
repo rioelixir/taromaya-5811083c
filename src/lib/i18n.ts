@@ -65,6 +65,7 @@ const DICT: Record<string, Entry> = {
   "Ayurveda":        { en: "Ayurveda",        hi: "आयुर्वेद",       hr: "Ayurveda" },
   "Chakra":          { en: "Chakra",          hi: "चक्र",           hr: "Chakra" },
   "Karma":           { en: "Karma",           hi: "कर्म",           hr: "Karma" },
+  "Vastu":           { en: "Vastu",           hi: "वास्तु",         hr: "Vastu" },
   "Tarot":           { en: "Tarot",           hi: "टैरो",          hr: "Tarot" },
   "Numerology":      { en: "Numerology",      hi: "अंक ज्योतिष",    hr: "Ank Jyotish" },
   "Baby Names":      { en: "Baby Names",      hi: "शिशु नाम",      hr: "Shishu Naam" },
