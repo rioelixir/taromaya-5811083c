@@ -275,7 +275,16 @@ function AuthFooter() {
           to="/auth"
           className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 text-sm"
         >
-          <LogIn className="h-4 w-4" /> Sign in
+          <LogIn className="h-4 w-4" /> <SignInLabel />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function SignInLabel() {
+  const { t } = useT();
+  return <>{t("Sign in")}</>;
         </Link>
       )}
     </div>
