@@ -99,9 +99,18 @@ function KundliPage() {
       const [y, m, d] = form.date.split("-").map(Number);
       const [hh, mm] = form.time.split(":").map(Number);
       const c = computeKundli({
-        year: y, month: m, day: d, hour: hh, minute: mm,
+        year: y, month: m, day: d,
+        hour: form.unknownTime ? 12 : hh,
+        minute: form.unknownTime ? 0 : mm,
+        seconds: form.unknownTime ? 0 : Number(form.seconds) || 0,
         tzOffsetHours: Number(form.tz),
         latitude: Number(form.lat), longitude: Number(form.lon),
+        config: {
+          ayanamsa: form.ayanamsa as never,
+          houseSystem: form.houseSystem as never,
+          nodeType: form.nodeType as never,
+          elevationMeters: Number(form.elevation) || 0,
+        },
       });
       setChart(c);
       setTab("overview");
