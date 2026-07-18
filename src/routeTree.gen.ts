@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as VedicTransitsRouteImport } from './routes/vedic-transits'
+import { Route as VastuRouteImport } from './routes/vastu'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TimelineRouteImport } from './routes/timeline'
@@ -68,6 +69,11 @@ const WeatherRoute = WeatherRouteImport.update({
 const VedicTransitsRoute = VedicTransitsRouteImport.update({
   id: '/vedic-transits',
   path: '/vedic-transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VastuRoute = VastuRouteImport.update({
+  id: '/vastu',
+  path: '/vastu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VarshphalRoute = VarshphalRouteImport.update({
@@ -350,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -401,6 +408,7 @@ export interface FileRoutesByTo {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -454,6 +462,7 @@ export interface FileRoutesById {
   '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
+  '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/weather': typeof WeatherRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -507,6 +516,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vastu'
     | '/vedic-transits'
     | '/weather'
     | '/admin'
@@ -558,6 +568,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vastu'
     | '/vedic-transits'
     | '/weather'
     | '/admin'
@@ -610,6 +621,7 @@ export interface FileRouteTypes {
     | '/timeline'
     | '/transits'
     | '/varshphal'
+    | '/vastu'
     | '/vedic-transits'
     | '/weather'
     | '/_authenticated/admin'
@@ -663,6 +675,7 @@ export interface RootRouteChildren {
   TimelineRoute: typeof TimelineRoute
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
+  VastuRoute: typeof VastuRoute
   VedicTransitsRoute: typeof VedicTransitsRoute
   WeatherRoute: typeof WeatherRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -683,6 +696,13 @@ declare module '@tanstack/react-router' {
       path: '/vedic-transits'
       fullPath: '/vedic-transits'
       preLoaderRoute: typeof VedicTransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vastu': {
+      id: '/vastu'
+      path: '/vastu'
+      fullPath: '/vastu'
+      preLoaderRoute: typeof VastuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/varshphal': {
@@ -1086,6 +1106,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimelineRoute: TimelineRoute,
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
+  VastuRoute: VastuRoute,
   VedicTransitsRoute: VedicTransitsRoute,
   WeatherRoute: WeatherRoute,
   ApiChatRoute: ApiChatRoute,
