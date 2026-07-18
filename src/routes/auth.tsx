@@ -115,9 +115,7 @@ function AuthPage() {
       <StarField />
       <div className="relative z-10 w-full max-w-md">
         <Link to="/auth" className="flex items-center justify-center gap-2 mb-8">
-          <div className="h-10 w-10 rounded-full gold-border grid place-items-center">
-            <Sparkles className="h-5 w-5 text-gold" />
-          </div>
+          <AuthLogo />
           <div className="font-display text-2xl tracking-widest gold-text">TAROMAYA</div>
         </Link>
 
