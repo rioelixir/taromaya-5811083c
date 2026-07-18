@@ -22,7 +22,8 @@ function PageNav({
       >
         <ArrowLeft className="h-4 w-4 text-gold" /> Back
       </button>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" data-no-translate>
+        <LanguageSwitcher compact />
         <button
           onClick={onToggle}
           className="inline-flex items-center gap-1 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
