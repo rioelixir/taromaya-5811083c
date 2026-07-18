@@ -114,7 +114,9 @@ export function buildGuideContext(row: SavedKundliRow | null): string {
   // === Vimshottari Dasha (current lords) ===
   try {
     const birth = birthDateFromRow(row);
-    const dasha = computeVimshottari(birth, moon.nakshatra, moon.degreeInNakshatra ?? 0);
+    const NAK_SPAN = 360 / 27;
+    const moonDegInNak = ((moon.longitude ?? 0) % NAK_SPAN + NAK_SPAN) % NAK_SPAN;
+    const dasha = computeVimshottari(birth, moon.nakshatra, moonDegInNak);
     lines.push("");
     lines.push("=== VIMSHOTTARI DASHA (running now) ===");
     lines.push(
