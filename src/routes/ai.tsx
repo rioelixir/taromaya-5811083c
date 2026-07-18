@@ -59,11 +59,12 @@ function AiPage() {
 
   const transport = useMemo(() => new DefaultChatTransport({
     api: "/api/chat",
-    headers: async () => {
+    headers: async (): Promise<Record<string, string>> => {
       const { data } = await supabase.auth.getSession();
       const t = data.session?.access_token;
       return t ? { Authorization: `Bearer ${t}` } : {};
     },
+
     body: () => ({
       context: buildGuideContext(selectedRow),
       system: GUIDE_SYSTEM_PROMPT,
