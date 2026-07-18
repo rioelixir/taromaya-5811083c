@@ -212,7 +212,7 @@ function NakshatraLocationPage() {
       aiIntent="Explain in the simplest human words what this Moon nakshatra means for someone standing at this location right now. Say which activities suit the next few hours and which to postpone. Mention Chandrashtama, Ganda Moola or Panchak only if flagged."
     >
       {/* Location & moment controls */}
-      <GlassCard className="p-5">
+      <div className="glass rounded-3xl p-5">
         <div className="grid gap-4 md:grid-cols-4">
           <div className="md:col-span-2">
             <Field label="City preset">
@@ -328,7 +328,7 @@ function NakshatraLocationPage() {
           </div>
 
           {/* Progress + exit info */}
-          <GlassCard className="p-5 space-y-4">
+          <div className="glass rounded-3xl p-5 space-y-4">
             <div className="flex items-center gap-3">
               <Moon className="h-5 w-5 text-gold" />
               <div className="font-display text-xl gold-text">Current lunar mansion</div>
@@ -395,7 +395,7 @@ function NakshatraLocationPage() {
           </div>
 
           {/* Chandrashtama */}
-          <GlassCard className="p-5">
+          <div className="glass rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <Compass className="h-4 w-4 text-gold" />
               <div className="text-xs uppercase tracking-[0.3em] text-gold/80">Chandrashtama for people born in</div>
@@ -413,7 +413,7 @@ function NakshatraLocationPage() {
           </GlassCard>
 
           {/* Timeline */}
-          <GlassCard className="p-5">
+          <div className="glass rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="h-4 w-4 text-aurora" />
               <div className="font-display text-xl gold-text">Upcoming nakshatra windows</div>
@@ -450,7 +450,7 @@ function NakshatraLocationPage() {
           </GlassCard>
 
           {/* Nakshatra finder */}
-          <GlassCard className="p-5">
+          <div className="glass rounded-3xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <Search className="h-4 w-4 text-gold" />
               <div className="font-display text-xl gold-text">Find a nakshatra window</div>
