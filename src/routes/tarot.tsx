@@ -3,24 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
-import { SPREADS, TAROT_DECK, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle } from "lucide-react";
-
-const DECK_META = [
-  { name: "Luna",    accent: "#C0C7FF", glyph: "☾" },
-  { name: "Solaris", accent: "#F5C56B", glyph: "☀" },
-  { name: "Aurora",  accent: "#7FE6C4", glyph: "✧" },
-  { name: "Vesper",  accent: "#E58CB4", glyph: "✦" },
-  { name: "Onyx",    accent: "#B79BFF", glyph: "❈" },
-];
 
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
     meta: [
-      { title: "Tarot Canvas — TAROMAYA" },
-      { name: "description", content: "Full-screen tarot canvas — drag cards from the deck and lock them into spreads." },
+      { title: "Tarot — TAROMAYA" },
+      { name: "description", content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from." },
     ],
   }),
 });
@@ -28,6 +21,7 @@ export const Route = createFileRoute("/tarot")({
 type PlacedCard = {
   uid: string;
   card: TarotCard;
+  deckKey: DeckKey;
   reversed: boolean;
   x: number; // canvas px
   y: number;
@@ -40,7 +34,6 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 130;
 const CARD_H = 200;
-const DECK_COUNT = 5;
 const MINI_W = 62;
 const MINI_H = 96;
 
@@ -48,9 +41,9 @@ function randomReversed() {
   return Math.random() < 0.3;
 }
 
-// Fisher-Yates that keeps original deck immutable
-function shuffledDeck() {
-  const d = [...TAROT_DECK];
+// Fisher-Yates shuffle helper (returns new array).
+function shuffle<T>(arr: T[]): T[] {
+  const d = [...arr];
   for (let i = d.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [d[i], d[j]] = [d[j], d[i]];
@@ -58,13 +51,17 @@ function shuffledDeck() {
   return d;
 }
 
-// Split a single shuffled deck into DECK_COUNT sub-stacks (round-robin).
-function makeDecks(): TarotCard[][] {
-  const shuffled = shuffledDeck();
-  const decks: TarotCard[][] = Array.from({ length: DECK_COUNT }, () => []);
-  shuffled.forEach((c, i) => decks[i % DECK_COUNT].push(c));
-  return decks;
+// Build the initial per-deck stacks, each independently shuffled.
+function makeDeckStacks(): Record<DeckKey, TarotCard[]> {
+  return {
+    "rider-waite": shuffle(DECKS["rider-waite"]),
+    "nakshatra":   shuffle(DECKS["nakshatra"]),
+    "health":      shuffle(DECKS["health"]),
+    "lost-found":  shuffle(DECKS["lost-found"]),
+    "soulmates":   shuffle(DECKS["soulmates"]),
+  };
 }
+
 
 function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
