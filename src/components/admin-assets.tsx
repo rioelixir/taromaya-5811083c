@@ -25,6 +25,7 @@ async function signedUrl(path: string | null | undefined): Promise<string | null
 export function AdminAssetsTab() {
   return (
     <div className="space-y-4">
+      <LogoEditor />
       <BackgroundEditor />
       {DECK_KEYS.map((d) => (
         <DeckEditor key={d.key} deckKey={d.key} label={d.name} expected={d.expected} />
