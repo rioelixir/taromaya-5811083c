@@ -33,6 +33,7 @@ type SubState = {
   loading: boolean;
   signedIn: boolean;
   isPremium: boolean;
+  isAdmin: boolean;
   status?: string;
 };
 
@@ -57,6 +58,7 @@ function PricingPage() {
     loading: true,
     signedIn: false,
     isPremium: false,
+    isAdmin: false,
   });
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -71,19 +73,27 @@ function PricingPage() {
     async function loadSub() {
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
-        setSubState({ loading: false, signedIn: false, isPremium: false });
+        setSubState({ loading: false, signedIn: false, isPremium: false, isAdmin: false });
         return;
       }
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      const isAdmin = !!roleRow;
       try {
         const res = await getMySubscription();
         setSubState({
           loading: false,
           signedIn: true,
           isPremium: res.isPremium,
+          isAdmin,
           status: res.subscription?.status,
         });
       } catch {
-        setSubState({ loading: false, signedIn: true, isPremium: false });
+        setSubState({ loading: false, signedIn: true, isPremium: false, isAdmin });
       }
     }
     loadSub();
@@ -113,6 +123,21 @@ function PricingPage() {
       setRequesting(false);
     }
   };
+
+  if (subState.isAdmin) {
+    return (
+      <PageShell hideAI eyebrow="Admin" title="Unlimited access" subtitle="Admins bypass membership — every module is unlocked for you.">
+        <GlassCard>
+          <div className="flex items-center gap-2 text-sm text-pearl">
+            <Crown className="h-4 w-4 text-gold" /> You have full admin access. No subscription needed.
+          </div>
+          <Link to="/admin" className="mt-4 inline-flex items-center gap-2 rounded-full gold-border bg-gold/10 px-5 py-2 text-sm text-gold hover:bg-gold/20">
+            Open admin panel
+          </Link>
+        </GlassCard>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell hideAI
