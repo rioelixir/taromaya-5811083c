@@ -4,6 +4,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { StarField } from "@/components/star-field";
 import { Sparkles, Loader2, Mail } from "lucide-react";
+import { useAppLogo } from "@/hooks/use-app-logo";
+
+function AuthLogo() {
+  const logo = useAppLogo();
+  if (logo) {
+    return (
+      <div className="h-10 w-10 rounded-full overflow-hidden gold-border">
+        <img src={logo} alt="Logo" className="h-full w-full object-cover" />
+      </div>
+    );
+  }
+  return (
+    <div className="h-10 w-10 rounded-full gold-border grid place-items-center">
+      <Sparkles className="h-5 w-5 text-gold" />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -115,9 +132,7 @@ function AuthPage() {
       <StarField />
       <div className="relative z-10 w-full max-w-md">
         <Link to="/auth" className="flex items-center justify-center gap-2 mb-8">
-          <div className="h-10 w-10 rounded-full gold-border grid place-items-center">
-            <Sparkles className="h-5 w-5 text-gold" />
-          </div>
+          <AuthLogo />
           <div className="font-display text-2xl tracking-widest gold-text">TAROMAYA</div>
         </Link>
 

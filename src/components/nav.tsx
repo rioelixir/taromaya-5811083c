@@ -10,6 +10,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Shield } from "lucide-react";
+import { useAppLogo } from "@/hooks/use-app-logo";
+
+function BrandMark() {
+  const logo = useAppLogo();
+  if (logo) {
+    return (
+      <div className="relative h-9 w-9 rounded-full overflow-hidden gold-border">
+        <img src={logo} alt="Logo" className="h-full w-full object-cover" />
+      </div>
+    );
+  }
+  return (
+    <div className="relative h-9 w-9 rounded-full gold-border grid place-items-center">
+      <Sparkles className="h-4 w-4 text-gold" />
+      <div className="absolute inset-0 rounded-full animate-twinkle bg-gold/10" />
+    </div>
+  );
+}
 
 type Item = { to: string; label: string; icon: typeof Sparkles };
 type Group = { label: string; items: Item[]; defaultOpen?: boolean };
@@ -117,10 +135,7 @@ export function Sidebar() {
       >
         <div className="px-6 pt-6 pb-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="relative h-9 w-9 rounded-full gold-border grid place-items-center">
-              <Sparkles className="h-4 w-4 text-gold" />
-              <div className="absolute inset-0 rounded-full animate-twinkle bg-gold/10" />
-            </div>
+            <BrandMark />
             <div>
               <div className="font-display text-xl tracking-widest gold-text leading-none">
                 TAROMAYA
