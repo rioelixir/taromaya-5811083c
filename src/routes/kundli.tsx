@@ -789,37 +789,37 @@ function DoshasTab({ chart }: { chart: KundliChart }) {
 function PlanetTable({ chart }: { chart: KundliChart }) {
   return (
     <GlassCard title="Planetary positions" desc="Sidereal longitudes, whole-sign house, nakshatra, and motion.">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
-              <th className="py-2 pr-3">Planet</th><th className="py-2 pr-3">Rashi</th>
-              <th className="py-2 pr-3">Degree</th><th className="py-2 pr-3">House</th>
-              <th className="py-2 pr-3">Nakshatra</th><th className="py-2 pr-3">Motion</th>
-            </tr>
-          </thead>
-          <tbody className="text-pearl/90">
-            {chart.planets.map((p) => {
-              const house = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
-              return (
-                <tr key={p.name} className="border-t border-white/5">
-                  <td className="py-2 pr-3">{p.name}</td>
-                  <td className="py-2 pr-3">{RASHIS[p.rashi]}</td>
-                  <td className="py-2 pr-3">{formatDegree(p.degreeInRashi)}</td>
-                  <td className="py-2 pr-3">{house}</td>
-                  <td className="py-2 pr-3">{NAKSHATRAS[p.nakshatra]} · {p.pada}</td>
-                  <td className="py-2 pr-3">
-                    {p.retrograde ? <span className="text-aurora">Retrograde</span> : <span className="text-muted-foreground">Direct</span>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {chart.planets.map((p) => {
+          const house = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
+          const pct = (p.degreeInRashi / 30) * 100;
+          return (
+            <div key={p.name} className="rounded-xl border border-white/10 bg-black/20 p-3">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-base text-pearl">{p.name}</span>
+                  {p.retrograde && <span className="text-[10px] uppercase tracking-widest text-aurora">℞</span>}
+                </div>
+                <span className="text-[10px] uppercase tracking-widest text-gold/80">H{house}</span>
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {RASHIS[p.rashi]} · {NAKSHATRAS[p.nakshatra]} · pada {p.pada}
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${pct}%` }} />
+              </div>
+              <div className="mt-1 flex justify-between font-mono text-[10px] text-muted-foreground">
+                <span>{formatDegree(p.degreeInRashi)}</span>
+                <span>{p.retrograde ? "Retrograde" : "Direct"}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </GlassCard>
   );
 }
+
 
 function ReadingTab({ reading, loading }: { reading: string | null; loading: boolean }) {
   return (
