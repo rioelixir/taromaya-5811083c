@@ -39,6 +39,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as DreamsRouteImport } from './routes/dreams'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
+import { Route as BabyNamesRouteImport } from './routes/baby-names'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
 import { Route as AstrocartographyRouteImport } from './routes/astrocartography'
@@ -205,6 +206,11 @@ const BookmarksRoute = BookmarksRouteImport.update({
   path: '/bookmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BabyNamesRoute = BabyNamesRouteImport.update({
+  id: '/baby-names',
+  path: '/baby-names',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
@@ -381,6 +389,7 @@ export interface FileRoutesById {
   '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
+  '/baby-names': typeof BabyNamesRoute
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
@@ -429,6 +438,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/baby-names'
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
@@ -475,6 +485,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/baby-names'
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
@@ -522,6 +533,7 @@ export interface FileRouteTypes {
     | '/astrocartography'
     | '/astrology'
     | '/auth'
+    | '/baby-names'
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
@@ -570,6 +582,7 @@ export interface RootRouteChildren {
   AstrocartographyRoute: typeof AstrocartographyRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
+  BabyNamesRoute: typeof BabyNamesRoute
   BookmarksRoute: typeof BookmarksRoute
   CompatibilityRoute: typeof CompatibilityRoute
   DreamsRoute: typeof DreamsRoute
@@ -816,6 +829,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/baby-names': {
+      id: '/baby-names'
+      path: '/baby-names'
+      fullPath: '/baby-names'
+      preLoaderRoute: typeof BabyNamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -953,6 +973,7 @@ const rootRouteChildren: RootRouteChildren = {
   AstrocartographyRoute: AstrocartographyRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
+  BabyNamesRoute: BabyNamesRoute,
   BookmarksRoute: BookmarksRoute,
   CompatibilityRoute: CompatibilityRoute,
   DreamsRoute: DreamsRoute,
