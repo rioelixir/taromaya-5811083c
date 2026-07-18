@@ -291,3 +291,67 @@ function ChaughadiyaTable({ rows }: { rows: { name: string; nature: string; from
   );
 }
 void Clock;
+
+function DeepAttributes({ p, weekdayNum }: { p: ReturnType<typeof computePanchang>; weekdayNum: number }) {
+  const panchaka = classifyPanchaka(p.nakshatra.name, weekdayNum);
+  const bhadra = bhadraInfo(p.karana.name);
+  const tq = tithiQuality(p.tithi.number);
+  const yq = yogaQuality(p.yoga.name);
+  const nak = nakshatraCharacter(p.nakshatra.index);
+  return (
+    <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <GlassCard title="Panchaka & Bhadra">
+        <div className={`rounded-xl p-3 mb-3 ${panchaka.active ? "bg-red-500/10 border border-red-400/30" : "bg-emerald-500/10 border border-emerald-400/20"}`}>
+          <div className="flex items-center gap-2 text-xs">
+            <ShieldAlert className={`w-4 h-4 ${panchaka.active ? "text-red-300" : "text-emerald-300"}`} />
+            <span className="uppercase tracking-widest text-muted-foreground">Panchaka</span>
+            {panchaka.type && <span className="gold-text">{panchaka.type}</span>}
+          </div>
+          <div className="mt-1 text-sm text-pearl">{panchaka.note}</div>
+        </div>
+        <div className={`rounded-xl p-3 ${bhadra.active ? "bg-red-500/10 border border-red-400/30" : "bg-white/5"}`}>
+          <div className="flex items-center gap-2 text-xs">
+            <Flame className={`w-4 h-4 ${bhadra.active ? "text-red-300" : "text-muted-foreground"}`} />
+            <span className="uppercase tracking-widest text-muted-foreground">Bhadra (Vishti)</span>
+          </div>
+          <div className="mt-1 text-sm text-pearl">{bhadra.note}</div>
+        </div>
+      </GlassCard>
+
+      <GlassCard title="Tithi & Yoga quality">
+        <div className={`rounded-xl p-3 mb-3 ${tq.auspicious ? "bg-emerald-500/10 border border-emerald-400/20" : "bg-red-500/10 border border-red-400/30"}`}>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Tithi group</div>
+          <div className="font-display text-lg gold-text">{tq.name}</div>
+          <div className="text-xs text-pearl mt-1">{tq.note}</div>
+        </div>
+        <div className={`rounded-xl p-3 ${yq.auspicious ? "bg-emerald-500/10 border border-emerald-400/20" : "bg-red-500/10 border border-red-400/30"}`}>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Yoga</div>
+          <div className="font-display text-lg gold-text">{p.yoga.name}</div>
+          <div className="text-xs text-pearl mt-1">{yq.note}</div>
+        </div>
+      </GlassCard>
+
+      <GlassCard title={`${nak.name} — nakshatra character`}>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+          <KV k="Deity" v={nak.deity} />
+          <KV k="Symbol" v={nak.symbol} />
+          <KV k="Gana" v={nak.gana} />
+          <KV k="Yoni" v={nak.yoni} />
+          <KV k="Guna" v={nak.guna} />
+          <KV k="Tatva" v={nak.tatva} />
+          <KV k="Nature" v={nak.nature} />
+          <KV k="Caste" v={nak.caste} />
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+function KV({ k, v }: { k: string; v: string }) {
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{k}</div>
+      <div className="text-pearl">{v}</div>
+    </div>
+  );
+}
