@@ -4,6 +4,12 @@
 // Runs entirely in the browser — no WASM, no ephemeris files.
 
 import * as A from "astronomy-engine";
+import {
+  DEFAULT_CHART_CONFIG,
+  AYANAMSA_OFFSET_FROM_LAHIRI,
+  type ChartConfig,
+  type Ayanamsa,
+} from "./chart-config";
 
 export const RASHIS = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
