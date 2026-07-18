@@ -4,6 +4,7 @@ import { PageShell } from "@/components/page-shell";
 import { BirthInputForm } from "@/components/birth-input-form";
 import { Card } from "@/components/ui/card";
 import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/rashi-chart";
+import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
@@ -107,6 +108,17 @@ function NewKundliPage() {
                 </div>
               </Card>
             )}
+
+            <VargaExplorer chart={chart} />
+
+
+            {(() => {
+              const moon = chart.planets.find((p) => p.name === "Moon");
+              if (!moon || !birth) return null;
+              const utcMs = Date.UTC(birth.year, birth.month - 1, birth.day, birth.hour, birth.minute, birth.seconds ?? 0)
+                - birth.tzOffsetHours * 3600 * 1000;
+              return <DashaTimeline birthDate={new Date(utcMs)} moonLongitude={moon.longitude} />;
+            })()}
           </div>
         )}
       </div>
