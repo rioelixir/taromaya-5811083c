@@ -152,7 +152,7 @@ function ObservatoryPage() {
         {tab === "retrogrades" && <RetroPanel windows={retroWindows} />}
         {tab === "ingresses" && <IngressPanel items={ingresses} />}
       </div>
-    </PageShell>
+    </div>
   );
 }
 
