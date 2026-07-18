@@ -34,6 +34,100 @@ export function AdminAssetsTab() {
   );
 }
 
+function LogoEditor() {
+  const [path, setPath] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const load = useCallback(async () => {
+    const { data } = await supabase.from("app_settings").select("value").eq("key", "app.logo").maybeSingle();
+    const p = (data?.value as any)?.path ?? null;
+    setPath(p);
+    setUrl(await signedUrl(p));
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const onUpload = async (file: File) => {
+    setErr(null); setUploading(true);
+    try {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const key = `logo/logo-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(key, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      if (path && path !== key) {
+        await supabase.storage.from(BUCKET).remove([path]);
+      }
+      const { error: e2 } = await supabase.from("app_settings").upsert({
+        key: "app.logo",
+        value: { path: key },
+        updated_at: new Date().toISOString(),
+      });
+      if (e2) throw e2;
+      await load();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onClear = async () => {
+    if (!path) return;
+    setUploading(true);
+    try {
+      await supabase.storage.from(BUCKET).remove([path]);
+      await supabase.from("app_settings").upsert({
+        key: "app.logo",
+        value: { path: null },
+        updated_at: new Date().toISOString(),
+      });
+      setPath(null); setUrl(null);
+    } finally { setUploading(false); }
+  };
+
+  return (
+    <GlassCard title="App logo" desc="Shown in the sidebar, sign-in page, and everywhere the brand mark appears. Square PNG/SVG with transparent background recommended.">
+      <div className="flex flex-col sm:flex-row gap-4 items-start">
+        <div className="relative h-24 w-24 rounded-2xl overflow-hidden border border-white/10 bg-black/40 grid place-items-center flex-shrink-0">
+          {url ? (
+            <img src={url} alt="Logo" className="h-full w-full object-contain" />
+          ) : (
+            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+          )}
+        </div>
+        <div className="flex-1 space-y-3">
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) onUpload(f); e.target.value = ""; }}
+          />
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic px-4 py-2 text-sm font-medium disabled:opacity-40"
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {path ? "Replace" : "Upload"}
+            </button>
+            {path && (
+              <button onClick={onClear} disabled={uploading} className="inline-flex items-center gap-2 rounded-xl border border-red-500/20 px-4 py-2 text-sm text-red-300 hover:bg-red-500/10">
+                <Trash2 className="h-4 w-4" /> Remove
+              </button>
+            )}
+          </div>
+          {err && <div className="text-xs text-red-300">{err}</div>}
+          {path && <div className="text-[10px] text-muted-foreground font-mono truncate">{path}</div>}
+        </div>
+      </div>
+    </GlassCard>
+  );
+}
+
 function BackgroundEditor() {
   const [path, setPath] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
