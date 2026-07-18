@@ -113,7 +113,7 @@ About 350 words.`,
       title="Read the sky"
       subtitle="Personalised daily, weekly, monthly and yearly readings across love, career, wealth, health, and luck."
     >
-      <CosmicRibbon today={today} onPickSign={(s) => generateReading(s)} />
+      <CosmicRibbon today={today} onPickSign={(s: string) => generateReading(s)} />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="flex gap-2">
