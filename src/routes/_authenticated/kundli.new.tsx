@@ -7,6 +7,7 @@ import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/ras
 import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
 import { StrengthsPanel } from "@/components/strengths-panel";
 import { YogasDoshasPanel } from "@/components/yogas-doshas-panel";
+import { JaiminiPanel } from "@/components/jaimini-panel";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
@@ -114,6 +115,14 @@ function NewKundliPage() {
             <StrengthsPanel chart={chart} />
 
             <YogasDoshasPanel chart={chart} />
+
+            {(() => {
+              const utcMs = birth
+                ? Date.UTC(birth.year, birth.month - 1, birth.day, birth.hour, birth.minute, birth.seconds ?? 0)
+                    - birth.tzOffsetHours * 3600 * 1000
+                : null;
+              return <JaiminiPanel chart={chart} birthDate={utcMs !== null ? new Date(utcMs) : null} />;
+            })()}
 
             <VargaExplorer chart={chart} />
 
