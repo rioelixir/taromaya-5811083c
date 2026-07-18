@@ -208,7 +208,7 @@ function TransitTimeline({ natalPlanets }: { natalPlanets: { name: import("@/lib
   const ingresses = useMemo<Ingress[]>(() => findIngresses(now, end), [now, end]);
   const eclipses = useMemo<EclipseEvent[]>(() => findEclipses(now, end), [now, end]);
   const hits = useMemo<TimelineHit[]>(
-    () => findAspectHits(natalPlanets, now, end),
+    () => findAspectHits(natalPlanets, now, end, ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"]),
     [natalPlanets, now, end],
   );
 
