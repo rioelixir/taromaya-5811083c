@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PremiumGate } from "@/components/premium-gate";
 import { useMemo, useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { moonPhaseInfo, moonSign } from "@/lib/horoscope";
 import { ChevronLeft, ChevronRight, Moon } from "lucide-react";
 
 export const Route = createFileRoute("/moon-calendar")({
-  component: MoonCalendarPage,
+  component: () => (<PremiumGate featureName="Moon Calendar"><MoonCalendarPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Moon Phase Calendar — TAROMAYA" },

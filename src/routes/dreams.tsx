@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PremiumGate } from "@/components/premium-gate";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -7,7 +8,7 @@ import { interpretDream } from "@/lib/dream-oracle.functions";
 import { Moon, Sparkles, Loader2, Feather, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/dreams")({
-  component: DreamsPage,
+  component: () => (<PremiumGate featureName="Dream Oracle"><DreamsPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Dream Oracle — TAROMAYA" },

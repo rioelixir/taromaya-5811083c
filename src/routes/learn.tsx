@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, ComingSoonGrid } from "@/components/page-shell";
+import { PremiumGate } from "@/components/premium-gate";
 
 const topics = [
   "Tarot Basics", "Major Arcana", "Minor Arcana", "Court Cards",
@@ -10,13 +11,15 @@ const topics = [
 
 export const Route = createFileRoute("/learn")({
   component: () => (
-    <PageShell
-      eyebrow="Learning"
-      title="Ancient wisdom, modern lens"
-      subtitle="Structured courses on tarot, astrology, numerology, and Vedic time — from novice to advanced."
-    >
-      <ComingSoonGrid items={topics} />
-    </PageShell>
+    <PremiumGate featureName="Learning">
+      <PageShell
+        eyebrow="Learning"
+        title="Ancient wisdom, modern lens"
+        subtitle="Structured courses on tarot, astrology, numerology, and Vedic time — from novice to advanced."
+      >
+        <ComingSoonGrid items={topics} />
+      </PageShell>
+    </PremiumGate>
   ),
   head: () => ({ meta: [{ title: "Learning — TAROMAYA" }] }),
 });
