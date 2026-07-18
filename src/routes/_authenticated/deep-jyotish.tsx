@@ -115,7 +115,7 @@ function DeepJyotishPage() {
                   <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{RASHIS[k.rashi].slice(0,3)}</span>
                 </div>
                 <div className="text-sm font-medium">{k.planet}</div>
-                <div className="text-[11px] text-muted-foreground">{formatDegree(k.degreeInRashi)}</div>
+                <div className="text-[11px] text-muted-foreground">{formatDegree(k.degree)}</div>
                 <div className="text-[11px] text-muted-foreground mt-1 leading-snug">{KARAKA_MEANING[k.karaka]}</div>
               </div>
             ))}
