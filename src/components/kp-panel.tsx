@@ -62,31 +62,24 @@ export function KPPanel({ chart }: Props) {
       </div>
 
       {(tab === "positions" || tab === "cusps") && (
-        <div className="overflow-hidden rounded-lg border border-border/40">
-          <table className="w-full text-xs">
-            <thead className="bg-background/40 text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 text-left">{tab === "positions" ? "Body" : "Cusp"}</th>
-                <th className="px-3 py-2 text-left">Sign</th>
-                <th className="px-3 py-2 text-left">Nakshatra</th>
-                <th className="px-3 py-2 text-left">Star</th>
-                <th className="px-3 py-2 text-left">Sub</th>
-                <th className="px-3 py-2 text-left">Sub-Sub</th>
-              </tr>
-            </thead>
-            <tbody className="font-mono">
-              {(tab === "positions" ? positions : cusps).map((r, i) => (
-                <tr key={i} className="border-t border-border/30">
-                  <td className="px-3 py-2 text-primary">{r.who}</td>
-                  <td className="px-3 py-2">{KP_RASHIS[r.sign]}</td>
-                  <td className="px-3 py-2">{KP_NAKSHATRAS[r.nakshatra]}</td>
-                  <td className="px-3 py-2">{r.starLord}</td>
-                  <td className="px-3 py-2">{r.subLord}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{r.subSubLord}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {(tab === "positions" ? positions : cusps).map((r, i) => (
+            <div key={i} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-display text-sm text-primary">{r.who}</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {KP_RASHIS[r.sign]} · {KP_NAKSHATRAS[r.nakshatra]}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center gap-1 text-[11px]">
+                <span className={chipCls + " border-primary/40 bg-primary/10 text-primary"}>{r.starLord}</span>
+                <span className="text-muted-foreground">→</span>
+                <span className={chipCls + " border-primary/40 bg-primary/10 text-primary"}>{r.subLord}</span>
+                <span className="text-muted-foreground">→</span>
+                <span className={chipCls + " text-muted-foreground"}>{r.subSubLord}</span>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -96,36 +89,35 @@ export function KPPanel({ chart }: Props) {
             4-fold significators per house: A) planets in star of occupants,
             B) occupants, C) planets in star of house-lord, D) house-lord.
           </p>
-          <div className="max-h-96 overflow-y-auto rounded-lg border border-border/40">
-            <table className="w-full text-xs">
-              <thead className="sticky top-0 bg-background/80 text-muted-foreground backdrop-blur">
-                <tr>
-                  <th className="px-3 py-2 text-left">H</th>
-                  <th className="px-3 py-2 text-left">Sign</th>
-                  <th className="px-3 py-2 text-left">A</th>
-                  <th className="px-3 py-2 text-left">B</th>
-                  <th className="px-3 py-2 text-left">C</th>
-                  <th className="px-3 py-2 text-left">D</th>
-                  <th className="px-3 py-2 text-left">Combined</th>
-                </tr>
-              </thead>
-              <tbody className="font-mono">
-                {sig.map((row) => (
-                  <tr key={row.house} className="border-t border-border/30">
-                    <td className="px-3 py-2 text-primary">{row.house}</td>
-                    <td className="px-3 py-2">{KP_RASHIS[row.sign]}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{row.A.join(", ") || "—"}</td>
-                    <td className="px-3 py-2">{row.B.join(", ") || "—"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{row.C.join(", ") || "—"}</td>
-                    <td className="px-3 py-2">{row.D.join(", ") || "—"}</td>
-                    <td className="px-3 py-2 text-primary">{row.combined.join(", ")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
+            {sig.map((row) => (
+              <div key={row.house} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-display text-sm text-primary">House {row.house}</span>
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{KP_RASHIS[row.sign]}</span>
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {([["A", row.A], ["B", row.B], ["C", row.C], ["D", row.D]] as const).map(([k, arr]) => (
+                    <div key={k}>
+                      <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{k}</div>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {arr.length ? arr.map((n) => <span key={n} className={chipCls}>{n}</span>) : <span className="text-muted-foreground">—</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 border-t border-border/30 pt-2">
+                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Combined</div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {row.combined.map((n) => <span key={n} className={chipCls + " border-primary/40 text-primary"}>{n}</span>)}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
+
 
       {tab === "ruling" && (
         <div className="space-y-3 text-xs">
