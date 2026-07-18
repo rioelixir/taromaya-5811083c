@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, PLANET_SHORT, formatDegree } from "@/lib/vedic";
 import { ashtakootMilan } from "@/lib/ashtakoot";
+import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
+import { synastryAspects, compositeChart, synastryScore } from "@/lib/synastry";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles, Heart, CheckCircle2, XCircle } from "lucide-react";
 
@@ -39,13 +41,26 @@ function CompatibilityPage() {
         tzOffsetHours: Number(p.tz), latitude: Number(p.lat), longitude: Number(p.lon),
       });
     };
+    const toWest = (p: Person) => {
+      const [y, m, d] = p.date.split("-").map(Number);
+      const [hh, mm] = p.time.split(":").map(Number);
+      return computeWesternChart({
+        year: y, month: m, day: d, hour: hh, minute: mm,
+        tzOffsetHours: Number(p.tz), latitude: Number(p.lat), longitude: Number(p.lon),
+      });
+    };
     const chartA = toChart(a), chartB = toChart(b);
+    const westA = toWest(a), westB = toWest(b);
     const milan = ashtakootMilan(
       { chart: chartA, name: a.name || "Boy", gender: "male" },
       { chart: chartB, name: b.name || "Girl", gender: "female" },
     );
-    return { chartA, chartB, milan };
+    const synHits = synastryAspects(westA, westB);
+    const synScore = synastryScore(synHits);
+    const composite = compositeChart(westA, westB);
+    return { chartA, chartB, milan, synHits, synScore, composite };
   }
+
 
   const onCalc = () => { setResult(compute()); setAiText(null); };
 
@@ -141,6 +156,62 @@ Structure: Overall Compatibility, Emotional & Mental (Gana, Bhakoot), Physical &
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <GlassCard title="Ashtakoot radar">
+              <KootaRadar kootas={result.milan.kootas} />
+            </GlassCard>
+            <GlassCard title="Western synastry">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <div className="font-display text-5xl gold-text">{result.synScore.score}<span className="text-lg text-muted-foreground">/100</span></div>
+                  <div className="mt-1 text-sm text-pearl">{result.synScore.label}</div>
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  <div><span className="text-emerald-300">+{result.synScore.positive}</span> harmonious</div>
+                  <div><span className="text-red-300">−{result.synScore.challenging}</span> challenging</div>
+                </div>
+              </div>
+              <div className="mt-4 max-h-52 overflow-y-auto text-xs">
+                {result.synHits.slice(0, 12).map((h, i) => (
+                  <div key={i} className="flex items-center justify-between border-t border-white/5 py-1.5">
+                    <span className="text-pearl">{h.a} <span className="text-muted-foreground">{h.type}</span> {h.b}</span>
+                    <span className="text-muted-foreground font-mono">{h.orb.toFixed(1)}°</span>
+                  </div>
+                ))}
+                {result.synHits.length === 0 && <div className="text-muted-foreground">No aspects within orb.</div>}
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="mt-6">
+            <GlassCard title="Composite chart — the relationship itself">
+              <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+                {result.composite.planets.slice(0, 7).map((p) => {
+                  const idx = Math.floor(p.longitude / 30);
+                  return (
+                    <div key={p.name} className="rounded-xl bg-white/5 border border-white/10 px-3 py-3">
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{p.name}</div>
+                      <div className="mt-1 font-display text-lg text-pearl flex items-center gap-1.5">
+                        <span className="gold-text">{SIGN_GLYPHS[idx]}</span> {SIGN_NAMES[idx]}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground font-mono">{(p.longitude % 30).toFixed(1)}°</div>
+                    </div>
+                  );
+                })}
+                <div className="rounded-xl gold-border bg-gold/10 px-3 py-3">
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Asc</div>
+                  <div className="mt-1 font-display text-lg text-pearl flex items-center gap-1.5">
+                    <span className="gold-text">{SIGN_GLYPHS[Math.floor(result.composite.ascendant / 30)]}</span> {SIGN_NAMES[Math.floor(result.composite.ascendant / 30)]}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-mono">{(result.composite.ascendant % 30).toFixed(1)}°</div>
+                </div>
+              </div>
+              <div className="mt-3 text-[11px] text-muted-foreground">
+                Midpoint composite — treat these placements as the identity of the relationship.
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <GlassCard title={`${a.name || "A"} — birth chart`}>
               <MiniChart chart={result.chartA} />
             </GlassCard>
@@ -224,3 +295,51 @@ function MiniChart({ chart }: { chart: ReturnType<typeof computeKundli> }) {
   );
 }
 void formatDegree;
+
+function KootaRadar({ kootas }: { kootas: { name: string; score: number; max: number }[] }) {
+  const size = 260;
+  const cx = size / 2, cy = size / 2;
+  const rMax = size / 2 - 32;
+  const n = kootas.length;
+  const angleFor = (i: number) => (i / n) * Math.PI * 2 - Math.PI / 2;
+  const point = (i: number, frac: number) => {
+    const a = angleFor(i);
+    return [cx + Math.cos(a) * rMax * frac, cy + Math.sin(a) * rMax * frac] as const;
+  };
+  const gridLevels = [0.25, 0.5, 0.75, 1];
+  const dataPath = kootas.map((k, i) => {
+    const [x, y] = point(i, k.score / k.max);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ") + " Z";
+
+  return (
+    <div className="flex justify-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[280px]">
+        {gridLevels.map((lv) => (
+          <polygon
+            key={lv}
+            points={kootas.map((_, i) => point(i, lv).join(",")).join(" ")}
+            fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"
+          />
+        ))}
+        {kootas.map((_, i) => {
+          const [x, y] = point(i, 1);
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />;
+        })}
+        <path d={dataPath} fill="rgba(212,175,55,0.25)" stroke="hsl(45 80% 60%)" strokeWidth="1.5" />
+        {kootas.map((k, i) => {
+          const [x, y] = point(i, k.score / k.max);
+          return <circle key={i} cx={x} cy={y} r="3" fill="hsl(45 80% 60%)" />;
+        })}
+        {kootas.map((k, i) => {
+          const [x, y] = point(i, 1.18);
+          return (
+            <text key={k.name} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fill="rgba(240,235,220,0.75)" fontSize="9" fontFamily="ui-sans-serif">
+              {k.name} {k.score}/{k.max}
+            </text>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
