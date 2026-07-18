@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
   BookOpen, GraduationCap, FileText, History, Bookmark, User, Settings,
   Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
-  Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon,
+  Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -66,6 +66,10 @@ const groups: Group[] = [
       { to: "/chakra", label: "Chakra", icon: Zap },
       { to: "/karma", label: "Karma", icon: InfIcon },
       { to: "/vastu", label: "Vastu", icon: HomeIcon },
+      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
+      { to: "/kaalsarp", label: "Kaal Sarp", icon: Waves },
+      { to: "/dharma", label: "Dharma", icon: Crown },
+      { to: "/yantra", label: "Yantra", icon: Triangle },
     ],
   },
   {
