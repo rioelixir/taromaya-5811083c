@@ -285,11 +285,16 @@ function BirthForm({
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Date"><input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} /></Field>
-          <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} /></Field>
+          <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} disabled={form.unknownTime} /></Field>
         </div>
-        <Field label="Timezone offset (hours from UTC)">
-          <input value={form.tz} onChange={(e) => setForm({ ...form, tz: e.target.value })} className={inputCls} placeholder="5.5" inputMode="decimal" />
-        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Seconds"><input value={form.seconds} onChange={(e) => setForm({ ...form, seconds: e.target.value })} className={inputCls} inputMode="numeric" disabled={form.unknownTime} placeholder="0" /></Field>
+          <Field label="Timezone (hrs from UTC)"><input value={form.tz} onChange={(e) => setForm({ ...form, tz: e.target.value })} className={inputCls} placeholder="5.5" inputMode="decimal" /></Field>
+        </div>
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <input type="checkbox" checked={form.unknownTime} onChange={(e) => setForm({ ...form, unknownTime: e.target.checked })} className="accent-gold" />
+          Time unknown (use noon chart)
+        </label>
         <Field label="Place (for your reference)">
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -299,6 +304,36 @@ function BirthForm({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Latitude"><input value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
           <Field label="Longitude"><input value={form.lon} onChange={(e) => setForm({ ...form, lon: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
+        </div>
+        <Field label="Elevation (m)">
+          <input value={form.elevation} onChange={(e) => setForm({ ...form, elevation: e.target.value })} className={inputCls} inputMode="numeric" placeholder="0" />
+        </Field>
+        <div className="grid grid-cols-3 gap-3">
+          <Field label="Ayanamsa">
+            <select value={form.ayanamsa} onChange={(e) => setForm({ ...form, ayanamsa: e.target.value })} className={inputCls}>
+              <option value="lahiri">Lahiri</option>
+              <option value="raman">Raman</option>
+              <option value="kp-old">KP (Old)</option>
+              <option value="kp-new">KP (New)</option>
+              <option value="tropical">Tropical</option>
+            </select>
+          </Field>
+          <Field label="House system">
+            <select value={form.houseSystem} onChange={(e) => setForm({ ...form, houseSystem: e.target.value })} className={inputCls}>
+              <option value="whole-sign">Whole Sign</option>
+              <option value="placidus">Placidus</option>
+              <option value="koch">Koch</option>
+              <option value="equal">Equal</option>
+              <option value="sripati">Sripati</option>
+              <option value="bhava-chalit">Bhava Chalit</option>
+            </select>
+          </Field>
+          <Field label="Rahu / Ketu">
+            <select value={form.nodeType} onChange={(e) => setForm({ ...form, nodeType: e.target.value })} className={inputCls}>
+              <option value="true">True Node</option>
+              <option value="mean">Mean Node</option>
+            </select>
+          </Field>
         </div>
         <button
           disabled={!canSubmit} onClick={onCompute}
