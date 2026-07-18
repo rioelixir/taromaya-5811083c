@@ -5,9 +5,9 @@ import { useState, useRef, useEffect, useCallback, type ReactNode } from "react"
 import { StarField } from "@/components/star-field";
 import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
-import { getCardDetails, isCourtCard } from "@/lib/tarot-details";
+import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
 
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
@@ -78,6 +78,7 @@ function TarotPage() {
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [zoomedUid, setZoomedUid] = useState<string | null>(null);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
@@ -301,71 +302,88 @@ function TarotPage() {
 
       {/* Top control bar */}
       <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
-          <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
+            {!headerCollapsed && (
+              <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+            )}
+          </div>
+          <button
+            onClick={() => setHeaderCollapsed((v) => !v)}
+            className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-pearl hover:bg-white/5"
+            aria-label={headerCollapsed ? "Expand controls" : "Collapse controls"}
+          >
+            {headerCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+            {headerCollapsed ? "Show" : "Hide"}
+          </button>
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
-            const active = k === spreadKey;
-            return (
+        {!headerCollapsed && (
+          <>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
+                const active = k === spreadKey;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => setSpreadKey(k)}
+                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
+                      active
+                        ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
+                        : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
+                    }`}
+                  >
+                    {SPREADS[k].label}
+                  </button>
+                );
+              })}
               <button
-                key={k}
-                onClick={() => setSpreadKey(k)}
-                className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
-                  active
+                onClick={() => setCourtOnly((v) => !v)}
+                className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
+                  courtOnly
                     ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
                     : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
                 }`}
+                title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
               >
-                {SPREADS[k].label}
+                <Crown className="h-3.5 w-3.5" /> Court Cards Only
               </button>
-            );
-          })}
-          <button
-            onClick={() => setCourtOnly((v) => !v)}
-            className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
-              courtOnly
-                ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
-                : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
-            }`}
-            title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
-          >
-            <Crown className="h-3.5 w-3.5" /> Court Cards Only
-          </button>
-        </div>
+            </div>
 
-        <div className="mt-2 flex flex-wrap gap-2 items-center">
-          <input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            maxLength={200}
-            placeholder="What's on your mind? (optional)"
-            className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
-          />
-          <button
-            onClick={shuffleAll}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-            title="Shuffle every deck"
-          >
-            <Shuffle className="h-4 w-4" /> Shuffle
-          </button>
-          <button
-            onClick={resetSpread}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-          >
-            <RotateCcw className="h-4 w-4" /> Start over
-          </button>
-          <button
-            onClick={requestReading}
-            disabled={!readyToInterpret || loadingReading}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Read the cards
-          </button>
-        </div>
+            <div className="mt-2 flex flex-wrap gap-2 items-center">
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                maxLength={200}
+                placeholder="What's on your mind? (optional)"
+                className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
+              />
+              <button
+                onClick={shuffleAll}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+                title="Shuffle every deck"
+              >
+                <Shuffle className="h-4 w-4" /> Shuffle
+              </button>
+              <button
+                onClick={resetSpread}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+              >
+                <RotateCcw className="h-4 w-4" /> Start over
+              </button>
+              <button
+                onClick={requestReading}
+                disabled={!readyToInterpret || loadingReading}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Read the cards
+              </button>
+            </div>
+          </>
+        )}
+
 
       </div>
 
@@ -504,16 +522,14 @@ function TarotPage() {
         )}
       </div>
 
-      {/* Fullscreen zoom overlay */}
+      {/* Fullscreen zoom overlay — image only, no text */}
       {zoomedUid && (() => {
         const zc = placed.find((p) => p.uid === zoomedUid);
         if (!zc) return null;
-        const d = getCardDetails(zc.card);
-        const court = isCourtCard(zc.card);
         return (
           <div
             onClick={() => setZoomedUid(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
           >
             <button
               onClick={(e) => { e.stopPropagation(); setZoomedUid(null); }}
@@ -524,84 +540,20 @@ function TarotPage() {
             </button>
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative my-6 rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_120px_-20px_var(--gold)] p-6 sm:p-8 grid gap-6 md:grid-cols-[220px_1fr]"
-              style={{ width: "min(94vw, 780px)" }}
+              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
+              style={{
+                width: "min(92vw, calc(92dvh * 0.66))",
+                height: "min(92dvh, calc(92vw * 1.5))",
+                transform: zc.reversed ? "rotate(180deg)" : undefined,
+              }}
             >
-              {/* Card face */}
-              <div className="flex flex-col items-center">
-                <div
-                  className="relative rounded-2xl border border-gold/50 bg-gradient-to-b from-cosmic to-black p-4 flex flex-col items-center"
-                  style={{
-                    width: 200,
-                    height: 300,
-                    transform: zc.reversed ? "rotate(180deg)" : undefined,
-                  }}
-                >
-                  <div className="text-[9px] uppercase tracking-[0.35em] text-gold/70">
-                    {zc.card.arcana === "major" ? "Major Arcana" : zc.card.suit}
-                  </div>
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-[6rem] leading-none">{glyphFor(zc.card)}</div>
-                  </div>
-                  <div className="font-display text-lg gold-text text-center leading-tight">
-                    {zc.card.name}
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
-                  {court && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
-                      <Crown className="h-3 w-3" /> Court
-                    </span>
-                  )}
-                  {zc.reversed && (
-                    <span className="rounded-full bg-black/60 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold/80">
-                      Reversed
-                    </span>
-                  )}
-                  {d.element && (
-                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
-                      {d.element}
-                    </span>
-                  )}
-                  {d.astrology && (
-                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
-                      {d.astrology}
-                    </span>
-                  )}
-                  {d.yesNo && (
-                    <span className="rounded-full bg-gold/10 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
-                      {d.yesNo}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="text-pearl/90 text-sm leading-relaxed space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                <div>
-                  <div className="font-display text-2xl gold-text">{zc.card.name}</div>
-                  <div className="mt-1 text-xs text-pearl/70 italic">{d.headline}</div>
-                </div>
-                <DetailBlock label={zc.reversed ? "Reversed meaning" : "Upright meaning"}>
-                  {zc.reversed ? d.reversed : d.upright}
-                </DetailBlock>
-                <DetailBlock label={zc.reversed ? "Upright meaning" : "Reversed meaning"} muted>
-                  {zc.reversed ? d.upright : d.reversed}
-                </DetailBlock>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <DetailBlock label="Love">{d.love}</DetailBlock>
-                  <DetailBlock label="Career">{d.career}</DetailBlock>
-                  <DetailBlock label="Spiritual">{d.spiritual}</DetailBlock>
-                </div>
-                <DetailBlock label="Keywords" muted>
-                  {(zc.reversed ? zc.card.keywordsReversed : zc.card.keywords).join(" · ")}
-                </DetailBlock>
-              </div>
+              <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
             </div>
           </div>
         );
       })()}
     </div>
+
   );
 }
 
@@ -758,18 +710,5 @@ function renderInline(text: string) {
     ) : (
       <span key={i}>{p}</span>
     ),
-  );
-}
-
-function DetailBlock({ label, children, muted = false }: { label: string; children: ReactNode; muted?: boolean }) {
-  return (
-    <div>
-      <div className={`text-[10px] uppercase tracking-[0.3em] mb-1 ${muted ? "text-pearl/50" : "text-gold/80"}`}>
-        {label}
-      </div>
-      <div className={`text-sm leading-relaxed ${muted ? "text-pearl/70" : "text-pearl"}`}>
-        {children}
-      </div>
-    </div>
   );
 }

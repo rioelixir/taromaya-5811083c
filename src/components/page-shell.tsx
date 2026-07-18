@@ -1,13 +1,19 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Home } from "lucide-react";
+import { ArrowLeft, Home, ChevronUp, ChevronDown } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
 
-function PageNav() {
+function PageNav({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
   const router = useRouter();
   return (
-    <div className="mb-6 flex items-center justify-between gap-2">
+    <div className="mb-4 flex items-center justify-between gap-2">
       <button
         onClick={() => router.history.back()}
         className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
@@ -15,13 +21,24 @@ function PageNav() {
       >
         <ArrowLeft className="h-4 w-4 text-gold" /> Back
       </button>
-      <Link
-        to="/"
-        className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
-        aria-label="Home"
-      >
-        <Home className="h-4 w-4 text-gold" /> Home
-      </Link>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggle}
+          className="inline-flex items-center gap-1 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
+          aria-label={collapsed ? "Expand header" : "Collapse header"}
+          title={collapsed ? "Show header" : "Hide header for focus"}
+        >
+          {collapsed ? <ChevronDown className="h-4 w-4 text-gold" /> : <ChevronUp className="h-4 w-4 text-gold" />}
+          <span className="hidden sm:inline">{collapsed ? "Show" : "Focus"}</span>
+        </button>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
+          aria-label="Home"
+        >
+          <Home className="h-4 w-4 text-gold" /> Home
+        </Link>
+      </div>
     </div>
   );
 }
@@ -49,26 +66,29 @@ export function PageShell({
   /** Set to true on utility pages (auth, terms, admin) to hide the AI panel. */
   hideAI?: boolean;
 }) {
+  const [collapsed, setCollapsed] = useState(false);
   return (
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
-      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-16 lg:pt-12 pb-16">
-        <PageNav />
-        <header className="mb-6 sm:mb-8">
-          {eyebrow && (
-            <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] text-muted-foreground">
-              {eyebrow}
-            </div>
-          )}
-          <h1 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl leading-tight break-words">
-            <span className="gold-text">{title}</span>
-          </h1>
-          {subtitle && (
-            <p className="mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground">
-              {subtitle}
-            </p>
-          )}
-        </header>
+      <div className={`relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pb-16 ${collapsed ? "pt-4" : "pt-16 lg:pt-12"}`}>
+        <PageNav collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+        {!collapsed && (
+          <header className="mb-6 sm:mb-8">
+            {eyebrow && (
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] text-muted-foreground">
+                {eyebrow}
+              </div>
+            )}
+            <h1 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl leading-tight break-words">
+              <span className="gold-text">{title}</span>
+            </h1>
+            {subtitle && (
+              <p className="mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground">
+                {subtitle}
+              </p>
+            )}
+          </header>
+        )}
         {children}
         {!hideAI && (
           <AIInterpretation
@@ -81,6 +101,7 @@ export function PageShell({
     </div>
   );
 }
+
 
 export function GlassCard({
   title,
