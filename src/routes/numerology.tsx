@@ -77,8 +77,8 @@ function NumerologyPage() {
       {tab === "chinese" && <NineStarKiTab birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "kabbalah" && <KabbalahTab fullName={fullName} setFullName={setFullName} />}
       {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
-      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} />}
-      {tab === "mobile" && <MobileNumerology />}
+      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
+      {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "compat" && <CompatibilityNumerology />}
     </PageShell>
   );
