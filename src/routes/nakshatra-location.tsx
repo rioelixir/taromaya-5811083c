@@ -301,7 +301,7 @@ function NakshatraLocationPage() {
             Please enter a valid latitude (−90 to 90) and longitude (−180 to 180).
           </div>
         )}
-      </GlassCard>
+      </div>
 
       {snap && moonProfile && (
         <>
@@ -370,7 +370,7 @@ function NakshatraLocationPage() {
                 <div className="text-sm text-pearl">{moonProfile.unfavourable.join(" · ")}</div>
               </div>
             </div>
-          </GlassCard>
+          </div>
 
           {/* Location-tied flags */}
           <div className="grid gap-3 sm:grid-cols-3">
@@ -410,7 +410,7 @@ function NakshatraLocationPage() {
             <p className="mt-2 text-xs text-muted-foreground">
               If your Moon nakshatra is on this list, take extra rest today and postpone major moves.
             </p>
-          </GlassCard>
+          </div>
 
           {/* Timeline */}
           <div className="glass rounded-3xl p-5">
@@ -447,7 +447,7 @@ function NakshatraLocationPage() {
                 );
               })}
             </div>
-          </GlassCard>
+          </div>
 
           {/* Nakshatra finder */}
           <div className="glass rounded-3xl p-5">
@@ -483,7 +483,7 @@ function NakshatraLocationPage() {
                 )}
               </div>
             )}
-          </GlassCard>
+          </div>
 
           {/* Coordinates footer */}
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
