@@ -62,6 +62,7 @@ const groups: Group[] = [
       { to: "/compatibility", label: "Matching", icon: Heart },
       { to: "/varshphal", label: "Varshphal", icon: Sun },
       { to: "/prashna", label: "Prashna", icon: CalendarClock },
+      { to: "/ayurveda", label: "Ayurveda", icon: Leaf },
     ],
   },
   {
