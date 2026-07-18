@@ -11,9 +11,17 @@ import {
   type AcgResult,
   type AcgLineKind,
 } from "@/lib/astrocartography";
+import {
+  computeParans,
+  computeLocalSpace,
+  recommendCities,
+  INTENTION_LABEL,
+  type Intention,
+} from "@/lib/astrocartography-deep";
 import type { BirthInput } from "@/lib/progressions";
 import type { PlanetName } from "@/lib/vedic";
-import { Globe2, MapPin, Sparkles } from "lucide-react";
+import { Globe2, MapPin, Sparkles, Crosshair, Compass, Trophy } from "lucide-react";
+
 
 export const Route = createFileRoute("/astrocartography")({
   component: () => (
