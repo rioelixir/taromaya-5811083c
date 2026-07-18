@@ -33,6 +33,7 @@ type SubState = {
   loading: boolean;
   signedIn: boolean;
   isPremium: boolean;
+  isAdmin: boolean;
   status?: string;
 };
 
