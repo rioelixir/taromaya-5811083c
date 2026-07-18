@@ -5,6 +5,7 @@ import {
   BookOpen, GraduationCap, FileText, History, Bookmark, User, Settings,
   Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
   Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
+  Briefcase, Coins, Activity, LayoutGrid,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,7 @@ const groups: Group[] = [
     defaultOpen: true,
     items: [
       { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/life-dashboard", label: "Life Dashboard", icon: LayoutGrid },
       { to: "/ai", label: "AI Guide", icon: Bot },
     ],
   },
@@ -68,8 +70,12 @@ const groups: Group[] = [
       { to: "/vastu", label: "Vastu", icon: HomeIcon },
       { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
       { to: "/kaalsarp", label: "Kaal Sarp", icon: Waves },
+      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
       { to: "/dharma", label: "Dharma", icon: Crown },
       { to: "/yantra", label: "Yantra", icon: Triangle },
+      { to: "/career", label: "Career", icon: Briefcase },
+      { to: "/finance", label: "Finance", icon: Coins },
+      { to: "/health", label: "Health", icon: Activity },
     ],
   },
   {
