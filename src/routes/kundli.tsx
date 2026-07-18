@@ -555,26 +555,62 @@ function VargaMini({
   );
 }
 
+type DashaSystem = "vimshottari" | "yogini" | "ashtottari";
+const DASHA_META: Record<DashaSystem, { label: string; totalYears: number; desc: string }> = {
+  vimshottari: { label: "Vimshottari", totalYears: 120, desc: "120-year nakshatra-based dasha — the primary Parashari timing system." },
+  yogini:      { label: "Yogini",       totalYears: 36,  desc: "36-year, 8-yogini cycle — quick, event-focused predictive tool." },
+  ashtottari:  { label: "Ashtottari",   totalYears: 108, desc: "108-year, 8-lord dasha — traditional supplement for karma & longevity." },
+};
+
 function DashaTab({ chart, birthDate }: { chart: KundliChart; birthDate: Date }) {
   const NAK_SPAN = 360 / 27;
   const moon = chart.planets[1];
   const moonDegInNak = (moon.longitude % NAK_SPAN + NAK_SPAN) % NAK_SPAN;
-  const tree = computeVimshottari(birthDate, chart.moonNakshatra.index, moonDegInNak);
+  const [system, setSystem] = useState<DashaSystem>("vimshottari");
+
+  const tree: DashaTree = useMemo(() => {
+    if (system === "yogini") return computeYogini(birthDate, chart.moonNakshatra.index, moonDegInNak);
+    if (system === "ashtottari") return computeAshtottari(birthDate, chart.moonNakshatra.index, moonDegInNak);
+    return computeVimshottari(birthDate, chart.moonNakshatra.index, moonDegInNak);
+  }, [system, birthDate, chart.moonNakshatra.index, moonDegInNak]);
+
+  const meta = DASHA_META[system];
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="flex flex-wrap gap-2">
+        {(Object.keys(DASHA_META) as DashaSystem[]).map((s) => (
+          <button
+            key={s}
+            onClick={() => setSystem(s)}
+            className={`px-3 py-1.5 rounded-full text-xs font-display tracking-wide border transition ${
+              system === s
+                ? "border-gold/60 bg-gold/15 text-gold"
+                : "border-white/10 text-muted-foreground hover:text-pearl hover:border-white/20"
+            }`}
+          >
+            {DASHA_META[s].label}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-3">
         <GlassCard title="Current Mahadasha" desc={`${fmtDate(tree.currentMaha.start)} → ${fmtDate(tree.currentMaha.end)}`}>
           <div className="mt-2 font-display text-2xl gold-text">{tree.currentMaha.lord}</div>
         </GlassCard>
         <GlassCard title="Current Antardasha" desc={`${fmtDate(tree.currentAntar.start)} → ${fmtDate(tree.currentAntar.end)}`}>
           <div className="mt-2 font-display text-2xl gold-text">{tree.currentAntar.lord}</div>
         </GlassCard>
+        <GlassCard title="Current Pratyantar" desc={`${fmtDate(tree.currentPratyantar.start)} → ${fmtDate(tree.currentPratyantar.end)}`}>
+          <div className="mt-2 font-display text-2xl gold-text">{tree.currentPratyantar.lord}</div>
+        </GlassCard>
       </div>
-      <GlassCard title="Vimshottari timeline" desc="Full 120-year Mahadasha cycle with Antardasha (Bhukti) periods.">
-        <div className="mt-3 space-y-2 max-h-[500px] overflow-y-auto pr-2">
+
+      <GlassCard title={`${meta.label} timeline`} desc={meta.desc}>
+        <div className="mt-3 space-y-2 max-h-[560px] overflow-y-auto pr-2">
           {tree.maha.map((m, idx) => {
-            const isCurrent = m.start <= new Date() && new Date() < m.end;
+            const now = new Date();
+            const isCurrent = m.start <= now && now < m.end;
             return (
               <details key={idx} open={isCurrent} className="rounded-xl border border-white/10 bg-black/20 open:bg-black/30">
                 <summary className={`cursor-pointer px-3 py-2 flex items-center justify-between text-sm ${isCurrent ? "text-gold" : "text-pearl"}`}>
@@ -588,13 +624,25 @@ function DashaTab({ chart, birthDate }: { chart: KundliChart; birthDate: Date })
                 </summary>
                 <div className="border-t border-white/5">
                   {m.antar.map((a, ai) => {
-                    const now = new Date();
                     const isA = a.start <= now && now < a.end;
                     return (
-                      <div key={ai} className={`px-4 py-1.5 flex items-center justify-between text-xs ${isA ? "text-gold" : "text-muted-foreground"}`}>
-                        <span>{a.lord}</span>
-                        <span className="text-[10px]">{fmtDate(a.start)} → {fmtDate(a.end)}</span>
-                      </div>
+                      <details key={ai} open={isA} className="border-t border-white/5 first:border-t-0">
+                        <summary className={`cursor-pointer px-4 py-1.5 flex items-center justify-between text-xs ${isA ? "text-gold" : "text-muted-foreground"}`}>
+                          <span>{m.lord} / {a.lord}</span>
+                          <span className="text-[10px]">{fmtDate(a.start)} → {fmtDate(a.end)}</span>
+                        </summary>
+                        <div className="bg-black/20">
+                          {a.pratyantar.map((p, pi) => {
+                            const isP = p.start <= now && now < p.end;
+                            return (
+                              <div key={pi} className={`px-6 py-1 flex items-center justify-between text-[11px] ${isP ? "text-gold" : "text-muted-foreground/80"}`}>
+                                <span>› {p.lord}</span>
+                                <span className="text-[9px]">{fmtDate(p.start)} → {fmtDate(p.end)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </details>
                     );
                   })}
                 </div>
