@@ -52,18 +52,14 @@ function WeatherPage() {
   const currentHour = hours.find(h => now >= h.start && now < h.end);
 
   return (
-    <PageShell>
+    <PageShell eyebrow="Phase 16 · Cosmic Weather" title="Cosmic Weather" subtitle={`The sky's forecast for ${day.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}.`}>
       <div className="max-w-6xl mx-auto space-y-8">
-        <header className="text-center space-y-3 pt-4">
+        <div className="flex justify-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass gold-border">
             <CloudSun className="h-3.5 w-3.5 text-gold" />
-            <span className="text-[10px] uppercase tracking-[0.35em] text-gold">Phase 16</span>
+            <span className="text-[10px] uppercase tracking-[0.35em] text-gold">Live sky report</span>
           </div>
-          <h1 className="font-display text-4xl md:text-5xl gold-text">Cosmic Weather</h1>
-          <p className="text-sm text-white/60 max-w-xl mx-auto">
-            The sky's forecast for {day.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}.
-          </p>
-        </header>
+        </div>
 
         <div className="glass rounded-2xl p-5 flex flex-wrap gap-4 items-end">
           <label className="flex flex-col gap-1 text-xs uppercase tracking-widest text-white/60">

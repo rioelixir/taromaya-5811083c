@@ -47,6 +47,8 @@ export function dayAspectTimeline(day: Date): AspectEvent[] {
       for (const p2 of OTHER) {
         if (p1 === p2) continue;
         for (const [name, def] of aspects) {
+          const tone = TONE[name];
+          if (!tone) continue;
           const diffA = signedDelta(a.lons[p1] - a.lons[p2], def.angle);
           const diffB = signedDelta(b.lons[p1] - b.lons[p2], def.angle);
           if (Math.sign(diffA) !== Math.sign(diffB) && Math.abs(diffA) < 6 && Math.abs(diffB) < 6) {
@@ -63,7 +65,7 @@ export function dayAspectTimeline(day: Date): AspectEvent[] {
             hits.push({
               when: new Date((lo + hi) / 2),
               transit: p1, natal: p2, type: name, angle: def.angle,
-              tone: TONE[name],
+              tone,
             });
           }
         }
@@ -192,10 +194,12 @@ export function signForecast(day: Date): { sign: string; score: number; tone: "g
       let d = Math.abs(norm360(p.tropicalLongitude - mid));
       if (d > 180) d = 360 - d;
       for (const [name, def] of Object.entries(ASPECTS) as [AspectType, typeof ASPECTS[AspectType]][]) {
+        const tone = TONE[name];
+        if (!tone) continue;
         const orb = Math.abs(d - def.angle);
         if (orb <= def.orb * 0.7) {
           const weight = (1 - orb / def.orb) * planetWeight(p.name);
-          score += TONE[name] === "harmonious" ? weight : TONE[name] === "tense" ? -weight : weight * 0.3;
+          score += tone === "harmonious" ? weight : tone === "tense" ? -weight : weight * 0.3;
         }
       }
     }
