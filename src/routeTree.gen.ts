@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
+import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as SynastryRouteImport } from './routes/synastry'
@@ -54,6 +55,11 @@ const VarshphalRoute = VarshphalRouteImport.update({
 const TransitsRoute = TransitsRouteImport.update({
   id: '/transits',
   path: '/transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
+  '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByTo {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
+  '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
+  '/timeline': typeof TimelineRoute
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/terms'
+    | '/timeline'
     | '/transits'
     | '/varshphal'
     | '/admin'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/terms'
+    | '/timeline'
     | '/transits'
     | '/varshphal'
     | '/admin'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/synastry'
     | '/tarot'
     | '/terms'
+    | '/timeline'
     | '/transits'
     | '/varshphal'
     | '/_authenticated/admin'
@@ -481,6 +493,7 @@ export interface RootRouteChildren {
   SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
   TermsRoute: typeof TermsRoute
+  TimelineRoute: typeof TimelineRoute
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -501,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/transits'
       fullPath: '/transits'
       preLoaderRoute: typeof TransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -792,6 +812,7 @@ const rootRouteChildren: RootRouteChildren = {
   SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
   TermsRoute: TermsRoute,
+  TimelineRoute: TimelineRoute,
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
   ApiChatRoute: ApiChatRoute,
