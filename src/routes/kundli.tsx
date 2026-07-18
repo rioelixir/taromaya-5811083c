@@ -896,30 +896,32 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
         </div>
       </GlassCard>
 
-      <GlassCard title="Bhinna Ashtakavarga" desc="Individual bindu distribution for each of the seven planets.">
-        <div className="overflow-x-auto mt-3">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                <th className="text-left py-2 pr-3">Planet</th>
-                {RASHIS.map((r) => <th key={r} className="py-2 px-1 text-center">{r.slice(0,3)}</th>)}
-                <th className="py-2 pl-3 text-right">Σ</th>
-              </tr>
-            </thead>
-            <tbody className="text-pearl/90">
-              {av.bhinna.map((row) => (
-                <tr key={row.planet} className="border-t border-white/5">
-                  <td className="py-2 pr-3 font-medium">{row.planet}</td>
-                  {row.bindus.map((b, i) => (
-                    <td key={i} className={`py-2 px-1 text-center ${b >= 5 ? "text-gold" : b <= 2 ? "text-muted-foreground/50" : ""}`}>{b}</td>
-                  ))}
-                  <td className="py-2 pl-3 text-right text-gold">{row.total}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <GlassCard title="Bhinna Ashtakavarga" desc="Individual bindu distribution — bar height shows relative strength per sign (max 8).">
+        <div className="mt-4 space-y-3">
+          {av.bhinna.map((row) => (
+            <div key={row.planet}>
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="text-sm font-medium text-pearl">{row.planet}</span>
+                <span className="text-[10px] uppercase tracking-widest text-gold">Σ {row.total}</span>
+              </div>
+              <div className="grid grid-cols-12 gap-1 items-end h-16">
+                {row.bindus.map((b, i) => {
+                  const h = (b / 8) * 100;
+                  const tone = b >= 5 ? "from-gold to-gold-soft" : b <= 2 ? "from-white/10 to-white/5" : "from-gold/40 to-gold/10";
+                  return (
+                    <div key={i} className="flex flex-col items-center justify-end h-full" title={`${RASHIS[i]}: ${b}`}>
+                      <div className={`w-full rounded-t bg-gradient-to-t ${tone}`} style={{ height: `${Math.max(6, h)}%` }} />
+                      <div className="mt-1 text-[8px] text-muted-foreground">{RASHIS[i].slice(0,2)}</div>
+                      <div className="text-[9px] font-mono text-pearl">{b}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </GlassCard>
+
     </div>
   );
 }
