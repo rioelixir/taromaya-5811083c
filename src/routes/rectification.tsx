@@ -267,3 +267,152 @@ function NumField({ label, v, onChange, step = 1 }: { label: string; v: number; 
     </label>
   );
 }
+
+function JaiminiCrossCheck({
+  entered, best, events,
+}: {
+  entered: BirthInput;
+  best: BirthInput;
+  events: LifeEvent[];
+}) {
+  const snapEntered = useMemo(() => jaiminiSnapshot(entered), [entered]);
+  const snapBest = useMemo(() => jaiminiSnapshot(best), [best]);
+  const diff = useMemo(() => diffJaimini(snapEntered, snapBest), [snapEntered, snapBest]);
+
+  const KEY_HOUSES = [1, 4, 5, 7, 10, 12];
+
+  return (
+    <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+      <GlassCard title="Jaimini cross-check">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Compass className="w-4 h-4 text-gold" />
+          Chara Karakas + Arudha Padas for the best-fit chart (Lahiri sidereal).
+        </div>
+
+        <div className="mt-4">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Chara Karakas</div>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
+            {snapBest.karakas.map((k) => {
+              const shifted = diff.karakaShifts.find((s) => s.karaka === k.karaka);
+              return (
+                <div key={k.karaka} className={`rounded-lg px-2.5 py-2 border ${shifted ? "border-gold/40 bg-gold/5" : "border-white/10 bg-white/5"}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="gold-text font-medium">{k.karaka}</span>
+                    <span className="text-pearl">{k.planet}</span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">
+                    {JAIMINI_RASHIS[k.rashi]} {k.degree.toFixed(1)}°
+                  </div>
+                  {shifted && (
+                    <div className="text-[10px] text-gold/80 mt-1">was {shifted.from} at entered time</div>
+                  )}
+                  <div className="text-[9px] text-muted-foreground mt-1 leading-tight">{KARAKA_MEANING[k.karaka]}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Arudha Padas · key houses</div>
+          <div className="grid grid-cols-3 gap-1.5 text-xs">
+            {KEY_HOUSES.map((h) => {
+              const ar = snapBest.arudhas.find((a) => a.house === h);
+              if (!ar) return null;
+              const shift = diff.arudhaShifts.find((s) => s.house === h);
+              return (
+                <div key={h} className={`rounded-lg px-2 py-1.5 border ${shift ? "border-gold/40 bg-gold/5" : "border-white/10 bg-white/5"}`}>
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">A{h}{h === 12 ? " · UL" : ""}</div>
+                  <div className="text-pearl">{JAIMINI_RASHIS[ar.arudha]}</div>
+                  {shift && (
+                    <div className="text-[9px] text-gold/80 mt-0.5">
+                      was {JAIMINI_RASHIS[shift.from]}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {diff.lagnaShift && (
+            <div className="mt-3 rounded-lg border border-gold/40 bg-gold/5 px-3 py-2 text-xs text-pearl">
+              Lagna shifted: <span className="text-muted-foreground">{JAIMINI_RASHIS[diff.lagnaShift.from]}</span>
+              <ArrowRight className="inline w-3 h-3 mx-1 text-gold" />
+              <span className="gold-text">{JAIMINI_RASHIS[diff.lagnaShift.to]}</span>
+              <div className="text-[10px] text-muted-foreground mt-0.5">
+                A whole-sign lagna shift is a strong rectification signal — every Arudha and Bhava changes.
+              </div>
+            </div>
+          )}
+        </div>
+      </GlassCard>
+
+      <GlassCard title="Event confirmation via Jaimini">
+        <div className="space-y-2">
+          {events.length === 0 && (
+            <div className="text-xs text-muted-foreground">No events to cross-check.</div>
+          )}
+          {events.map((ev) => {
+            const cfg = CATEGORY_JAIMINI[ev.category];
+            const relevantShifts = diff.arudhaShifts.filter((s) => cfg.arudhaHouses.includes(s.house));
+            const relevantKarakaShifts = diff.karakaShifts.filter((s) => cfg.karakas.includes(s.karaka));
+            const anyShift = relevantShifts.length + relevantKarakaShifts.length > 0;
+            return (
+              <div key={ev.id} className="rounded-lg bg-white/5 border border-white/10 p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <div className="text-pearl">
+                    {ev.label || ev.category} · <span className="text-muted-foreground">{ev.date}</span>
+                  </div>
+                  <div className={anyShift ? "gold-text text-[10px] uppercase tracking-widest" : "text-muted-foreground text-[10px] uppercase tracking-widest"}>
+                    {anyShift ? "confirms" : "stable"}
+                  </div>
+                </div>
+                <div className="mt-1 text-[10px] text-muted-foreground">{cfg.label}</div>
+                {cfg.arudhaHouses.map((h) => {
+                  const ar = snapBest.arudhas.find((a) => a.house === h);
+                  if (!ar) return null;
+                  const shift = diff.arudhaShifts.find((s) => s.house === h);
+                  return (
+                    <div key={h} className="mt-1 flex items-center gap-2 text-[11px]">
+                      <span className="text-muted-foreground w-10">A{h}</span>
+                      <span className="text-pearl">{JAIMINI_RASHIS[ar.arudha]}</span>
+                      {shift && (
+                        <>
+                          <ArrowRight className="w-3 h-3 text-gold" />
+                          <span className="text-muted-foreground text-[10px]">shift under window</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+                {cfg.karakas.map((kk) => {
+                  const k = snapBest.karakas.find((x) => x.karaka === kk);
+                  if (!k) return null;
+                  const shift = diff.karakaShifts.find((s) => s.karaka === kk);
+                  return (
+                    <div key={kk} className="mt-1 flex items-center gap-2 text-[11px]">
+                      <span className="text-muted-foreground w-10">{kk}</span>
+                      <span className="text-pearl">{k.planet}</span>
+                      <span className="text-muted-foreground text-[10px]">· {JAIMINI_RASHIS[k.rashi]}</span>
+                      {shift && (
+                        <>
+                          <ArrowRight className="w-3 h-3 text-gold" />
+                          <span className="text-gold text-[10px]">was {shift.from}</span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-4 text-[10px] text-muted-foreground leading-relaxed">
+          A "confirms" tag means the best-fit birth minute moved a category-relevant Arudha or Chara Karaka into a
+          different sign versus your entered time — a Jaimini-side signal that the rectified moment is meaningfully
+          different from your estimate, not just a fractional-degree nudge.
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
