@@ -205,6 +205,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_downloads: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          label: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          label?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

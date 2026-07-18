@@ -20,10 +20,15 @@ import {
 } from "@/lib/vedic-deep";
 import { interpretKundli } from "@/lib/kundli.functions";
 import { saveKundli } from "@/lib/kundli-storage.functions";
+import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
+import { QuotaBadge } from "./reports";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import jsPDF from "jspdf";
 import {
   Sparkles, Loader2, MapPin, Save, Check, AlertTriangle,
-  CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound,
+  CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
 
 export const Route = createFileRoute("/kundli")({
@@ -219,6 +224,7 @@ function KundliPage() {
                   <Link to="/auth" className="text-gold hover:underline">Sign in</Link>
                 </div>
               )}
+              <KundliPdfSection chart={chart} form={form} birthDate={birthDate!} />
             </>
           ) : (
             <GlassCard title="Waiting for your details" desc="Enter your birth date, time, and coordinates. Chart, dasha, yogas and doshas will appear here.">
@@ -1045,3 +1051,235 @@ function Meta({ label, value }: { label: string; value: string }) {
 }
 
 void Grid3x3;
+
+/* ============ Kundli PDF download (monthly quota) ============ */
+
+function KundliPdfSection({ chart, form, birthDate }: {
+  chart: KundliChart; form: FormState; birthDate: Date;
+}) {
+  const fetchQuota = useServerFn(getPdfQuota);
+  const recordDownload = useServerFn(recordPdfDownload);
+  const qc = useQueryClient();
+  const quotaQuery = useQuery({
+    queryKey: ["pdf-quota"],
+    queryFn: () => fetchQuota(),
+  });
+  const q = quotaQuery.data?.kundli;
+  const [busy, setBusy] = useState(false);
+  const blocked = !!q && !q.isAdmin && q.remaining !== null && q.remaining <= 0;
+
+  const download = async () => {
+    setBusy(true);
+    try {
+      await recordDownload({ data: { kind: "kundli", label: form.name || "Kundli" } });
+      const pdf = buildKundliPdf(chart, form, birthDate);
+      const safe = (form.name || "Kundli").replace(/\s+/g, "_");
+      pdf.save(`TAROMAYA-Kundli-${safe}-${new Date().toISOString().slice(0,10)}.pdf`);
+      qc.invalidateQueries({ queryKey: ["pdf-quota"] });
+      toast.success("Kundli PDF downloaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="glass rounded-2xl p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs text-muted-foreground">
+          Download a complete Kundli PDF — chart, planets, dasha, yogas, doshas, remedies.
+        </div>
+        <button
+          onClick={download}
+          disabled={busy || blocked}
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-xs disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
+          {blocked ? "Limit reached" : "Download PDF"}
+        </button>
+      </div>
+      <QuotaBadge status={q} loading={quotaQuery.isLoading} label="Kundli PDFs this month" />
+    </div>
+  );
+}
+
+function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): jsPDF {
+  const pdf = new jsPDF({ unit: "pt", format: "a4" });
+  const w = pdf.internal.pageSize.getWidth();
+  const h = pdf.internal.pageSize.getHeight();
+  const margin = 40;
+  const BG: [number, number, number] = [11, 12, 24];
+  const GOLD: [number, number, number] = [212, 175, 55];
+  const TEXT: [number, number, number] = [230, 225, 210];
+  const MUTED: [number, number, number] = [160, 155, 145];
+
+  const setBG = () => { pdf.setFillColor(...BG); pdf.rect(0, 0, w, h, "F"); };
+  setBG();
+
+  const drawHeader = () => {
+    pdf.setTextColor(...GOLD);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.text("TAROMAYA", margin, 32, { charSpace: 3 });
+    pdf.text("KUNDLI REPORT", w - margin, 32, { align: "right", charSpace: 3 });
+    pdf.setDrawColor(...GOLD);
+    pdf.setLineWidth(0.4);
+    pdf.line(margin, 42, w - margin, 42);
+  };
+  drawHeader();
+
+  // Title block
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(22);
+  pdf.text(form.name || "Seeker", margin, 90);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...MUTED);
+  pdf.text(`${form.date}  ·  ${form.time}  ·  TZ ${form.tz}`, margin, 108);
+  pdf.text(form.place || `${form.lat}, ${form.lon}`, margin, 122);
+
+  // Summary rows
+  let y = 160;
+  const line = (label: string, value: string) => {
+    pdf.setTextColor(...GOLD);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.text(label.toUpperCase(), margin, y, { charSpace: 2 });
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...TEXT);
+    pdf.setFontSize(11);
+    pdf.text(value, margin + 130, y);
+    y += 18;
+  };
+
+  const ascRashi = RASHIS[chart.ascendant.rashi];
+  const moon = chart.planets.find(p => p.name === "Moon")!;
+  const sun = chart.planets.find(p => p.name === "Sun")!;
+  const nak = NAKSHATRAS[chart.moonNakshatra.index];
+
+  line("Ayanamsa (Lahiri)", `${chart.ayanamsa.toFixed(4)}°`);
+  line("Ascendant (Lagna)", `${ascRashi}  ${formatDegree(chart.ascendant.degreeInRashi)}`);
+  line("Moon Rashi", `${RASHIS[moon.rashi]}  ${formatDegree(moon.degreeInRashi)}`);
+  line("Sun Rashi", `${RASHIS[sun.rashi]}  ${formatDegree(sun.degreeInRashi)}`);
+  line("Nakshatra", `${nak}  · Pada ${chart.moonNakshatra.pada}  · ${chart.moonNakshatra.lord}`);
+
+  // Planets table
+  y += 10;
+  pdf.setDrawColor(...GOLD);
+  pdf.line(margin, y, w - margin, y);
+  y += 18;
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("PLANETARY POSITIONS", margin, y, { charSpace: 2 });
+  y += 16;
+
+  pdf.setFontSize(9);
+  pdf.setTextColor(...MUTED);
+  const cols = [margin, margin + 90, margin + 200, margin + 290, margin + 360, margin + 430];
+  ["Planet", "Rashi", "Degree", "House", "Nakshatra", "Retro"].forEach((h, i) =>
+    pdf.text(h, cols[i], y),
+  );
+  y += 6;
+  pdf.setDrawColor(80, 78, 70);
+  pdf.setLineWidth(0.2);
+  pdf.line(margin, y, w - margin, y);
+  y += 12;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...TEXT);
+  const asc = chart.ascendant.rashi;
+  chart.planets.forEach((p) => {
+    const house = ((p.rashi - asc + 12) % 12) + 1;
+    const nkIdx = Math.floor((p.longitude % 360) / (360 / 27));
+    pdf.text(p.name, cols[0], y);
+    pdf.text(RASHIS[p.rashi], cols[1], y);
+    pdf.text(formatDegree(p.degreeInRashi), cols[2], y);
+    pdf.text(String(house), cols[3], y);
+    pdf.text(NAKSHATRAS[nkIdx], cols[4], y);
+    pdf.text(p.retrograde ? "R" : "—", cols[5], y);
+    y += 14;
+    if (y > h - 100) return;
+  });
+
+  // Yogas & Doshas
+  y += 12;
+  const yogas = detectYogas(chart);
+  const doshas = detectDoshas(chart);
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("YOGAS DETECTED", margin, y, { charSpace: 2 });
+  y += 14;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...TEXT);
+  if (yogas.length === 0) {
+    pdf.setTextColor(...MUTED);
+    pdf.text("No major yogas detected.", margin, y); y += 14;
+  } else {
+    yogas.slice(0, 8).forEach((yg) => {
+      const lines = pdf.splitTextToSize(`• ${yg.name} — ${yg.detail}`, w - margin * 2) as string[];
+      lines.forEach((ln) => { pdf.text(ln, margin, y); y += 12; });
+    });
+  }
+
+  y += 8;
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("DOSHAS", margin, y, { charSpace: 2 });
+  y += 14;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...TEXT);
+  if (doshas.length === 0) {
+    pdf.setTextColor(...MUTED);
+    pdf.text("No major doshas detected.", margin, y);
+  } else {
+    doshas.forEach((d) => {
+      const lines = pdf.splitTextToSize(`• ${d.name} — ${d.detail}`, w - margin * 2) as string[];
+      lines.forEach((ln) => { pdf.text(ln, margin, y); y += 12; });
+    });
+  }
+
+  // Vimshottari — new page
+  pdf.addPage();
+  setBG(); drawHeader();
+  y = 90;
+  pdf.setTextColor(...GOLD);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.text("Vimshottari Mahadasha", margin, y);
+  y += 22;
+
+  const tree = computeVimshottari(birthDate, chart.moonNakshatra.index, chart.planets.find(p => p.name === "Moon")!.longitude % (360/27));
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...MUTED);
+  const mdCols = [margin, margin + 100, margin + 220, margin + 340];
+  ["Lord", "Start", "End", "Duration (yr)"].forEach((hd, i) => pdf.text(hd, mdCols[i], y));
+  y += 6;
+  pdf.setDrawColor(80, 78, 70); pdf.line(margin, y, w - margin, y); y += 12;
+  pdf.setTextColor(...TEXT);
+  tree.maha.forEach((md) => {
+    if (y > h - 80) { pdf.addPage(); setBG(); drawHeader(); y = 90; }
+    pdf.text(md.lord, mdCols[0], y);
+    pdf.text(fmtDate(md.start), mdCols[1], y);
+    pdf.text(fmtDate(md.end), mdCols[2], y);
+    pdf.text(md.years.toFixed(2), mdCols[3], y);
+    y += 14;
+  });
+
+  // Footer note
+  pdf.setFontSize(8);
+  pdf.setTextColor(...MUTED);
+  pdf.text(
+    `Generated ${new Date().toLocaleDateString()} · TAROMAYA · App by Riaa`,
+    w / 2, h - 24, { align: "center" },
+  );
+
+  return pdf;
+}

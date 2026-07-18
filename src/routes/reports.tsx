@@ -1,7 +1,10 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
 import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
@@ -11,7 +14,8 @@ import { computeNumerology } from "@/lib/numerology";
 import { loShuGrid } from "@/lib/numerology-deep";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
+import { FileText, Download, Loader2, Infinity as InfIcon } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
   component: () => (<PremiumGate featureName="Reports"><ReportsPage /></PremiumGate>),
@@ -44,16 +48,32 @@ function ReportsPage() {
   });
   const [downloading, setDownloading] = useState<ReportKey | null>(null);
 
+  const fetchQuota = useServerFn(getPdfQuota);
+  const recordDownload = useServerFn(recordPdfDownload);
+  const qc = useQueryClient();
+  const quotaQuery = useQuery({
+    queryKey: ["pdf-quota"],
+    queryFn: () => fetchQuota(),
+  });
+  const q = quotaQuery.data?.report;
+
   const generate = async (key: ReportKey) => {
     setDownloading(key);
     try {
+      // Reserve the slot server-side first (blocks over-quota users).
+      await recordDownload({ data: { kind: "report", label: REPORT_META[key].title } });
       await new Promise(r => setTimeout(r, 30));
       const pdf = buildPdf(key, birth);
       pdf.save(`TAROMAYA-${REPORT_META[key].title.replace(/\s+/g, "_")}-${todayIso()}.pdf`);
+      qc.invalidateQueries({ queryKey: ["pdf-quota"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Download failed");
     } finally {
       setDownloading(null);
     }
   };
+
+  const quotaBlocked = !!q && !q.isAdmin && q.remaining !== null && q.remaining <= 0;
 
   return (
     <PageShell
@@ -73,7 +93,11 @@ function ReportsPage() {
         </div>
       </GlassCard>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6">
+        <QuotaBadge status={q} loading={quotaQuery.isLoading} label="Report PDFs this month" />
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(Object.keys(REPORT_META) as ReportKey[]).map((k) => {
           const m = REPORT_META[k];
           const busy = downloading === k;
@@ -93,11 +117,13 @@ function ReportsPage() {
                 ))}
               </ul>
               <button
-                disabled={busy}
+                disabled={busy || quotaBlocked}
                 onClick={() => generate(k)}
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 hover:brightness-110 disabled:opacity-60"
               >
-                {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Preparing…</> : <><Download className="h-4 w-4" /> Download PDF</>}
+                {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Preparing…</>
+                  : quotaBlocked ? <>Monthly limit reached</>
+                  : <><Download className="h-4 w-4" /> Download PDF</>}
               </button>
             </div>
           );
@@ -105,9 +131,36 @@ function ReportsPage() {
       </div>
 
       <div className="mt-6 text-xs text-muted-foreground">
-        Reports render locally in your browser — nothing about your birth chart is uploaded during PDF generation.
+        Reports render locally in your browser — nothing about your birth chart is uploaded during PDF generation. Non-admin members may download up to 10 report PDFs per calendar month.
       </div>
     </PageShell>
+  );
+}
+
+export function QuotaBadge({ status, loading, label }: {
+  status: { used: number; limit: number | null; isAdmin: boolean; remaining: number | null } | undefined;
+  loading: boolean;
+  label: string;
+}) {
+  if (loading || !status) {
+    return <div className="glass rounded-2xl px-4 py-2 text-xs text-muted-foreground inline-flex items-center gap-2"><Loader2 className="h-3 w-3 animate-spin" /> Loading quota…</div>;
+  }
+  if (status.isAdmin) {
+    return (
+      <div className="glass rounded-2xl px-4 py-2 text-xs inline-flex items-center gap-2">
+        <InfIcon className="h-3.5 w-3.5 text-gold" />
+        <span className="text-gold uppercase tracking-widest text-[10px]">Admin</span>
+        <span className="text-muted-foreground">Unlimited downloads — {label.toLowerCase()}</span>
+      </div>
+    );
+  }
+  const low = (status.remaining ?? 0) <= 2;
+  return (
+    <div className={`glass rounded-2xl px-4 py-2 text-xs inline-flex items-center gap-2 ${low ? "text-rose-200" : "text-pearl"}`}>
+      <span className="uppercase tracking-widest text-[10px] text-gold">{label}</span>
+      <span className="font-mono">{status.used} / {status.limit}</span>
+      <span className="text-muted-foreground">· {status.remaining} left this month</span>
+    </div>
   );
 }
 
