@@ -109,6 +109,45 @@ export type Database = {
           },
         ]
       }
+      journal_entries: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          meta: Json
+          mood: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind: string
+          meta?: Json
+          mood?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+          mood?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -1,6 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { Send, Sparkles, RotateCcw, Star, ChevronDown } from "lucide-react";
+import { Send, Sparkles, RotateCcw, Star, ChevronDown, BookmarkPlus, Check } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
@@ -8,7 +8,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listKundlis } from "@/lib/kundli-storage.functions";
 import { buildGuideContext, GUIDE_SYSTEM_PROMPT, type SavedKundliRow } from "@/lib/ai-context";
+import { createJournalEntry } from "@/lib/journal.functions";
 import ReactMarkdown from "react-markdown";
+
 
 export const Route = createFileRoute("/ai")({
   component: () => (<PremiumGate featureName="Ai"><AiPage /></PremiumGate>),
@@ -241,20 +243,48 @@ function AiPage() {
 function MessageBubble({ m }: { m: UIMessage }) {
   const isAi = m.role !== "user";
   const text = m.parts.map((p: any) => (p.type === "text" ? p.text : "")).join("");
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const saveToJournal = async () => {
+    if (saving || saved || !text.trim()) return;
+    setSaving(true);
+    try {
+      const title = text.split("\n").find((l) => l.trim())?.slice(0, 100) || "AI reflection";
+      await createJournalEntry({ data: { kind: "ai", title, body: text, tags: ["ai-guide"] } });
+      setSaved(true);
+    } catch {
+      // silent — user can retry
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <div className={`flex ${isAi ? "" : "justify-end"}`}>
+    <div className={`flex ${isAi ? "" : "justify-end"} group`}>
       <div
         className={
           isAi
-            ? "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-galaxy/25 to-midnight/30 gold-border px-4 py-3 text-sm text-pearl prose prose-invert prose-sm max-w-none prose-p:my-2 prose-headings:font-display prose-headings:text-gold prose-strong:text-gold-soft"
+            ? "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-galaxy/25 to-midnight/30 gold-border px-4 py-3 text-sm text-pearl prose prose-invert prose-sm max-w-none prose-p:my-2 prose-headings:font-display prose-headings:text-gold prose-strong:text-gold-soft relative"
             : "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-pearl whitespace-pre-wrap"
         }
       >
         {isAi ? <ReactMarkdown>{text}</ReactMarkdown> : text}
+        {isAi && text.trim() && (
+          <button
+            onClick={saveToJournal}
+            disabled={saving || saved}
+            title={saved ? "Saved to Journal" : "Save to Journal"}
+            className="absolute -top-2 -right-2 h-7 w-7 rounded-full grid place-items-center bg-cosmic/80 border border-gold/40 text-gold opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-100"
+          >
+            {saved ? <Check className="h-3.5 w-3.5" /> : <BookmarkPlus className="h-3.5 w-3.5" />}
+          </button>
+        )}
       </div>
     </div>
   );
 }
+
 
 function TypingDots() {
   return (

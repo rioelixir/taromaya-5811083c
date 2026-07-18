@@ -26,7 +26,6 @@ import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
-import { Route as JournalRouteImport } from './routes/journal'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
@@ -39,6 +38,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const VarshphalRoute = VarshphalRouteImport.update({
@@ -126,11 +126,6 @@ const KundliRoute = KundliRouteImport.update({
   path: '/kundli',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JournalRoute = JournalRouteImport.update({
-  id: '/journal',
-  path: '/journal',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
   id: '/horoscope',
   path: '/horoscope',
@@ -190,6 +185,11 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -206,7 +206,6 @@ export interface FileRoutesByFullPath {
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
@@ -225,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/journal': typeof AuthenticatedJournalRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -238,7 +238,6 @@ export interface FileRoutesByTo {
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
@@ -257,6 +256,7 @@ export interface FileRoutesByTo {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/journal': typeof AuthenticatedJournalRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -272,7 +272,6 @@ export interface FileRoutesById {
   '/compatibility': typeof CompatibilityRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/journal': typeof JournalRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
@@ -291,6 +290,7 @@ export interface FileRoutesById {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
 }
@@ -306,7 +306,6 @@ export interface FileRouteTypes {
     | '/compatibility'
     | '/history'
     | '/horoscope'
-    | '/journal'
     | '/kundli'
     | '/learn'
     | '/muhurat'
@@ -325,6 +324,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/admin'
+    | '/journal'
     | '/saved'
     | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
@@ -338,7 +338,6 @@ export interface FileRouteTypes {
     | '/compatibility'
     | '/history'
     | '/horoscope'
-    | '/journal'
     | '/kundli'
     | '/learn'
     | '/muhurat'
@@ -357,6 +356,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/admin'
+    | '/journal'
     | '/saved'
     | '/api/chat'
   id:
@@ -371,7 +371,6 @@ export interface FileRouteTypes {
     | '/compatibility'
     | '/history'
     | '/horoscope'
-    | '/journal'
     | '/kundli'
     | '/learn'
     | '/muhurat'
@@ -390,6 +389,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/_authenticated/admin'
+    | '/_authenticated/journal'
     | '/_authenticated/saved'
     | '/api/chat'
   fileRoutesById: FileRoutesById
@@ -405,7 +405,6 @@ export interface RootRouteChildren {
   CompatibilityRoute: typeof CompatibilityRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
-  JournalRoute: typeof JournalRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
   MuhuratRoute: typeof MuhuratRoute
@@ -547,13 +546,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KundliRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/journal': {
-      id: '/journal'
-      path: '/journal'
-      fullPath: '/journal'
-      preLoaderRoute: typeof JournalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/horoscope': {
       id: '/horoscope'
       path: '/horoscope'
@@ -638,6 +630,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/journal': {
+      id: '/_authenticated/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof AuthenticatedJournalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -650,11 +649,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
 }
 
@@ -672,7 +673,6 @@ const rootRouteChildren: RootRouteChildren = {
   CompatibilityRoute: CompatibilityRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
-  JournalRoute: JournalRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
   MuhuratRoute: MuhuratRoute,
