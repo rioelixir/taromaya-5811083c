@@ -4,6 +4,7 @@ import { PageShell } from "@/components/page-shell";
 import { BirthInputForm } from "@/components/birth-input-form";
 import { Card } from "@/components/ui/card";
 import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/rashi-chart";
+import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
