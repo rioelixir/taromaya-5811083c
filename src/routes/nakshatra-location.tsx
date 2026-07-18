@@ -1,7 +1,7 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { PageShell, GlassCard } from "@/components/page-shell";
+import { PageShell } from "@/components/page-shell";
 import {
   computeNakshatraForLocation,
   findNextNakshatraWindow,
