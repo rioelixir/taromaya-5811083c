@@ -160,6 +160,18 @@ function KundliPage() {
           tzOffset: Number(form.tz),
           latitude: Number(form.lat), longitude: Number(form.lon),
           place: form.place,
+          ayanamsa: form.ayanamsa,
+          houseSystem: form.houseSystem,
+          nodeType: form.nodeType,
+          birthSeconds: Number(form.seconds) || 0,
+          elevationMeters: Number(form.elevation) || 0,
+          unknownTime: form.unknownTime,
+          chartConfig: {
+            ayanamsa: form.ayanamsa,
+            houseSystem: form.houseSystem,
+            nodeType: form.nodeType,
+            elevationMeters: Number(form.elevation) || 0,
+          },
         },
       });
       setSaveMsg("Saved to your library.");
