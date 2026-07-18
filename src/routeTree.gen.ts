@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
@@ -39,6 +40,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
+const VarshphalRoute = VarshphalRouteImport.update({
+  id: '/varshphal',
+  path: '/varshphal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransitsRoute = TransitsRouteImport.update({
   id: '/transits',
   path: '/transits',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
+  '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
+  '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
 }
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/transits': typeof TransitsRoute
+  '/varshphal': typeof VarshphalRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
 }
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/tarot'
     | '/terms'
     | '/transits'
+    | '/varshphal'
     | '/admin'
     | '/saved'
   fileRoutesByTo: FileRoutesByTo
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/tarot'
     | '/terms'
     | '/transits'
+    | '/varshphal'
     | '/admin'
     | '/saved'
   id:
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/tarot'
     | '/terms'
     | '/transits'
+    | '/varshphal'
     | '/_authenticated/admin'
     | '/_authenticated/saved'
   fileRoutesById: FileRoutesById
@@ -398,10 +410,18 @@ export interface RootRouteChildren {
   TarotRoute: typeof TarotRoute
   TermsRoute: typeof TermsRoute
   TransitsRoute: typeof TransitsRoute
+  VarshphalRoute: typeof VarshphalRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/varshphal': {
+      id: '/varshphal'
+      path: '/varshphal'
+      fullPath: '/varshphal'
+      preLoaderRoute: typeof VarshphalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transits': {
       id: '/transits'
       path: '/transits'
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   TarotRoute: TarotRoute,
   TermsRoute: TermsRoute,
   TransitsRoute: TransitsRoute,
+  VarshphalRoute: VarshphalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
