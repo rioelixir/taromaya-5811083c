@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Shield } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
+import { useT } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 function BrandMark() {
   const logo = useAppLogo();
@@ -176,6 +178,9 @@ export function Sidebar() {
           <AdminNavGroup pathname={pathname} />
         </nav>
 
+        <div className="px-3 pb-2">
+          <LanguageSwitcher />
+        </div>
         <AuthFooter />
       </aside>
     </>
@@ -183,6 +188,7 @@ export function Sidebar() {
 }
 
 function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
+  const { t } = useT();
   const containsActive = group.items.some(
     (i) => pathname === i.to || (i.to !== "/" && pathname.startsWith(i.to)),
   );
@@ -197,7 +203,7 @@ function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80 hover:text-pearl"
       >
-        <span>{group.label}</span>
+        <span>{t(group.label)}</span>
         <ChevronDown className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`} />
       </button>
       {open && (
@@ -221,7 +227,7 @@ function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
                     active ? "text-gold" : "text-muted-foreground group-hover:text-gold-soft",
                   ].join(" ")}
                 />
-                <span className="truncate">{label}</span>
+                <span className="truncate">{t(label)}</span>
               </Link>
             );
           })}
@@ -269,11 +275,16 @@ function AuthFooter() {
           to="/auth"
           className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 text-sm"
         >
-          <LogIn className="h-4 w-4" /> Sign in
+          <LogIn className="h-4 w-4" /> <SignInLabel />
         </Link>
       )}
     </div>
   );
+}
+
+function SignInLabel() {
+  const { t } = useT();
+  return <>{t("Sign in")}</>;
 }
 
 const bottomNav = [
@@ -286,6 +297,7 @@ const bottomNav = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { t } = useT();
   return (
     <nav
       className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-white/5 bg-cosmic/85 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]"
@@ -312,7 +324,7 @@ export function BottomNav() {
                   <Icon className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
                 </span>
                 <span className={active ? "text-pearl" : "text-muted-foreground"}>
-                  {label}
+                  {t(label)}
                 </span>
               </Link>
             </li>
@@ -328,11 +340,12 @@ void Users;
 
 function AdminNavGroup({ pathname }: { pathname: string }) {
   const { isAdmin } = useIsAdmin();
+  const { t } = useT();
   if (!isAdmin) return null;
   const active = pathname === "/admin" || pathname.startsWith("/admin");
   return (
     <div className="pt-2 mt-2 border-t border-white/5">
-      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">Admin</div>
+      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">{t("Admin")}</div>
       <Link
         to="/admin"
         className={[
@@ -343,7 +356,7 @@ function AdminNavGroup({ pathname }: { pathname: string }) {
         ].join(" ")}
       >
         <Shield className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
-        <span>Control Room</span>
+        <span>{t("Control Room")}</span>
       </Link>
     </div>
   );
