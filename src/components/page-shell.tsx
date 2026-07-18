@@ -1,16 +1,29 @@
 import type { ReactNode } from "react";
 import { StarField } from "@/components/star-field";
+import { AIInterpretation } from "@/components/ai-interpretation";
 
 export function PageShell({
   eyebrow,
   title,
   subtitle,
   children,
+  aiModule,
+  aiSnapshot,
+  aiIntent,
+  hideAI,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   children: ReactNode;
+  /** Module name for the AI Interpretation panel; defaults to `title`. */
+  aiModule?: string;
+  /** Page-specific facts to ground the AI reading in. */
+  aiSnapshot?: string;
+  /** Optional extra user intent for the AI reading. */
+  aiIntent?: string;
+  /** Set to true on utility pages (auth, terms, admin) to hide the AI panel. */
+  hideAI?: boolean;
 }) {
   return (
     <div className="relative flex min-h-dvh w-full flex-col">
@@ -32,6 +45,13 @@ export function PageShell({
           )}
         </header>
         {children}
+        {!hideAI && (
+          <AIInterpretation
+            module={aiModule ?? title}
+            snapshot={aiSnapshot}
+            intent={aiIntent}
+          />
+        )}
       </div>
     </div>
   );
