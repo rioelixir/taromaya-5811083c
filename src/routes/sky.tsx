@@ -34,22 +34,13 @@ function SkyPage() {
   const now = snap.now;
 
   return (
-    <PageShell>
-      <StarField />
-      <div className="relative z-10 flex w-full flex-col gap-6">
-        <header className="glass rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-gold/15 blur-3xl animate-float" />
-          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-gold">
-            <Orbit className="h-4 w-4" /> Live Sky
-          </div>
-          <h1 className="mt-3 font-display text-3xl sm:text-5xl text-pearl">
-            The Heavens, <span className="gold-text">Right Now</span>
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {now.toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-            {" · updates every 30s"}
-          </p>
-        </header>
+    <PageShell
+      eyebrow="Live Sky"
+      title="The Heavens, Right Now"
+      subtitle={`${now.toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · updates every 30 seconds`}
+    >
+      <div className="flex w-full flex-col gap-6">
+        <div className="hidden"><Orbit /></div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="glass rounded-3xl p-4 sm:p-8">
