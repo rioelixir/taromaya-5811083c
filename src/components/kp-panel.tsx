@@ -1,0 +1,170 @@
+import { useMemo, useState } from "react";
+import { Card } from "@/components/ui/card";
+import {
+  kpPlanets,
+  kpCusps,
+  cuspalSignificators,
+  rulingPlanets,
+  KP_RASHIS,
+  KP_NAKSHATRAS,
+  type ChartLite,
+} from "@/lib/kp";
+
+type Props = { chart: ChartLite };
+type Tab = "positions" | "cusps" | "significators" | "ruling";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "positions", label: "Positions" },
+  { id: "cusps", label: "Cusps" },
+  { id: "significators", label: "Significators" },
+  { id: "ruling", label: "Ruling Planets" },
+];
+
+const chipCls =
+  "inline-flex items-center rounded-full border border-border/40 bg-background/40 px-2 py-0.5 font-mono text-[10px]";
+
+export function KPPanel({ chart }: Props) {
+  const [tab, setTab] = useState<Tab>("positions");
+
+  const positions = useMemo(() => kpPlanets(chart), [chart]);
+  const cusps = useMemo(() => kpCusps(chart), [chart]);
+  const sig = useMemo(() => cuspalSignificators(chart), [chart]);
+
+  const ruling = useMemo(() => {
+    // Live ruling-planet snapshot uses the natal Moon and natal Lagna as
+    // a fallback when no live sidereal engine is threaded in.
+    const moon = chart.planets.find((p) => p.name === "Moon");
+    if (!moon) return null;
+    const asc = chart.ascendant.rashi * 30 + chart.ascendant.degreeInRashi;
+    return rulingPlanets(new Date(), asc, moon.longitude);
+  }, [chart]);
+
+  return (
+    <Card className="glass-card space-y-4 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="font-serif text-lg">KP System</h3>
+          <p className="text-xs text-muted-foreground">
+            Krishnamurti Paddhati · sub-lords, cuspal significators, ruling planets
+          </p>
+        </div>
+        <div className="inline-flex overflow-hidden rounded-full border border-border/50 bg-background/40 text-xs">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-3 py-1.5 ${tab === t.id ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {(tab === "positions" || tab === "cusps") && (
+        <div className="overflow-hidden rounded-lg border border-border/40">
+          <table className="w-full text-xs">
+            <thead className="bg-background/40 text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">{tab === "positions" ? "Body" : "Cusp"}</th>
+                <th className="px-3 py-2 text-left">Sign</th>
+                <th className="px-3 py-2 text-left">Nakshatra</th>
+                <th className="px-3 py-2 text-left">Star</th>
+                <th className="px-3 py-2 text-left">Sub</th>
+                <th className="px-3 py-2 text-left">Sub-Sub</th>
+              </tr>
+            </thead>
+            <tbody className="font-mono">
+              {(tab === "positions" ? positions : cusps).map((r, i) => (
+                <tr key={i} className="border-t border-border/30">
+                  <td className="px-3 py-2 text-primary">{r.who}</td>
+                  <td className="px-3 py-2">{KP_RASHIS[r.sign]}</td>
+                  <td className="px-3 py-2">{KP_NAKSHATRAS[r.nakshatra]}</td>
+                  <td className="px-3 py-2">{r.starLord}</td>
+                  <td className="px-3 py-2">{r.subLord}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{r.subSubLord}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === "significators" && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">
+            4-fold significators per house: A) planets in star of occupants,
+            B) occupants, C) planets in star of house-lord, D) house-lord.
+          </p>
+          <div className="max-h-96 overflow-y-auto rounded-lg border border-border/40">
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-background/80 text-muted-foreground backdrop-blur">
+                <tr>
+                  <th className="px-3 py-2 text-left">H</th>
+                  <th className="px-3 py-2 text-left">Sign</th>
+                  <th className="px-3 py-2 text-left">A</th>
+                  <th className="px-3 py-2 text-left">B</th>
+                  <th className="px-3 py-2 text-left">C</th>
+                  <th className="px-3 py-2 text-left">D</th>
+                  <th className="px-3 py-2 text-left">Combined</th>
+                </tr>
+              </thead>
+              <tbody className="font-mono">
+                {sig.map((row) => (
+                  <tr key={row.house} className="border-t border-border/30">
+                    <td className="px-3 py-2 text-primary">{row.house}</td>
+                    <td className="px-3 py-2">{KP_RASHIS[row.sign]}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{row.A.join(", ") || "—"}</td>
+                    <td className="px-3 py-2">{row.B.join(", ") || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{row.C.join(", ") || "—"}</td>
+                    <td className="px-3 py-2">{row.D.join(", ") || "—"}</td>
+                    <td className="px-3 py-2 text-primary">{row.combined.join(", ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {tab === "ruling" && (
+        <div className="space-y-3 text-xs">
+          {!ruling ? (
+            <p className="text-muted-foreground">Moon position required.</p>
+          ) : (
+            <>
+              <p className="text-muted-foreground">
+                Ruling planets for the query moment. Live-transit variants are
+                used across Horary and event-timing selections.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  ["Weekday lord", ruling.weekdayLord],
+                  ["Moon sign lord", ruling.moonSignLord],
+                  ["Moon star lord", ruling.moonStarLord],
+                  ["Moon sub lord", ruling.moonSubLord],
+                  ["Lagna sign lord", ruling.ascSignLord],
+                  ["Lagna star lord", ruling.ascStarLord],
+                  ["Lagna sub lord", ruling.ascSubLord],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-center justify-between rounded-lg border border-border/40 bg-background/30 px-3 py-2">
+                    <span className="text-muted-foreground">{k}</span>
+                    <span className="font-mono text-primary">{v}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Combined RP set</div>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {ruling.combined.map((n) => (
+                    <span key={n} className={chipCls}>{n}</span>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
