@@ -1240,7 +1240,7 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
     pdf.text("No major doshas detected.", margin, y);
   } else {
     doshas.forEach((d) => {
-      const lines = pdf.splitTextToSize(`• ${d.name} — ${d.description}`, w - margin * 2) as string[];
+      const lines = pdf.splitTextToSize(`• ${d.name} — ${d.detail}`, w - margin * 2) as string[];
       lines.forEach((ln) => { pdf.text(ln, margin, y); y += 12; });
     });
   }
