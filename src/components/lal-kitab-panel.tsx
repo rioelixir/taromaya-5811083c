@@ -113,28 +113,22 @@ export function LalKitabPanel({ chart, birthDate }: Props) {
             </span>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border/40">
-            <table className="w-full text-xs">
-              <thead className="bg-background/40 text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left">Planet</th>
-                  <th className="px-3 py-2 text-right">Natal H</th>
-                  <th className="px-3 py-2 text-right">Annual H</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody className="font-mono">
-                {varsh.map((v) => (
-                  <tr key={v.planet} className="border-t border-border/30">
-                    <td className="px-3 py-2 text-primary">{v.planet}</td>
-                    <td className="px-3 py-2 text-right text-muted-foreground">{v.natalHouse}</td>
-                    <td className="px-3 py-2 text-right">{v.annualHouse}</td>
-                    <td className={`px-3 py-2 ${statusColor(v.status)}`}>{v.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+            {varsh.map((v) => (
+              <div key={v.planet} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-display text-sm text-primary">{v.planet}</span>
+                  <span className={`text-[10px] uppercase tracking-widest ${statusColor(v.status)}`}>{v.status}</span>
+                </div>
+                <div className="mt-2 flex items-center gap-2 font-mono text-[11px]">
+                  <span className="rounded-full border border-border/40 bg-background/40 px-2 py-0.5 text-muted-foreground">Natal H{v.natalHouse}</span>
+                  <span className="text-muted-foreground">→</span>
+                  <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-primary">Annual H{v.annualHouse}</span>
+                </div>
+              </div>
+            ))}
           </div>
+
         </div>
       )}
     </Card>
