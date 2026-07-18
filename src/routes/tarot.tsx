@@ -444,9 +444,8 @@ function TarotPage() {
           </div>
         </div>
 
-        </div>
-
         {/* Reading */}
+
         {(reading || error || loadingReading) && (
           <div className="mt-6 glass rounded-3xl p-6">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
