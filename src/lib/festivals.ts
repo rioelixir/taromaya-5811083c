@@ -1,96 +1,138 @@
-/**
- * Hindu Festival Calendar — Tithi/Paksha based rules.
- * Scans a date range and returns matching festivals per day.
- */
+// Festivals & Vrat Calendar — computed from tithi/nakshatra and sidereal Sun sign changes.
 
-import { computePanchang } from "./panchang";
+import * as A from "astronomy-engine";
+import { computePanchang, type Panchang } from "./panchang";
+import { lahiriAyanamsa, RASHIS } from "./vedic";
 
-export type FestivalHit = {
+const norm360 = (x: number) => ((x % 360) + 360) % 360;
+
+export type FestivalKind = "vrat" | "purnima" | "amavasya" | "sankranti" | "major" | "auspicious";
+export type Festival = {
   date: Date;
   name: string;
-  category: "major" | "vrata" | "ekadashi" | "pradosh" | "chaturthi" | "amavasya" | "purnima" | "sankranti";
-  detail: string;
+  kind: FestivalKind;
+  significance: string;
 };
 
-// A festival rule matches a given Panchang result.
-type Rule = (p: ReturnType<typeof computePanchang>, date: Date) => FestivalHit | null;
+function sunSiderealSign(date: Date): number {
+  const g = A.GeoVector(A.Body.Sun, date, true);
+  const rot = A.Rotation_EQJ_ECT(date);
+  const e = A.RotateVector(rot, g);
+  const trop = norm360(Math.atan2(e.y, e.x) * 180 / Math.PI);
+  const sid = norm360(trop - lahiriAyanamsa(date));
+  return Math.floor(sid / 30);
+}
 
-const cat = (name: string, category: FestivalHit["category"], detail: string) =>
-  (p: ReturnType<typeof computePanchang>, date: Date, ok: boolean): FestivalHit | null =>
-    ok ? { date, name, category, detail } : null;
+function detectFromPanchang(p: Panchang, date: Date): Festival[] {
+  const out: Festival[] = [];
+  const t = p.tithi.name;
+  const paksha = p.tithi.paksha;
+  const nak = p.nakshatra.name;
 
-const RULES: Rule[] = [
-  // Tithi-based recurring
-  (p, d) => cat("Amavasya (New Moon)", "amavasya", "New moon night — ancestral remembrance, meditation.")(p, d, p.tithi.number === 30 || p.tithi.name === "Amavasya"),
-  (p, d) => cat("Purnima (Full Moon)", "purnima", "Full moon night — Satya Narayan puja, fasts, meditation.")(p, d, p.tithi.number === 15 && p.tithi.paksha === "Shukla"),
-
-  (p, d) => cat("Ekadashi", "ekadashi", "11th lunar day — fasting for Lord Vishnu.")(p, d, p.tithi.number === 11 || p.tithi.number === 26),
-  (p, d) => cat("Pradosh Vrata", "pradosh", "13th lunar day — Shiva fast, evening prayers.")(p, d, p.tithi.number === 13 || p.tithi.number === 28),
-  (p, d) => cat("Sankashti Chaturthi", "chaturthi", "4th of Krishna paksha — Ganesha fast, moonrise viewing.")(p, d, p.tithi.number === 19),
-  (p, d) => cat("Vinayaka Chaturthi", "chaturthi", "4th of Shukla paksha — Ganesha puja.")(p, d, p.tithi.number === 4),
-
-  // Special weekday × nakshatra combinations
-  (p, d) => cat("Sarvartha Siddhi Yoga", "vrata", "Highly auspicious day-nakshatra combination.")(p, d,
-    (d.getDay() === 0 && ["Hasta","Mula","Uttara Ashadha","Uttara Phalguni","Uttara Bhadrapada","Pushya","Ashwini"].includes(p.nakshatra.name)) ||
-    (d.getDay() === 1 && ["Rohini","Shravana","Mrigashira","Pushya","Anuradha"].includes(p.nakshatra.name)) ||
-    (d.getDay() === 4 && ["Ashwini","Punarvasu","Pushya","Anuradha","Revati"].includes(p.nakshatra.name)),
-  ),
-
-  // Solar month starts — Makar Sankranti (~Jan 14), Mesha Sankranti (~Apr 14)
-  (p, d) => {
-    const m = d.getMonth() + 1, day = d.getDate();
-    if (m === 1 && day === 14) return { date: d, name: "Makar Sankranti", category: "sankranti", detail: "Sun enters Capricorn. Uttarayana begins." };
-    if (m === 4 && (day === 13 || day === 14)) return { date: d, name: "Mesha Sankranti / Baisakhi", category: "sankranti", detail: "Sun enters Aries. Solar new year." };
-    if (m === 8 && (day === 16 || day === 17)) return { date: d, name: "Simha Sankranti", category: "sankranti", detail: "Sun enters Leo." };
-    return null;
-  },
-];
-
-// Named festivals keyed off tithi + month (approx solar, ok for demo)
-const NAMED: { month: number; tithi: number; paksha: "Shukla" | "Krishna"; name: string; detail: string }[] = [
-  { month: 3, tithi: 8,  paksha: "Krishna", name: "Holika Dahan", detail: "Eve of Holi — bonfire ritual." },
-  { month: 3, tithi: 1,  paksha: "Krishna", name: "Holi", detail: "Festival of colours." },
-  { month: 4, tithi: 9,  paksha: "Shukla",  name: "Ram Navami", detail: "Birth of Lord Rama." },
-  { month: 5, tithi: 3,  paksha: "Shukla",  name: "Akshaya Tritiya", detail: "Highly auspicious for beginnings, gold purchase." },
-  { month: 7, tithi: 2,  paksha: "Shukla",  name: "Guru Purnima", detail: "Honour of teachers." },
-  { month: 8, tithi: 15, paksha: "Shukla",  name: "Raksha Bandhan", detail: "Sibling bond." },
-  { month: 8, tithi: 8,  paksha: "Krishna", name: "Janmashtami", detail: "Birth of Lord Krishna." },
-  { month: 9, tithi: 4,  paksha: "Shukla",  name: "Ganesh Chaturthi", detail: "Ganesha installation." },
-  { month: 10, tithi: 1, paksha: "Shukla",  name: "Navratri begins", detail: "Nine nights of the Goddess." },
-  { month: 10, tithi: 10, paksha: "Shukla", name: "Dussehra / Vijayadashami", detail: "Victory of good over evil." },
-  { month: 11, tithi: 13, paksha: "Krishna",name: "Dhanteras", detail: "Wealth-purchase festival, start of Diwali." },
-  { month: 11, tithi: 15, paksha: "Krishna",name: "Diwali (Lakshmi Puja)", detail: "Festival of lights." },
-  { month: 11, tithi: 1, paksha: "Shukla",  name: "Govardhan Puja", detail: "Day after Diwali." },
-  { month: 11, tithi: 2, paksha: "Shukla",  name: "Bhai Dooj", detail: "Sister-brother festival." },
-  { month: 3, tithi: 14, paksha: "Krishna", name: "Maha Shivratri", detail: "Great Night of Shiva — fast and vigil." },
-];
-
-export function scanFestivals(
-  from: Date, to: Date, latitude: number, longitude: number,
-): FestivalHit[] {
-  const out: FestivalHit[] = [];
-  const cursor = new Date(from.getFullYear(), from.getMonth(), from.getDate(), 12, 0, 0);
-  const end = new Date(to.getFullYear(), to.getMonth(), to.getDate(), 12, 0, 0);
-  while (cursor <= end) {
-    const p = computePanchang({ date: new Date(cursor), latitude, longitude });
-    for (const r of RULES) {
-      const hit = r(p, new Date(cursor));
-      if (hit) out.push(hit);
-    }
-    // Named
-    for (const n of NAMED) {
-      if ((cursor.getMonth() + 1) === n.month && p.tithi.number === (n.paksha === "Shukla" ? n.tithi : n.tithi + 15) && p.tithi.paksha === n.paksha) {
-        out.push({ date: new Date(cursor), name: n.name, category: "major", detail: n.detail });
-      }
-    }
-    cursor.setDate(cursor.getDate() + 1);
+  if (t === "Ekadashi") {
+    out.push({ date, name: `${paksha} Ekadashi`, kind: "vrat",
+      significance: "Vishnu fast — grants liberation and removes karmic debt. Fast from grains." });
   }
-  // Dedupe by name+date
-  const seen = new Set<string>();
-  return out.filter(h => {
-    const k = `${h.name}|${h.date.toDateString()}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
+  if (t === "Trayodashi") {
+    out.push({ date, name: `${paksha} Pradosh Vrat`, kind: "vrat",
+      significance: "Shiva–Parvati worship at twilight; grants harmony and prosperity." });
+  }
+  if (t === "Chaturthi" && paksha === "Krishna") {
+    out.push({ date, name: "Sankashti Chaturthi", kind: "vrat",
+      significance: "Ganesha vrat — removes obstacles. Fast until moonrise." });
+  }
+  if (t === "Chaturthi" && paksha === "Shukla") {
+    out.push({ date, name: "Vinayaka Chaturthi", kind: "vrat",
+      significance: "Ganesha vrat for wisdom and success in new ventures." });
+  }
+  if (t === "Chaturdashi" && paksha === "Krishna") {
+    out.push({ date, name: "Masik Shivaratri", kind: "vrat",
+      significance: "Monthly Shiva night — meditation, japa, all-night vigil." });
+    // Maha Shivaratri: Krishna Chaturdashi of Phalguna month (Feb–Mar)
+    const m = date.getMonth();
+    if (m === 1 || m === 2) {
+      out.push({ date, name: "Maha Shivaratri", kind: "major",
+        significance: "The great night of Shiva — cosmic dance, ultimate spiritual awakening." });
+    }
+  }
+  if (t === "Ashtami" && paksha === "Krishna") {
+    out.push({ date, name: "Kalashtami", kind: "vrat",
+      significance: "Kaal Bhairav worship — protection from fear and enemies." });
+    if (date.getMonth() === 7 || date.getMonth() === 8) {
+      out.push({ date, name: "Krishna Janmashtami (possible)", kind: "major",
+        significance: "Birth of Lord Krishna — midnight fast and celebration." });
+    }
+  }
+  if (t === "Purnima") {
+    out.push({ date, name: "Purnima Vrat", kind: "purnima",
+      significance: "Full moon — Satyanarayan katha, charity, and lunar worship." });
+    const m = date.getMonth();
+    if (m === 6 || m === 7) out.push({ date, name: "Guru Purnima (window)", kind: "major",
+      significance: "Honour spiritual and worldly teachers." });
+    if (m === 8 || m === 9) out.push({ date, name: "Sharad Purnima (window)", kind: "major",
+      significance: "Moon's brightest night; Lakshmi worship." });
+    if (m === 2 || m === 3) out.push({ date, name: "Hanuman Jayanti (window)", kind: "major",
+      significance: "Birth of Hanuman — courage and devotion." });
+  }
+  if (t === "Amavasya") {
+    out.push({ date, name: "Amavasya", kind: "amavasya",
+      significance: "New moon — pitru tarpan (ancestor rites), meditation, silence." });
+    if (date.getMonth() === 9 || date.getMonth() === 10) {
+      out.push({ date, name: "Diwali Amavasya (window)", kind: "major",
+        significance: "Lakshmi Puja — festival of lights on Kartik Amavasya." });
+    }
+  }
+  if (t === "Navami" && paksha === "Shukla") {
+    if (date.getMonth() === 2 || date.getMonth() === 3) {
+      out.push({ date, name: "Ram Navami (window)", kind: "major",
+        significance: "Birth of Lord Rama — recitation of Ramayana." });
+    }
+    out.push({ date, name: "Durga Navami", kind: "auspicious",
+      significance: "Ninth form of Durga — culmination of Navratri devotion." });
+  }
+  // Nakshatra-linked
+  if (nak === "Pushya") {
+    out.push({ date, name: "Pushya Nakshatra", kind: "auspicious",
+      significance: "Most auspicious nakshatra — ideal for gold purchase and new ventures." });
+  }
+  if (nak === "Rohini" && paksha === "Krishna" && (date.getMonth() === 7 || date.getMonth() === 8)) {
+    out.push({ date, name: "Janmashtami (Rohini yoga)", kind: "major",
+      significance: "Krishna's birth star aligning with Krishna Ashtami — supreme yoga." });
+  }
+  return out;
+}
+
+export type FestivalScan = { days: { date: Date; panchang: Panchang; festivals: Festival[] }[] };
+
+export function scanFestivals(startISO: string, days: number, lat: number, lon: number): FestivalScan {
+  const [y, m, d] = startISO.split("-").map(Number);
+  const start = new Date(y, m - 1, d, 12, 0, 0);
+  const out: FestivalScan["days"] = [];
+  let prevSign = sunSiderealSign(new Date(start.getTime() - 86400000));
+  for (let i = 0; i < days; i++) {
+    const date = new Date(start.getTime() + i * 86400000);
+    const p = computePanchang({ date, latitude: lat, longitude: lon });
+    const fests = detectFromPanchang(p, date);
+    const sign = sunSiderealSign(date);
+    if (sign !== prevSign) {
+      const rashi = RASHIS[sign];
+      fests.push({
+        date, name: `${rashi} Sankranti`, kind: "sankranti",
+        significance: `Sun enters ${rashi}. ${sankrantiNote(sign)}`,
+      });
+    }
+    prevSign = sign;
+    out.push({ date, panchang: p, festivals: fests });
+  }
+  return { days: out };
+}
+
+function sankrantiNote(sign: number): string {
+  switch (sign) {
+    case 9: return "Makar Sankranti — Uttarayana begins; harvest festival across India.";
+    case 0: return "Mesha Sankranti — solar new year; Baisakhi window.";
+    case 3: return "Karka Sankranti — Dakshinayana begins; monsoon rites.";
+    case 6: return "Tula Sankranti — equinoctial transit; charity and ancestor rites.";
+    default: return "Auspicious sun-sign transit — snan (holy bath) and daan (charity) recommended.";
+  }
 }
