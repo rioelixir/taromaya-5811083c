@@ -194,10 +194,10 @@ function RootComponent() {
       {bgUrl && (
         <div
           aria-hidden
-          className="fixed inset-0 -z-10 bg-cover bg-center opacity-70"
+          className="fixed inset-0 -z-10 bg-cover bg-center opacity-50"
           style={{ backgroundImage: `url(${bgUrl})` }}
         >
-          <div className="absolute inset-0 bg-cosmic/70" />
+          <div className="absolute inset-0 bg-cosmic/50" />
         </div>
       )}
       <div className="relative min-h-dvh">
