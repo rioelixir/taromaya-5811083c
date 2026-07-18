@@ -3,6 +3,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Home, ChevronUp, ChevronDown } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 function PageNav({
   collapsed,
