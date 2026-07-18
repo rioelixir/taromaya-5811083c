@@ -5,6 +5,7 @@ import { BirthInputForm } from "@/components/birth-input-form";
 import { Card } from "@/components/ui/card";
 import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/rashi-chart";
 import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
+import { StrengthsPanel } from "@/components/strengths-panel";
 import { computePanchang, fmtTime } from "@/lib/panchang";
 
 export const Route = createFileRoute("/_authenticated/kundli/new")({
