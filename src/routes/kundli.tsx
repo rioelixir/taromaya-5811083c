@@ -1255,7 +1255,7 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
   pdf.text("Vimshottari Mahadasha", margin, y);
   y += 22;
 
-  const tree = computeVimshottari(chart, birthDate);
+  const tree = computeVimshottari(birthDate, chart.moonNakshatra.index, chart.planets.find(p => p.name === "Moon")!.longitude % (360/27));
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
   pdf.setTextColor(...MUTED);
@@ -1264,7 +1264,7 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
   y += 6;
   pdf.setDrawColor(80, 78, 70); pdf.line(margin, y, w - margin, y); y += 12;
   pdf.setTextColor(...TEXT);
-  tree.mahadashas.forEach((md) => {
+  tree.maha.forEach((md) => {
     if (y > h - 80) { pdf.addPage(); setBG(); drawHeader(); y = 90; }
     pdf.text(md.lord, mdCols[0], y);
     pdf.text(fmtDate(md.start), mdCols[1], y);
