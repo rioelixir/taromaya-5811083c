@@ -989,32 +989,26 @@ function KPTab({ chart }: { chart: KundliChart }) {
   const rows = useMemo(() => computeKP(chart, NAKSHATRAS, RASHIS), [chart]);
   return (
     <GlassCard title="KP Sub-lords" desc="Krishnamurti Paddhati: Nakshatra star lord → Sub-lord → Sub-sub for precise cuspal analysis.">
-      <div className="overflow-x-auto mt-3">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground">
-              <th className="py-2 pr-3"><KeyRound className="inline h-3 w-3 mr-1" />Point</th>
-              <th className="py-2 pr-3">Sign</th>
-              <th className="py-2 pr-3">Nakshatra</th>
-              <th className="py-2 pr-3">Star Lord</th>
-              <th className="py-2 pr-3">Sub Lord</th>
-              <th className="py-2 pr-3">Sub-Sub</th>
-            </tr>
-          </thead>
-          <tbody className="text-pearl/90">
-            {rows.map((r) => (
-              <tr key={r.who} className="border-t border-white/5">
-                <td className="py-2 pr-3 font-medium">{r.who}</td>
-                <td className="py-2 pr-3">{r.sign}</td>
-                <td className="py-2 pr-3">{r.nakshatra}</td>
-                <td className="py-2 pr-3 text-gold">{r.starLord}</td>
-                <td className="py-2 pr-3 text-gold">{r.subLord}</td>
-                <td className="py-2 pr-3 text-muted-foreground">{r.subSubLord}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {rows.map((r) => (
+          <div key={r.who} className="rounded-xl border border-white/10 bg-black/20 p-3">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 font-display text-sm text-pearl">
+                <KeyRound className="h-3 w-3 text-gold" />{r.who}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{r.sign} · {r.nakshatra}</span>
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[11px]">
+              <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 font-mono text-gold">{r.starLord}</span>
+              <span className="text-muted-foreground">→</span>
+              <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 font-mono text-gold">{r.subLord}</span>
+              <span className="text-muted-foreground">→</span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-muted-foreground">{r.subSubLord}</span>
+            </div>
+          </div>
+        ))}
       </div>
+
       <div className="mt-4 text-[11px] text-muted-foreground">
         In KP the sub-lord of a cusp or planet is the final significator — it decides whether the promise of the star lord fructifies.
       </div>
