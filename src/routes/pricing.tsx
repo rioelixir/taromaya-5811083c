@@ -58,6 +58,7 @@ function PricingPage() {
     loading: true,
     signedIn: false,
     isPremium: false,
+    isAdmin: false,
   });
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
@@ -72,19 +73,27 @@ function PricingPage() {
     async function loadSub() {
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
-        setSubState({ loading: false, signedIn: false, isPremium: false });
+        setSubState({ loading: false, signedIn: false, isPremium: false, isAdmin: false });
         return;
       }
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      const isAdmin = !!roleRow;
       try {
         const res = await getMySubscription();
         setSubState({
           loading: false,
           signedIn: true,
           isPremium: res.isPremium,
+          isAdmin,
           status: res.subscription?.status,
         });
       } catch {
-        setSubState({ loading: false, signedIn: true, isPremium: false });
+        setSubState({ loading: false, signedIn: true, isPremium: false, isAdmin });
       }
     }
     loadSub();
