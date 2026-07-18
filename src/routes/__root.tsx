@@ -79,25 +79,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0716" },
-      { title: "TAROMAYA — AI Tarot & Vedic Astrology" },
+      { title: "TAROMAYA — Your Cosmic Portal" },
       {
         name: "description",
         content:
-          "TAROMAYA is a premium AI-powered platform for tarot, Vedic astrology, kundli, panchang and numerology. Discover your cosmic path.",
+          "Enter the cosmic portal — tarot, Vedic astrology, kundli, panchang, numerology and an AI oracle in one luxury platform.",
       },
       { name: "author", content: "TAROMAYA" },
-      { property: "og:title", content: "TAROMAYA — AI Tarot & Vedic Astrology" },
+      { property: "og:title", content: "TAROMAYA — Your Cosmic Portal" },
       {
         property: "og:description",
         content:
-          "Luxury AI-powered tarot and Vedic astrology. Kundli, panchang, transits, numerology and a personal AI astrologer.",
+          "Enter the cosmic portal — tarot, Vedic astrology, kundli, panchang, numerology and an AI oracle in one luxury platform.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "TAROMAYA — Your Cosmic Portal" },
+      { name: "twitter:description", content: "Enter the cosmic portal — tarot, Vedic astrology, kundli, panchang, numerology and an AI oracle in one luxury platform." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49a8d0a9-dec0-4efa-a4a4-d5ad4537e6d9/id-preview-5df04fe0--6ceb9175-9072-438a-9f13-683eb0a04026.lovable.app-1784382658921.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49a8d0a9-dec0-4efa-a4a4-d5ad4537e6d9/id-preview-5df04fe0--6ceb9175-9072-438a-9f13-683eb0a04026.lovable.app-1784382658921.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
