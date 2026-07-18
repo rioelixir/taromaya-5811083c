@@ -285,10 +285,6 @@ function AuthFooter() {
 function SignInLabel() {
   const { t } = useT();
   return <>{t("Sign in")}</>;
-        </Link>
-      )}
-    </div>
-  );
 }
 
 const bottomNav = [
