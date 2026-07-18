@@ -110,7 +110,10 @@ function NewKundliPage() {
               </Card>
             )}
 
+            <StrengthsPanel chart={chart} />
+
             <VargaExplorer chart={chart} />
+
 
 
             {(() => {
