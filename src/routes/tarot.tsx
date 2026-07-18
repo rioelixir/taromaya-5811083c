@@ -123,8 +123,20 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks());
-  }, []);
+    setDecks(makeDeckStacks(courtOnly));
+  }, [courtOnly]);
+
+  // Rebuild the Rider-Waite stack whenever the Court-Only toggle changes.
+  useEffect(() => {
+    setDecks((prev) => ({
+      ...prev,
+      "rider-waite": shuffle(
+        courtOnly
+          ? DECKS["rider-waite"].filter(isCourtCard)
+          : DECKS["rider-waite"],
+      ),
+    }));
+  }, [courtOnly]);
 
   useEffect(() => {
     setPlaced([]);
