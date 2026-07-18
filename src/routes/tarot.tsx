@@ -372,15 +372,14 @@ function TarotPage() {
 
 
 
-      {/* Canvas */}
-      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 pt-6 pb-40">
+      {/* Canvas — fills remaining viewport */}
+      <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
         <div
           ref={canvasRef}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          className="relative rounded-3xl border border-white/10 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
-          style={{ height: "min(72vh, 720px)" }}
+          className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
         >
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
