@@ -53,6 +53,7 @@ export function PageShell({
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
       <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-16 lg:pt-12 pb-16">
+        <PageNav />
         <header className="mb-6 sm:mb-8">
           {eyebrow && (
             <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] text-muted-foreground">
