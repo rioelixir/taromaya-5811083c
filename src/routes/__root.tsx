@@ -205,6 +205,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AutoTranslator />
+
       {bgUrl && (
         <div
           aria-hidden
