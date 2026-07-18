@@ -20,6 +20,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RemediesRouteImport } from './routes/remedies'
+import { Route as RectificationRouteImport } from './routes/rectification'
 import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -100,6 +101,11 @@ const ReportsRoute = ReportsRouteImport.update({
 const RemediesRoute = RemediesRouteImport.update({
   id: '/remedies',
   path: '/remedies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RectificationRoute = RectificationRouteImport.update({
+  id: '/rectification',
+  path: '/rectification',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressionsRoute = ProgressionsRouteImport.update({
@@ -250,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
+  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
@@ -368,6 +377,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/profile'
     | '/progressions'
+    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/settings'
@@ -406,6 +416,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/profile'
     | '/progressions'
+    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/settings'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/profile'
     | '/progressions'
+    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/settings'
@@ -485,6 +497,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ProgressionsRoute: typeof ProgressionsRoute
+  RectificationRoute: typeof RectificationRoute
   RemediesRoute: typeof RemediesRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/remedies'
       fullPath: '/remedies'
       preLoaderRoute: typeof RemediesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rectification': {
+      id: '/rectification'
+      path: '/rectification'
+      fullPath: '/rectification'
+      preLoaderRoute: typeof RectificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progressions': {
@@ -804,6 +824,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ProgressionsRoute: ProgressionsRoute,
+  RectificationRoute: RectificationRoute,
   RemediesRoute: RemediesRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
