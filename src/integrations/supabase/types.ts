@@ -244,6 +244,93 @@ export type Database = {
         }
         Relationships: []
       }
+      sky_alert_dispatch: {
+        Row: {
+          channel: string
+          created_at: string
+          event_key: string
+          event_time: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          event_key: string
+          event_time: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          event_key?: string
+          event_time?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sky_alert_preferences: {
+        Row: {
+          alert_full_moon: boolean
+          alert_ingress: boolean
+          alert_new_moon: boolean
+          alert_retrograde: boolean
+          channel: string
+          created_at: string
+          email: string | null
+          enabled: boolean
+          ingress_planets: string[]
+          latitude: number | null
+          lead_hours: number
+          longitude: number | null
+          place: string | null
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_full_moon?: boolean
+          alert_ingress?: boolean
+          alert_new_moon?: boolean
+          alert_retrograde?: boolean
+          channel?: string
+          created_at?: string
+          email?: string | null
+          enabled?: boolean
+          ingress_planets?: string[]
+          latitude?: number | null
+          lead_hours?: number
+          longitude?: number | null
+          place?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_full_moon?: boolean
+          alert_ingress?: boolean
+          alert_new_moon?: boolean
+          alert_retrograde?: boolean
+          channel?: string
+          created_at?: string
+          email?: string | null
+          enabled?: boolean
+          ingress_planets?: string[]
+          latitude?: number | null
+          lead_hours?: number
+          longitude?: number | null
+          place?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           billing_period: string

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Moon, RotateCcw, Sparkles, ArrowRightLeft } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Moon, RotateCcw, Sparkles, ArrowRightLeft, MapPin } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { liveSkySnapshot, signName } from "@/lib/live-sky";
 import { PLANET_GLYPHS, RASHIS, type PlanetName } from "@/lib/vedic";
+import { SkyAlertPrefs, type SkyLocation } from "@/components/sky-alert-prefs";
 
 export const Route = createFileRoute("/sky")({
   component: SkyPage,
@@ -25,20 +26,46 @@ const PLANET_COLOR: Record<PlanetName, string> = {
 
 function SkyPage() {
   const [tick, setTick] = useState(0);
+  const [loc, setLoc] = useState<SkyLocation>(() => {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("taromaya:sky-loc") : null;
+    if (raw) { try { return JSON.parse(raw); } catch { /* ignore */ } }
+    return {
+      timezone: (typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC",
+      latitude: null, longitude: null, place: null,
+    };
+  });
+  const onLocationChange = useCallback((next: SkyLocation) => {
+    setLoc(next);
+    try { localStorage.setItem("taromaya:sky-loc", JSON.stringify(next)); } catch { /* ignore */ }
+  }, []);
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 30_000);
     return () => clearInterval(id);
   }, []);
   const snap = useMemo(() => liveSkySnapshot(new Date()), [tick]);
   const now = snap.now;
+  const tz = loc.timezone || "UTC";
+
+  const locLabel = loc.place ? loc.place : (loc.latitude != null && loc.longitude != null
+    ? `${loc.latitude.toFixed(2)}°, ${loc.longitude.toFixed(2)}°`
+    : "Set your location");
 
   return (
     <PageShell
       eyebrow="Live Sky"
       title="The Heavens, Right Now"
-      subtitle={`${now.toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · updates every 30 seconds`}
+      subtitle={`${fmtLocal(now, tz, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" })} · updates every 30 seconds`}
     >
       <div className="flex w-full flex-col gap-6">
+
+        <div className="glass rounded-3xl px-5 py-3 flex items-center justify-between flex-wrap gap-2 text-sm">
+          <div className="flex items-center gap-2 text-pearl">
+            <MapPin className="h-4 w-4 text-gold" />
+            <span className="font-display">{locLabel}</span>
+            <span className="text-muted-foreground text-xs">· {tz}</span>
+          </div>
+          <a href="#sky-prefs" className="text-xs text-gold hover:underline">Personalize ↓</a>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="glass rounded-3xl p-4 sm:p-8">
@@ -46,13 +73,17 @@ function SkyPage() {
           </section>
 
           <aside className="flex flex-col gap-4">
-            <MoonCard moon={snap.moon} />
-            <RetroCard retros={snap.retros} />
+            <MoonCard moon={snap.moon} tz={tz} />
+            <RetroCard retros={snap.retros} tz={tz} />
           </aside>
         </div>
 
-        <IngressList ingresses={snap.ingresses} />
+        <IngressList ingresses={snap.ingresses} tz={tz} />
         <PlanetTable snap={snap} />
+
+        <div id="sky-prefs">
+          <SkyAlertPrefs onLocationChange={onLocationChange} />
+        </div>
       </div>
     </PageShell>
   );
@@ -170,7 +201,7 @@ function deconflict(lons: number[]): number[] {
   return out;
 }
 
-function MoonCard({ moon }: { moon: ReturnType<typeof liveSkySnapshot>["moon"] }) {
+function MoonCard({ moon, tz }: { moon: ReturnType<typeof liveSkySnapshot>["moon"]; tz: string }) {
   const pct = Math.round(moon.illumination * 100);
   return (
     <div className="glass rounded-3xl p-5">
@@ -185,8 +216,8 @@ function MoonCard({ moon }: { moon: ReturnType<typeof liveSkySnapshot>["moon"] }
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2 text-[11px]">
-        <Cell label="Next New" value={fmtDate(moon.nextNew)} />
-        <Cell label="Next Full" value={fmtDate(moon.nextFull)} />
+        <Cell label="Next New" value={fmtDateTz(moon.nextNew, tz)} />
+        <Cell label="Next Full" value={fmtDateTz(moon.nextFull, tz)} />
       </div>
     </div>
   );
@@ -220,7 +251,7 @@ function MoonSVG({ angle }: { angle: number }) {
   );
 }
 
-function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["retros"] }) {
+function RetroCard({ retros, tz }: { retros: ReturnType<typeof liveSkySnapshot>["retros"]; tz: string }) {
   const active = retros.filter((r) => r.retrograde);
   return (
     <div className="glass rounded-3xl p-5">
@@ -239,7 +270,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
                 <span className="text-gold text-lg">{PLANET_GLYPHS[r.planet]}</span> {r.planet} ℞
               </span>
               <span className="text-xs text-muted-foreground">
-                turns direct {r.nextStation ? fmtDate(r.nextStation) : "—"}
+                turns direct {r.nextStation ? fmtDateTz(r.nextStation, tz) : "—"}
               </span>
             </li>
           ))}
@@ -249,7 +280,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
         {retros.filter((r) => !r.retrograde).map((r) => (
           <div key={r.planet} className="flex items-center justify-between text-[11px] text-muted-foreground">
             <span>{PLANET_GLYPHS[r.planet]} {r.planet} direct</span>
-            <span>next ℞ {r.nextStation ? fmtDate(r.nextStation) : "—"}</span>
+            <span>next ℞ {r.nextStation ? fmtDateTz(r.nextStation, tz) : "—"}</span>
           </div>
         ))}
       </div>
@@ -257,7 +288,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
   );
 }
 
-function IngressList({ ingresses }: { ingresses: ReturnType<typeof liveSkySnapshot>["ingresses"] }) {
+function IngressList({ ingresses, tz }: { ingresses: ReturnType<typeof liveSkySnapshot>["ingresses"]; tz: string }) {
   return (
     <section className="glass rounded-3xl p-6">
       <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
@@ -276,7 +307,7 @@ function IngressList({ ingresses }: { ingresses: ReturnType<typeof liveSkySnapsh
               </div>
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              {ing.when.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+              {fmtLocal(ing.when, tz, { month: "long", day: "numeric", year: "numeric" })}
             </div>
           </div>
         ))}
@@ -335,6 +366,12 @@ function Cell({ label, value }: { label: string; value: string }) {
   );
 }
 
-function fmtDate(d: Date) {
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+function fmtDateTz(d: Date, tz: string) {
+  return fmtLocal(d, tz, { month: "short", day: "numeric" });
+}
+
+function fmtLocal(d: Date, tz: string, opts: Intl.DateTimeFormatOptions) {
+  try { return d.toLocaleString(undefined, { ...opts, timeZone: tz }); }
+  catch { return d.toLocaleString(undefined, opts); }
 }

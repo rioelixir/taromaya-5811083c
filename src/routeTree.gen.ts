@@ -42,6 +42,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
 
 const VarshphalRoute = VarshphalRouteImport.update({
   id: '/varshphal',
@@ -207,6 +208,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksSkyAlertsRoute = ApiPublicHooksSkyAlertsRouteImport.update({
+  id: '/api/public/hooks/sky-alerts',
+  path: '/api/public/hooks/sky-alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -311,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/saved'
     | '/api/chat'
+    | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/saved'
     | '/api/chat'
+    | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
     | '/'
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/_authenticated/meditation'
     | '/_authenticated/saved'
     | '/api/chat'
+    | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -448,6 +460,7 @@ export interface RootRouteChildren {
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -683,6 +696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/sky-alerts': {
+      id: '/api/public/hooks/sky-alerts'
+      path: '/api/public/hooks/sky-alerts'
+      fullPath: '/api/public/hooks/sky-alerts'
+      preLoaderRoute: typeof ApiPublicHooksSkyAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -733,6 +753,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
