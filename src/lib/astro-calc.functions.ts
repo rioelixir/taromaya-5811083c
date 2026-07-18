@@ -71,7 +71,7 @@ export const calculateAstroChart = createServerFn({ method: "POST" })
         chart_id: data.savedChartId ?? null,
         config_hash: hash,
         engine_version: `${provider.version}::${cacheKey}`,
-        payload: chart as unknown as Record<string, unknown>,
+        payload: JSON.parse(JSON.stringify(chart)),
       },
       { onConflict: "user_id,chart_id,engine_version,config_hash", ignoreDuplicates: true },
     );
