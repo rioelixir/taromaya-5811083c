@@ -3,10 +3,14 @@
 // classical Vedic auspiciousness criteria for a chosen activity.
 
 import { computePanchang, type Panchang } from "./panchang";
+import { computeHoras, type HoraLord } from "./hora";
+import { NAKSHATRAS, RASHIS } from "./vedic";
+import { scoreElectional, type BirthContext } from "./electional";
 
 export type Activity =
   | "marriage" | "griha-pravesh" | "vehicle" | "business"
   | "travel" | "surgery" | "namkaran" | "signing";
+
 
 export const ACTIVITIES: { key: Activity; label: string; desc: string }[] = [
   { key: "marriage",     label: "Marriage",         desc: "Vivaha muhurat — union, engagement, wedding." },
