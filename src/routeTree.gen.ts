@@ -25,6 +25,7 @@ import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PanchangRouteImport } from './routes/panchang'
+import { Route as ObservatoryRouteImport } from './routes/observatory'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as LearnRouteImport } from './routes/learn'
@@ -127,6 +128,11 @@ const PricingRoute = PricingRouteImport.update({
 const PanchangRoute = PanchangRouteImport.update({
   id: '/panchang',
   path: '/panchang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObservatoryRoute = ObservatoryRouteImport.update({
+  id: '/observatory',
+  path: '/observatory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NumerologyRoute = NumerologyRouteImport.update({
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
+  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
+  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/learn': typeof LearnRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
+  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -383,6 +392,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/muhurat'
     | '/numerology'
+    | '/observatory'
     | '/panchang'
     | '/pricing'
     | '/profile'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/muhurat'
     | '/numerology'
+    | '/observatory'
     | '/panchang'
     | '/pricing'
     | '/profile'
@@ -464,6 +475,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/muhurat'
     | '/numerology'
+    | '/observatory'
     | '/panchang'
     | '/pricing'
     | '/profile'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   LearnRoute: typeof LearnRoute
   MuhuratRoute: typeof MuhuratRoute
   NumerologyRoute: typeof NumerologyRoute
+  ObservatoryRoute: typeof ObservatoryRoute
   PanchangRoute: typeof PanchangRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
@@ -638,6 +651,13 @@ declare module '@tanstack/react-router' {
       path: '/panchang'
       fullPath: '/panchang'
       preLoaderRoute: typeof PanchangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/observatory': {
+      id: '/observatory'
+      path: '/observatory'
+      fullPath: '/observatory'
+      preLoaderRoute: typeof ObservatoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/numerology': {
@@ -841,6 +861,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnRoute: LearnRoute,
   MuhuratRoute: MuhuratRoute,
   NumerologyRoute: NumerologyRoute,
+  ObservatoryRoute: ObservatoryRoute,
   PanchangRoute: PanchangRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
@@ -863,13 +884,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
