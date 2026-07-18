@@ -46,8 +46,8 @@ function ProfilePage() {
       const [{ data: profile }, { data: role }, { data: sub }, { data: birth }] = await Promise.all([
         supabase.from("profiles").select("email, display_name, avatar_url").eq("id", user.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
-        supabase.from("user_subscriptions").select("status, plan, expires_at").eq("user_id", user.id).maybeSingle(),
-        supabase.from("user_birth_profile").select("full_name, birth_date, birth_time, birth_place, latitude, longitude").eq("user_id", user.id).maybeSingle(),
+        supabase.from("user_subscriptions").select("status, plan_id, expires_at").eq("user_id", user.id).maybeSingle(),
+        supabase.from("user_birth_profile").select("full_name, birth_date, birth_time, place, latitude, longitude").eq("user_id", user.id).maybeSingle(),
       ]);
       if (!mounted) return;
       setData({
@@ -55,12 +55,12 @@ function ProfilePage() {
         displayName: profile?.display_name ?? user.user_metadata?.full_name ?? null,
         avatarUrl: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
         isAdmin: !!role,
-        subscription: sub ? { status: sub.status, plan: sub.plan, expiresAt: sub.expires_at } : null,
+        subscription: sub ? { status: sub.status, plan: sub.plan_id, expiresAt: sub.expires_at } : null,
         birth: birth ? {
           fullName: birth.full_name,
           date: birth.birth_date,
           time: birth.birth_time,
-          place: birth.birth_place,
+          place: birth.place,
           latitude: birth.latitude,
           longitude: birth.longitude,
         } : null,
