@@ -296,18 +296,17 @@ function TarotPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh w-full flex-col">
+    <div className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
       <StarField />
 
       {/* Top control bar */}
-      <div className="relative z-20 w-full px-4 sm:px-6 pt-6">
-        <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Pick a deck. Pull a card.</h1>
-        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-          Five decks sit in the bottom right corner. Choose one, drag a card onto the board, and get a clear, kind reading.
-        </p>
+      <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
+          <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+        </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
             const active = k === spreadKey;
             return (
@@ -337,7 +336,7 @@ function TarotPage() {
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2 items-center">
+        <div className="mt-2 flex flex-wrap gap-2 items-center">
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
@@ -368,25 +367,19 @@ function TarotPage() {
           </button>
         </div>
 
-        <div className="mt-2 text-xs text-muted-foreground">
-          {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you like.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} onto the board.`}
-        </div>
       </div>
 
 
 
 
-      {/* Canvas */}
-      <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 pt-6 pb-40">
+      {/* Canvas — fills remaining viewport */}
+      <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
         <div
           ref={canvasRef}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          className="relative rounded-3xl border border-white/10 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
-          style={{ height: "min(72vh, 720px)" }}
+          className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
         >
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
@@ -479,28 +472,34 @@ function TarotPage() {
           </div>
         </div>
 
-        {/* Reading */}
-
+        {/* Reading — floating overlay */}
         {(reading || error || loadingReading) && (
-          <div className="mt-6 glass rounded-3xl p-6">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
-              <Sparkles className="h-3.5 w-3.5" /> AI Reading
+          <div className="pointer-events-none absolute left-3 right-3 sm:left-6 sm:right-auto sm:max-w-md top-[7.5rem] z-30">
+            <div className="pointer-events-auto glass rounded-2xl p-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] max-h-[60vh] overflow-y-auto">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
+                  <Sparkles className="h-3.5 w-3.5" /> AI Reading
+                </div>
+                <button
+                  onClick={() => { setReading(null); setError(null); }}
+                  className="text-muted-foreground hover:text-pearl"
+                  aria-label="Close reading"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {loadingReading && !reading && (
+                <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
+                </div>
+              )}
+              {error && (
+                <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-200">
+                  {error}
+                </div>
+              )}
+              {reading && <div className="mt-3"><ReadingMarkdown text={reading} /></div>}
             </div>
-            {loadingReading && !reading && (
-              <div className="mt-4 flex items-center gap-3 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
-              </div>
-            )}
-            {error && (
-              <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-200">
-                {error}
-              </div>
-            )}
-            {reading && (
-              <div className="mt-4">
-                <ReadingMarkdown text={reading} />
-              </div>
-            )}
           </div>
         )}
       </div>
