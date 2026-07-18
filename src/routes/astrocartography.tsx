@@ -62,8 +62,27 @@ function AcgPage() {
   );
   const [enabledKinds, setEnabledKinds] = useState<Set<AcgLineKind>>(new Set(KINDS));
   const [pin, setPin] = useState<{ lat: number; lon: number; name?: string } | null>(null);
+  const [intent, setIntent] = useState<Intention>("love");
+  const [showParans, setShowParans] = useState(true);
+  const [showLocalSpace, setShowLocalSpace] = useState(false);
 
   const result: AcgResult = useMemo(() => computeAstrocartography(birth), [birth]);
+  const parans = useMemo(
+    () =>
+      computeParans(result).filter(
+        (p) =>
+          enabledPlanets.has(p.a.planet) &&
+          enabledPlanets.has(p.b.planet) &&
+          enabledKinds.has(p.a.kind) &&
+          enabledKinds.has(p.b.kind),
+      ),
+    [result, enabledPlanets, enabledKinds],
+  );
+  const localSpace = useMemo(
+    () => (pin && showLocalSpace ? computeLocalSpace(birth, { lat: pin.lat, lon: pin.lon }) : []),
+    [birth, pin, showLocalSpace],
+  );
+  const bestCities = useMemo(() => recommendCities(result, ACG_CITIES, intent, 5), [result, intent]);
 
   const influences = useMemo(() => {
     if (!pin) return [];
@@ -71,6 +90,7 @@ function AcgPage() {
       (h) => enabledPlanets.has(h.planet) && enabledKinds.has(h.kind),
     );
   }, [pin, result, enabledPlanets, enabledKinds]);
+
 
   const togglePlanet = (p: PlanetName) => {
     setEnabledPlanets((s) => { const n = new Set(s); n.has(p) ? n.delete(p) : n.add(p); return n; });
