@@ -147,10 +147,11 @@ function AuthPage() {
     <div className="relative min-h-dvh grid place-items-center px-4 py-16 overflow-hidden">
       <StarField />
       <div className="relative z-10 w-full max-w-md">
-        <Link to="/auth" className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex flex-col items-center mb-8">
           <AuthLogo />
-          <div className="font-display text-2xl tracking-widest gold-text">TAROMAYA</div>
-        </Link>
+          <div className="font-display text-2xl sm:text-3xl tracking-[0.35em] gold-text">TAROMAYA</div>
+          <div className="mt-1 text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Cosmic Intelligence</div>
+        </div>
 
         <div className="glass rounded-3xl p-8">
           <h1 className="font-display text-3xl gold-text text-center">
