@@ -14,6 +14,7 @@ import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as SynastryRouteImport } from './routes/synastry'
+import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
@@ -64,6 +65,11 @@ const TarotRoute = TarotRouteImport.update({
 const SynastryRoute = SynastryRouteImport.update({
   id: '/synastry',
   path: '/synastry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkyRoute = SkyRouteImport.update({
+  id: '/sky',
+  path: '/sky',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sky': typeof SkyRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sky': typeof SkyRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sky': typeof SkyRoute
   '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/sky'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/sky'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/sitemap.xml'
+    | '/sky'
     | '/synastry'
     | '/tarot'
     | '/terms'
@@ -417,6 +429,7 @@ export interface RootRouteChildren {
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SkyRoute: typeof SkyRoute
   SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
   TermsRoute: typeof TermsRoute
@@ -460,6 +473,13 @@ declare module '@tanstack/react-router' {
       path: '/synastry'
       fullPath: '/synastry'
       preLoaderRoute: typeof SynastryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sky': {
+      id: '/sky'
+      path: '/sky'
+      fullPath: '/sky'
+      preLoaderRoute: typeof SkyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -685,6 +705,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SkyRoute: SkyRoute,
   SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
   TermsRoute: TermsRoute,
