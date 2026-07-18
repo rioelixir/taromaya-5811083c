@@ -9,9 +9,10 @@ import {
   type KundliChart, type PlanetName,
 } from "@/lib/vedic";
 import {
-  computeVarga, computeVimshottari, detectYogas, detectDoshas,
+  computeVarga, computeVimshottari, computeAshtottari, computeYogini,
+  detectYogas, detectDoshas,
   VARGA_LABELS, VARGA_ORDER, fmtDate,
-  type VargaCode,
+  type VargaCode, type DashaTree,
 } from "@/lib/vedic-extended";
 import {
   computeAshtakavarga, computeShadbala, computeKP,
