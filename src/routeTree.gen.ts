@@ -35,6 +35,7 @@ import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
+import { Route as AstrocartographyRouteImport } from './routes/astrocartography'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -178,6 +179,11 @@ const AstrologyRoute = AstrologyRouteImport.update({
   path: '/astrology',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AstrocartographyRoute = AstrocartographyRouteImport.update({
+  id: '/astrocartography',
+  path: '/astrocartography',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiRoute = AiRouteImport.update({
   id: '/ai',
   path: '/ai',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
+  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
+  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
+  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-terms'
     | '/ai'
+    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/bookmarks'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-terms'
     | '/ai'
+    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/bookmarks'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/accept-terms'
     | '/ai'
+    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/bookmarks'
@@ -483,6 +495,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcceptTermsRoute: typeof AcceptTermsRoute
   AiRoute: typeof AiRoute
+  AstrocartographyRoute: typeof AstrocartographyRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
   BookmarksRoute: typeof BookmarksRoute
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AstrologyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/astrocartography': {
+      id: '/astrocartography'
+      path: '/astrocartography'
+      fullPath: '/astrocartography'
+      preLoaderRoute: typeof AstrocartographyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai': {
       id: '/ai'
       path: '/ai'
@@ -810,6 +830,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcceptTermsRoute: AcceptTermsRoute,
   AiRoute: AiRoute,
+  AstrocartographyRoute: AstrocartographyRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
   BookmarksRoute: BookmarksRoute,
