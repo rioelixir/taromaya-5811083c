@@ -36,6 +36,7 @@ import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as FestivalsRouteImport } from './routes/festivals'
 import { Route as DreamsRouteImport } from './routes/dreams'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
@@ -191,6 +192,11 @@ const HistoryRoute = HistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FestivalsRoute = FestivalsRouteImport.update({
+  id: '/festivals',
+  path: '/festivals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DreamsRoute = DreamsRouteImport.update({
   id: '/dreams',
   path: '/dreams',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
+  '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
@@ -344,6 +351,7 @@ export interface FileRoutesByTo {
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
+  '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
@@ -393,6 +401,7 @@ export interface FileRoutesById {
   '/bookmarks': typeof BookmarksRoute
   '/compatibility': typeof CompatibilityRoute
   '/dreams': typeof DreamsRoute
+  '/festivals': typeof FestivalsRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
+    | '/festivals'
     | '/history'
     | '/horoscope'
     | '/kundli'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
+    | '/festivals'
     | '/history'
     | '/horoscope'
     | '/kundli'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/compatibility'
     | '/dreams'
+    | '/festivals'
     | '/history'
     | '/horoscope'
     | '/kundli'
@@ -586,6 +598,7 @@ export interface RootRouteChildren {
   BookmarksRoute: typeof BookmarksRoute
   CompatibilityRoute: typeof CompatibilityRoute
   DreamsRoute: typeof DreamsRoute
+  FestivalsRoute: typeof FestivalsRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
   KundliRoute: typeof KundliRoute
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/festivals': {
+      id: '/festivals'
+      path: '/festivals'
+      fullPath: '/festivals'
+      preLoaderRoute: typeof FestivalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dreams': {
       id: '/dreams'
       path: '/dreams'
@@ -977,6 +997,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookmarksRoute: BookmarksRoute,
   CompatibilityRoute: CompatibilityRoute,
   DreamsRoute: DreamsRoute,
+  FestivalsRoute: FestivalsRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
   KundliRoute: KundliRoute,
