@@ -522,16 +522,14 @@ function TarotPage() {
         )}
       </div>
 
-      {/* Fullscreen zoom overlay */}
+      {/* Fullscreen zoom overlay — image only, no text */}
       {zoomedUid && (() => {
         const zc = placed.find((p) => p.uid === zoomedUid);
         if (!zc) return null;
-        const d = getCardDetails(zc.card);
-        const court = isCourtCard(zc.card);
         return (
           <div
             onClick={() => setZoomedUid(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
           >
             <button
               onClick={(e) => { e.stopPropagation(); setZoomedUid(null); }}
@@ -542,84 +540,20 @@ function TarotPage() {
             </button>
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative my-6 rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_120px_-20px_var(--gold)] p-6 sm:p-8 grid gap-6 md:grid-cols-[220px_1fr]"
-              style={{ width: "min(94vw, 780px)" }}
+              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
+              style={{
+                width: "min(92vw, calc(92dvh * 0.66))",
+                height: "min(92dvh, calc(92vw * 1.5))",
+                transform: zc.reversed ? "rotate(180deg)" : undefined,
+              }}
             >
-              {/* Card face */}
-              <div className="flex flex-col items-center">
-                <div
-                  className="relative rounded-2xl border border-gold/50 bg-gradient-to-b from-cosmic to-black p-4 flex flex-col items-center"
-                  style={{
-                    width: 200,
-                    height: 300,
-                    transform: zc.reversed ? "rotate(180deg)" : undefined,
-                  }}
-                >
-                  <div className="text-[9px] uppercase tracking-[0.35em] text-gold/70">
-                    {zc.card.arcana === "major" ? "Major Arcana" : zc.card.suit}
-                  </div>
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className="text-[6rem] leading-none">{glyphFor(zc.card)}</div>
-                  </div>
-                  <div className="font-display text-lg gold-text text-center leading-tight">
-                    {zc.card.name}
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
-                  {court && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
-                      <Crown className="h-3 w-3" /> Court
-                    </span>
-                  )}
-                  {zc.reversed && (
-                    <span className="rounded-full bg-black/60 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold/80">
-                      Reversed
-                    </span>
-                  )}
-                  {d.element && (
-                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
-                      {d.element}
-                    </span>
-                  )}
-                  {d.astrology && (
-                    <span className="rounded-full bg-white/[0.04] border border-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-pearl/80">
-                      {d.astrology}
-                    </span>
-                  )}
-                  {d.yesNo && (
-                    <span className="rounded-full bg-gold/10 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
-                      {d.yesNo}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Details */}
-              <div className="text-pearl/90 text-sm leading-relaxed space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                <div>
-                  <div className="font-display text-2xl gold-text">{zc.card.name}</div>
-                  <div className="mt-1 text-xs text-pearl/70 italic">{d.headline}</div>
-                </div>
-                <DetailBlock label={zc.reversed ? "Reversed meaning" : "Upright meaning"}>
-                  {zc.reversed ? d.reversed : d.upright}
-                </DetailBlock>
-                <DetailBlock label={zc.reversed ? "Upright meaning" : "Reversed meaning"} muted>
-                  {zc.reversed ? d.upright : d.reversed}
-                </DetailBlock>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <DetailBlock label="Love">{d.love}</DetailBlock>
-                  <DetailBlock label="Career">{d.career}</DetailBlock>
-                  <DetailBlock label="Spiritual">{d.spiritual}</DetailBlock>
-                </div>
-                <DetailBlock label="Keywords" muted>
-                  {(zc.reversed ? zc.card.keywordsReversed : zc.card.keywords).join(" · ")}
-                </DetailBlock>
-              </div>
+              <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
             </div>
           </div>
         );
       })()}
     </div>
+
   );
 }
 
