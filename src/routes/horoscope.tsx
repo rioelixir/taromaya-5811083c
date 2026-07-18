@@ -238,3 +238,48 @@ function ChineseZodiacGrid({ onSelect }: { onSelect: (year: number) => void }) {
     </div>
   );
 }
+
+function CosmicRibbon({ today, onPickSign }: { today: Date; onPickSign: (sign: string) => void }) {
+  const cotd = useMemo(() => tarotCardOfTheDay(today), [today]);
+  const moon = useMemo(() => moonPhaseInfo(today), [today]);
+  const sunS = useMemo(() => sunSign(today), [today]);
+  const moonS = useMemo(() => moonSign(today), [today]);
+
+  return (
+    <div className="mb-6 grid gap-3 sm:grid-cols-3">
+      <button
+        onClick={() => onPickSign(sunS)}
+        className="glass rounded-2xl p-5 text-left hover:bg-white/[0.06] transition-colors"
+      >
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Card of the day</div>
+        <div className="mt-1 font-display text-xl text-pearl">
+          {cotd.card.name}{cotd.reversed && <span className="text-gold text-sm"> ⤵</span>}
+        </div>
+        <div className="mt-2 text-xs text-muted-foreground">{cardGuidance(cotd.card, cotd.reversed)}</div>
+      </button>
+
+      <div className="glass rounded-2xl p-5">
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Moon phase</div>
+        <div className="mt-1 font-display text-xl text-pearl flex items-center gap-2">
+          <span className="text-2xl">{moon.emoji}</span> {moon.name}
+        </div>
+        <div className="mt-2 h-1 rounded-full bg-white/5 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${Math.round(moon.illumination * 100)}%` }} />
+        </div>
+        <div className="mt-2 text-[10px] text-muted-foreground">
+          {Math.round(moon.illumination * 100)}% illuminated · {moon.waxing ? "waxing" : "waning"}
+        </div>
+      </div>
+
+      <button
+        onClick={() => onPickSign(sunS)}
+        className="glass rounded-2xl p-5 text-left hover:bg-white/[0.06] transition-colors"
+      >
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sky right now</div>
+        <div className="mt-1 font-display text-xl text-pearl">Sun in {sunS}</div>
+        <div className="mt-1 text-xs text-muted-foreground">Moon in {moonS}</div>
+        <div className="mt-2 text-[10px] gold-text">Tap for today's reading →</div>
+      </button>
+    </div>
+  );
+}
