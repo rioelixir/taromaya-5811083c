@@ -78,6 +78,7 @@ function TarotPage() {
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [zoomedUid, setZoomedUid] = useState<string | null>(null);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
