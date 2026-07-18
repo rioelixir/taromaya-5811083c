@@ -301,11 +301,10 @@ function TarotPage() {
 
       {/* Top control bar */}
       <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
-        <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Pick a deck. Pull a card.</h1>
-        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-          Five decks sit in the bottom right corner. Choose one, drag a card onto the board, and get a clear, kind reading.
-        </p>
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
+          <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+        </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
