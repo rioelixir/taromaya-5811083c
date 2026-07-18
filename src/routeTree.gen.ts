@@ -39,6 +39,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
+import { Route as AuthenticatedPrashnaRouteImport } from './routes/_authenticated/prashna'
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -194,6 +195,11 @@ const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPrashnaRoute = AuthenticatedPrashnaRouteImport.update({
+  id: '/prashna',
+  path: '/prashna',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMeditationRoute = AuthenticatedMeditationRouteImport.update({
   id: '/meditation',
   path: '/meditation',
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
+  '/prashna': typeof AuthenticatedPrashnaRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
+  '/prashna': typeof AuthenticatedPrashnaRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
+  '/_authenticated/prashna': typeof AuthenticatedPrashnaRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/journal'
     | '/meditation'
+    | '/prashna'
     | '/saved'
     | '/api/chat'
     | '/kundli/new'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/journal'
     | '/meditation'
+    | '/prashna'
     | '/saved'
     | '/api/chat'
     | '/kundli/new'
@@ -436,6 +447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/journal'
     | '/_authenticated/meditation'
+    | '/_authenticated/prashna'
     | '/_authenticated/saved'
     | '/api/chat'
     | '/_authenticated/kundli/new'
@@ -687,6 +699,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/prashna': {
+      id: '/_authenticated/prashna'
+      path: '/prashna'
+      fullPath: '/prashna'
+      preLoaderRoute: typeof AuthenticatedPrashnaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/meditation': {
       id: '/_authenticated/meditation'
       path: '/meditation'
@@ -729,6 +748,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
+  AuthenticatedPrashnaRoute: typeof AuthenticatedPrashnaRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedKundliNewRoute: typeof AuthenticatedKundliNewRoute
 }
@@ -737,6 +757,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
+  AuthenticatedPrashnaRoute: AuthenticatedPrashnaRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedKundliNewRoute: AuthenticatedKundliNewRoute,
 }
