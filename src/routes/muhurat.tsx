@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { ACTIVITIES, scanMuhurats, type Activity, type MuhuratWindow } from "@/lib/muhurat";
 import { NAKSHATRAS, RASHIS } from "@/lib/vedic";
 import { Sparkles, CalendarClock, AlertTriangle, CheckCircle2, MapPin, Crown, Star, Sun, Moon } from "lucide-react";
+import { MuhuratDeepPanel } from "@/components/muhurat-deep-panel";
 
 export const Route = createFileRoute("/muhurat")({
   component: () => (<PremiumGate featureName="Muhurat"><MuhuratPage /></PremiumGate>),
@@ -167,6 +168,10 @@ function MuhuratPage() {
           </div>
         </GlassCard>
       </div>
+      <div className="mt-8">
+        <MuhuratDeepPanel date={startDate} lat={Number(lat) || 0} lon={Number(lon) || 0} />
+      </div>
+
 
       {grouped.length > 0 && (
         <div className="mt-8 space-y-6">
