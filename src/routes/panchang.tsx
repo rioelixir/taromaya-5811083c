@@ -39,6 +39,28 @@ function PanchangPage() {
     return todaysFestivals(p, new Date(y, m - 1, d));
   }, [p, date]);
 
+  const horas = useMemo<HoraSlot[]>(() => {
+    const [y, m, d] = date.split("-").map(Number);
+    if (!p.sunrise || !p.sunset) return [];
+    // Next sunrise: recompute panchang for the following day.
+    const next = computePanchang({
+      date: new Date(y, m - 1, d + 1, 12, 0, 0),
+      latitude: Number(lat),
+      longitude: Number(lon),
+    });
+    if (!next.sunrise) return [];
+    return computeHoras(p.sunrise, p.sunset, next.sunrise, new Date(y, m - 1, d).getDay());
+  }, [p, date, lat, lon]);
+
+  const nowHora = useMemo(() => currentHora(horas), [horas]);
+
+  const festivalCalendar = useMemo(() => {
+    const [y, m, d] = date.split("-").map(Number);
+    const start = new Date(y, m - 1, d);
+    const end = new Date(y, m - 1, d + 60);
+    return scanFestivals(start, end, Number(lat), Number(lon));
+  }, [date, lat, lon]);
+
   return (
     <PageShell
       eyebrow="Panchang"
