@@ -145,10 +145,11 @@ function BackgroundEditor() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const onUpload = async (file: File) => {
+  const onUpload = async (raw: File) => {
     setErr(null); setUploading(true);
     try {
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const file = await compressImage(raw, PRESETS.background);
+      const ext = file.type === "image/webp" ? "webp" : (file.name.split(".").pop() || "jpg").toLowerCase();
       const key = `background/bg-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(BUCKET).upload(key, file, { upsert: true, contentType: file.type });
       if (error) throw error;
