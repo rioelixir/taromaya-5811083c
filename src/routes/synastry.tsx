@@ -59,6 +59,37 @@ function SynastryPage() {
   const composite = useMemo(() => (chartA && chartB ? compositeChart(chartA, chartB) : null), [chartA, chartB]);
   const score = useMemo(() => synastryScore(hits), [hits]);
 
+  // Vedic Ashtakoot on the same two births.
+  const ashtakoot = useMemo(() => {
+    if (!computed) return null;
+    const toVedic = (p: Person) => {
+      const [y, m, d] = p.date.split("-").map(Number);
+      const [hh, mm] = p.time.split(":").map(Number);
+      return computeKundli({
+        year: y, month: m, day: d, hour: hh, minute: mm,
+        tzOffsetHours: Number(p.tz), latitude: Number(p.lat), longitude: Number(p.lon),
+      });
+    };
+    return ashtakootMilan(
+      { chart: toVedic(a), name: a.name || "You", gender: "male" },
+      { chart: toVedic(b), name: b.name || "Partner", gender: "female" },
+    );
+  }, [a, b, computed]);
+
+  // Relationship transits — sky hits to composite planets, next 12 months.
+  const relTransits = useMemo(() => {
+    if (!composite) return [];
+    const start = new Date();
+    const end = new Date(start.getTime() + 365 * 86400000);
+    const natal = composite.planets.map(p => ({ name: p.name, longitude: p.longitude }));
+    return findAspectHits(
+      natal, start, end,
+      ["Jupiter", "Saturn", "Mars"],
+      ["conjunction", "opposition", "square", "trine"],
+    );
+  }, [composite]);
+
+
   const generate = async () => {
     if (!chartA || !chartB) return;
     setLoading(true); setAiText(null);
