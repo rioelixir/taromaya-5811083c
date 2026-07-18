@@ -324,7 +324,7 @@ export function BottomNav() {
                   <Icon className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
                 </span>
                 <span className={active ? "text-pearl" : "text-muted-foreground"}>
-                  {label}
+                  {t(label)}
                 </span>
               </Link>
             </li>
