@@ -69,6 +69,7 @@ const groups: Group[] = [
       { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/numerology", label: "Numerology", icon: Hash },
       { to: "/baby-names", label: "Baby Names", icon: Baby },
+      { to: "/festivals", label: "Festivals", icon: Flame },
     ],
   },
   {
