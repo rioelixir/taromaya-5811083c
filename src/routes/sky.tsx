@@ -26,20 +26,46 @@ const PLANET_COLOR: Record<PlanetName, string> = {
 
 function SkyPage() {
   const [tick, setTick] = useState(0);
+  const [loc, setLoc] = useState<SkyLocation>(() => {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("taromaya:sky-loc") : null;
+    if (raw) { try { return JSON.parse(raw); } catch { /* ignore */ } }
+    return {
+      timezone: (typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC",
+      latitude: null, longitude: null, place: null,
+    };
+  });
+  const onLocationChange = useCallback((next: SkyLocation) => {
+    setLoc(next);
+    try { localStorage.setItem("taromaya:sky-loc", JSON.stringify(next)); } catch { /* ignore */ }
+  }, []);
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 30_000);
     return () => clearInterval(id);
   }, []);
   const snap = useMemo(() => liveSkySnapshot(new Date()), [tick]);
   const now = snap.now;
+  const tz = loc.timezone || "UTC";
+
+  const locLabel = loc.place ? loc.place : (loc.latitude != null && loc.longitude != null
+    ? `${loc.latitude.toFixed(2)}°, ${loc.longitude.toFixed(2)}°`
+    : "Set your location");
 
   return (
     <PageShell
       eyebrow="Live Sky"
       title="The Heavens, Right Now"
-      subtitle={`${now.toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} · updates every 30 seconds`}
+      subtitle={`${fmtLocal(now, tz, { weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" })} · updates every 30 seconds`}
     >
       <div className="flex w-full flex-col gap-6">
+
+        <div className="glass rounded-3xl px-5 py-3 flex items-center justify-between flex-wrap gap-2 text-sm">
+          <div className="flex items-center gap-2 text-pearl">
+            <MapPin className="h-4 w-4 text-gold" />
+            <span className="font-display">{locLabel}</span>
+            <span className="text-muted-foreground text-xs">· {tz}</span>
+          </div>
+          <a href="#sky-prefs" className="text-xs text-gold hover:underline">Personalize ↓</a>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="glass rounded-3xl p-4 sm:p-8">
@@ -47,13 +73,17 @@ function SkyPage() {
           </section>
 
           <aside className="flex flex-col gap-4">
-            <MoonCard moon={snap.moon} />
-            <RetroCard retros={snap.retros} />
+            <MoonCard moon={snap.moon} tz={tz} />
+            <RetroCard retros={snap.retros} tz={tz} />
           </aside>
         </div>
 
-        <IngressList ingresses={snap.ingresses} />
+        <IngressList ingresses={snap.ingresses} tz={tz} />
         <PlanetTable snap={snap} />
+
+        <div id="sky-prefs">
+          <SkyAlertPrefs onLocationChange={onLocationChange} />
+        </div>
       </div>
     </PageShell>
   );
