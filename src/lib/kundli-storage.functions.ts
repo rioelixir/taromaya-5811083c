@@ -36,7 +36,7 @@ export const saveKundli = createServerFn({ method: "POST" })
         latitude: data.latitude,
         longitude: data.longitude,
         place: data.place,
-        chart_config: data.chartConfig,
+        chart_config: data.chartConfig as never,
         engine_version: data.engineVersion,
         ayanamsa: data.ayanamsa,
         house_system: data.houseSystem,
