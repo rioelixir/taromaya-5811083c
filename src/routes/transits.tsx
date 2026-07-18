@@ -232,6 +232,12 @@ function TransitTimeline({ natalPlanets }: { natalPlanets: { name: import("@/lib
         </div>
       </GlassCard>
 
+      <ForecastStrip
+        start={now} end={end}
+        hits={hits} stations={stations} ingresses={ingresses} eclipses={eclipses}
+      />
+
+
       <div className="grid gap-6 lg:grid-cols-2">
         <GlassCard title="Retrograde stations">
           {stations.length === 0 ? <Empty label="No stations in window." /> : (
