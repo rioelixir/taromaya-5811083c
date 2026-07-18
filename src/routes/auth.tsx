@@ -137,7 +137,8 @@ function AuthPage() {
       return;
     }
     const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth",
+      redirect_uri: window.location.origin,
+      extraParams: { prompt: "select_account" },
     });
     if (res.error) setErr(res.error.message);
     else if (!res.redirected) await routeAfterAuth(navigate);
