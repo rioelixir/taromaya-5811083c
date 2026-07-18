@@ -2,7 +2,7 @@ import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
-import { scanFestivals, type Festival, type FestivalKind } from "@/lib/festivals";
+import { scanFestivalCalendar, type Festival, type FestivalKind } from "@/lib/festivals-scan";
 import { Calendar, Sparkles, Sun, Moon, Star, Flame, Flower2 } from "lucide-react";
 
 export const Route = createFileRoute("/festivals")({
