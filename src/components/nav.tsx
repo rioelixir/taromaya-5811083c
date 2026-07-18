@@ -2,7 +2,7 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
-  BookOpen, GraduationCap, FileText, History, Bookmark, User, Settings,
+  BookOpen, FileText, History, Bookmark, User, Settings,
   Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
   Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
   Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock,
@@ -83,10 +83,16 @@ const groups: Group[] = [
     ],
   },
   {
+    label: "Tarot",
+    defaultOpen: true,
+    items: [
+      { to: "/tarot", label: "Tarot Board", icon: Sparkles },
+    ],
+  },
+  {
     label: "Divination",
     defaultOpen: true,
     items: [
-      { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/numerology", label: "Numerology", icon: Hash },
       { to: "/baby-names", label: "Baby Names", icon: Baby },
       { to: "/festivals", label: "Festivals", icon: Flame },
@@ -109,9 +115,6 @@ const groups: Group[] = [
       { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
       { to: "/nakshatra", label: "Nakshatra", icon: Stars },
       { to: "/reports", label: "Reports", icon: FileText },
-
-
-
     ],
   },
   {
@@ -120,10 +123,9 @@ const groups: Group[] = [
       { to: "/saved", label: "Saved Charts", icon: Bookmark },
       { to: "/history", label: "History", icon: History },
       { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
-      { to: "/journal", label: "Journal", icon: BookOpen },
-      { to: "/learn", label: "Learn", icon: GraduationCap },
     ],
   },
+
   {
     label: "Account",
     items: [

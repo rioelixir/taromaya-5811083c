@@ -38,7 +38,6 @@ import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
 import { Route as MangalDoshaRouteImport } from './routes/mangal-dosha'
 import { Route as LifeDashboardRouteImport } from './routes/life-dashboard'
-import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
@@ -217,11 +216,6 @@ const MangalDoshaRoute = MangalDoshaRouteImport.update({
 const LifeDashboardRoute = LifeDashboardRouteImport.update({
   id: '/life-dashboard',
   path: '/life-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnRoute = LearnRouteImport.update({
-  id: '/learn',
-  path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KundliRoute = KundliRouteImport.update({
@@ -420,7 +414,6 @@ export interface FileRoutesByFullPath {
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
-  '/learn': typeof LearnRoute
   '/life-dashboard': typeof LifeDashboardRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -485,7 +478,6 @@ export interface FileRoutesByTo {
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
-  '/learn': typeof LearnRoute
   '/life-dashboard': typeof LifeDashboardRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -552,7 +544,6 @@ export interface FileRoutesById {
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
-  '/learn': typeof LearnRoute
   '/life-dashboard': typeof LifeDashboardRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
@@ -619,7 +610,6 @@ export interface FileRouteTypes {
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
-    | '/learn'
     | '/life-dashboard'
     | '/mangal-dosha'
     | '/moon-calendar'
@@ -684,7 +674,6 @@ export interface FileRouteTypes {
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
-    | '/learn'
     | '/life-dashboard'
     | '/mangal-dosha'
     | '/moon-calendar'
@@ -750,7 +739,6 @@ export interface FileRouteTypes {
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
-    | '/learn'
     | '/life-dashboard'
     | '/mangal-dosha'
     | '/moon-calendar'
@@ -817,7 +805,6 @@ export interface RootRouteChildren {
   KaalsarpRoute: typeof KaalsarpRoute
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
-  LearnRoute: typeof LearnRoute
   LifeDashboardRoute: typeof LifeDashboardRoute
   MangalDoshaRoute: typeof MangalDoshaRoute
   MoonCalendarRoute: typeof MoonCalendarRoute
@@ -1054,13 +1041,6 @@ declare module '@tanstack/react-router' {
       path: '/life-dashboard'
       fullPath: '/life-dashboard'
       preLoaderRoute: typeof LifeDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learn': {
-      id: '/learn'
-      path: '/learn'
-      fullPath: '/learn'
-      preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kundli': {
@@ -1354,7 +1334,6 @@ const rootRouteChildren: RootRouteChildren = {
   KaalsarpRoute: KaalsarpRoute,
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
-  LearnRoute: LearnRoute,
   LifeDashboardRoute: LifeDashboardRoute,
   MangalDoshaRoute: MangalDoshaRoute,
   MoonCalendarRoute: MoonCalendarRoute,

@@ -3,24 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
-import { SPREADS, TAROT_DECK, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle } from "lucide-react";
-
-const DECK_META = [
-  { name: "Luna",    accent: "#C0C7FF", glyph: "☾" },
-  { name: "Solaris", accent: "#F5C56B", glyph: "☀" },
-  { name: "Aurora",  accent: "#7FE6C4", glyph: "✧" },
-  { name: "Vesper",  accent: "#E58CB4", glyph: "✦" },
-  { name: "Onyx",    accent: "#B79BFF", glyph: "❈" },
-];
 
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
     meta: [
-      { title: "Tarot Canvas — TAROMAYA" },
-      { name: "description", content: "Full-screen tarot canvas — drag cards from the deck and lock them into spreads." },
+      { title: "Tarot — TAROMAYA" },
+      { name: "description", content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from." },
     ],
   }),
 });
@@ -28,6 +21,7 @@ export const Route = createFileRoute("/tarot")({
 type PlacedCard = {
   uid: string;
   card: TarotCard;
+  deckKey: DeckKey;
   reversed: boolean;
   x: number; // canvas px
   y: number;
@@ -40,7 +34,6 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 130;
 const CARD_H = 200;
-const DECK_COUNT = 5;
 const MINI_W = 62;
 const MINI_H = 96;
 
@@ -48,9 +41,9 @@ function randomReversed() {
   return Math.random() < 0.3;
 }
 
-// Fisher-Yates that keeps original deck immutable
-function shuffledDeck() {
-  const d = [...TAROT_DECK];
+// Fisher-Yates shuffle helper (returns new array).
+function shuffle<T>(arr: T[]): T[] {
+  const d = [...arr];
   for (let i = d.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [d[i], d[j]] = [d[j], d[i]];
@@ -58,19 +51,23 @@ function shuffledDeck() {
   return d;
 }
 
-// Split a single shuffled deck into DECK_COUNT sub-stacks (round-robin).
-function makeDecks(): TarotCard[][] {
-  const shuffled = shuffledDeck();
-  const decks: TarotCard[][] = Array.from({ length: DECK_COUNT }, () => []);
-  shuffled.forEach((c, i) => decks[i % DECK_COUNT].push(c));
-  return decks;
+// Build the initial per-deck stacks, each independently shuffled.
+function makeDeckStacks(): Record<DeckKey, TarotCard[]> {
+  return {
+    "rider-waite": shuffle(DECKS["rider-waite"]),
+    "nakshatra":   shuffle(DECKS["nakshatra"]),
+    "health":      shuffle(DECKS["health"]),
+    "lost-found":  shuffle(DECKS["lost-found"]),
+    "soulmates":   shuffle(DECKS["soulmates"]),
+  };
 }
+
 
 function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [decks, setDecks] = useState<TarotCard[][]>(() => makeDecks());
+  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks());
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +102,6 @@ function TarotPage() {
     if (n === 1) {
       return [{ index: 0, label: spread.positions[0], x: canvasSize.w / 2 - CARD_W / 2, y: cy }];
     }
-    // Spread horizontally centered
     const gap = 40;
     const totalW = n * CARD_W + (n - 1) * gap;
     const startX = canvasSize.w / 2 - totalW / 2;
@@ -121,10 +117,9 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDecks());
+    setDecks(makeDeckStacks());
   }, []);
 
-  // Switch spread — clear the board
   useEffect(() => {
     setPlaced([]);
     setReading(null);
@@ -139,8 +134,8 @@ function TarotPage() {
     fromDeck: boolean;
   }>({ uid: null, offsetX: 0, offsetY: 0, fromDeck: false });
 
-  const beginDragFromDeck = (e: React.PointerEvent, deckIdx: number) => {
-    const source = decks[deckIdx];
+  const beginDragFromDeck = (e: React.PointerEvent, deckKey: DeckKey) => {
+    const source = decks[deckKey];
     if (!source || source.length === 0) return;
     const canvasRect = canvasRef.current!.getBoundingClientRect();
     const card = source[0];
@@ -150,6 +145,7 @@ function TarotPage() {
     const newPlaced: PlacedCard = {
       uid,
       card,
+      deckKey,
       reversed: randomReversed(),
       x,
       y,
@@ -157,7 +153,7 @@ function TarotPage() {
       locked: false,
       flipped: false,
     };
-    setDecks((prev) => prev.map((d, i) => (i === deckIdx ? d.slice(1) : d)));
+    setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].slice(1) }));
     setPlaced((p) => [...p, newPlaced]);
     dragState.current = { uid, offsetX: CARD_W / 2, offsetY: CARD_H / 2, fromDeck: true };
     (e.target as Element).setPointerCapture?.(e.pointerId);
@@ -198,12 +194,10 @@ function TarotPage() {
       if (idx < 0) return prev;
       const card = prev[idx];
 
-      // Snap to a subtle grid so the board stays clean.
       const GRID = 20;
       const sx = Math.round(card.x / GRID) * GRID;
       const sy = Math.round(card.y / GRID) * GRID;
 
-      // Keep card fully inside the canvas.
       const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
       const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
       const clampedX = Math.min(Math.max(0, sx), maxX);
@@ -226,12 +220,7 @@ function TarotPage() {
     setPlaced((prev) => {
       const removed = prev.find((p) => p.uid === uid);
       if (removed) {
-        setDecks((prev) => {
-          // Return to the currently smallest stack.
-          let target = 0;
-          for (let i = 1; i < prev.length; i++) if (prev[i].length < prev[target].length) target = i;
-          return prev.map((d, i) => (i === target ? [...d, removed.card] : d));
-        });
+        setDecks((d) => ({ ...d, [removed.deckKey]: [...d[removed.deckKey], removed.card] }));
       }
       return prev.filter((p) => p.uid !== uid);
     });
@@ -239,17 +228,12 @@ function TarotPage() {
 
   const shuffleAll = useCallback(() => {
     setDecks((prev) => {
-      // Pool all remaining deck cards, reshuffle, redistribute across visible stacks.
-      const pool = prev.flat();
-      for (let i = pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-      const out: TarotCard[][] = Array.from({ length: prev.length }, () => []);
-      pool.forEach((c, i) => out[i % prev.length].push(c));
+      const out = { ...prev };
+      (Object.keys(out) as DeckKey[]).forEach((k) => { out[k] = shuffle(out[k]); });
       return out;
     });
   }, []);
+
 
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
@@ -300,7 +284,10 @@ function TarotPage() {
       {/* Top control bar */}
       <div className="relative z-20 w-full px-4 sm:px-6 pt-6">
         <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Your Sacred Canvas</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Pick a deck. Pull a card.</h1>
+        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          Five decks sit in the bottom right corner. Choose one, drag a card onto the board, and get a clear, kind reading.
+        </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
@@ -326,21 +313,21 @@ function TarotPage() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             maxLength={200}
-            placeholder="Hold your question in mind…"
+            placeholder="What's on your mind? (optional)"
             className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
           />
           <button
             onClick={shuffleAll}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-            title="Shuffle every visible deck"
+            title="Shuffle every deck"
           >
-            <Shuffle className="h-4 w-4" /> Shuffle All
+            <Shuffle className="h-4 w-4" /> Shuffle
           </button>
           <button
             onClick={resetSpread}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
           >
-            <RotateCcw className="h-4 w-4" /> Reset
+            <RotateCcw className="h-4 w-4" /> Start over
           </button>
           <button
             onClick={requestReading}
@@ -348,16 +335,19 @@ function TarotPage() {
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Interpret
+            Read the cards
           </button>
         </div>
 
         <div className="mt-2 text-xs text-muted-foreground">
           {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you want — they snap to a clean grid.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} anywhere on the board; they snap into place.`}
+            ? `${spread.blurb} Drop as many cards as you like.`
+            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} onto the board.`}
         </div>
       </div>
+
+
+
 
       {/* Canvas */}
       <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 pt-6 pb-40">
@@ -391,17 +381,18 @@ function TarotPage() {
           {/* Five deck stacks — bottom right */}
           <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
-              Decks · {decks.reduce((n, d) => n + d.length, 0)} cards
+              Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
             </div>
             <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
-              {decks.map((subDeck, di) => {
+              {DECK_LIST.map((meta, di) => {
+                const subDeck = decks[meta.key];
                 const empty = subDeck.length === 0;
-                const meta = DECK_META[di % DECK_META.length];
                 return (
                   <div
-                    key={di}
+                    key={meta.key}
                     className="relative flex flex-col items-center"
                     style={{ width: MINI_W }}
+                    title={`${meta.name} — ${meta.tagline}`}
                   >
                     <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
                       {[0, 1, 2].map((i) => {
@@ -410,7 +401,7 @@ function TarotPage() {
                         return (
                           <div
                             key={i}
-                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
+                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, meta.key) : undefined}
                             className={`absolute inset-0 rounded-xl border ${
                               empty
                                 ? "border-white/10 bg-black/30"
@@ -441,25 +432,26 @@ function TarotPage() {
                       })}
                     </div>
                     <div
-                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium"
+                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium text-center leading-tight"
                       style={{ color: meta.accent }}
                     >
-                      {meta.name}
+                      {meta.shortName}
                     </div>
                     <div className="text-[9px] text-muted-foreground leading-none">
-                      {subDeck.length}
+                      {subDeck.length}/{meta.count}
                     </div>
                   </div>
                 );
               })}
             </div>
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
-              Drag from any deck onto the canvas
+              Drag any deck onto the board
             </div>
           </div>
         </div>
 
         {/* Reading */}
+
         {(reading || error || loadingReading) && (
           <div className="mt-6 glass rounded-3xl p-6">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
