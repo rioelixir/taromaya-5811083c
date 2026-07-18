@@ -122,9 +122,9 @@
 
   body {
     background:
-      radial-gradient(ellipse at 20% 10%, oklch(0.35 0.2 295 / 0.28), transparent 55%),
-      radial-gradient(ellipse at 85% 90%, oklch(0.55 0.18 210 / 0.22), transparent 55%),
-      radial-gradient(ellipse at 50% 50%, oklch(0.15 0.05 275), oklch(0.08 0.02 275) 70%);
+      radial-gradient(ellipse at 15% 8%, oklch(0.82 0.11 300 / 0.55), transparent 60%),
+      radial-gradient(ellipse at 88% 92%, oklch(0.86 0.08 260 / 0.5), transparent 60%),
+      radial-gradient(ellipse at 50% 40%, oklch(0.97 0.02 300), oklch(0.94 0.03 305) 70%);
     background-attachment: fixed;
     min-height: 100dvh;
   }
