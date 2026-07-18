@@ -192,6 +192,9 @@ function PanchangPage() {
         </div>
       )}
 
+      {/* Deep attributes: Panchaka, Bhadra, Tithi quality, Yoga quality, Nakshatra character */}
+      <DeepAttributes p={p} weekdayNum={new Date(date).getDay()} />
+
       {/* Festival Calendar */}
       <div className="mt-6">
         <GlassCard title="Festival Calendar — next 60 days">
