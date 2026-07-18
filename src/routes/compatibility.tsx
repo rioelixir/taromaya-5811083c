@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, PLANET_SHORT, formatDegree } from "@/lib/vedic";
 import { ashtakootMilan } from "@/lib/ashtakoot";
+import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
+import { synastryAspects, compositeChart, synastryScore } from "@/lib/synastry";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles, Heart, CheckCircle2, XCircle } from "lucide-react";
 
