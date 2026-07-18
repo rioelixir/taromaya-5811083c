@@ -121,7 +121,7 @@ export function nakshatraCharacter(index: number): NakChar {
   return NAK_TABLE[((index % 27) + 27) % 27];
 }
 export function nakshatraByName(name: string): NakChar | null {
-  const idx = NAKSHATRAS.indexOf(name);
+  const idx = (NAKSHATRAS as readonly string[]).indexOf(name);
   return idx >= 0 ? NAK_TABLE[idx] : null;
 }
 
