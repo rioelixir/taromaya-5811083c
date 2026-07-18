@@ -64,8 +64,9 @@ export function buildGuideContext(row: SavedKundliRow | null): string {
   const ingresses = findIngresses(now, end).slice(0, 4);
   if (stations.length || ingresses.length) {
     lines.push("Next 14 days:");
-    for (const s of stations) lines.push(`  · ${s.body} goes ${s.direction} on ${s.date.toDateString()}`);
-    for (const g of ingresses) lines.push(`  · ${g.body} enters ${g.to} on ${g.date.toDateString()}`);
+    for (const s of stations) lines.push(`  · ${s.planet} goes ${s.kind} on ${s.date.toDateString()}`);
+    for (const g of ingresses) lines.push(`  · ${g.planet} enters ${g.toSign} on ${g.date.toDateString()}`);
+
   }
 
   if (!row) {
