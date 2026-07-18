@@ -340,11 +340,12 @@ void Users;
 
 function AdminNavGroup({ pathname }: { pathname: string }) {
   const { isAdmin } = useIsAdmin();
+  const { t } = useT();
   if (!isAdmin) return null;
   const active = pathname === "/admin" || pathname.startsWith("/admin");
   return (
     <div className="pt-2 mt-2 border-t border-white/5">
-      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">Admin</div>
+      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">{t("Admin")}</div>
       <Link
         to="/admin"
         className={[
@@ -355,7 +356,7 @@ function AdminNavGroup({ pathname }: { pathname: string }) {
         ].join(" ")}
       >
         <Shield className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
-        <span>Control Room</span>
+        <span>{t("Control Room")}</span>
       </Link>
     </div>
   );
