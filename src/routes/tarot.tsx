@@ -336,7 +336,7 @@ function TarotPage() {
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2 items-center">
+        <div className="mt-2 flex flex-wrap gap-2 items-center">
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
