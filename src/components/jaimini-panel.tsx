@@ -124,39 +124,23 @@ export function JaiminiPanel({ chart, birthDate }: Props) {
                 Sign-based Mahadashas starting from Lagna; direction alternates by odd
                 and even signs. Duration = count to sign lord.
               </p>
-              <div className="max-h-96 overflow-y-auto rounded-lg border border-border/40">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-background/80 text-muted-foreground backdrop-blur">
-                    <tr>
-                      <th className="px-3 py-2 text-left">Sign</th>
-                      <th className="px-3 py-2 text-left">Lord</th>
-                      <th className="px-3 py-2 text-right">Years</th>
-                      <th className="px-3 py-2 text-left">Start</th>
-                      <th className="px-3 py-2 text-left">End</th>
-                    </tr>
-                  </thead>
-                  <tbody className="font-mono">
-                    {dasha.map((d, i) => {
-                      const active =
-                        now >= d.start.getTime() && now < d.end.getTime();
-                      return (
-                        <tr
-                          key={i}
-                          className={`border-t border-border/30 ${
-                            active ? "bg-primary/10 text-primary" : ""
-                          }`}
-                        >
-                          <td className="px-3 py-2">{RASHIS[d.sign]}</td>
-                          <td className="px-3 py-2">{d.lord}</td>
-                          <td className="px-3 py-2 text-right">{d.years}</td>
-                          <td className="px-3 py-2">{fmtDate(d.start)}</td>
-                          <td className="px-3 py-2">{fmtDate(d.end)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="max-h-96 space-y-1.5 overflow-y-auto pr-1">
+                {dasha.map((d, i) => {
+                  const active = now >= d.start.getTime() && now < d.end.getTime();
+                  return (
+                    <div key={i} className={`rounded-lg border p-2.5 text-xs ${active ? "border-primary/60 bg-primary/10" : "border-border/40 bg-background/30"}`}>
+                      <div className="flex items-baseline justify-between">
+                        <span className={`font-display text-sm ${active ? "text-primary" : ""}`}>{RASHIS[d.sign]}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">{d.lord} · {d.years}y</span>
+                      </div>
+                      <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                        {fmtDate(d.start)} → {fmtDate(d.end)} {active && <span className="ml-1 text-primary">● now</span>}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
             </>
           )}
         </div>
