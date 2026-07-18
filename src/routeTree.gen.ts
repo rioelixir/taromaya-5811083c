@@ -37,6 +37,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
@@ -179,6 +180,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   id: '/saved',
   path: '/saved',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/varshphal': typeof VarshphalRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/varshphal': typeof VarshphalRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/admin'
     | '/saved'
+    | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/admin'
     | '/saved'
+    | '/api/chat'
   id:
     | '__root__'
     | '/'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/_authenticated/admin'
     | '/_authenticated/saved'
+    | '/api/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -411,6 +423,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -611,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/saved': {
       id: '/_authenticated/saved'
       path: '/saved'
@@ -670,6 +690,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
