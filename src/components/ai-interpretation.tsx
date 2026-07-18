@@ -1,9 +1,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { aiReading } from "@/lib/ai-reading.functions";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
@@ -25,15 +23,11 @@ export function AIInterpretation({
   snapshot,
   intent,
 }: {
-  /** Human-readable module name, e.g. "Progressions", "Numerology". */
   module: string;
-  /** Page-specific facts the model should ground its reading in. */
   snapshot?: string;
-  /** Optional extra instruction, e.g. "Focus on career decisions". */
   intent?: string;
 }) {
   const { data: profile } = useBirthProfile();
-  const runFn = useServerFn(aiReading);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,32 +35,47 @@ export function AIInterpretation({
   async function reveal() {
     setLoading(true);
     setError(null);
+    setText("");
     try {
       const row = profile ? profileToRow(profile) : null;
       const context = buildGuideContext(row);
       const system = [
-        `You are Taromaya's AI interpreter for the "${module}" module.`,
-        "Write a personalised, elegant reading in clean markdown (## headings, **bold** placements, short paragraphs, bullet lists).",
-        "Ground EVERY claim in the CONTEXT and MODULE DATA blocks — never invent degrees, dates, dashas, or placements.",
-        "Explain jargon in one line (ELI10) but keep the tone luxurious and precise (IQ200).",
-        "Structure: Overview → Key Signals → What It Means For You → Practical Guidance → Remedies/Next Steps.",
-        "Never predict death, medical outcomes, or legal verdicts. If context is missing, say so honestly.",
+        `You are Taromaya's friendly guide for the "${module}" module.`,
+        "Write like you're talking to a curious 10-year-old best friend: super simple everyday words, short sentences, warm and kind. NO jargon. If you must use a special word, explain it in 4-5 words right after.",
+        "Use clean markdown: ## short headings, **bold** the key idea, tiny paragraphs (1-2 lines), bullet points.",
+        "Ground every point in the CONTEXT and MODULE DATA. Never invent numbers, dates, or placements.",
+        "Structure: ## What's happening (2 lines) → ## What it means for you (3 bullets) → ## What to do this week (3 tiny tips).",
+        "Keep the whole reading under 220 words. No fluff. No death, medical, or legal predictions.",
       ].join(" ");
       const prompt = [
         `MODULE: ${module}`,
         intent ? `USER INTENT: ${intent}` : "",
         "",
-        "=== CONTEXT (birth chart + today's sky) ===",
+        "=== CONTEXT ===",
         context,
         "",
-        "=== MODULE DATA (what the user is currently viewing) ===",
-        snapshot?.trim() || "(no page-specific data provided — interpret the module in light of the CONTEXT)",
+        "=== MODULE DATA ===",
+        snapshot?.trim() || "(no page data — read the module from context)",
         "",
-        `Write the reading now for the ${module} module.`,
+        "Write the super-simple reading now.",
       ].filter(Boolean).join("\n");
 
-      const res = await runFn({ data: { system: system.slice(0, 2000), prompt: prompt.slice(0, 4000) } });
-      setText(res.text);
+      const res = await fetch("/api/ai-reading", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ system: system.slice(0, 2000), prompt: prompt.slice(0, 4000) }),
+      });
+      if (!res.ok || !res.body) throw new Error(await res.text().catch(() => "Failed"));
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setText(acc);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate reading");
     } finally {
@@ -82,12 +91,12 @@ export function AIInterpretation({
             AI Interpretation
           </div>
           <h2 className="mt-1 font-display text-2xl">
-            <span className="gold-text">Reveal your {module} reading</span>
+            <span className="gold-text">Your simple {module} reading</span>
           </h2>
           <p className="mt-1 text-sm text-foreground/80">
             {profile
-              ? `Personalised for ${profile.full_name} using your saved birth chart.`
-              : "Save your birth details for a personalised reading — otherwise this will be generic."}
+              ? `Made just for ${profile.full_name} — in easy words.`
+              : "Save your birth details for a personal reading."}
           </p>
         </div>
         <Button
@@ -96,9 +105,9 @@ export function AIInterpretation({
           className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {loading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Interpreting…</>
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading…</>
           ) : text ? (
-            <><RefreshCw className="mr-2 h-4 w-4" /> Regenerate</>
+            <><RefreshCw className="mr-2 h-4 w-4" /> Read again</>
           ) : (
             <><Sparkles className="mr-2 h-4 w-4" /> Reveal reading</>
           )}

@@ -64,6 +64,7 @@ import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedPrashnaRouteImport } from './routes/_authenticated/prashna'
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
@@ -348,6 +349,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiReadingRoute = ApiAiReadingRouteImport.update({
+  id: '/api/ai-reading',
+  path: '/api/ai-reading',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSavedRoute = AuthenticatedSavedRouteImport.update({
   id: '/saved',
   path: '/saved',
@@ -457,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
@@ -522,6 +529,7 @@ export interface FileRoutesByTo {
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
   '/saved': typeof AuthenticatedSavedRoute
+  '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
@@ -589,6 +597,7 @@ export interface FileRoutesById {
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/prashna': typeof AuthenticatedPrashnaRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
+  '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
@@ -656,6 +665,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/prashna'
     | '/saved'
+    | '/api/ai-reading'
     | '/api/chat'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
@@ -721,6 +731,7 @@ export interface FileRouteTypes {
     | '/meditation'
     | '/prashna'
     | '/saved'
+    | '/api/ai-reading'
     | '/api/chat'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
@@ -787,6 +798,7 @@ export interface FileRouteTypes {
     | '/_authenticated/meditation'
     | '/_authenticated/prashna'
     | '/_authenticated/saved'
+    | '/api/ai-reading'
     | '/api/chat'
     | '/_authenticated/kundli/new'
     | '/api/public/hooks/sky-alerts'
@@ -847,6 +859,7 @@ export interface RootRouteChildren {
   VedicTransitsRoute: typeof VedicTransitsRoute
   WeatherRoute: typeof WeatherRoute
   YantraRoute: typeof YantraRoute
+  ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -1238,6 +1251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai-reading': {
+      id: '/api/ai-reading'
+      path: '/api/ai-reading'
+      fullPath: '/api/ai-reading'
+      preLoaderRoute: typeof ApiAiReadingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/saved': {
       id: '/_authenticated/saved'
       path: '/saved'
@@ -1384,6 +1404,7 @@ const rootRouteChildren: RootRouteChildren = {
   VedicTransitsRoute: VedicTransitsRoute,
   WeatherRoute: WeatherRoute,
   YantraRoute: YantraRoute,
+  ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
