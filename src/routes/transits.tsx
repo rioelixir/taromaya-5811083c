@@ -6,9 +6,13 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { BiWheelChart } from "@/components/bi-wheel-chart";
 import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { computeCurrentSky, transitAspects, transitHouses, keyTransits } from "@/lib/transits";
+import {
+  findStations, findIngresses, findEclipses, findAspectHits, fmtDay,
+  type Station, type Ingress, type EclipseEvent, type TimelineHit,
+} from "@/lib/transits-timeline";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-reading.functions";
-import { Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
 
 export const Route = createFileRoute("/transits")({
   component: () => (<PremiumGate featureName="Transits"><TransitsPage /></PremiumGate>),
@@ -169,6 +173,7 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
         </GlassCard>
       </div>
 
+
       <div className="mt-6">
         <GlassCard title="AI transit forecast">
           {!aiText && !loading && (
@@ -181,6 +186,129 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
           {aiText && <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{aiText}</div>}
         </GlassCard>
       </div>
+
+      <TransitTimeline
+        natalPlanets={natal.tropicalPlanets.map((p) => ({ name: p.name, longitude: p.tropicalLongitude }))}
+      />
     </PageShell>
   );
 }
+
+function TransitTimeline({ natalPlanets }: { natalPlanets: { name: import("@/lib/vedic").PlanetName; longitude: number }[] }) {
+  const [months, setMonths] = useState(12);
+  const now = useMemo(() => new Date(), []);
+  const end = useMemo(() => {
+    const d = new Date(now);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }, [now, months]);
+
+  const stations = useMemo<Station[]>(() => findStations(now, end), [now, end]);
+  const ingresses = useMemo<Ingress[]>(() => findIngresses(now, end), [now, end]);
+  const eclipses = useMemo<EclipseEvent[]>(() => findEclipses(now, end), [now, end]);
+  const hits = useMemo<TimelineHit[]>(
+    () => findAspectHits(natalPlanets, now, end),
+    [natalPlanets, now, end],
+  );
+
+  return (
+    <div className="mt-6 space-y-6">
+      <GlassCard title="Timeline">
+        <div className="flex flex-wrap items-center gap-2">
+          <CalendarRange className="w-4 h-4 text-gold" />
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Window</span>
+          {[3, 6, 12, 24].map((m) => (
+            <button key={m} onClick={() => setMonths(m)}
+              className={`rounded-full px-3 py-1 text-xs uppercase tracking-widest ${
+                months === m ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"
+              }`}>
+              {m}mo
+            </button>
+          ))}
+          <div className="ml-auto text-xs text-muted-foreground">
+            {fmtDay(now)} → {fmtDay(end)}
+          </div>
+        </div>
+      </GlassCard>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <GlassCard title="Retrograde stations">
+          {stations.length === 0 ? <Empty label="No stations in window." /> : (
+            <ul className="divide-y divide-white/5 text-sm">
+              {stations.map((s, i) => (
+                <li key={i} className="py-2 flex items-center gap-2">
+                  <RotateCcw className={`w-3.5 h-3.5 ${s.kind === "retrograde" ? "text-red-400" : "text-emerald-300"}`} />
+                  <span className="gold-text font-serif">{PLANET_GLYPHS[s.planet]}</span>
+                  <span className="text-pearl">{s.planet}</span>
+                  <span className={`text-xs uppercase tracking-widest ${s.kind === "retrograde" ? "text-red-400" : "text-emerald-300"}`}>
+                    stations {s.kind}
+                  </span>
+                  <span className="text-xs text-muted-foreground">in {s.sign} · {formatDegree(s.longitude - Math.floor(s.longitude / 30) * 30)}</span>
+                  <span className="ml-auto text-xs text-muted-foreground font-mono">{fmtDay(s.date)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+
+        <GlassCard title="Sign ingresses">
+          {ingresses.length === 0 ? <Empty label="No ingresses in window." /> : (
+            <ul className="divide-y divide-white/5 text-sm max-h-96 overflow-y-auto">
+              {ingresses.map((g, i) => (
+                <li key={i} className="py-2 flex items-center gap-2">
+                  <span className="gold-text font-serif">{PLANET_GLYPHS[g.planet]}</span>
+                  <span className="text-pearl">{g.planet}</span>
+                  <span className="text-muted-foreground text-xs">{g.fromSign}</span>
+                  <ArrowRight className="w-3 h-3 text-gold" />
+                  <span className="text-pearl text-xs">{g.toSign}</span>
+                  <span className="ml-auto text-xs text-muted-foreground font-mono">{fmtDay(g.date)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+
+        <GlassCard title="Eclipses">
+          {eclipses.length === 0 ? <Empty label="No eclipses in window." /> : (
+            <ul className="divide-y divide-white/5 text-sm">
+              {eclipses.map((e, i) => (
+                <li key={i} className="py-2 flex items-center gap-2">
+                  <Eclipse className={`w-3.5 h-3.5 ${e.kind === "solar" ? "text-gold" : "text-cyan-300"}`} />
+                  <span className={`text-xs uppercase tracking-widest ${e.kind === "solar" ? "text-gold" : "text-cyan-300"}`}>
+                    {e.kind} · {e.variety}
+                  </span>
+                  {typeof e.obscuration === "number" && (
+                    <span className="text-xs text-muted-foreground">· {(e.obscuration * 100).toFixed(0)}%</span>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground font-mono">{fmtDay(e.date)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+
+        <GlassCard title="Exact aspect hits (Mars · Jupiter · Saturn → natal)">
+          {hits.length === 0 ? <Empty label="No aspect peaks in window." /> : (
+            <ul className="divide-y divide-white/5 text-sm max-h-96 overflow-y-auto">
+              {hits.map((h, i) => (
+                <li key={i} className="py-2 flex items-center gap-2">
+                  <span className="gold-text font-serif">{PLANET_GLYPHS[h.transit]}</span>
+                  <span className="text-pearl">{h.transit}</span>
+                  <span className={`text-xs uppercase tracking-widest ${ASPECT_COLORS[h.type] ?? "text-muted-foreground"}`}>{h.type}</span>
+                  <span className="text-cyan-300 font-serif">{PLANET_GLYPHS[h.natal]}</span>
+                  <span className="text-cyan-300">{h.natal}</span>
+                  <span className="ml-auto text-xs text-muted-foreground font-mono">{fmtDay(h.date)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </GlassCard>
+      </div>
+    </div>
+  );
+}
+
+function Empty({ label }: { label: string }) {
+  return <div className="text-sm text-muted-foreground">{label}</div>;
+}
+
