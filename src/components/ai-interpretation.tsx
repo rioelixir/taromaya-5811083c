@@ -29,6 +29,7 @@ export function AIInterpretation({
   intent?: string;
 }) {
   const { data: profile } = useBirthProfile();
+  const lang = useLang();
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,8 +41,15 @@ export function AIInterpretation({
     try {
       const row = profile ? profileToRow(profile) : null;
       const context = buildGuideContext(row);
+      const langInstr =
+        lang === "hi"
+          ? "Write the ENTIRE reading in Hindi (Devanagari script). Do not use English words except proper names."
+          : lang === "hr"
+          ? "Write the ENTIRE reading in Roman Hinglish — Hindi words written in Latin/English script, natural and conversational."
+          : "Write the reading in simple English.";
       const system = [
         `You are Taromaya's friendly guide for the "${module}" module.`,
+        langInstr,
         "Write like you're talking to a curious 10-year-old best friend: super simple everyday words, short sentences, warm and kind. NO jargon. If you must use a special word, explain it in 4-5 words right after.",
         "Use clean markdown: ## short headings, **bold** the key idea, tiny paragraphs (1-2 lines), bullet points.",
         "Ground every point in the CONTEXT and MODULE DATA. Never invent numbers, dates, or placements.",
