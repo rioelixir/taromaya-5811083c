@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
   BookOpen, GraduationCap, FileText, History, Bookmark, User, Settings,
   Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
-  Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather,
+  Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -68,6 +68,7 @@ const groups: Group[] = [
     items: [
       { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/numerology", label: "Numerology", icon: Hash },
+      { to: "/baby-names", label: "Baby Names", icon: Baby },
     ],
   },
   {
