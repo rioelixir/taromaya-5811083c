@@ -23,8 +23,6 @@ export const Route = createFileRoute("/reports")({
   }),
 });
 
-type ReportKey = "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
-
 type ReportKey = "grand" | "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
 
 const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: string[] }> = {
