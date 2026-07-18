@@ -144,17 +144,11 @@ async function translatePage(lang: Lang) {
       if (!translated) return;
       const leading = raw.match(/^\s*/)?.[0] ?? "";
       const trailing = raw.match(/\s*$/)?.[0] ?? "";
-      // Save original for revert
-      const parent = n.parentElement as (HTMLElement & { __i18nOriginals?: Record<string, string> }) | null;
-      if (parent) {
-        parent.setAttribute("data-i18n-text", "1");
-        parent.__i18nOriginals = parent.__i18nOriginals || {};
-        const tn = n as Text & { __i18nKey?: string };
-        if (!tn.__i18nKey) {
-          tn.__i18nKey = key + "|" + Math.random().toString(36).slice(2, 7);
-          parent.__i18nOriginals[tn.__i18nKey] = raw;
-        }
-      }
+      // Mark translated so we don't retranslate on mutation
+      const tn = n as Text & { __i18nDone?: boolean };
+      if (tn.__i18nDone) return;
+      tn.__i18nDone = true;
+
       n.nodeValue = leading + translated + trailing;
     });
 
