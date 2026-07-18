@@ -1,19 +1,9 @@
-// TAROMAYA Astrology Provider Adapter
-// -----------------------------------------------------------------------------
-// A single stable interface every astrology module talks to. Today it is backed
-// by our verified Swiss-Ephemeris-grade engine (astronomy-engine + Lahiri).
-// Tomorrow, a Divine API adapter can implement the same interface and
-// downstream modules (Vargas, Dashas, KP, Jaimini, Panchang, transits, etc.)
-// will not need to change.
-//
-// Runs server-side only (imported by *.functions.ts inside handlers, or by
-// server routes). Do not import from client code.
+// TAROMAYA Astrology Provider Adapter (server-only).
+// Stable interface every astrology module talks to. Backed today by our
+// verified Swiss-Ephemeris-grade engine (astronomy-engine + Lahiri).
+// A Divine API adapter can plug in later without changing downstream modules.
 
-import {
-  computeKundli,
-  type KundliInput,
-  type Planet,
-} from "@/lib/vedic";
+import { computeKundli, type KundliInput, type Planet } from "@/lib/vedic";
 import type { ChartConfig } from "@/lib/chart-config";
 
 export type AstroBirthInput = KundliInput & {
@@ -34,15 +24,10 @@ export type NormalizedPlanet = Planet & {
 };
 
 export type NormalizedChart = {
-  ascendant: {
-    longitude: number;
-    rashi: number;
-    degreeInRashi: number;
-    nakshatra: number;
-    pada: number;
-  };
+  ascendant: { longitude: number; rashi: number; degreeInRashi: number };
   planets: NormalizedPlanet[];
-  houses: { cusp: number; rashi: number }[]; // 12 whole-sign
+  houses: { cusp: number; rashi: number }[];
+  moonNakshatra: { index: number; pada: number; lord: string };
   meta: {
     engine: string;
     engineVersion: string;
@@ -51,8 +36,6 @@ export type NormalizedChart = {
     houseSystem: string;
     nodeType: string;
     zodiac: "sidereal" | "tropical";
-    utcISO: string;
-    julianDay: number;
     computedAt: string;
   };
 };
@@ -60,15 +43,9 @@ export type NormalizedChart = {
 export interface AstroProvider {
   readonly id: string;
   readonly version: string;
-  computeRashi(
-    input: AstroBirthInput,
-    config: ChartConfig,
-  ): Promise<NormalizedChart>;
+  computeRashi(input: AstroBirthInput, config: ChartConfig): Promise<NormalizedChart>;
 }
 
-// -----------------------------------------------------------------------------
-// Swiss-Ephemeris-grade adapter (astronomy-engine + Lahiri).
-// -----------------------------------------------------------------------------
 const NAKSHATRA_LORDS_9 = [
   "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
 ];
@@ -87,30 +64,18 @@ class SwissAdapter implements AstroProvider {
   readonly id = "swiss";
   readonly version = "astronomy-engine@2.x+lahiri";
 
-  async computeRashi(
-    input: AstroBirthInput,
-    config: ChartConfig,
-  ): Promise<NormalizedChart> {
-    const raw = computeKundli(input, config);
-
-    // Whole-sign houses from ascendant sign.
+  async computeRashi(input: AstroBirthInput, config: ChartConfig): Promise<NormalizedChart> {
+    const raw = computeKundli({ ...input, config });
     const ascSign = raw.ascendant.rashi;
     const houses = Array.from({ length: 12 }, (_, i) => ({
       cusp: ((ascSign + i) % 12) * 30,
       rashi: (ascSign + i) % 12,
     }));
-
-    // House index (1..12) for each planet under whole-sign.
     const sunLon = raw.planets.find((p) => p.name === "Sun")?.longitude ?? 0;
     const planets: NormalizedPlanet[] = raw.planets.map((p) => {
       const house = ((p.rashi - ascSign + 12) % 12) + 1;
-      // Combustion: within 8° of Sun (skip Sun/Moon nodes)
-      const arc = Math.min(
-        Math.abs(p.longitude - sunLon),
-        360 - Math.abs(p.longitude - sunLon),
-      );
-      const combust =
-        p.name !== "Sun" && p.name !== "Rahu" && p.name !== "Ketu" && arc < 8;
+      const arc = Math.min(Math.abs(p.longitude - sunLon), 360 - Math.abs(p.longitude - sunLon));
+      const combust = p.name !== "Sun" && p.name !== "Rahu" && p.name !== "Ketu" && arc < 8;
       return {
         ...p,
         house,
@@ -121,11 +86,11 @@ class SwissAdapter implements AstroProvider {
         debilitated: DEBILITATION[p.name] === p.rashi,
       };
     });
-
     return {
       ascendant: raw.ascendant,
       planets,
       houses,
+      moonNakshatra: raw.moonNakshatra,
       meta: {
         engine: this.id,
         engineVersion: this.version,
@@ -133,16 +98,13 @@ class SwissAdapter implements AstroProvider {
         ayanamsaValue: raw.ayanamsa,
         houseSystem: config.houseSystem,
         nodeType: config.nodeType,
-        zodiac: "sidereal",
-        utcISO: raw.utcISO,
-        julianDay: raw.jd,
+        zodiac: config.ayanamsa === "tropical" ? "tropical" : "sidereal",
         computedAt: new Date().toISOString(),
       },
     };
   }
 }
 
-// Registry — future: Divine API adapter registered under id="divine".
 const providers = new Map<string, AstroProvider>();
 providers.set("swiss", new SwissAdapter());
 
@@ -152,7 +114,7 @@ export function getAstroProvider(id: string = "swiss"): AstroProvider {
   return p;
 }
 
-// Deterministic config hash — used as cache key in chart_calculations.
+// Deterministic 16-char fingerprint used as chart_calculations cache key.
 export function hashCalcRequest(
   input: AstroBirthInput,
   config: ChartConfig,
@@ -165,12 +127,11 @@ export function hashCalcRequest(
     tz: input.tzOffsetHours,
     lat: Math.round(input.latitude * 1e5) / 1e5,
     lon: Math.round(input.longitude * 1e5) / 1e5,
-    elev: input.elevation ?? 0,
+    elev: config.elevationMeters ?? 0,
     ayanamsa: config.ayanamsa,
     houseSystem: config.houseSystem,
     nodeType: config.nodeType,
   });
-  // Simple stable 32-char hex hash (FNV-1a 64-bit style, no crypto deps).
   let h1 = 0xcbf29ce4, h2 = 0x84222325;
   for (let i = 0; i < canon.length; i++) {
     h1 = Math.imul(h1 ^ canon.charCodeAt(i), 0x01000193) >>> 0;
