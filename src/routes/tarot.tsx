@@ -375,17 +375,18 @@ function TarotPage() {
           {/* Five deck stacks — bottom right */}
           <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
-              Decks · {decks.reduce((n, d) => n + d.length, 0)} cards
+              Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
             </div>
             <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
-              {decks.map((subDeck, di) => {
+              {DECK_LIST.map((meta, di) => {
+                const subDeck = decks[meta.key];
                 const empty = subDeck.length === 0;
-                const meta = DECK_META[di % DECK_META.length];
                 return (
                   <div
-                    key={di}
+                    key={meta.key}
                     className="relative flex flex-col items-center"
                     style={{ width: MINI_W }}
+                    title={`${meta.name} — ${meta.tagline}`}
                   >
                     <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
                       {[0, 1, 2].map((i) => {
@@ -394,7 +395,7 @@ function TarotPage() {
                         return (
                           <div
                             key={i}
-                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, di) : undefined}
+                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, meta.key) : undefined}
                             className={`absolute inset-0 rounded-xl border ${
                               empty
                                 ? "border-white/10 bg-black/30"
@@ -425,22 +426,24 @@ function TarotPage() {
                       })}
                     </div>
                     <div
-                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium"
+                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium text-center leading-tight"
                       style={{ color: meta.accent }}
                     >
-                      {meta.name}
+                      {meta.shortName}
                     </div>
                     <div className="text-[9px] text-muted-foreground leading-none">
-                      {subDeck.length}
+                      {subDeck.length}/{meta.count}
                     </div>
                   </div>
                 );
               })}
             </div>
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
-              Drag from any deck onto the canvas
+              Drag any deck onto the board
             </div>
           </div>
+        </div>
+
         </div>
 
         {/* Reading */}
