@@ -8,16 +8,32 @@ import { useAppLogo } from "@/hooks/use-app-logo";
 
 function AuthLogo() {
   const logo = useAppLogo();
-  if (logo) {
-    return (
-      <div className="h-10 w-10 rounded-full overflow-hidden gold-border">
-        <img src={logo} alt="Logo" className="h-full w-full object-cover" />
-      </div>
-    );
-  }
   return (
-    <div className="h-10 w-10 rounded-full gold-border grid place-items-center">
-      <Sparkles className="h-5 w-5 text-gold" />
+    <div className="relative mx-auto mb-6 h-32 w-32 sm:h-40 sm:w-40">
+      {/* Outer aurora ring */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gold/30 via-galaxy/20 to-transparent blur-xl animate-pulse" />
+      {/* Rotating star ring */}
+      <div className="absolute inset-0 rounded-full gold-border animate-[spin_40s_linear_infinite]">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <span
+            key={i}
+            className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/80 shadow-[0_0_6px_var(--gold,#d4af37)]"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${i * 30}deg) translateY(-${
+                62
+              }px)`,
+            }}
+          />
+        ))}
+      </div>
+      {/* Inner circle with logo */}
+      <div className="absolute inset-3 rounded-full overflow-hidden gold-border bg-cosmic/60 backdrop-blur-xl grid place-items-center">
+        {logo ? (
+          <img src={logo} alt="Logo" className="h-full w-full object-cover" />
+        ) : (
+          <Sparkles className="h-10 w-10 text-gold" />
+        )}
+      </div>
     </div>
   );
 }
@@ -131,10 +147,11 @@ function AuthPage() {
     <div className="relative min-h-dvh grid place-items-center px-4 py-16 overflow-hidden">
       <StarField />
       <div className="relative z-10 w-full max-w-md">
-        <Link to="/auth" className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex flex-col items-center mb-8">
           <AuthLogo />
-          <div className="font-display text-2xl tracking-widest gold-text">TAROMAYA</div>
-        </Link>
+          <div className="font-display text-2xl sm:text-3xl tracking-[0.35em] gold-text">TAROMAYA</div>
+          <div className="mt-1 text-[10px] uppercase tracking-[0.4em] text-muted-foreground">Cosmic Intelligence</div>
+        </div>
 
         <div className="glass rounded-3xl p-8">
           <h1 className="font-display text-3xl gold-text text-center">

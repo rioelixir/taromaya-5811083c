@@ -1,6 +1,30 @@
 import type { ReactNode } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Home } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
+
+function PageNav() {
+  const router = useRouter();
+  return (
+    <div className="mb-6 flex items-center justify-between gap-2">
+      <button
+        onClick={() => router.history.back()}
+        className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
+        aria-label="Go back"
+      >
+        <ArrowLeft className="h-4 w-4 text-gold" /> Back
+      </button>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
+        aria-label="Home"
+      >
+        <Home className="h-4 w-4 text-gold" /> Home
+      </Link>
+    </div>
+  );
+}
 
 export function PageShell({
   eyebrow,
@@ -29,6 +53,7 @@ export function PageShell({
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
       <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pt-16 lg:pt-12 pb-16">
+        <PageNav />
         <header className="mb-6 sm:mb-8">
           {eyebrow && (
             <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] text-muted-foreground">
