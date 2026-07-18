@@ -130,7 +130,7 @@ export function AIInterpretation({
       )}
 
       {text && (
-        <article className="mt-6 space-y-3 text-foreground leading-relaxed
+        <article data-no-translate className="mt-6 space-y-3 text-foreground leading-relaxed
           [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
           [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-xl [&_h2]:text-primary
           [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-lg
