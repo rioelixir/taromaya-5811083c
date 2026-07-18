@@ -472,28 +472,34 @@ function TarotPage() {
           </div>
         </div>
 
-        {/* Reading */}
-
+        {/* Reading — floating overlay */}
         {(reading || error || loadingReading) && (
-          <div className="mt-6 glass rounded-3xl p-6">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
-              <Sparkles className="h-3.5 w-3.5" /> AI Reading
+          <div className="pointer-events-none absolute left-3 right-3 sm:left-6 sm:right-auto sm:max-w-md top-[7.5rem] z-30">
+            <div className="pointer-events-auto glass rounded-2xl p-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] max-h-[60vh] overflow-y-auto">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
+                  <Sparkles className="h-3.5 w-3.5" /> AI Reading
+                </div>
+                <button
+                  onClick={() => { setReading(null); setError(null); }}
+                  className="text-muted-foreground hover:text-pearl"
+                  aria-label="Close reading"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {loadingReading && !reading && (
+                <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
+                </div>
+              )}
+              {error && (
+                <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-200">
+                  {error}
+                </div>
+              )}
+              {reading && <div className="mt-3"><ReadingMarkdown text={reading} /></div>}
             </div>
-            {loadingReading && !reading && (
-              <div className="mt-4 flex items-center gap-3 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
-              </div>
-            )}
-            {error && (
-              <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-200">
-                {error}
-              </div>
-            )}
-            {reading && (
-              <div className="mt-4">
-                <ReadingMarkdown text={reading} />
-              </div>
-            )}
           </div>
         )}
       </div>
