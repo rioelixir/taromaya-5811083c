@@ -6,6 +6,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { WheelChart } from "@/components/wheel-chart";
 import { computeWesternChart, computeAspects, ASPECTS, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { progressedChart, solarReturnChart, type BirthInput } from "@/lib/progressions";
+import { solarArcDirections, solarArcHits, harmonicChart, midpointTree, lunarReturnDate } from "@/lib/western-deep";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles, RefreshCw } from "lucide-react";
 
