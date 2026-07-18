@@ -39,8 +39,9 @@ const MINI_W = 62;
 const MINI_H = 96;
 
 function randomReversed() {
-  return Math.random() < 0.3;
+  return false;
 }
+
 
 // Fisher-Yates shuffle helper (returns new array).
 function shuffle<T>(arr: T[]): T[] {
