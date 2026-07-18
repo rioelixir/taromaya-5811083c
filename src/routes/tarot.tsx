@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback, type ReactNode } from "react"
 import { StarField } from "@/components/star-field";
 import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
-import { getCardDetails, isCourtCard } from "@/lib/tarot-details";
+import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
 
