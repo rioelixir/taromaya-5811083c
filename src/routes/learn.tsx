@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, ComingSoonGrid } from "@/components/page-shell";
+import { PremiumGate } from "@/components/premium-gate";
 
 const topics = [
   "Tarot Basics", "Major Arcana", "Minor Arcana", "Court Cards",
