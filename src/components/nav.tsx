@@ -114,6 +114,7 @@ const groups: Group[] = [
       { to: "/dreams", label: "Dream Oracle", icon: Feather },
       { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
       { to: "/nakshatra", label: "Nakshatra", icon: Stars },
+      { to: "/nakshatra-location", label: "Nakshatra for Location", icon: Compass },
       { to: "/reports", label: "Reports", icon: FileText },
     ],
   },
