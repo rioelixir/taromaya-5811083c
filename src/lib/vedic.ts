@@ -53,10 +53,13 @@ export type KundliInput = {
   // Local birth date/time components as entered by the user.
   year: number; month: number; day: number;
   hour: number; minute: number;
+  seconds?: number;
   // Timezone offset in hours east of UTC (e.g. India = 5.5).
   tzOffsetHours: number;
   latitude: number;
   longitude: number;
+  /** Optional; defaults to Lahiri + True Node + Whole Sign. */
+  config?: Partial<ChartConfig>;
 };
 
 export type KundliChart = {
