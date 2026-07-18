@@ -195,7 +195,7 @@ function NakshatraLocationPage() {
       title="Nakshatra for Location"
       subtitle="Which lunar mansion is active over your city, right now — with exact entry & exit times, ascendant nakshatra, and dosha windows tied to this latitude & longitude."
       aiModule="Nakshatra for Location"
-      aiSnapshot={{
+      aiSnapshot={JSON.stringify({
         location: `${city.name}, ${city.region}`,
         latitude: parsedLat,
         longitude: parsedLon,
@@ -208,7 +208,7 @@ function NakshatraLocationPage() {
         isGandaMoola: snap?.isGandaMoola,
         isPanchak: snap?.isPanchak,
         chandrashtama: snap?.chandrashtama,
-      }}
+      })}
       aiIntent="Explain in the simplest human words what this Moon nakshatra means for someone standing at this location right now. Say which activities suit the next few hours and which to postpone. Mention Chandrashtama, Ganda Moola or Panchak only if flagged."
     >
       {/* Location & moment controls */}
