@@ -4,7 +4,12 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { formatDegree, RASHIS, PLANET_SHORT, type KundliInput } from "@/lib/vedic";
 import { computeVarshphal, planetHouse, type VarshphalChart } from "@/lib/varshphal";
-import { Sparkles, Loader2, CalendarClock, Crown, Sun } from "lucide-react";
+import {
+  computeTajikaAspects, detectTajikaYogas, detectKambool, munthaVarsheshLink,
+  computeHarshaBala,
+} from "@/lib/varshphal-deep";
+import { Sparkles, Loader2, CalendarClock, Crown, Sun, ArrowRight, Zap, CheckCircle2, XCircle } from "lucide-react";
+
 
 const inputCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
