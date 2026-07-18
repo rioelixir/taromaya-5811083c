@@ -29,6 +29,7 @@ import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as ObservatoryRouteImport } from './routes/observatory'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
+import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
@@ -150,6 +151,11 @@ const NumerologyRoute = NumerologyRouteImport.update({
 const MuhuratRoute = MuhuratRouteImport.update({
   id: '/muhurat',
   path: '/muhurat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoonCalendarRoute = MoonCalendarRouteImport.update({
+  id: '/moon-calendar',
+  path: '/moon-calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -276,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
@@ -319,6 +326,7 @@ export interface FileRoutesByTo {
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/horoscope': typeof HoroscopeRoute
   '/kundli': typeof KundliRoute
   '/learn': typeof LearnRoute
+  '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
@@ -409,6 +418,7 @@ export interface FileRouteTypes {
     | '/horoscope'
     | '/kundli'
     | '/learn'
+    | '/moon-calendar'
     | '/muhurat'
     | '/numerology'
     | '/observatory'
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/horoscope'
     | '/kundli'
     | '/learn'
+    | '/moon-calendar'
     | '/muhurat'
     | '/numerology'
     | '/observatory'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/horoscope'
     | '/kundli'
     | '/learn'
+    | '/moon-calendar'
     | '/muhurat'
     | '/numerology'
     | '/observatory'
@@ -541,6 +553,7 @@ export interface RootRouteChildren {
   HoroscopeRoute: typeof HoroscopeRoute
   KundliRoute: typeof KundliRoute
   LearnRoute: typeof LearnRoute
+  MoonCalendarRoute: typeof MoonCalendarRoute
   MuhuratRoute: typeof MuhuratRoute
   NumerologyRoute: typeof NumerologyRoute
   ObservatoryRoute: typeof ObservatoryRoute
@@ -705,6 +718,13 @@ declare module '@tanstack/react-router' {
       path: '/muhurat'
       fullPath: '/muhurat'
       preLoaderRoute: typeof MuhuratRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moon-calendar': {
+      id: '/moon-calendar'
+      path: '/moon-calendar'
+      fullPath: '/moon-calendar'
+      preLoaderRoute: typeof MoonCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -900,6 +920,7 @@ const rootRouteChildren: RootRouteChildren = {
   HoroscopeRoute: HoroscopeRoute,
   KundliRoute: KundliRoute,
   LearnRoute: LearnRoute,
+  MoonCalendarRoute: MoonCalendarRoute,
   MuhuratRoute: MuhuratRoute,
   NumerologyRoute: NumerologyRoute,
   ObservatoryRoute: ObservatoryRoute,
