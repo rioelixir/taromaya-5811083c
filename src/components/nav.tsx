@@ -83,10 +83,16 @@ const groups: Group[] = [
     ],
   },
   {
+    label: "Tarot",
+    defaultOpen: true,
+    items: [
+      { to: "/tarot", label: "Tarot Board", icon: Sparkles },
+    ],
+  },
+  {
     label: "Divination",
     defaultOpen: true,
     items: [
-      { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/numerology", label: "Numerology", icon: Hash },
       { to: "/baby-names", label: "Baby Names", icon: Baby },
       { to: "/festivals", label: "Festivals", icon: Flame },
@@ -109,9 +115,6 @@ const groups: Group[] = [
       { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
       { to: "/nakshatra", label: "Nakshatra", icon: Stars },
       { to: "/reports", label: "Reports", icon: FileText },
-
-
-
     ],
   },
   {
@@ -120,10 +123,9 @@ const groups: Group[] = [
       { to: "/saved", label: "Saved Charts", icon: Bookmark },
       { to: "/history", label: "History", icon: History },
       { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
-      { to: "/journal", label: "Journal", icon: BookOpen },
-      { to: "/learn", label: "Learn", icon: GraduationCap },
     ],
   },
+
   {
     label: "Account",
     items: [
