@@ -284,7 +284,10 @@ function TarotPage() {
       {/* Top control bar */}
       <div className="relative z-20 w-full px-4 sm:px-6 pt-6">
         <div className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Tarot</div>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Your Sacred Canvas</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl gold-text">Pick a deck. Pull a card.</h1>
+        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          Five decks sit in the bottom right corner. Choose one, drag a card onto the board, and get a clear, kind reading.
+        </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
@@ -310,21 +313,21 @@ function TarotPage() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             maxLength={200}
-            placeholder="Hold your question in mind…"
+            placeholder="What's on your mind? (optional)"
             className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
           />
           <button
             onClick={shuffleAll}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
-            title="Shuffle every visible deck"
+            title="Shuffle every deck"
           >
-            <Shuffle className="h-4 w-4" /> Shuffle All
+            <Shuffle className="h-4 w-4" /> Shuffle
           </button>
           <button
             onClick={resetSpread}
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
           >
-            <RotateCcw className="h-4 w-4" /> Reset
+            <RotateCcw className="h-4 w-4" /> Start over
           </button>
           <button
             onClick={requestReading}
@@ -332,16 +335,16 @@ function TarotPage() {
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Interpret
+            Read the cards
           </button>
         </div>
 
         <div className="mt-2 text-xs text-muted-foreground">
           {isFreestyle
-            ? `${spread.blurb} Drop as many cards as you want — they snap to a clean grid.`
-            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} anywhere on the board; they snap into place.`}
+            ? `${spread.blurb} Drop as many cards as you like.`
+            : `${spread.blurb} Drag ${spread.positions.length} card${spread.positions.length > 1 ? "s" : ""} onto the board.`}
         </div>
-      </div>
+
 
       {/* Canvas */}
       <div className="relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 pt-6 pb-40">
