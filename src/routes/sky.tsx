@@ -251,7 +251,7 @@ function MoonSVG({ angle }: { angle: number }) {
   );
 }
 
-function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["retros"] }) {
+function RetroCard({ retros, tz }: { retros: ReturnType<typeof liveSkySnapshot>["retros"]; tz: string }) {
   const active = retros.filter((r) => r.retrograde);
   return (
     <div className="glass rounded-3xl p-5">
@@ -270,7 +270,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
                 <span className="text-gold text-lg">{PLANET_GLYPHS[r.planet]}</span> {r.planet} ℞
               </span>
               <span className="text-xs text-muted-foreground">
-                turns direct {r.nextStation ? fmtDate(r.nextStation) : "—"}
+                turns direct {r.nextStation ? fmtDateTz(r.nextStation, tz) : "—"}
               </span>
             </li>
           ))}
@@ -280,7 +280,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
         {retros.filter((r) => !r.retrograde).map((r) => (
           <div key={r.planet} className="flex items-center justify-between text-[11px] text-muted-foreground">
             <span>{PLANET_GLYPHS[r.planet]} {r.planet} direct</span>
-            <span>next ℞ {r.nextStation ? fmtDate(r.nextStation) : "—"}</span>
+            <span>next ℞ {r.nextStation ? fmtDateTz(r.nextStation, tz) : "—"}</span>
           </div>
         ))}
       </div>
@@ -288,7 +288,7 @@ function RetroCard({ retros }: { retros: ReturnType<typeof liveSkySnapshot>["ret
   );
 }
 
-function IngressList({ ingresses }: { ingresses: ReturnType<typeof liveSkySnapshot>["ingresses"] }) {
+function IngressList({ ingresses, tz }: { ingresses: ReturnType<typeof liveSkySnapshot>["ingresses"]; tz: string }) {
   return (
     <section className="glass rounded-3xl p-6">
       <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
@@ -307,7 +307,7 @@ function IngressList({ ingresses }: { ingresses: ReturnType<typeof liveSkySnapsh
               </div>
             </div>
             <div className="mt-3 text-xs text-muted-foreground">
-              {ing.when.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+              {fmtLocal(ing.when, tz, { month: "long", day: "numeric", year: "numeric" })}
             </div>
           </div>
         ))}
