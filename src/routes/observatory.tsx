@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PremiumGate } from "@/components/premium-gate";
 import { useMemo, useState } from "react";
 import { Telescope, Eclipse, RotateCcw, ArrowRightLeft, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
@@ -13,7 +14,7 @@ import {
 } from "@/lib/transits-timeline";
 
 export const Route = createFileRoute("/observatory")({
-  component: ObservatoryPage,
+  component: () => (<PremiumGate featureName="Celestial Observatory"><ObservatoryPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Observatory — Eclipses & Retrogrades | TAROMAYA" },

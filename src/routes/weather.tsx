@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PremiumGate } from "@/components/premium-gate";
 import { useMemo, useState } from "react";
 import { CloudSun, Moon, Clock, Sun, Sparkles, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
@@ -6,7 +7,7 @@ import { dayAspectTimeline, moonVoidOfCourse, planetaryHours, signForecast, type
 import { PLANET_GLYPHS, type PlanetName } from "@/lib/vedic";
 
 export const Route = createFileRoute("/weather")({
-  component: WeatherPage,
+  component: () => (<PremiumGate featureName="Cosmic Weather"><WeatherPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Cosmic Weather — TAROMAYA" },

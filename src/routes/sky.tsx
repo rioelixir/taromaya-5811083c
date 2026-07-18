@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PremiumGate } from "@/components/premium-gate";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Moon, RotateCcw, Sparkles, ArrowRightLeft, MapPin } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
@@ -7,7 +8,7 @@ import { PLANET_GLYPHS, RASHIS, type PlanetName } from "@/lib/vedic";
 import { SkyAlertPrefs, type SkyLocation } from "@/components/sky-alert-prefs";
 
 export const Route = createFileRoute("/sky")({
-  component: SkyPage,
+  component: () => (<PremiumGate featureName="Live Sky"><SkyPage /></PremiumGate>),
   head: () => ({
     meta: [
       { title: "Live Sky — TAROMAYA" },
