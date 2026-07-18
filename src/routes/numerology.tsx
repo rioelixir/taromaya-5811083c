@@ -9,6 +9,10 @@ import {
 import {
   loShuGrid, nineStarKi, kabbalah, essenceTimeline, lifeCycles, analyseName,
 } from "@/lib/numerology-deep";
+import {
+  spellingCheck, nameDeepMeaning, missingAlphabets, spellingVariants,
+  mobileDobMatch,
+} from "@/lib/name-spelling";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { Loader2, Sparkles } from "lucide-react";
 
@@ -73,8 +77,8 @@ function NumerologyPage() {
       {tab === "chinese" && <NineStarKiTab birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "kabbalah" && <KabbalahTab fullName={fullName} setFullName={setFullName} />}
       {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
-      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} />}
-      {tab === "mobile" && <MobileNumerology />}
+      {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
+      {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "compat" && <CompatibilityNumerology />}
     </PageShell>
   );
@@ -205,24 +209,32 @@ Structure: Core Signature, Life Path & Destiny, Inner Self (Soul Urge & Personal
   );
 }
 
-function MobileNumerology() {
+function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setBirthDate: (s: string) => void }) {
   const [num, setNum] = useState("");
   const analysis = useMemo(() => (num ? analyzeMobile(num) : null), [num]);
+  const match = useMemo(() => (num && birthDate ? mobileDobMatch(num, birthDate) : null), [num, birthDate]);
   return (
     <>
       <GlassCard>
-        <label className="block">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile number</span>
-          <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile number</span>
+            <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          </label>
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+            <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          </label>
+        </div>
       </GlassCard>
       {analysis && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <BigNum label="Reduced" n={analysis.reduced} />
           <BigNum label="Total" n={analysis.total} />
           <GlassCard title="Signature">
-            <div className={`text-sm ${analysis.favorable ? "text-emerald-300" : "text-orange-300"}`}>
+            <div className={`text-sm ${analysis.favorable ? "text-emerald-600" : "text-orange-600"}`}>
               {analysis.favorable ? "Favourable vibration" : "Requires balance"}
             </div>
             <div className="mt-1 text-xs text-muted-foreground">Ruler: {analysis.planetRuler}</div>
@@ -240,9 +252,61 @@ function MobileNumerology() {
           </GlassCard>
         </div>
       )}
+
+      {match && (
+        <div className="mt-6">
+          <GlassCard title="Mobile ↔ Date of Birth frequency match">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="rounded-xl bg-white/5 p-4 text-center">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Match score</div>
+                <div className={`font-display text-5xl mt-2 ${
+                  match.score >= 80 ? "text-emerald-600" :
+                  match.score >= 60 ? "gold-text" :
+                  match.score >= 40 ? "text-orange-600" : "text-red-600"
+                }`}>{match.score}%</div>
+                <div className="mt-2 text-xs text-pearl">{match.verdict}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Mobile vibration</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.reducedMobile}</div>
+                <div className="text-xs text-muted-foreground">Planet: {match.planetMobile}</div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Sum {match.totalMobile}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Life-Path vibration</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.conductorDob}</div>
+                <div className="text-xs text-muted-foreground">Planet: {match.planetDob}</div>
+                <div className="mt-2 text-[11px] text-muted-foreground">Driver (Mulank) {match.driverDob}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Digit overlap</div>
+                <div className="font-display text-3xl gold-text mt-1">{match.digitOverlap}<span className="text-lg text-muted-foreground">/10</span></div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {match.overlapDigits.map((d) => (
+                    <span key={d} className="rounded-full bg-gold/10 border border-gold/30 px-2 py-0.5 text-xs gold-text">{d}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-2 md:grid-cols-3 text-xs">
+              <div className={`rounded-lg px-3 py-2 ${match.matchesLifePath ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.matchesLifePath ? "✓" : "✗"} Reduces to your Life-Path number
+              </div>
+              <div className={`rounded-lg px-3 py-2 ${match.matchesDriver ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.matchesDriver ? "✓" : "✗"} Reduces to your Driver (Mulank)
+              </div>
+              <div className={`rounded-lg px-3 py-2 ${match.compatible ? "gold-border bg-gold/10 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
+                {match.compatible ? "✓" : "✗"} Planet-compatible with your DOB
+              </div>
+            </div>
+            <div className="mt-4 rounded-xl bg-white/5 p-3 text-sm text-pearl">{match.advice}</div>
+          </GlassCard>
+        </div>
+      )}
     </>
   );
 }
+
 
 function CompatibilityNumerology() {
   const [a, setA] = useState({ name: "", date: "1995-06-15" });
@@ -676,8 +740,22 @@ function EssenceTab({ fullName, birthDate }: { fullName: string; birthDate: stri
 // ═══════════════════════════════════════════════════════════════════
 // NAME ANALYSIS — hidden passion, karmic lessons, balance, sub-conscious
 // ═══════════════════════════════════════════════════════════════════
-function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullName: (s: string) => void }) {
+function NameAnalysisTab({
+  fullName, setFullName, birthDate,
+}: { fullName: string; setFullName: (s: string) => void; birthDate: string }) {
   const a = useMemo(() => (fullName ? analyseName(fullName) : null), [fullName]);
+  const spelling = useMemo(() => (fullName ? spellingCheck(fullName) : null), [fullName]);
+  const deep = useMemo(() => (fullName ? nameDeepMeaning(fullName) : null), [fullName]);
+  const miss = useMemo(() => (fullName ? missingAlphabets(fullName) : null), [fullName]);
+  const lifePath = useMemo(
+    () => (birthDate ? computeNumerology({ fullName: fullName || "X", birthDate }).lifePath : 0),
+    [fullName, birthDate],
+  );
+  const variants = useMemo(
+    () => (fullName && birthDate ? spellingVariants(fullName, birthDate, lifePath) : []),
+    [fullName, birthDate, lifePath],
+  );
+
   return (
     <>
       <GlassCard>
@@ -687,6 +765,7 @@ function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullN
             className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
         </label>
       </GlassCard>
+
       {a && (
         <>
           <div className="mt-6 grid gap-4 lg:grid-cols-4">
@@ -695,7 +774,7 @@ function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullN
               <div className="mt-1 text-xs text-muted-foreground">Most-repeated numbers in your name — your innate talents.</div>
             </GlassCard>
             <GlassCard title="Karmic lessons">
-              <div className="font-display text-3xl text-red-300">{a.karmicLessons.join(" · ") || "None"}</div>
+              <div className="font-display text-3xl text-red-600">{a.karmicLessons.join(" · ") || "None"}</div>
               <div className="mt-1 text-xs text-muted-foreground">Digits absent from your name — soul lessons to master.</div>
             </GlassCard>
             <GlassCard title="Balance number">
@@ -704,18 +783,19 @@ function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullN
             </GlassCard>
             <GlassCard title="Sub-conscious self">
               <div className="font-display text-3xl gold-text">{a.subconsciousSelf}<span className="text-lg text-muted-foreground">/9</span></div>
-              <div className="mt-1 text-xs text-muted-foreground">Your instinctive capacity in crisis (higher = more self-reliant).</div>
+              <div className="mt-1 text-xs text-muted-foreground">Your instinctive capacity in crisis.</div>
             </GlassCard>
           </div>
+
           <div className="mt-6">
             <GlassCard title="Digit frequency in name">
               <div className="grid grid-cols-9 gap-2 text-center">
                 {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => {
                   const c = a.frequency[n] ?? 0;
                   return (
-                    <div key={n} className={`rounded-xl p-3 ${c === 0 ? "bg-red-500/5 border border-red-400/20" : "bg-white/5"}`}>
+                    <div key={n} className={`rounded-xl p-3 ${c === 0 ? "bg-red-500/5 border border-red-400/30" : "bg-white/5"}`}>
                       <div className="text-[10px] text-muted-foreground">{n}</div>
-                      <div className={`font-display text-2xl mt-1 ${c === 0 ? "text-red-300" : "gold-text"}`}>{c}</div>
+                      <div className={`font-display text-2xl mt-1 ${c === 0 ? "text-red-600" : "gold-text"}`}>{c}</div>
                     </div>
                   );
                 })}
@@ -724,6 +804,147 @@ function NameAnalysisTab({ fullName, setFullName }: { fullName: string; setFullN
           </div>
         </>
       )}
+
+      {spelling && (
+        <div className="mt-6">
+          <GlassCard title="Spelling checker">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Destiny (Expression)</div>
+                <div className="font-display text-4xl gold-text mt-1">{spelling.destiny}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Soul Urge (Vowels)</div>
+                <div className="font-display text-4xl gold-text mt-1">{spelling.soulUrge}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">Vowel sum {spelling.vowelSum}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Personality (Consonants)</div>
+                <div className="font-display text-4xl gold-text mt-1">{spelling.personality}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">Consonant sum {spelling.consonantSum}</div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Letter values</div>
+              <div className="flex flex-wrap gap-1.5">
+                {spelling.letterValues.map((l, i) => (
+                  <div key={i} className={`w-10 h-12 rounded-md flex flex-col items-center justify-center text-xs ${l.vowel ? "gold-border bg-gold/10" : "bg-white/5 border border-white/10"}`}>
+                    <div className="font-display text-base text-pearl">{l.letter}</div>
+                    <div className="gold-text text-[10px]">{l.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <ul className="mt-4 space-y-1 text-sm text-pearl list-disc list-inside">
+              {spelling.suggestions.map((s, i) => <li key={i}>{s}</li>)}
+            </ul>
+          </GlassCard>
+        </div>
+      )}
+
+      {variants.length > 0 && (
+        <div className="mt-6">
+          <GlassCard title={`Spelling variants — aligned to Life-Path ${lifePath}`}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="text-muted-foreground">
+                  <tr>
+                    <th className="text-left py-2">Spelling</th>
+                    <th className="text-right">Destiny</th>
+                    <th className="text-right">Soul Urge</th>
+                    <th className="text-right">Personality</th>
+                    <th className="text-right">Alignment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {variants.map((v) => (
+                    <tr key={v.spelling} className={`border-t border-white/10 ${v.matchesTarget ? "bg-gold/10" : ""}`}>
+                      <td className="py-2 text-pearl font-display text-base">{v.spelling}</td>
+                      <td className="text-right gold-text">{v.destiny}</td>
+                      <td className="text-right">{v.soulUrge}</td>
+                      <td className="text-right">{v.personality}</td>
+                      <td className={`text-right ${v.matchesTarget ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>{v.delta}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-3 text-[11px] text-muted-foreground">
+              Simple respectful transformations only (extra vowel, drop trailing H/A, Y↔I swap). Try each spelling aloud — the one that feels most like you and resonates numerically is the correct choice.
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
+      {miss && (
+        <div className="mt-6">
+          <GlassCard title="Missing alphabets in your name">
+            <div className="grid gap-3 md:grid-cols-3">
+              {[1,2,3,4,5,6,7,8,9].map((d) => {
+                const present = !miss.missingDigits.includes(d);
+                const letters = ["A","B","C","D","E","F","G","H","I"].slice(0); // just for structure
+                void letters;
+                const group = ({1:["A","J","S"],2:["B","K","T"],3:["C","L","U"],4:["D","M","V"],5:["E","N","W"],6:["F","O","X"],7:["G","P","Y"],8:["H","Q","Z"],9:["I","R"]} as Record<number,string[]>)[d];
+                return (
+                  <div key={d} className={`rounded-xl p-3 ${present ? "bg-white/5" : "bg-red-500/5 border border-red-400/30"}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="font-display text-2xl gold-text">{d}</div>
+                      <div className={`text-[10px] uppercase tracking-widest ${present ? "text-emerald-600" : "text-red-600"}`}>{present ? "Present" : "Missing"}</div>
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {group.map((L) => {
+                        const has = miss.presentLetters.includes(L);
+                        return (
+                          <span key={L} className={`rounded-md px-2 py-0.5 text-xs ${has ? "gold-border bg-gold/10 gold-text" : "bg-white/5 text-muted-foreground line-through"}`}>{L}</span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 text-sm text-pearl">{miss.guidance}</div>
+          </GlassCard>
+        </div>
+      )}
+
+      {deep && (
+        <div className="mt-6">
+          <GlassCard title="Deeper meaning of your name">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Cornerstone (first letter)</div>
+                <div className="font-display text-4xl gold-text mt-1">{deep.cornerstone.letter}</div>
+                <div className="text-xs text-pearl mt-2">{deep.cornerstone.meaning}</div>
+              </div>
+              <div className="rounded-xl bg-white/5 p-4">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Capstone (last letter)</div>
+                <div className="font-display text-4xl gold-text mt-1">{deep.capstone.letter}</div>
+                <div className="text-xs text-pearl mt-2">{deep.capstone.meaning}</div>
+              </div>
+              {deep.firstVowel && (
+                <div className="rounded-xl bg-white/5 p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">First vowel (inner drive)</div>
+                  <div className="font-display text-4xl gold-text mt-1">{deep.firstVowel.letter}</div>
+                  <div className="text-xs text-pearl mt-2">{deep.firstVowel.meaning}</div>
+                </div>
+              )}
+            </div>
+            <div className="mt-4">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Letter-by-letter</div>
+              <div className="grid gap-2 md:grid-cols-2">
+                {deep.letterBreakdown.map((l) => (
+                  <div key={l.letter} className="rounded-lg bg-white/5 p-3 text-xs">
+                    <span className="font-display text-lg gold-text mr-2">{l.letter}</span>
+                    <span className="text-pearl">{l.meaning}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </div>
+      )}
     </>
   );
 }
+
