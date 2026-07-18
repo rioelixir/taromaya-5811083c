@@ -579,6 +579,16 @@ function buildPdf(key: ReportKey, b: Birth) {
     }
   }
 
+  if (key === "grand") {
+    const sun = chart.planets.find(p => p.name === "Sun")!;
+    const venus = chart.planets.find(p => p.name === "Venus")!;
+    drawSub("Overview");
+    drawP(`This dossier weaves your Vedic architecture (${RASHIS[chart.ascendant.rashi]} Lagna · Moon in ${NAKSHATRAS[chart.moonNakshatra.index]}) with Western sensitivities (Sun in ${RASHIS[sun.rashi]} · Venus in ${RASHIS[venus.rashi]}) and your numerology signature (Life Path ${num.lifePath}, Destiny ${num.destiny}, Soul Urge ${num.soulUrge}). The current Mahadasha of ${cm?.lord ?? "—"} and Antardasha of ${ca?.lord ?? "—"} colour the present chapter.`);
+    drawSub("Priority Focus");
+    for (const p of priorities.slice(0, 4)) drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus."]]);
+    drawSub("Guidance");
+    drawP("Read this dossier three times: once for information, once for pattern, once for silence. What repeats is what matters.");
+
   // Footer on every content page
   const pages = pdf.getNumberOfPages();
   for (let i = 2; i <= pages; i++) {
