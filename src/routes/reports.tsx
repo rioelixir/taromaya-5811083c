@@ -588,6 +588,8 @@ function buildPdf(key: ReportKey, b: Birth) {
     for (const p of priorities.slice(0, 4)) drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus."]]);
     drawSub("Guidance");
     drawP("Read this dossier three times: once for information, once for pattern, once for silence. What repeats is what matters.");
+  }
+
 
   // Footer on every content page
   const pages = pdf.getNumberOfPages();
