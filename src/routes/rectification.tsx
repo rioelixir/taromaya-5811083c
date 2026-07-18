@@ -5,7 +5,9 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { runRectification, type LifeEvent, type EventCategory, type RectificationResult } from "@/lib/rectification";
 import { SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import type { BirthInput } from "@/lib/progressions";
-import { Plus, Trash2, Sparkles, Loader2, Target } from "lucide-react";
+import { jaiminiSnapshot, diffJaimini, CATEGORY_JAIMINI, JAIMINI_RASHIS } from "@/lib/rectification-jaimini";
+import { KARAKA_MEANING } from "@/lib/jaimini";
+import { Plus, Trash2, Sparkles, Loader2, Target, Compass, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/rectification")({
   component: () => (
