@@ -168,6 +168,10 @@ function MuhuratPage() {
           </div>
         </GlassCard>
       </div>
+      <div className="mt-8">
+        <MuhuratDeepPanel date={startDate} lat={Number(lat) || 0} lon={Number(lon) || 0} />
+      </div>
+
 
       {grouped.length > 0 && (
         <div className="mt-8 space-y-6">
