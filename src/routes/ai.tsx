@@ -1,6 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { Send, Sparkles, RotateCcw, Star, ChevronDown } from "lucide-react";
+import { Send, Sparkles, RotateCcw, Star, ChevronDown, BookmarkPlus, Check } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
@@ -8,7 +8,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listKundlis } from "@/lib/kundli-storage.functions";
 import { buildGuideContext, GUIDE_SYSTEM_PROMPT, type SavedKundliRow } from "@/lib/ai-context";
+import { createJournalEntry } from "@/lib/journal.functions";
 import ReactMarkdown from "react-markdown";
+
 
 export const Route = createFileRoute("/ai")({
   component: () => (<PremiumGate featureName="Ai"><AiPage /></PremiumGate>),
