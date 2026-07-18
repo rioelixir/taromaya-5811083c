@@ -157,6 +157,10 @@ Structure: Overall Compatibility, Emotional & Mental (Gana, Bhakoot), Physical &
             </GlassCard>
           </div>
 
+          <DeepCompatPanel deep={result.deep} />
+
+
+
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <GlassCard title="Ashtakoot radar">
               <KootaRadar kootas={result.milan.kootas} />
