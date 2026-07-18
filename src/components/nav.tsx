@@ -188,6 +188,7 @@ export function Sidebar() {
 }
 
 function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
+  const { t } = useT();
   const containsActive = group.items.some(
     (i) => pathname === i.to || (i.to !== "/" && pathname.startsWith(i.to)),
   );
@@ -202,7 +203,7 @@ function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80 hover:text-pearl"
       >
-        <span>{group.label}</span>
+        <span>{t(group.label)}</span>
         <ChevronDown className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`} />
       </button>
       {open && (
@@ -226,7 +227,7 @@ function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
                     active ? "text-gold" : "text-muted-foreground group-hover:text-gold-soft",
                   ].join(" ")}
                 />
-                <span className="truncate">{label}</span>
+                <span className="truncate">{t(label)}</span>
               </Link>
             );
           })}
