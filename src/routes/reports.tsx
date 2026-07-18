@@ -504,7 +504,7 @@ function buildPdf(key: ReportKey, b: Birth) {
       drawLoShu(pdf, gx, gy, 220, grid);
       y += 260;
       if (grid.missing?.length) drawP(`Missing: ${grid.missing.join(", ")} — karmic focus areas.`);
-      if (grid.strong?.length) drawP(`Repeated: ${grid.strong.map(s => `${s.digit}×${s.count}`).join(", ")} — natural strengths.`);
+      if (grid.strong?.length) drawP(`Repeated: ${grid.strong.map(n => `${n}×${grid.counts[n]}`).join(", ")} — natural strengths.`);
     } catch { /* ignore */ }
   }
 
