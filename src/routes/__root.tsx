@@ -16,6 +16,7 @@ import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
 import { AutoTranslator } from "@/components/auto-translator";
 import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
+import { useBranding } from "@/hooks/use-branding";
 
 function NotFoundComponent() {
   return (
@@ -203,6 +204,7 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const bgUrl = useBackgroundImage();
+  const branding = useBranding();
   const [showAuthorsNote, setShowAuthorsNote] = useState(false);
 
   useEffect(() => {
@@ -243,9 +245,9 @@ function RootComponent() {
               <Link to="/pages/$slug" params={{ slug: "refund" }} className="hover:text-gold">Refund</Link>
               <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-gold">Contact</Link>
             </nav>
-            <p>2026 • Taromaya.</p>
-            <p>App created by Riaa.</p>
-            <p>Reference from theplanetstoday.com</p>
+            {branding.footerLine1 && <p>{branding.footerLine1}</p>}
+            {branding.footerLine2 && <p>{branding.footerLine2}</p>}
+            {branding.footerLine3 && <p>{branding.footerLine3}</p>}
           </footer>
         </div>
       </div>
