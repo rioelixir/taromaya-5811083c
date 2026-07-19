@@ -197,11 +197,23 @@
     opacity: 1 !important;
   }
 
-  /* SVG text inside charts (Lagna / Vargas / wheels) */
-  svg text {
-    fill: oklch(0.10 0.02 295);
-    font-weight: 600;
+  /* SVG text inside charts (Lagna / Vargas / wheels / bi-wheel / rashi).
+     Force near-black fill + a white paint-order stroke so glyphs stay
+     razor-sharp on any background tint. */
+  svg text, svg tspan {
+    fill: oklch(0.06 0 0) !important;
+    font-weight: 700 !important;
+    stroke: oklch(1 0 0 / 0.85);
+    stroke-width: 2.4px;
+    paint-order: stroke fill;
+    stroke-linejoin: round;
+    letter-spacing: 0.01em;
   }
+  /* Small labels inside dense charts get a slightly thinner halo */
+  svg text[font-size], svg text.small {
+    stroke-width: 2px;
+  }
+
 
   /* Form labels + helper text: high-contrast, same as body */
   label, .form-label, [data-slot="form-label"] {
