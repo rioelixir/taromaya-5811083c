@@ -245,9 +245,9 @@ function RootComponent() {
               <Link to="/pages/$slug" params={{ slug: "refund" }} className="hover:text-gold">Refund</Link>
               <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-gold">Contact</Link>
             </nav>
-            <p>2026 • Taromaya.</p>
-            <p>App created by Riaa.</p>
-            <p>Reference from theplanetstoday.com</p>
+            {branding.footerLine1 && <p>{branding.footerLine1}</p>}
+            {branding.footerLine2 && <p>{branding.footerLine2}</p>}
+            {branding.footerLine3 && <p>{branding.footerLine3}</p>}
           </footer>
         </div>
       </div>
