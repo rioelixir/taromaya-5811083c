@@ -575,6 +575,16 @@ function TarotPage() {
           </div>
         );
       })()}
+
+      {/* One-time designer note — pops up on first click, then fades away */}
+      {designerNote && (
+        <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
+          <div className="glass rounded-2xl border border-gold/40 bg-cosmic/90 px-6 py-4 shadow-[0_0_80px_-20px_var(--gold)] text-center max-w-xs">
+            <div className="text-xs uppercase tracking-[0.3em] text-gold/80 mb-2">Tarot Decks</div>
+            <div className="font-display text-lg sm:text-xl text-pearl">designed by Giaa Sharmaa</div>
+          </div>
+        </div>
+      )}
     </div>
 
   );
