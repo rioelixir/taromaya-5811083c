@@ -75,6 +75,7 @@ const TABS: { id: TabId; label: string }[] = [
 
 function KundliPage() {
   const [form, setForm] = useState<FormState>(DEFAULTS);
+  useAutofillBirth<FormState>(setForm);
   const [chart, setChart] = useState<KundliChart | null>(null);
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
