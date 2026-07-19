@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable";
 import { StarField } from "@/components/star-field";
 import { Sparkles, Loader2, Mail } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
+import { queueAuthorsNote } from "@/components/authors-note-modal";
 
 function AuthLogo() {
   const logo = useAppLogo();
@@ -112,6 +113,7 @@ function AuthPage() {
         if (data.session?.user) {
           await markTermsAccepted(data.session.user.id);
           setMsg("Welcome! You're successfully registered.");
+          queueAuthorsNote();
           navigate({ to: "/" });
           return;
         }
@@ -136,6 +138,7 @@ function AuthPage() {
       setErr("Please agree to the Terms & Conditions before continuing with Google.");
       return;
     }
+    if (mode === "signup") queueAuthorsNote();
     const res = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
       extraParams: { prompt: "select_account" },

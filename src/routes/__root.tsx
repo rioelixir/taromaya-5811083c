@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -15,6 +15,7 @@ import { Sidebar } from "@/components/nav";
 import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
 import { AutoTranslator } from "@/components/auto-translator";
+import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
 
 function NotFoundComponent() {
   return (
@@ -202,10 +203,17 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const bgUrl = useBackgroundImage();
+  const [showAuthorsNote, setShowAuthorsNote] = useState(false);
+
+  useEffect(() => {
+    if (consumeAuthorsNotePending()) setShowAuthorsNote(true);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
+
 
       {bgUrl && (
         <div
