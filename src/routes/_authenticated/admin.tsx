@@ -66,6 +66,8 @@ function AdminPage() {
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
         <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plan & Price</TabBtn>
         <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
+        <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
+        <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
         <TabBtn active={tab === "assets"} onClick={() => setTab("assets")} icon={<ImageIcon className="h-4 w-4" />}>Assets</TabBtn>
@@ -75,6 +77,8 @@ function AdminPage() {
       {tab === "users" && <UsersTab />}
       {tab === "plan" && <PlanTab />}
       {tab === "subs" && <SubscriptionsTab />}
+      {tab === "decks" && <AdminTarotCmsTab />}
+      {tab === "prompts" && <AdminPromptsTab />}
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
       {tab === "assets" && <AdminAssetsTab />}
