@@ -72,7 +72,10 @@ const NORTH_CELLS: { x: number; y: number; w: number; h: number }[] = [
 ];
 
 /** Render North-Indian diamond chart with proper 12-cell layout. */
-export function NorthIndianChart({
+export function NorthIndianChart(props: { chart: Chart; title?: string; size?: number }) {
+  return <ChartZoom label={props.title ?? "North Indian Chart"}><NorthIndianChartInner {...props} /></ChartZoom>;
+}
+function NorthIndianChartInner({
   chart, title, size = 320,
 }: { chart: Chart; title?: string; size?: number }) {
   const asc = chart.ascendant.rashi;
