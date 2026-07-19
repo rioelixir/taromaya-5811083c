@@ -83,7 +83,8 @@ function AdminPage() {
 
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
-      {tab === "plan" && <PlanTab />}
+      {tab === "plan" && <AdminPlansTab />}
+      {tab === "coupons" && <AdminCouponsTab />}
       {tab === "subs" && <SubscriptionsTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
       {tab === "prompts" && <AdminPromptsTab />}
