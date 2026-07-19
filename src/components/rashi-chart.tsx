@@ -2,6 +2,7 @@
 // Consumes the NormalizedChart shape from the astro provider.
 
 import { navamshaSign } from "@/lib/vargas";
+import { ChartZoom } from "@/components/chart-zoom";
 
 type NP = {
   name: string;
