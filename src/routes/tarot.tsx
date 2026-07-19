@@ -9,6 +9,8 @@ import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
 
+const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
+
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
@@ -80,10 +82,30 @@ function TarotPage() {
   const [error, setError] = useState<string | null>(null);
   const [zoomedUid, setZoomedUid] = useState<string | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const [designerNote, setDesignerNote] = useState(false);
+  const designerNoteFired = useRef(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
   const interpret = useServerFn(interpretTarot);
+
+  // Show the one-time designer note on the first click in the Tarot module, then fade it out.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem(DESIGNER_NOTE_KEY)) {
+      designerNoteFired.current = true;
+    }
+  }, []);
+
+  const triggerDesignerNote = useCallback(() => {
+    if (designerNoteFired.current) return;
+    designerNoteFired.current = true;
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(DESIGNER_NOTE_KEY, "1");
+    }
+    setDesignerNote(true);
+    window.setTimeout(() => setDesignerNote(false), 2600);
+  }, []);
 
   const spread = SPREADS[spreadKey];
   const isFreestyle = !!spread.freestyle;
@@ -298,7 +320,7 @@ function TarotPage() {
   };
 
   return (
-    <div className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
+    <div onClick={triggerDesignerNote} className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
       <StarField />
 
       {/* Top control bar */}
@@ -553,6 +575,16 @@ function TarotPage() {
           </div>
         );
       })()}
+
+      {/* One-time designer note — pops up on first click, then fades away */}
+      {designerNote && (
+        <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
+          <div className="glass rounded-2xl border border-gold/40 bg-cosmic/90 px-6 py-4 shadow-[0_0_80px_-20px_var(--gold)] text-center max-w-xs">
+            <div className="text-xs uppercase tracking-[0.3em] text-gold/80 mb-2">Tarot Decks</div>
+            <div className="font-display text-lg sm:text-xl text-pearl">designed by Giaa Sharmaa</div>
+          </div>
+        </div>
+      )}
     </div>
 
   );
