@@ -12,7 +12,7 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
   if (!data) throw new Error("Forbidden: admin only");
 }
 
-// ─── Public: get the active plan ─────────────────────────────────────────
+// ─── Public: get the active plan (backwards-compat: first active) ──────
 export const getActivePlan = createServerFn({ method: "GET" }).handler(async () => {
   const { createClient } = await import("@supabase/supabase-js");
   const url = process.env.SUPABASE_URL!;
@@ -22,12 +22,103 @@ export const getActivePlan = createServerFn({ method: "GET" }).handler(async () 
     .from("subscription_plans")
     .select("*")
     .eq("is_active", true)
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
   if (error) throw error;
   return data;
 });
+
+// ─── Public: list all active plans ─────────────────────────────────────
+export const getActivePlans = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("@supabase/supabase-js");
+  const url = process.env.SUPABASE_URL!;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  const supabase = createClient(url, key, { auth: { persistSession: false } });
+  const { data, error } = await supabase
+    .from("subscription_plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("price_cents", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+});
+
+// ─── Admin: list all plans ─────────────────────────────────────────────
+export const adminListPlans = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("subscription_plans")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+// ─── Admin: create plan ────────────────────────────────────────────────
+export const adminCreatePlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: {
+    slug: string;
+    name: string;
+    description?: string;
+    price_cents: number;
+    currency?: string;
+    billing_period?: string;
+    features?: string[];
+    payment_link?: string | null;
+    is_active?: boolean;
+    tier?: string;
+    badge?: string | null;
+    highlight?: boolean;
+    trial_days?: number;
+    sort_order?: number;
+  }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("subscription_plans")
+      .insert({
+        slug: data.slug,
+        name: data.name,
+        description: data.description ?? null,
+        price_cents: data.price_cents,
+        currency: data.currency ?? "INR",
+        billing_period: data.billing_period ?? "monthly",
+        features: data.features ?? [],
+        payment_link: data.payment_link ?? null,
+        is_active: data.is_active ?? true,
+        tier: data.tier ?? "standard",
+        badge: data.badge ?? null,
+        highlight: data.highlight ?? false,
+        trial_days: data.trial_days ?? 0,
+        sort_order: data.sort_order ?? 0,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return row;
+  });
+
+// ─── Admin: delete plan ────────────────────────────────────────────────
+export const adminDeletePlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("subscription_plans").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
 
 // ─── User: my subscription ───────────────────────────────────────────────
 export const getMySubscription = createServerFn({ method: "GET" })
