@@ -320,7 +320,7 @@ function TarotPage() {
   };
 
   return (
-    <div className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
+    <div onClick={triggerDesignerNote} className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
       <StarField />
 
       {/* Top control bar */}
