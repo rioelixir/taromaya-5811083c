@@ -1,4 +1,5 @@
 import type { WesternChart } from "@/lib/western";
+import { ChartZoom } from "@/components/chart-zoom";
 import { SIGN_GLYPHS } from "@/lib/western";
 import { PLANET_GLYPHS, type PlanetName } from "@/lib/vedic";
 

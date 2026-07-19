@@ -1,4 +1,5 @@
 import type { WesternChart } from "@/lib/western";
+import { ChartZoom } from "@/components/chart-zoom";
 import { PLANET_GLYPHS, RASHIS } from "@/lib/vedic";
 import { computeAspects, ASPECTS, SIGN_GLYPHS } from "@/lib/western";
 
@@ -10,7 +11,10 @@ function rotate(chart: WesternChart, longitude: number): number {
   return norm360(longitude - chart.tropicalAscendant + 180);
 }
 
-export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: number }) {
+export function WheelChart(props: { chart: WesternChart; size?: number }) {
+  return <ChartZoom label="Natal Wheel Chart"><WheelChartInner {...props} /></ChartZoom>;
+}
+function WheelChartInner({ chart, size = 520 }: { chart: WesternChart; size?: number }) {
   const cx = size / 2;
   const cy = size / 2;
   const rOuter = size * 0.48;
