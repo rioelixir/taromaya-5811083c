@@ -9,6 +9,8 @@ import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
 
+const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
+
 export const Route = createFileRoute("/tarot")({
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
