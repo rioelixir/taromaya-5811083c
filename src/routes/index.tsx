@@ -53,6 +53,7 @@ function Home() {
 /* ─────────────────────────  HERO — cosmic seal  ───────────────────────── */
 
 function CelestialHero() {
+  const branding = useBranding();
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
@@ -72,14 +73,13 @@ function CelestialHero() {
           ✦ &nbsp; {today} &nbsp; ✦
         </div>
         <h1 className="mt-4 font-display text-5xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-tight">
-          <span className="gold-text">TAROMAYA</span>
+          <span className="gold-text">{branding.heroTitle}</span>
         </h1>
         <div className="mt-2 text-xs uppercase tracking-[0.35em] text-pearl/70">
-          Cosmic Oracle · Vedic Wisdom · AI Guidance
+          {branding.heroKicker}
         </div>
         <p className="mx-auto mt-6 max-w-lg text-sm sm:text-base text-muted-foreground">
-          The universe has been waiting. Choose your gateway below — draw a card,
-          chart the sky, or converse with your AI oracle.
+          {branding.heroDescription}
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
