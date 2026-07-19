@@ -22,6 +22,7 @@ import {
   Coins,
 } from "lucide-react";
 import { StarField } from "@/components/star-field";
+import { useBranding } from "@/hooks/use-branding";
 
 export const Route = createFileRoute("/")({
   component: Home,
