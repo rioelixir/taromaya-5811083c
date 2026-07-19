@@ -109,13 +109,15 @@ export function GlassCard({
   title,
   desc,
   children,
+  className,
 }: {
   title?: string;
   desc?: string;
   children?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="glass rounded-3xl p-6">
+    <div className={["glass rounded-3xl p-6", className].filter(Boolean).join(" ")}>
       {title && <div className="font-display text-xl text-pearl">{title}</div>}
       {desc && <div className="mt-1 text-sm text-muted-foreground">{desc}</div>}
       {children && <div className={title ? "mt-4" : ""}>{children}</div>}

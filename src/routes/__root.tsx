@@ -233,7 +233,16 @@ function RootComponent() {
           <main className="relative min-h-dvh pb-8 lg:pb-12">
             <Outlet />
           </main>
-          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm space-y-1">
+          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm space-y-2">
+            <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-white/70">
+              <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-gold">About</Link>
+              <Link to="/blog" className="hover:text-gold">Blog</Link>
+              <Link to="/faq" className="hover:text-gold">FAQ</Link>
+              <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-gold">Privacy</Link>
+              <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-gold">Terms</Link>
+              <Link to="/pages/$slug" params={{ slug: "refund" }} className="hover:text-gold">Refund</Link>
+              <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-gold">Contact</Link>
+            </nav>
             <p>2026 • Taromaya.</p>
             <p>App created by Riaa.</p>
             <p>Reference from theplanetstoday.com</p>

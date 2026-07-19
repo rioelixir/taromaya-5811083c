@@ -47,12 +47,14 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as FestivalsRouteImport } from './routes/festivals'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DreamsRouteImport } from './routes/dreams'
 import { Route as DharmaRouteImport } from './routes/dharma'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as ChakraRouteImport } from './routes/chakra'
 import { Route as CareerRouteImport } from './routes/career'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BabyNamesRouteImport } from './routes/baby-names'
 import { Route as AyurvedaRouteImport } from './routes/ayurveda'
 import { Route as AvakhadaRouteImport } from './routes/avakhada'
@@ -63,6 +65,8 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiTranslateRouteImport } from './routes/api/translate'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
@@ -266,6 +270,11 @@ const FestivalsRoute = FestivalsRouteImport.update({
   path: '/festivals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DreamsRoute = DreamsRouteImport.update({
   id: '/dreams',
   path: '/dreams',
@@ -294,6 +303,11 @@ const CareerRoute = CareerRouteImport.update({
 const BookmarksRoute = BookmarksRouteImport.update({
   id: '/bookmarks',
   path: '/bookmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BabyNamesRoute = BabyNamesRouteImport.update({
@@ -344,6 +358,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PagesSlugRoute = PagesSlugRouteImport.update({
+  id: '/pages/$slug',
+  path: '/pages/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const ApiTranslateRoute = ApiTranslateRouteImport.update({
   id: '/api/translate',
@@ -418,12 +442,14 @@ export interface FileRoutesByFullPath {
   '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
+  '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
+  '/faq': typeof FaqRoute
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
@@ -472,6 +498,8 @@ export interface FileRoutesByFullPath {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/translate': typeof ApiTranslateRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -485,12 +513,14 @@ export interface FileRoutesByTo {
   '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
+  '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
+  '/faq': typeof FaqRoute
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
@@ -539,6 +569,8 @@ export interface FileRoutesByTo {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/translate': typeof ApiTranslateRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -554,12 +586,14 @@ export interface FileRoutesById {
   '/avakhada': typeof AvakhadaRoute
   '/ayurveda': typeof AyurvedaRoute
   '/baby-names': typeof BabyNamesRoute
+  '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
   '/dharma': typeof DharmaRoute
   '/dreams': typeof DreamsRoute
+  '/faq': typeof FaqRoute
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
@@ -608,6 +642,8 @@ export interface FileRoutesById {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/translate': typeof ApiTranslateRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/pages/$slug': typeof PagesSlugRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -623,12 +659,14 @@ export interface FileRouteTypes {
     | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
+    | '/blog'
     | '/bookmarks'
     | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
+    | '/faq'
     | '/festivals'
     | '/finance'
     | '/health'
@@ -677,6 +715,8 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/translate'
+    | '/blog/$slug'
+    | '/pages/$slug'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
@@ -690,12 +730,14 @@ export interface FileRouteTypes {
     | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
+    | '/blog'
     | '/bookmarks'
     | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
+    | '/faq'
     | '/festivals'
     | '/finance'
     | '/health'
@@ -744,6 +786,8 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/translate'
+    | '/blog/$slug'
+    | '/pages/$slug'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   id:
@@ -758,12 +802,14 @@ export interface FileRouteTypes {
     | '/avakhada'
     | '/ayurveda'
     | '/baby-names'
+    | '/blog'
     | '/bookmarks'
     | '/career'
     | '/chakra'
     | '/compatibility'
     | '/dharma'
     | '/dreams'
+    | '/faq'
     | '/festivals'
     | '/finance'
     | '/health'
@@ -812,6 +858,8 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/translate'
+    | '/blog/$slug'
+    | '/pages/$slug'
     | '/_authenticated/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
@@ -827,12 +875,14 @@ export interface RootRouteChildren {
   AvakhadaRoute: typeof AvakhadaRoute
   AyurvedaRoute: typeof AyurvedaRoute
   BabyNamesRoute: typeof BabyNamesRoute
+  BlogRoute: typeof BlogRouteWithChildren
   BookmarksRoute: typeof BookmarksRoute
   CareerRoute: typeof CareerRoute
   ChakraRoute: typeof ChakraRoute
   CompatibilityRoute: typeof CompatibilityRoute
   DharmaRoute: typeof DharmaRoute
   DreamsRoute: typeof DreamsRoute
+  FaqRoute: typeof FaqRoute
   FestivalsRoute: typeof FestivalsRoute
   FinanceRoute: typeof FinanceRoute
   HealthRoute: typeof HealthRoute
@@ -874,6 +924,7 @@ export interface RootRouteChildren {
   ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiTranslateRoute: typeof ApiTranslateRoute
+  PagesSlugRoute: typeof PagesSlugRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1145,6 +1196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FestivalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dreams': {
       id: '/dreams'
       path: '/dreams'
@@ -1185,6 +1243,13 @@ declare module '@tanstack/react-router' {
       path: '/bookmarks'
       fullPath: '/bookmarks'
       preLoaderRoute: typeof BookmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/baby-names': {
@@ -1256,6 +1321,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/pages/$slug': {
+      id: '/pages/$slug'
+      path: '/pages/$slug'
+      fullPath: '/pages/$slug'
+      preLoaderRoute: typeof PagesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/api/translate': {
       id: '/api/translate'
@@ -1369,6 +1448,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1380,12 +1469,14 @@ const rootRouteChildren: RootRouteChildren = {
   AvakhadaRoute: AvakhadaRoute,
   AyurvedaRoute: AyurvedaRoute,
   BabyNamesRoute: BabyNamesRoute,
+  BlogRoute: BlogRouteWithChildren,
   BookmarksRoute: BookmarksRoute,
   CareerRoute: CareerRoute,
   ChakraRoute: ChakraRoute,
   CompatibilityRoute: CompatibilityRoute,
   DharmaRoute: DharmaRoute,
   DreamsRoute: DreamsRoute,
+  FaqRoute: FaqRoute,
   FestivalsRoute: FestivalsRoute,
   FinanceRoute: FinanceRoute,
   HealthRoute: HealthRoute,
@@ -1427,6 +1518,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
   ApiTranslateRoute: ApiTranslateRoute,
+  PagesSlugRoute: PagesSlugRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport

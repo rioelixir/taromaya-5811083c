@@ -207,6 +207,129 @@ export type Database = {
           },
         ]
       }
+      cms_blogs: {
+        Row: {
+          author: string
+          body_md: string
+          cover_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published: boolean
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          body_md?: string
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          body_md?: string
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_faqs: {
+        Row: {
+          answer_md: string
+          category: string
+          created_at: string
+          id: string
+          published: boolean
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer_md?: string
+          category?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer_md?: string
+          category?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_pages: {
+        Row: {
+          body_md: string
+          created_at: string
+          id: string
+          published: boolean
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body_md?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body_md?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           body: string
