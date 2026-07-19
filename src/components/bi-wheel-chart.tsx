@@ -106,78 +106,102 @@ export function BiWheelChart({
 
 
       {/* Zodiac ring + glyphs */}
+      <g role="list" aria-label="Zodiac signs">
       {signSegments.map(({ i, start, mid }) => {
         const p1 = pol(start, rZodiac);
         const p2 = pol(start, rOuter);
         const g = pol(mid, (rZodiac + rOuter) / 2);
         const color = ["oklch(0.72 0.15 45)","oklch(0.65 0.12 130)","oklch(0.72 0.12 220)","oklch(0.7 0.13 280)"][i % 4];
         return (
-          <g key={i}>
+          <g key={i} role="listitem" tabIndex={0} aria-label={RASHI_NAMES[i]} className="chart-hit" data-chart-hit>
+            <title>{RASHI_NAMES[i]}</title>
             <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="oklch(1 0 0 / 0.2)" strokeWidth="0.6" />
+            <circle cx={g.x} cy={g.y} r={hitR} fill="transparent" />
             <text x={g.x} y={g.y} fill={color} fontSize={size * 0.028} textAnchor="middle" dominantBaseline="middle" fontFamily="serif">
               {SIGN_GLYPHS[i]}
             </text>
           </g>
         );
       })}
+      </g>
 
       {/* House cusps */}
+      <g role="list" aria-label="Houses">
       {chart.cusps.map((c, i) => {
         const rc = rotate(c);
         const p1 = pol(rc, rHouseInner);
         const p2 = pol(rc, rHouseOuter);
         const isAngle = i === 0 || i === 3 || i === 6 || i === 9;
+        const mid = pol(rc + 5, (rHouseInner + rHouseOuter) / 2);
         return (
-          <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
-            stroke={isAngle ? "oklch(0.82 0.13 85 / 0.7)" : "oklch(1 0 0 / 0.2)"}
-            strokeWidth={isAngle ? 1.2 : 0.6} />
+          <g key={i} role="listitem" tabIndex={0} aria-label={`House ${i + 1}${isAngle ? " (angular)" : ""}`} className="chart-hit" data-chart-hit>
+            <title>{`House ${i + 1}`}</title>
+            <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+              stroke={isAngle ? "oklch(0.82 0.13 85 / 0.7)" : "oklch(1 0 0 / 0.2)"}
+              strokeWidth={isAngle ? 1.2 : 0.6} />
+            <circle cx={mid.x} cy={mid.y} r={hitR * 0.7} fill="transparent" />
+          </g>
         );
       })}
+      </g>
 
       {/* Inner–outer aspect links */}
+      <g aria-hidden="true">
       {links.map((l, i) => {
         const p1 = pol(l.a, rAspect);
         const p2 = pol(l.b, rAspect);
         return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={l.color} strokeWidth={0.9} />;
       })}
+      </g>
 
       {/* Outer planets */}
+      <g role="list" aria-label={`${outerLabel} planets`}>
       {outer.map((p) => {
         const pos = pol(p.theta, rOuterPlanet);
         const tick1 = pol(rotate(p.longitude), rZodiac);
         const tick2 = pol(rotate(p.longitude), rZodiac - size * 0.015);
+        const label = `${outerLabel} ${p.name} at ${p.longitude.toFixed(2)}°${p.retrograde ? ", retrograde" : ""}`;
         return (
-          <g key={"o" + p.name}>
+          <g key={"o" + p.name} role="listitem" tabIndex={0} aria-label={label} className="chart-hit" data-chart-hit>
+            <title>{label}</title>
             <line x1={tick1.x} y1={tick1.y} x2={tick2.x} y2={tick2.y} stroke="oklch(0.75 0.15 200 / 0.9)" strokeWidth={1} />
+            <circle cx={pos.x} cy={pos.y} r={hitR} fill="transparent" />
             <circle cx={pos.x} cy={pos.y} r={size * 0.017} fill="oklch(0.09 0.03 275)" stroke="oklch(0.75 0.15 200)" strokeWidth={1} />
             <text x={pos.x} y={pos.y + size * 0.005} fill="oklch(0.85 0.12 210)" fontSize={size * 0.022} textAnchor="middle" dominantBaseline="middle" fontFamily="serif">
               {PLANET_GLYPHS[p.name]}
             </text>
             {p.retrograde && (
-              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.013} textAnchor="middle">℞</text>
+              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.013} textAnchor="middle" aria-hidden="true">℞</text>
             )}
           </g>
         );
       })}
+      </g>
 
       {/* Inner (natal) planets */}
+      <g role="list" aria-label="Natal planets">
       {inner.map((p) => {
         const pos = pol(p.theta, rInnerPlanet);
         const tick1 = pol(rotate(p.tropicalLongitude), rHouseOuter);
         const tick2 = pol(rotate(p.tropicalLongitude), rHouseOuter + size * 0.013);
+        const label = `Natal ${p.name} at ${p.tropicalLongitude.toFixed(2)}°${p.retrograde ? ", retrograde" : ""}`;
         return (
-          <g key={"i" + p.name}>
+          <g key={"i" + p.name} role="listitem" tabIndex={0} aria-label={label} className="chart-hit" data-chart-hit>
+            <title>{label}</title>
             <line x1={tick1.x} y1={tick1.y} x2={tick2.x} y2={tick2.y} stroke="oklch(0.82 0.13 85 / 0.85)" strokeWidth={1} />
+            <circle cx={pos.x} cy={pos.y} r={hitR} fill="transparent" />
             <circle cx={pos.x} cy={pos.y} r={size * 0.017} fill="oklch(0.09 0.03 275)" stroke="oklch(0.82 0.13 85)" strokeWidth={1} />
             <text x={pos.x} y={pos.y + size * 0.005} fill="oklch(0.92 0.09 88)" fontSize={size * 0.022} textAnchor="middle" dominantBaseline="middle" fontFamily="serif">
               {PLANET_GLYPHS[p.name]}
             </text>
             {p.retrograde && (
-              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.013} textAnchor="middle">℞</text>
+              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.013} textAnchor="middle" aria-hidden="true">℞</text>
             )}
           </g>
         );
       })}
+      </g>
+
 
       {/* Legend */}
       <g fontSize={size * 0.02} fontFamily="serif">
