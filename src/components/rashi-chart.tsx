@@ -169,7 +169,10 @@ function NorthIndianChartInner({
 
 
 /** Render South-Indian fixed-sign grid (4x4 with Aries top-left corner of outer ring). */
-export function SouthIndianChart({
+export function SouthIndianChart(props: { chart: Chart; title?: string; size?: number }) {
+  return <ChartZoom label={props.title ?? "South Indian Chart"}><SouthIndianChartInner {...props} /></ChartZoom>;
+}
+function SouthIndianChartInner({
   chart, title, size = 320,
 }: { chart: Chart; title?: string; size?: number }) {
   // Sign positions in a 4x4 grid (Aries=col1,row0 clockwise).
