@@ -252,11 +252,22 @@ function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
               </Link>
             );
           })}
+          {group.label === "Home" && (
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
+              className="w-full group flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground hover:text-pearl hover:bg-white/5 transition-all"
+            >
+              <Feather className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-gold-soft" />
+              <span className="truncate">{t("Author's Note")}</span>
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 }
+
 
 function AuthFooter() {
   const { user, loading } = useAuth();
