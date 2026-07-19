@@ -203,10 +203,17 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const bgUrl = useBackgroundImage();
+  const [showAuthorsNote, setShowAuthorsNote] = useState(false);
+
+  useEffect(() => {
+    if (consumeAuthorsNotePending()) setShowAuthorsNote(true);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
+
 
       {bgUrl && (
         <div
