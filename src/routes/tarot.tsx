@@ -82,10 +82,30 @@ function TarotPage() {
   const [error, setError] = useState<string | null>(null);
   const [zoomedUid, setZoomedUid] = useState<string | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  const [designerNote, setDesignerNote] = useState(false);
+  const designerNoteFired = useRef(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
   const interpret = useServerFn(interpretTarot);
+
+  // Show the one-time designer note on the first click in the Tarot module, then fade it out.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem(DESIGNER_NOTE_KEY)) {
+      designerNoteFired.current = true;
+    }
+  }, []);
+
+  const triggerDesignerNote = useCallback(() => {
+    if (designerNoteFired.current) return;
+    designerNoteFired.current = true;
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(DESIGNER_NOTE_KEY, "1");
+    }
+    setDesignerNote(true);
+    window.setTimeout(() => setDesignerNote(false), 2600);
+  }, []);
 
   const spread = SPREADS[spreadKey];
   const isFreestyle = !!spread.freestyle;
