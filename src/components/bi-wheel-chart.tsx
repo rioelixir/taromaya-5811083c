@@ -1,4 +1,5 @@
 import type { WesternChart } from "@/lib/western";
+import { ChartZoom } from "@/components/chart-zoom";
 import { SIGN_GLYPHS } from "@/lib/western";
 import { PLANET_GLYPHS, type PlanetName } from "@/lib/vedic";
 
@@ -11,7 +12,11 @@ type OuterPlanet = { name: PlanetName; longitude: number; retrograde?: boolean }
  * Bi-wheel: natal chart on the inner ring, transiting or partner planets on the outer ring.
  * Aspects between inner and outer planets are drawn as connecting lines.
  */
-export function BiWheelChart({
+type BiWheelProps = { chart: WesternChart; outerPlanets: OuterPlanet[]; outerLabel?: string; size?: number };
+export function BiWheelChart(props: BiWheelProps) {
+  return <ChartZoom label={`${props.outerLabel ?? "Transits"} Bi-Wheel Chart`}><BiWheelChartInner {...props} /></ChartZoom>;
+}
+function BiWheelChartInner({
   chart,
   outerPlanets,
   outerLabel = "Transits",

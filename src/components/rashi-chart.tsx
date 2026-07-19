@@ -2,6 +2,7 @@
 // Consumes the NormalizedChart shape from the astro provider.
 
 import { navamshaSign } from "@/lib/vargas";
+import { ChartZoom } from "@/components/chart-zoom";
 
 type NP = {
   name: string;
@@ -72,7 +73,10 @@ const NORTH_CELLS: { x: number; y: number; w: number; h: number }[] = [
 ];
 
 /** Render North-Indian diamond chart with proper 12-cell layout. */
-export function NorthIndianChart({
+export function NorthIndianChart(props: { chart: Chart; title?: string; size?: number }) {
+  return <ChartZoom label={props.title ?? "North Indian Chart"}><NorthIndianChartInner {...props} /></ChartZoom>;
+}
+function NorthIndianChartInner({
   chart, title, size = 320,
 }: { chart: Chart; title?: string; size?: number }) {
   const asc = chart.ascendant.rashi;
@@ -165,7 +169,10 @@ export function NorthIndianChart({
 
 
 /** Render South-Indian fixed-sign grid (4x4 with Aries top-left corner of outer ring). */
-export function SouthIndianChart({
+export function SouthIndianChart(props: { chart: Chart; title?: string; size?: number }) {
+  return <ChartZoom label={props.title ?? "South Indian Chart"}><SouthIndianChartInner {...props} /></ChartZoom>;
+}
+function SouthIndianChartInner({
   chart, title, size = 320,
 }: { chart: Chart; title?: string; size?: number }) {
   // Sign positions in a 4x4 grid (Aries=col1,row0 clockwise).
