@@ -138,6 +138,7 @@ function AuthPage() {
       setErr("Please agree to the Terms & Conditions before continuing with Google.");
       return;
     }
+    if (mode === "signup") queueAuthorsNote();
     const res = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
       extraParams: { prompt: "select_account" },
