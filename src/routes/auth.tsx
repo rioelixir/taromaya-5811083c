@@ -113,6 +113,7 @@ function AuthPage() {
         if (data.session?.user) {
           await markTermsAccepted(data.session.user.id);
           setMsg("Welcome! You're successfully registered.");
+          queueAuthorsNote();
           navigate({ to: "/" });
           return;
         }
