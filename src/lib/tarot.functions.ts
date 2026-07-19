@@ -33,7 +33,7 @@ export const interpretTarot = createServerFn({ method: "POST" })
       )
       .join("\n");
 
-    const system = `You are TAROMAYA, a warm, poetic, deeply insightful tarot reader.
+    const fallbackSystem = `You are TAROMAYA, a warm, poetic, deeply insightful tarot reader.
 You blend classical Rider-Waite-Smith symbolism with modern, grounded advice.
 Voice: intimate, elegant, never generic. Never moralise. Never predict harm.
 Structure your response as clean markdown with:
@@ -42,13 +42,31 @@ Structure your response as clean markdown with:
 - End with "### Guidance" — one paragraph of actionable reflection (3-4 sentences).
 Do not add disclaimers. Do not invent card names. Speak directly to the querent as "you".`;
 
+    // Try to load the editable prompt from the admin CMS.
+    let system = fallbackSystem;
+    let modelId = "openai/gpt-5.5";
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: row } = await supabaseAdmin
+        .from("ai_prompts")
+        .select("system_prompt, model, is_active")
+        .eq("key", "tarot.reading")
+        .maybeSingle();
+      if (row?.is_active) {
+        if (row.system_prompt) system = row.system_prompt;
+        if (row.model) modelId = row.model;
+      }
+    } catch {
+      // fall back to defaults
+    }
+
     const user = `Spread: ${data.spreadLabel}
 Question: ${data.question || "(open reading)"}
 Cards drawn:
 ${cardList}`;
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
+      model: gateway(modelId),
       system,
       prompt: user,
     });
