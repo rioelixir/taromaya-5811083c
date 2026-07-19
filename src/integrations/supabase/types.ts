@@ -50,6 +50,104 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_prompt_versions: {
+        Row: {
+          created_at: string
+          id: string
+          model: string
+          prompt_id: string
+          saved_by: string | null
+          system_prompt: string
+          temperature: number
+          user_template: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model: string
+          prompt_id: string
+          saved_by?: string | null
+          system_prompt: string
+          temperature: number
+          user_template: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model?: string
+          prompt_id?: string
+          saved_by?: string | null
+          system_prompt?: string
+          temperature?: number
+          user_template?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prompt_versions_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_prompts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          key: string
+          label: string
+          language: string | null
+          max_output_tokens: number | null
+          model: string
+          system_prompt: string
+          temperature: number
+          updated_at: string
+          updated_by: string | null
+          user_template: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key: string
+          label: string
+          language?: string | null
+          max_output_tokens?: number | null
+          model?: string
+          system_prompt?: string
+          temperature?: number
+          updated_at?: string
+          updated_by?: string | null
+          user_template?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          key?: string
+          label?: string
+          language?: string | null
+          max_output_tokens?: number | null
+          model?: string
+          system_prompt?: string
+          temperature?: number
+          updated_at?: string
+          updated_by?: string | null
+          user_template?: string
+          version?: number
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -465,6 +563,209 @@ export type Database = {
           payment_link?: string | null
           price_cents?: number
           slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tarot_cards: {
+        Row: {
+          advice: string | null
+          affirmation: string | null
+          arcana: string | null
+          audio_url: string | null
+          back_image_url: string | null
+          career: string | null
+          chakra: string | null
+          color: string | null
+          created_at: string
+          crystal: string | null
+          deck_id: string
+          element: string | null
+          finance: string | null
+          front_image_url: string | null
+          health: string | null
+          id: string
+          is_active: boolean
+          journal_prompt: string | null
+          keywords: string[] | null
+          love: string | null
+          meaning_reversed: string | null
+          meaning_upright: string | null
+          meditation: string | null
+          name: string
+          number: string | null
+          planet: string | null
+          position: number
+          spiritual: string | null
+          suit: string | null
+          tags: string[] | null
+          timing: string | null
+          updated_at: string
+          zodiac: string | null
+        }
+        Insert: {
+          advice?: string | null
+          affirmation?: string | null
+          arcana?: string | null
+          audio_url?: string | null
+          back_image_url?: string | null
+          career?: string | null
+          chakra?: string | null
+          color?: string | null
+          created_at?: string
+          crystal?: string | null
+          deck_id: string
+          element?: string | null
+          finance?: string | null
+          front_image_url?: string | null
+          health?: string | null
+          id?: string
+          is_active?: boolean
+          journal_prompt?: string | null
+          keywords?: string[] | null
+          love?: string | null
+          meaning_reversed?: string | null
+          meaning_upright?: string | null
+          meditation?: string | null
+          name: string
+          number?: string | null
+          planet?: string | null
+          position?: number
+          spiritual?: string | null
+          suit?: string | null
+          tags?: string[] | null
+          timing?: string | null
+          updated_at?: string
+          zodiac?: string | null
+        }
+        Update: {
+          advice?: string | null
+          affirmation?: string | null
+          arcana?: string | null
+          audio_url?: string | null
+          back_image_url?: string | null
+          career?: string | null
+          chakra?: string | null
+          color?: string | null
+          created_at?: string
+          crystal?: string | null
+          deck_id?: string
+          element?: string | null
+          finance?: string | null
+          front_image_url?: string | null
+          health?: string | null
+          id?: string
+          is_active?: boolean
+          journal_prompt?: string | null
+          keywords?: string[] | null
+          love?: string | null
+          meaning_reversed?: string | null
+          meaning_upright?: string | null
+          meditation?: string | null
+          name?: string
+          number?: string | null
+          planet?: string | null
+          position?: number
+          spiritual?: string | null
+          suit?: string | null
+          tags?: string[] | null
+          timing?: string | null
+          updated_at?: string
+          zodiac?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tarot_cards_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "tarot_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tarot_decks: {
+        Row: {
+          accent: string | null
+          author: string | null
+          card_back_url: string | null
+          category: string | null
+          cover_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty: string | null
+          glyph: string | null
+          guidebook_pdf_url: string | null
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          is_premium: boolean
+          is_public: boolean
+          keywords: string[] | null
+          language: string | null
+          name: string
+          publisher: string | null
+          short_name: string | null
+          slug: string
+          sort_order: number
+          tagline: string | null
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          accent?: string | null
+          author?: string | null
+          card_back_url?: string | null
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty?: string | null
+          glyph?: string | null
+          guidebook_pdf_url?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_premium?: boolean
+          is_public?: boolean
+          keywords?: string[] | null
+          language?: string | null
+          name: string
+          publisher?: string | null
+          short_name?: string | null
+          slug: string
+          sort_order?: number
+          tagline?: string | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accent?: string | null
+          author?: string | null
+          card_back_url?: string | null
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty?: string | null
+          glyph?: string | null
+          guidebook_pdf_url?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          is_premium?: boolean
+          is_public?: boolean
+          keywords?: string[] | null
+          language?: string | null
+          name?: string
+          publisher?: string | null
+          short_name?: string | null
+          slug?: string
+          sort_order?: number
+          tagline?: string | null
+          thumbnail_url?: string | null
           updated_at?: string
         }
         Relationships: []
