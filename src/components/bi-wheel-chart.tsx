@@ -92,10 +92,18 @@ export function BiWheelChart({
       </desc>
 
 
+      <defs>
+        <radialGradient id="biwheelBg" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="oklch(0.15 0.05 275)" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="oklch(0.08 0.02 275)" stopOpacity="1" />
+        </radialGradient>
+      </defs>
+
       <circle cx={cx} cy={cy} r={rOuter} fill="url(#biwheelBg)" stroke="oklch(0.82 0.13 85 / 0.5)" strokeWidth="1.2" />
       <circle cx={cx} cy={cy} r={rZodiac} fill="none" stroke="oklch(1 0 0 / 0.15)" strokeWidth="0.8" />
       <circle cx={cx} cy={cy} r={rHouseOuter} fill="none" stroke="oklch(1 0 0 / 0.1)" strokeWidth="0.6" />
       <circle cx={cx} cy={cy} r={rHouseInner} fill="none" stroke="oklch(1 0 0 / 0.08)" strokeWidth="0.5" />
+
 
       {/* Zodiac ring + glyphs */}
       {signSegments.map(({ i, start, mid }) => {
