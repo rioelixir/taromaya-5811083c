@@ -185,17 +185,24 @@ export function SouthIndianChart({
   for (let s = 0; s < 12; s++) planetsBySign[s] = [];
   for (const p of chart.planets) planetsBySign[p.rashi].push(p);
 
+  const RASHI_FULL_S = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+
   return (
     <div className="glass-card p-3">
       {title && <div className="mb-2 text-center font-serif text-sm text-primary">{title}</div>}
-      <svg viewBox={`0 0 ${S} ${S}`} className="w-full">
+      <svg
+        viewBox={`0 0 ${S} ${S}`}
+        className="w-full"
+        role="img"
+        aria-label={`${title ?? "South Indian chart"} — Ascendant in ${RASHI_FULL_S[asc]}, ${chart.planets.length} planets`}
+      >
         {/* outer frame */}
         <rect x={0} y={0} width={S} height={S} fill="none" stroke="currentColor" strokeOpacity={0.35} />
         {/* inner void (center 2x2) */}
         <rect x={cell} y={cell} width={cell*2} height={cell*2} fill="none" stroke="currentColor" strokeOpacity={0.35} />
         {/* cell grid lines on outer ring */}
         {[1,2,3].map(i => (
-          <g key={i}>
+          <g key={i} aria-hidden="true">
             <line x1={i*cell} y1={0} x2={i*cell} y2={cell} stroke="currentColor" strokeOpacity={0.35} />
             <line x1={i*cell} y1={S-cell} x2={i*cell} y2={S} stroke="currentColor" strokeOpacity={0.35} />
             <line x1={0} y1={i*cell} x2={cell} y2={i*cell} stroke="currentColor" strokeOpacity={0.35} />
@@ -208,8 +215,12 @@ export function SouthIndianChart({
           const y = r * cell;
           const planets = planetsBySign[s] ?? [];
           const isLagna = s === asc;
+          const planetNames = planets.map((p) => p.name).join(", ") || "empty";
+          const label = `${RASHI_FULL_S[s]}${isLagna ? " (Ascendant)" : ""}: ${planetNames}`;
           return (
-            <g key={s}>
+            <g key={s} role="button" tabIndex={0} aria-label={label} className="chart-hit" data-chart-hit>
+              <title>{label}</title>
+              <rect x={x} y={y} width={cell} height={cell} fill="transparent" />
               <text x={x + 4} y={y + 12} fontSize={S*0.028} className="fill-primary/80" fontFamily="serif">
                 {RASHIS_SHORT[s]}{isLagna ? " · As" : ""}
               </text>
@@ -226,6 +237,7 @@ export function SouthIndianChart({
     </div>
   );
 }
+
 
 /** Compute a D9 Navamsha chart from the D1 normalized chart. */
 export function toNavamsha(chart: Chart): Chart {
