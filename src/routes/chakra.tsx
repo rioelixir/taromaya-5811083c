@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { analyzeChakras, CHAKRA_META, type Chakra } from "@/lib/chakra";
 import { Sparkles, Music, Gem, HeartPulse, AlertTriangle } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/chakra")({
   component: () => (
@@ -146,6 +147,7 @@ function Card({
 
 function ChakraPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
   const [selected, setSelected] = useState<Chakra>("Anahata");
 
   const reading = useMemo(() => {

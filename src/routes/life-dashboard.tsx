@@ -8,6 +8,7 @@ import { analyzeHealth } from "@/lib/health";
 import { analyzeFinance } from "@/lib/finance";
 import { analyzeMangal } from "@/lib/mangal-deep";
 import { Briefcase, Heart, Coins, Flame, ArrowRight } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/life-dashboard")({
   component: () => (
@@ -27,6 +28,7 @@ const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", 
 
 function LifeDashboardPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
   const data = useMemo(() => {
     try {
       const [y,m,d] = form.date.split("-").map(Number);

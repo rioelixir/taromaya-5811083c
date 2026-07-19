@@ -6,6 +6,7 @@ import { computeKundli } from "@/lib/vedic";
 import { analyseSadeSati } from "@/lib/dosha-windows";
 import { computeSadeSati } from "@/lib/vedic-transits";
 import { AlertTriangle, Sparkles, Clock, CheckCircle2 } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/sadesati")({
   component: () => (
@@ -29,6 +30,7 @@ function fmt(d: Date): string {
 
 function SadeSatiPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
 
   const data = useMemo(() => {
     try {

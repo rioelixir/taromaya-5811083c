@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { analyzeMangal, MANGAL_CANCELLATION_RULES } from "@/lib/mangal-deep";
 import { AlertTriangle, CheckCircle2, Heart, Sparkles, Shield } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/mangal-dosha")({
   component: () => (
@@ -32,6 +33,7 @@ const SEVERITY_TONE: Record<string, string> = {
 
 function MangalPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
   const reading = useMemo(() => {
     try {
       const [y,m,d] = form.date.split("-").map(Number);

@@ -1,6 +1,8 @@
+import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getBirthProfile, saveBirthProfile, type BirthProfile } from "@/lib/birth-profile.functions";
+
 
 export function useBirthProfile() {
   const fetchFn = useServerFn(getBirthProfile);
@@ -44,4 +46,44 @@ export function birthProfileToKundliInput(p: BirthProfile) {
     latitude: Number(p.latitude),
     longitude: Number(p.longitude),
   };
+}
+
+/** Map a BirthProfile to the common form-state field strings shared across modules. */
+export function birthProfileToFormFields(p: BirthProfile) {
+  const time = p.birth_time.length >= 5 ? p.birth_time.slice(0, 5) : p.birth_time;
+  return {
+    name: p.full_name ?? "",
+    date: p.birth_date,
+    time,
+    tz: String(p.tz_offset_hours),
+    lat: String(p.latitude),
+    lon: String(p.longitude),
+    place: p.place ?? "",
+    seconds: "0",
+  };
+}
+
+/**
+ * Autofill a module form with the user's saved birth profile once it loads.
+ * Only hydrates the fields the form actually has, and only runs once so the
+ * user can freely edit afterwards without being overwritten.
+ */
+export function useAutofillBirth<T extends Record<string, unknown>>(
+  setForm: (updater: (prev: T) => T) => void,
+) {
+  const { data: profile } = useBirthProfile();
+  const done = useRef(false);
+  useEffect(() => {
+    if (done.current || !profile) return;
+    done.current = true;
+    const fields = birthProfileToFormFields(profile);
+    setForm((prev) => {
+      const next = { ...prev } as Record<string, unknown>;
+      for (const [k, v] of Object.entries(fields)) {
+        if (k in next) next[k] = v;
+      }
+      return next as T;
+    });
+  }, [profile, setForm]);
+  return profile ?? null;
 }

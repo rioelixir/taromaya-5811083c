@@ -8,6 +8,7 @@ import {
 import { computeVimshottari } from "@/lib/vedic-extended";
 import { computeVedicTransits, type VedicTransitReport } from "@/lib/vedic-transits";
 import { RefreshCw, ShieldCheck, ShieldAlert, Moon, Flame, Sparkles, Compass } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/vedic-transits")({
   component: () => (<PremiumGate featureName="Vedic Transits"><VedicTransitsPage /></PremiumGate>),
@@ -23,6 +24,7 @@ const DEFAULT_FORM = { name: "", date: "1995-06-15", time: "07:45", tz: "5.5", l
 
 function VedicTransitsPage() {
   const [form, setForm] = useState(DEFAULT_FORM);
+  useAutofillBirth<typeof DEFAULT_FORM>(setForm);
   const [now, setNow] = useState(new Date());
 
   const natal = useMemo(() => {

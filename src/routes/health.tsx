@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { analyzeHealth } from "@/lib/health";
 import { Heart, ShieldCheck, AlertTriangle, Activity } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/health")({
   component: () => (
@@ -24,6 +25,7 @@ const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", 
 
 function HealthPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
   const reading = useMemo(() => {
     try {
       const [y,m,d] = form.date.split("-").map(Number);

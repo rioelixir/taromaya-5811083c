@@ -23,6 +23,7 @@ import { saveKundli } from "@/lib/kundli-storage.functions";
 import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
 import { QuotaBadge } from "./reports";
 import { useAuth } from "@/hooks/use-auth";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -74,6 +75,7 @@ const TABS: { id: TabId; label: string }[] = [
 
 function KundliPage() {
   const [form, setForm] = useState<FormState>(DEFAULTS);
+  useAutofillBirth<FormState>(setForm);
   const [chart, setChart] = useState<KundliChart | null>(null);
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);

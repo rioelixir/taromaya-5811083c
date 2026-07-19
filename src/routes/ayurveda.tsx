@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, NAKSHATRAS, RASHIS } from "@/lib/vedic";
 import { computePrakriti, DOSHA_META, type Dosha } from "@/lib/ayurveda";
 import { Flame, Droplet, Wind, Sparkles, Leaf, Utensils, HeartPulse, Ban } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/ayurveda")({
   component: () => (
@@ -95,6 +96,7 @@ function AdviceCard({
 
 function AyurvedaPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
 
   const result = useMemo(() => {
     try {
