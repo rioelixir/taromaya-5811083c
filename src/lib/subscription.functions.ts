@@ -177,6 +177,11 @@ export const adminUpdatePlan = createServerFn({ method: "POST" })
       features?: string[];
       payment_link?: string | null;
       is_active?: boolean;
+      tier?: string;
+      badge?: string | null;
+      highlight?: boolean;
+      trial_days?: number;
+      sort_order?: number;
     }) => d,
   )
   .handler(async ({ context, data }) => {
