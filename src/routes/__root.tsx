@@ -204,6 +204,7 @@ function RootComponent() {
   }, [router, queryClient]);
 
   const bgUrl = useBackgroundImage();
+  const branding = useBranding();
   const [showAuthorsNote, setShowAuthorsNote] = useState(false);
 
   useEffect(() => {
