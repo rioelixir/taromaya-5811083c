@@ -75,14 +75,22 @@ export function BiWheelChart({
     }
   }
 
+  const RASHI_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+  const hitR = size * 0.05;
+
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-auto select-none">
-      <defs>
-        <radialGradient id="biwheelBg" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stopColor="oklch(0.15 0.05 275)" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="oklch(0.08 0.02 275)" stopOpacity="1" />
-        </radialGradient>
-      </defs>
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      className="w-full h-auto select-none"
+      role="img"
+      aria-labelledby="biwheel-title biwheel-desc"
+    >
+      <title id="biwheel-title">Bi-wheel chart: natal with {outerLabel.toLowerCase()}</title>
+      <desc id="biwheel-desc">
+        Inner ring shows {chart.tropicalPlanets.length} natal planets; outer ring shows {outerPlanets.length} {outerLabel.toLowerCase()} planets.
+        Lines between rings mark major aspects. Press Tab to move between planets and signs.
+      </desc>
+
 
       <circle cx={cx} cy={cy} r={rOuter} fill="url(#biwheelBg)" stroke="oklch(0.82 0.13 85 / 0.5)" strokeWidth="1.2" />
       <circle cx={cx} cy={cy} r={rZodiac} fill="none" stroke="oklch(1 0 0 / 0.15)" strokeWidth="0.8" />
