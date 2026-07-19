@@ -207,6 +207,9 @@ function RootComponent() {
 
   useEffect(() => {
     if (consumeAuthorsNotePending()) setShowAuthorsNote(true);
+    const open = () => setShowAuthorsNote(true);
+    window.addEventListener("taromaya:open-authors-note", open);
+    return () => window.removeEventListener("taromaya:open-authors-note", open);
   }, []);
 
   return (
