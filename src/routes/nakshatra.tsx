@@ -8,6 +8,7 @@ import {
   ganaCompat, nadiCompat, yoniCompat, type NakshatraProfile,
 } from "@/lib/nakshatra-deep";
 import { Star, Compass, Flame, Droplet, Wind, Mountain, Sparkles } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/nakshatra")({
   component: () => (
@@ -149,6 +150,7 @@ function ProfileCard({ p, birthPada }: { p: NakshatraProfile; birthPada?: number
 
 function NakshatraPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
   const [selected, setSelected] = useState<number | null>(null);
   const [partnerNak, setPartnerNak] = useState<number>(0);
 

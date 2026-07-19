@@ -9,6 +9,7 @@ import {
   computeHarshaBala,
 } from "@/lib/varshphal-deep";
 import { Sparkles, Loader2, CalendarClock, Crown, Sun, ArrowRight, Zap, CheckCircle2, XCircle } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 
 const inputCls =
@@ -36,6 +37,7 @@ const DEFAULTS: Form = {
 
 function VarshphalPage() {
   const [f, setF] = useState<Form>(DEFAULTS);
+  useAutofillBirth<Form>(setF);
   const [chart, setChart] = useState<VarshphalChart | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { analyzeKarma } from "@/lib/karma";
 import { Infinity as InfIcon, Flame, Waves, Sparkles, Feather, Gift } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/karma")({
   component: () => (
@@ -30,6 +31,7 @@ const PILLAR_ICON = [InfIcon, Flame, Waves, Feather] as const;
 
 function KarmaPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
 
   const reading = useMemo(() => {
     try {

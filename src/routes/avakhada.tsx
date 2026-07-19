@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { computeAvakhada } from "@/lib/avakhada";
 import { MapPin } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/avakhada")({
   component: () => (
@@ -31,6 +32,7 @@ const DEFAULTS: FormState = {
 
 function AvakhadaPage() {
   const [form, setForm] = useState<FormState>(DEFAULTS);
+  useAutofillBirth<FormState>(setForm);
 
   const chart = useMemo(() => {
     try {

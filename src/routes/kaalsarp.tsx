@@ -5,6 +5,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { analyzeKaalSarp } from "@/lib/kaalsarp";
 import { Sparkles, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/kaalsarp")({
   component: () => (
@@ -24,6 +25,7 @@ const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", 
 
 function KaalSarpPage() {
   const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
 
   const report = useMemo(() => {
     try {

@@ -14,6 +14,7 @@ import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { ForecastStrip } from "@/components/forecast-strip";
 import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
+import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 export const Route = createFileRoute("/transits")({
   component: () => (<PremiumGate featureName="Transits"><TransitsPage /></PremiumGate>),
@@ -35,6 +36,7 @@ const ASPECT_COLORS: Record<string, string> = {
 
 function TransitsPage() {
   const [form, setForm] = useState(DEFAULT_FORM);
+  useAutofillBirth<typeof DEFAULT_FORM>(setForm);
   const [now, setNow] = useState(new Date());
   const [aiText, setAiText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
