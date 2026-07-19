@@ -16,6 +16,7 @@ import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
 import { AutoTranslator } from "@/components/auto-translator";
 import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
+import { useBranding } from "@/hooks/use-branding";
 
 function NotFoundComponent() {
   return (
