@@ -214,6 +214,24 @@
     stroke-width: 2px;
   }
 
+  /* Keyboard-focusable chart groups: cursor, hover halo, and a visible
+     focus ring drawn inside the SVG canvas via outline. */
+  [data-chart-hit] {
+    cursor: pointer;
+    outline: none;
+  }
+  [data-chart-hit]:hover > circle[fill="transparent"],
+  [data-chart-hit]:hover > rect[fill="transparent"] {
+    fill: oklch(0.72 0.14 78 / 0.18) !important;
+  }
+  [data-chart-hit]:focus-visible > circle[fill="transparent"],
+  [data-chart-hit]:focus-visible > rect[fill="transparent"] {
+    fill: oklch(0.55 0.20 300 / 0.22) !important;
+    stroke: oklch(0.45 0.20 300);
+    stroke-width: 2;
+  }
+
+
 
   /* Form labels + helper text: high-contrast, same as body */
   label, .form-label, [data-slot="form-label"] {

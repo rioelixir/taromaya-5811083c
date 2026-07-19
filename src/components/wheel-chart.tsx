@@ -57,8 +57,27 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
     return `M ${p1.x} ${p1.y} A ${r} ${r} 0 ${largeArc} 0 ${p2.x} ${p2.y}`;
   };
 
+  const RASHI_NAMES = [
+    "Aries","Taurus","Gemini","Cancer","Leo","Virgo",
+    "Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces",
+  ];
+  const hitR = size * 0.055; // ≥44px equivalent at typical render sizes
+
+  const titleId = "wheel-title";
+  const descId = "wheel-desc";
+
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-auto select-none">
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      className="w-full h-auto select-none"
+      role="img"
+      aria-labelledby={`${titleId} ${descId}`}
+    >
+      <title id={titleId}>Natal wheel chart</title>
+      <desc id={descId}>
+        Zodiac wheel showing {chart.tropicalPlanets.length} planets across 12 houses,
+        with the Ascendant on the left. Press Tab to move between planets and houses.
+      </desc>
       <defs>
         <radialGradient id="wheelBg" cx="50%" cy="50%" r="60%">
           <stop offset="0%" stopColor="oklch(0.15 0.05 275)" stopOpacity="0.9" />
@@ -72,6 +91,7 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
       <circle cx={cx} cy={cy} r={rHouseInner} fill="none" stroke="oklch(1 0 0 / 0.08)" strokeWidth="0.5" />
 
       {/* Zodiac ring divisions + glyphs */}
+      <g role="list" aria-label="Zodiac signs">
       {signSegments.map(({ i, start, mid }) => {
         const p1 = pol(start, rHouseOuter);
         const p2 = pol(start, rOuter);
@@ -84,29 +104,36 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
                     : isAir ? "oklch(0.72 0.12 220)"
                     : "oklch(0.7 0.13 280)";
         return (
-          <g key={i}>
+          <g key={i} role="listitem" tabIndex={0} aria-label={RASHI_NAMES[i]} className="chart-hit" data-chart-hit>
+            <title>{RASHI_NAMES[i]}</title>
             <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="oklch(1 0 0 / 0.2)" strokeWidth="0.6" />
+            <circle cx={g.x} cy={g.y} r={hitR} fill="transparent" />
             <text x={g.x} y={g.y} fill={color} fontSize={size * 0.032} textAnchor="middle" dominantBaseline="middle" fontFamily="serif">
               {SIGN_GLYPHS[i]}
             </text>
           </g>
         );
       })}
+      </g>
 
       {/* House cusps */}
+      <g role="list" aria-label="Houses">
       {houseCusps.map((c, i) => {
         const p1 = pol(c, rHouseInner);
         const p2 = pol(c, rHouseOuter);
         const isAngle = i === 0 || i === 3 || i === 6 || i === 9;
+        const labelPos = pol(c + 5, rHouseInner - size * 0.02);
         return (
-          <g key={i}>
+          <g key={i} role="listitem" tabIndex={0} aria-label={`House ${i + 1}${isAngle ? " (angular)" : ""}`} className="chart-hit" data-chart-hit>
+            <title>{`House ${i + 1}`}</title>
             <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
               stroke={isAngle ? "oklch(0.82 0.13 85 / 0.7)" : "oklch(1 0 0 / 0.2)"}
               strokeWidth={isAngle ? 1.2 : 0.6}
             />
+            <circle cx={labelPos.x} cy={labelPos.y} r={hitR * 0.75} fill="transparent" />
             <text
-              x={pol(c + 5, rHouseInner - size * 0.02).x}
-              y={pol(c + 5, rHouseInner - size * 0.02).y}
+              x={labelPos.x}
+              y={labelPos.y}
               fill="oklch(0.72 0.03 260)"
               fontSize={size * 0.018}
               textAnchor="middle" dominantBaseline="middle"
@@ -116,6 +143,7 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
           </g>
         );
       })}
+      </g>
 
       {/* Ascendant / MC labels */}
       {(() => {
@@ -123,13 +151,14 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
         const mc = pol(rotate(chart, chart.midheaven), rOuter + size * 0.02);
         return (
           <g fill="oklch(0.92 0.09 88)" fontSize={size * 0.02} fontFamily="serif">
-            <text x={asc.x - 8} y={asc.y} textAnchor="end" dominantBaseline="middle">Asc</text>
-            <text x={mc.x} y={mc.y - 6} textAnchor="middle" dominantBaseline="middle">MC</text>
+            <text x={asc.x - 8} y={asc.y} textAnchor="end" dominantBaseline="middle" aria-label="Ascendant">Asc</text>
+            <text x={mc.x} y={mc.y - 6} textAnchor="middle" dominantBaseline="middle" aria-label="Midheaven">MC</text>
           </g>
         );
       })()}
 
       {/* Aspect lines */}
+      <g aria-hidden="true">
       {aspects.map((h, i) => {
         const a = planets.find((p) => p.name === h.a)!;
         const b = planets.find((p) => p.name === h.b)!;
@@ -142,29 +171,37 @@ export function WheelChart({ chart, size = 520 }: { chart: WesternChart; size?: 
           : "oklch(0.72 0.12 220 / 0.4)";
         return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color} strokeWidth={0.8} />;
       })}
+      </g>
 
       {/* Planets */}
+      <g role="list" aria-label="Planets">
       {planets.map((p) => {
         const pos = pol(p.theta, rPlanet);
         const tick1 = pol(rotate(chart, p.tropicalLongitude), rHouseOuter);
         const tick2 = pol(rotate(chart, p.tropicalLongitude), rHouseOuter + size * 0.015);
+        const deg = p.tropicalLongitude.toFixed(2);
+        const label = `${p.name} at ${deg}°${p.retrograde ? ", retrograde" : ""}`;
         return (
-          <g key={p.name}>
+          <g key={p.name} role="listitem" tabIndex={0} aria-label={label} className="chart-hit" data-chart-hit>
+            <title>{label}</title>
             <line x1={tick1.x} y1={tick1.y} x2={tick2.x} y2={tick2.y} stroke="oklch(0.82 0.13 85 / 0.8)" strokeWidth={1} />
+            <circle cx={pos.x} cy={pos.y} r={hitR} fill="transparent" />
             <circle cx={pos.x} cy={pos.y} r={size * 0.018} fill="oklch(0.09 0.03 275)" stroke="oklch(0.82 0.13 85)" strokeWidth={1} />
             <text x={pos.x} y={pos.y + size * 0.006} fill="oklch(0.92 0.09 88)" fontSize={size * 0.024} textAnchor="middle" dominantBaseline="middle" fontFamily="serif">
               {PLANET_GLYPHS[p.name]}
             </text>
             {p.retrograde && (
-              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.014} textAnchor="middle">
+              <text x={pos.x + size * 0.02} y={pos.y - size * 0.015} fill="oklch(0.65 0.15 200)" fontSize={size * 0.014} textAnchor="middle" aria-hidden="true">
                 ℞
               </text>
             )}
           </g>
         );
       })}
+      </g>
     </svg>
   );
 }
+
 
 void RASHIS;
