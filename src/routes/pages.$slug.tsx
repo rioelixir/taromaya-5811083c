@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { supabase } from "@/integrations/supabase/client";
