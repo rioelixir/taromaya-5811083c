@@ -330,6 +330,96 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_redemptions: {
+        Row: {
+          amount_off_cents: number
+          coupon_id: string
+          created_at: string
+          id: string
+          plan_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_off_cents?: number
+          coupon_id: string
+          created_at?: string
+          id?: string
+          plan_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_off_cents?: number
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          plan_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          currency: string
+          description: string | null
+          discount_amount_cents: number
+          discount_percent: number
+          id: string
+          is_active: boolean
+          max_redemptions: number | null
+          times_redeemed: number
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          discount_amount_cents?: number
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          times_redeemed?: number
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          discount_amount_cents?: number
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          max_redemptions?: number | null
+          times_redeemed?: number
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           body: string
@@ -647,45 +737,60 @@ export type Database = {
       }
       subscription_plans: {
         Row: {
+          badge: string | null
           billing_period: string
           created_at: string
           currency: string
           description: string | null
           features: Json
+          highlight: boolean
           id: string
           is_active: boolean
           name: string
           payment_link: string | null
           price_cents: number
           slug: string
+          sort_order: number
+          tier: string
+          trial_days: number
           updated_at: string
         }
         Insert: {
+          badge?: string | null
           billing_period?: string
           created_at?: string
           currency?: string
           description?: string | null
           features?: Json
+          highlight?: boolean
           id?: string
           is_active?: boolean
           name: string
           payment_link?: string | null
           price_cents?: number
           slug: string
+          sort_order?: number
+          tier?: string
+          trial_days?: number
           updated_at?: string
         }
         Update: {
+          badge?: string | null
           billing_period?: string
           created_at?: string
           currency?: string
           description?: string | null
           features?: Json
+          highlight?: boolean
           id?: string
           is_active?: boolean
           name?: string
           payment_link?: string | null
           price_cents?: number
           slug?: string
+          sort_order?: number
+          tier?: string
+          trial_days?: number
           updated_at?: string
         }
         Relationships: []
@@ -961,33 +1066,39 @@ export type Database = {
       }
       user_subscriptions: {
         Row: {
+          coupon_code: string | null
           created_at: string
           expires_at: string | null
           id: string
           notes: string | null
           plan_id: string | null
+          price_paid_cents: number | null
           started_at: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          coupon_code?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           notes?: string | null
           plan_id?: string | null
+          price_paid_cents?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          coupon_code?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           notes?: string | null
           plan_id?: string | null
+          price_paid_cents?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string

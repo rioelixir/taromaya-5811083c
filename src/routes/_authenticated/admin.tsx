@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette } from "lucide-react";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, Tag } from "lucide-react";
+import { AdminPlansTab, AdminCouponsTab } from "@/components/admin-payments";
 import { AdminBrandingTab } from "@/components/admin-branding";
 import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "plan" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding";
+type Tab = "overview" | "users" | "plan" | "coupons" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
@@ -66,7 +67,8 @@ function AdminPage() {
       <div className="mb-6 flex flex-wrap gap-2">
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
-        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plan & Price</TabBtn>
+        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plans</TabBtn>
+        <TabBtn active={tab === "coupons"} onClick={() => setTab("coupons")} icon={<Tag className="h-4 w-4" />}>Coupons</TabBtn>
         <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
         <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
@@ -81,7 +83,8 @@ function AdminPage() {
 
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
-      {tab === "plan" && <PlanTab />}
+      {tab === "plan" && <AdminPlansTab />}
+      {tab === "coupons" && <AdminCouponsTab />}
       {tab === "subs" && <SubscriptionsTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
       {tab === "prompts" && <AdminPromptsTab />}
