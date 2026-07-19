@@ -85,6 +85,7 @@ function AdminPage() {
       {tab === "subs" && <SubscriptionsTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
       {tab === "prompts" && <AdminPromptsTab />}
+      {tab === "branding" && <AdminBrandingTab />}
       {tab === "pages" && <AdminPagesTab />}
       {tab === "faqs" && <AdminFaqsTab />}
       {tab === "blogs" && <AdminBlogsTab />}
