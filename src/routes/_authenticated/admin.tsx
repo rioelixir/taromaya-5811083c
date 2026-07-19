@@ -67,7 +67,8 @@ function AdminPage() {
       <div className="mb-6 flex flex-wrap gap-2">
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
-        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plan & Price</TabBtn>
+        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plans</TabBtn>
+        <TabBtn active={tab === "coupons"} onClick={() => setTab("coupons")} icon={<Tag className="h-4 w-4" />}>Coupons</TabBtn>
         <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
         <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
