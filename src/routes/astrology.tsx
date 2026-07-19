@@ -44,6 +44,7 @@ const ASPECT_COLORS: Record<string, string> = {
 
 function AstrologyPage() {
   const [form, setForm] = useState(DEFAULT_FORM);
+  useAutofillBirth<typeof DEFAULT_FORM>(setForm);
   const [system, setSystem] = useState<HouseSystem>("placidus");
   const [chart, setChart] = useState<ReturnType<typeof computeWesternChart> | null>(null);
   const [reading, setReading] = useState<string | null>(null);
