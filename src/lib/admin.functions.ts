@@ -226,3 +226,127 @@ export const adminProvisionTestUser = createServerFn({ method: "POST" })
 
     return { email: TEST_USER_EMAIL, password, userId };
   });
+
+// ------------------------------------------------------------------
+// Employee / staff provisioning: create users + shareable invite links
+// ------------------------------------------------------------------
+
+function randomPassword() {
+  return `Taromaya#${Math.random().toString(36).slice(2, 10)}${Math.floor(Math.random() * 90 + 10)}`;
+}
+
+function randomInviteCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < 12; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return s;
+}
+
+async function grantFreeSubscription(userId: string, years = 5) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const expires = new Date();
+  expires.setFullYear(expires.getFullYear() + years);
+  await supabaseAdmin
+    .from("user_subscriptions")
+    .upsert(
+      { user_id: userId, status: "active", expires_at: expires.toISOString() },
+      { onConflict: "user_id" },
+    );
+  await supabaseAdmin
+    .from("profiles")
+    .update({ terms_accepted_at: new Date().toISOString() })
+    .eq("id", userId);
+}
+
+export const adminCreateStaffUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { email: string; password?: string; fullName?: string; note?: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const email = data.email.trim().toLowerCase();
+    if (!email || !email.includes("@")) throw new Error("Valid email required");
+    const password = data.password && data.password.length >= 8 ? data.password : randomPassword();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: data.fullName ?? email.split("@")[0],
+        terms_accepted: true,
+        staff_note: data.note ?? null,
+      },
+    });
+    if (error) throw new Error(error.message);
+    const userId = created.user!.id;
+    await grantFreeSubscription(userId);
+    return { email, password, userId };
+  });
+
+export const adminCreateStaffInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { note?: string; expiresInDays?: number | null; maxUses?: number }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const code = randomInviteCode();
+    const expires_at =
+      data.expiresInDays && data.expiresInDays > 0
+        ? new Date(Date.now() + data.expiresInDays * 86400_000).toISOString()
+        : null;
+    const max_uses = Math.max(1, Math.min(500, data.maxUses ?? 1));
+    const { data: row, error } = await supabaseAdmin
+      .from("staff_invites")
+      .insert({
+        code,
+        note: data.note ?? null,
+        created_by: context.userId,
+        expires_at,
+        max_uses,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const adminListStaffInvites = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("staff_invites")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const adminRevokeStaffInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("staff_invites")
+      .update({ revoked: true })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const adminDeleteStaffInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("staff_invites").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
