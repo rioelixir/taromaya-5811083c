@@ -92,6 +92,7 @@ function AdminPage() {
 
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
+      {tab === "staff" && <StaffTab />}
       {tab === "plan" && <AdminPlansTab />}
       {tab === "coupons" && <AdminCouponsTab />}
       {tab === "subs" && <SubscriptionsTab />}
