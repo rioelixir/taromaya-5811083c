@@ -774,3 +774,252 @@ function SubscriptionsTab() {
     </div>
   );
 }
+
+// ------------------------------------------------------------------
+// Employees & Invites
+// ------------------------------------------------------------------
+
+type StaffInvite = {
+  id: string;
+  code: string;
+  note: string | null;
+  expires_at: string | null;
+  max_uses: number;
+  used_count: number;
+  revoked: boolean;
+  created_at: string;
+};
+
+function StaffTab() {
+  const [invites, setInvites] = useState<StaffInvite[]>([]);
+  const [loadingList, setLoadingList] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+
+  const refresh = () => {
+    setLoadingList(true);
+    adminListStaffInvites()
+      .then((rows) => setInvites(rows as StaffInvite[]))
+      .catch((e: Error) => setErr(e.message))
+      .finally(() => setLoadingList(false));
+  };
+  useEffect(refresh, []);
+
+  return (
+    <div className="space-y-6">
+      <CreateStaffUserCard />
+      <CreateInviteCard onCreated={refresh} />
+      <GlassCard title="Active invite links" desc={`${invites.length} total`}>
+        {err && <div className="text-xs text-red-300 mb-3">{err}</div>}
+        {loadingList ? (
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          </div>
+        ) : invites.length === 0 ? (
+          <div className="text-sm text-muted-foreground">No invites yet. Create one above.</div>
+        ) : (
+          <div className="space-y-3">
+            {invites.map((inv) => (
+              <InviteRow key={inv.id} invite={inv} onChange={refresh} />
+            ))}
+          </div>
+        )}
+      </GlassCard>
+    </div>
+  );
+}
+
+function CreateStaffUserCard() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [result, setResult] = useState<{ email: string; password: string } | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setResult(null); setBusy(true);
+    try {
+      const res = await adminCreateStaffUser({
+        data: {
+          email,
+          password: password || undefined,
+          fullName: name || undefined,
+          note: note || undefined,
+        },
+      });
+      setResult({ email: res.email, password: res.password });
+      setEmail(""); setName(""); setPassword(""); setNote("");
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : "Failed to create user");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GlassCard
+      title="Create employee account"
+      desc="Directly provision a free account with a 5-year active subscription. Share the credentials with the employee."
+    >
+      <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
+        <input required type="email" placeholder="Employee email" value={email} onChange={(e) => setEmail(e.target.value)} className={staffInput} />
+        <input placeholder="Full name (optional)" value={name} onChange={(e) => setName(e.target.value)} className={staffInput} />
+        <input placeholder="Password (optional — auto-generated if blank)" value={password} onChange={(e) => setPassword(e.target.value)} className={staffInput} />
+        <input placeholder="Internal note (optional)" value={note} onChange={(e) => setNote(e.target.value)} className={staffInput} />
+        <button disabled={busy} className="sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-5 py-2.5 text-sm font-medium text-cosmic disabled:opacity-50">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />} Create employee account
+        </button>
+      </form>
+      {err && <div className="mt-3 text-xs text-red-300">{err}</div>}
+      {result && (
+        <div className="mt-4 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm space-y-2">
+          <div className="text-[10px] uppercase tracking-widest text-gold/80">Credentials — copy & share now</div>
+          <div><span className="text-muted-foreground">Email:</span> <span className="font-mono text-pearl">{result.email}</span></div>
+          <div><span className="text-muted-foreground">Password:</span> <span className="font-mono text-pearl">{result.password}</span></div>
+        </div>
+      )}
+    </GlassCard>
+  );
+}
+
+function CreateInviteCard({ onCreated }: { onCreated: () => void }) {
+  const [note, setNote] = useState("");
+  const [expiresInDays, setExpiresInDays] = useState<number | "">(30);
+  const [maxUses, setMaxUses] = useState<number>(1);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [lastLink, setLastLink] = useState<string | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null); setLastLink(null); setBusy(true);
+    try {
+      const inv = await adminCreateStaffInvite({
+        data: {
+          note: note || undefined,
+          expiresInDays: expiresInDays === "" ? null : Number(expiresInDays),
+          maxUses,
+        },
+      });
+      const url = `${window.location.origin}/invite/${(inv as StaffInvite).code}`;
+      setLastLink(url);
+      setNote("");
+      onCreated();
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : "Failed to create invite");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GlassCard
+      title="Generate invite link"
+      desc="Shareable link — anyone who opens it signs up (or signs in) and is instantly unlocked with a free 5-year subscription."
+    >
+      <form onSubmit={submit} className="grid gap-3 sm:grid-cols-3">
+        <input placeholder="Note (e.g. Design team)" value={note} onChange={(e) => setNote(e.target.value)} className={`${staffInput} sm:col-span-3`} />
+        <label className="text-xs text-muted-foreground flex flex-col gap-1">
+          Expires in (days, blank = never)
+          <input type="number" min={0} value={expiresInDays} onChange={(e) => setExpiresInDays(e.target.value === "" ? "" : Number(e.target.value))} className={staffInput} />
+        </label>
+        <label className="text-xs text-muted-foreground flex flex-col gap-1">
+          Max uses
+          <input type="number" min={1} max={500} value={maxUses} onChange={(e) => setMaxUses(Math.max(1, Number(e.target.value) || 1))} className={staffInput} />
+        </label>
+        <button disabled={busy} className="self-end inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-5 py-2.5 text-sm font-medium text-cosmic disabled:opacity-50">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />} Generate link
+        </button>
+      </form>
+      {err && <div className="mt-3 text-xs text-red-300">{err}</div>}
+      {lastLink && (
+        <div className="mt-4 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm">
+          <div className="text-[10px] uppercase tracking-widest text-gold/80 mb-2">New invite link</div>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 truncate rounded-lg bg-black/40 px-3 py-2 text-xs text-pearl font-mono">{lastLink}</code>
+            <button
+              onClick={() => { navigator.clipboard.writeText(lastLink); }}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs text-pearl hover:bg-white/10"
+            >
+              <Copy className="h-3.5 w-3.5" /> Copy
+            </button>
+          </div>
+        </div>
+      )}
+    </GlassCard>
+  );
+}
+
+function InviteRow({ invite, onChange }: { invite: StaffInvite; onChange: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const url = `${typeof window !== "undefined" ? window.location.origin : ""}/invite/${invite.code}`;
+  const exhausted = invite.used_count >= invite.max_uses;
+  const expired = !!invite.expires_at && new Date(invite.expires_at) < new Date();
+  const status = invite.revoked ? "Revoked" : expired ? "Expired" : exhausted ? "Fully used" : "Active";
+  const statusColor =
+    status === "Active" ? "text-aurora border-aurora/40 bg-aurora/10" : "text-muted-foreground border-white/10 bg-white/5";
+
+  const revoke = async () => {
+    if (!confirm("Revoke this invite?")) return;
+    setBusy(true);
+    try { await adminRevokeStaffInvite({ data: { id: invite.id } }); onChange(); }
+    finally { setBusy(false); }
+  };
+  const remove = async () => {
+    if (!confirm("Delete this invite permanently?")) return;
+    setBusy(true);
+    try { await adminDeleteStaffInvite({ data: { id: invite.id } }); onChange(); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+      <div className="flex flex-wrap items-center gap-3 justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm text-pearl">{invite.code}</span>
+            <span className={`text-[10px] uppercase tracking-widest rounded-full border px-2 py-0.5 ${statusColor}`}>{status}</span>
+          </div>
+          {invite.note && <div className="mt-1 text-xs text-muted-foreground">{invite.note}</div>}
+          <div className="mt-1 text-[11px] text-muted-foreground">
+            {invite.used_count}/{invite.max_uses} used
+            {invite.expires_at ? ` · expires ${new Date(invite.expires_at).toLocaleDateString()}` : " · no expiry"}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigator.clipboard.writeText(url)}
+            className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-pearl hover:bg-white/10"
+          >
+            <Copy className="h-3.5 w-3.5" /> Copy link
+          </button>
+          {!invite.revoked && (
+            <button
+              disabled={busy}
+              onClick={revoke}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-pearl hover:bg-white/10 disabled:opacity-50"
+            >
+              <Ban className="h-3.5 w-3.5" /> Revoke
+            </button>
+          )}
+          <button
+            disabled={busy}
+            onClick={remove}
+            className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/20 disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+        </div>
+      </div>
+      <div className="mt-3">
+        <code className="block truncate rounded-lg bg-black/40 px-3 py-2 text-[11px] text-muted-foreground font-mono">{url}</code>
+      </div>
+    </div>
+  );
+}
+
+const staffInput =
+  "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
+
