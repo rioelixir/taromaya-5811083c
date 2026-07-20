@@ -735,6 +735,45 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          max_uses: number
+          note: string | null
+          revoked: boolean
+          updated_at: string
+          used_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          revoked?: boolean
+          updated_at?: string
+          used_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          note?: string | null
+          revoked?: boolean
+          updated_at?: string
+          used_count?: number
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           badge: string | null
