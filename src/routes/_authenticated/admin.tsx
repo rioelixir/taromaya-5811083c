@@ -19,6 +19,7 @@ import {
   adminListKundlis,
   adminDeleteKundli,
   adminStats,
+  adminProvisionTestUser,
 } from "@/lib/admin.functions";
 import {
   getActivePlan,
@@ -121,11 +122,69 @@ function OverviewTab() {
     adminStats().then(setStats).catch(() => setStats({ users: 0, kundlis: 0, admins: 0 }));
   }, []);
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <StatCard label="Total users" value={stats?.users ?? "—"} icon={<Users className="h-5 w-5 text-gold" />} />
-      <StatCard label="Admins" value={stats?.admins ?? "—"} icon={<Shield className="h-5 w-5 text-gold" />} />
-      <StatCard label="Saved charts" value={stats?.kundlis ?? "—"} icon={<Bookmark className="h-5 w-5 text-gold" />} />
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard label="Total users" value={stats?.users ?? "—"} icon={<Users className="h-5 w-5 text-gold" />} />
+        <StatCard label="Admins" value={stats?.admins ?? "—"} icon={<Shield className="h-5 w-5 text-gold" />} />
+        <StatCard label="Saved charts" value={stats?.kundlis ?? "—"} icon={<Bookmark className="h-5 w-5 text-gold" />} />
+      </div>
+      <TestUserCard />
     </div>
+  );
+}
+
+function TestUserCard() {
+  const [pwd, setPwd] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ email: string; password: string } | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const provision = async () => {
+    setBusy(true); setErr(null);
+    try {
+      const res = await adminProvisionTestUser({ data: { password: pwd || undefined } });
+      setResult({ email: res.email, password: res.password });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <GlassCard
+      title="View-as-user test account"
+      desc="Creates (or resets) a regular non-admin user with an active subscription so you can log in and inspect every module exactly as a subscriber sees it."
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          type="text"
+          value={pwd}
+          onChange={(e) => setPwd(e.target.value)}
+          placeholder="Optional password (min 8 chars) — leave blank to auto-generate"
+          className="flex-1 rounded-xl bg-black/30 border border-white/10 px-4 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
+        />
+        <button
+          onClick={provision}
+          disabled={busy}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-5 py-2 text-sm font-medium text-cosmic disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          {result ? "Reset test user" : "Create test user"}
+        </button>
+      </div>
+      {err && <div className="mt-3 text-xs text-red-300">{err}</div>}
+      {result && (
+        <div className="mt-4 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm space-y-2">
+          <div className="text-[10px] uppercase tracking-widest text-gold/80">Credentials — copy now</div>
+          <div><span className="text-muted-foreground">Email:</span> <span className="font-mono text-pearl">{result.email}</span></div>
+          <div><span className="text-muted-foreground">Password:</span> <span className="font-mono text-pearl">{result.password}</span></div>
+          <div className="text-xs text-muted-foreground pt-1">
+            Sign out and log in with these credentials to browse the app as a regular subscriber. The account is not an admin and has a 1-year active subscription.
+          </div>
+        </div>
+      )}
+    </GlassCard>
   );
 }
 
