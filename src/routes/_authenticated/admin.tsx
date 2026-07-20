@@ -19,6 +19,7 @@ import {
   adminListKundlis,
   adminDeleteKundli,
   adminStats,
+  adminProvisionTestUser,
 } from "@/lib/admin.functions";
 import {
   getActivePlan,
