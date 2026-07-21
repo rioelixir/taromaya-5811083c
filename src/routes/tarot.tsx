@@ -55,14 +55,29 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
+// Rider-Waite deck-mode isolation: full 78, majors only (22), minors only (56), courts only (16).
+export type RWMode = "full" | "major" | "minor" | "court";
+const RW_MODES: { key: RWMode; label: string }[] = [
+  { key: "full",   label: "Full 78" },
+  { key: "major",  label: "Major 22" },
+  { key: "minor",  label: "Minor 56" },
+  { key: "court",  label: "Court 16" },
+];
+
+function filterRW(mode: RWMode): TarotCard[] {
+  const all = DECKS["rider-waite"];
+  switch (mode) {
+    case "major": return all.filter((c) => c.arcana === "major");
+    case "minor": return all.filter((c) => c.arcana === "minor");
+    case "court": return all.filter(isCourtCard);
+    default:      return all;
+  }
+}
+
 // Build the initial per-deck stacks, each independently shuffled.
-// When courtOnly is on, Rider-Waite is filtered to its 16 court cards.
-function makeDeckStacks(courtOnly = false): Record<DeckKey, TarotCard[]> {
-  const rw = courtOnly
-    ? DECKS["rider-waite"].filter(isCourtCard)
-    : DECKS["rider-waite"];
+function makeDeckStacks(rwMode: RWMode = "full"): Record<DeckKey, TarotCard[]> {
   return {
-    "rider-waite": shuffle(rw),
+    "rider-waite": shuffle(filterRW(rwMode)),
     "nakshatra":   shuffle(DECKS["nakshatra"]),
     "health":      shuffle(DECKS["health"]),
     "lost-found":  shuffle(DECKS["lost-found"]),
