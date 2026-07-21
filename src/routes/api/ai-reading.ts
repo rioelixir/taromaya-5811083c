@@ -26,7 +26,7 @@ const ALLOWED_MODELS = new Set([
   "openai/gpt-5.5",
 ]);
 
-const DEFAULT_MODEL = "google/gemini-3.5-flash";
+const DEFAULT_MODEL = "google/gemini-3.1-flash-lite";
 
 export const Route = createFileRoute("/api/ai-reading")({
   server: {
