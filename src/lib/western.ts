@@ -92,39 +92,57 @@ function porphyryCusps(asc: number, mc: number): number[] {
 function placidusIntermediate(
   RAMCdeg: number, epsDeg: number, phiDeg: number,
   houseNum: 11 | 12 | 2 | 3,
-  seedLon: number,   // initial ecliptic-longitude guess in degrees
+  seedLon: number,
 ): number | null {
   const eps = deg2rad(epsDeg);
   const phi = deg2rad(phiDeg);
-  let lam = deg2rad(norm360(seedLon));
   const TWO_PI = 2 * Math.PI;
-  for (let i = 0; i < 80; i++) {
+  const RAMC = deg2rad(RAMCdeg);
+  // f(λ) = (currentRAoffset - targetRAoffset), wrapped to (-π,π].
+  // Returns { f, ok } where ok=false means circumpolar at this λ.
+  const evalF = (lam: number): { f: number; ok: boolean } => {
     const sL = Math.sin(lam), cL = Math.cos(lam);
-    // Two-argument RA preserves the correct ecliptic branch (avoids collapsing
-    // λ and λ+180° to the same right ascension).
     let ra = Math.atan2(sL * Math.cos(eps), cL);
     if (ra < 0) ra += TWO_PI;
     const dec = Math.asin(sL * Math.sin(eps));
     const cosArg = -Math.tan(dec) * Math.tan(phi);
-    if (cosArg <= -1 || cosArg >= 1) return null; // circumpolar → undefined
-    const SD = Math.acos(cosArg);       // semi-diurnal arc (0..π)
-    const SN = Math.PI - SD;             // semi-nocturnal arc
-    // Placidus trisection: target RA offset east of RAMC.
-    // Order:  MC → 11 → 12 → Asc → 2 → 3 → IC
+    if (cosArg <= -1 || cosArg >= 1) return { f: 0, ok: false };
+    const SD = Math.acos(cosArg);
+    const SN = Math.PI - SD;
     let target: number;
     if (houseNum === 11)      target = SD / 3;
     else if (houseNum === 12) target = (2 * SD) / 3;
     else if (houseNum === 2)  target = SD + SN / 3;
-    else                       target = SD + (2 * SN) / 3; // house 3
-    let cur = ra - deg2rad(RAMCdeg);
+    else                       target = SD + (2 * SN) / 3;
+    let cur = ra - RAMC;
     cur = ((cur % TWO_PI) + TWO_PI) % TWO_PI;
-    let diff = target - cur;
-    if (diff > Math.PI) diff -= TWO_PI;
-    if (diff < -Math.PI) diff += TWO_PI;
-    lam += diff;
-    if (Math.abs(diff) < 1e-11) break;
+    let d = cur - target;
+    if (d > Math.PI) d -= TWO_PI;
+    if (d < -Math.PI) d += TWO_PI;
+    return { f: d, ok: true };
+  };
+  // Bracket around seed ±40°, then bisect. This is unconditionally robust and
+  // stays on the correct ecliptic branch as long as the seed is within ~40°.
+  const seed = deg2rad(norm360(seedLon));
+  const W = deg2rad(40);
+  let lo = seed - W, hi = seed + W;
+  const flo = evalF(lo), fhi = evalF(hi);
+  if (!flo.ok || !fhi.ok) return null;
+  if (flo.f * fhi.f > 0) {
+    // No sign change in the window — widen once to ±70°.
+    lo = seed - deg2rad(70); hi = seed + deg2rad(70);
+    const a = evalF(lo), b = evalF(hi);
+    if (!a.ok || !b.ok || a.f * b.f > 0) return null;
   }
-  return norm360(rad2deg(lam));
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    const fm = evalF(mid);
+    if (!fm.ok) return null;
+    const flo2 = evalF(lo);
+    if (flo2.f * fm.f <= 0) hi = mid; else lo = mid;
+    if (hi - lo < 1e-11) break;
+  }
+  return norm360(rad2deg((lo + hi) / 2));
 }
 
 function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number, phiDeg: number): number[] {
