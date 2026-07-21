@@ -56,8 +56,8 @@ describe("computeKundli() — reference case (New Delhi, 15 Jun 1990 10:30 IST)"
   it("Rahu and Ketu are exactly 180° apart", () => {
     const rahu = chart.planets.find((p) => p.name === "Rahu")!;
     const ketu = chart.planets.find((p) => p.name === "Ketu")!;
-    const diff = ((ketu.longitude - rahu.longitude + 540) % 360) - 180;
-    expect(Math.abs(diff)).toBeLessThan(1e-6);
+    const diff = ((ketu.longitude - rahu.longitude) % 360 + 360) % 360;
+    expect(Math.abs(diff - 180)).toBeLessThan(1e-6);
   });
   it("houses are 12 consecutive rashi indices from Lagna", () => {
     expect(chart.houses).toHaveLength(12);
