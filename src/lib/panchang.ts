@@ -24,7 +24,8 @@ const WEEKDAY = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Sa
 const CHAUGHADIYA_NAMES = ["Udveg","Chal","Labh","Amrit","Kaal","Shubh","Rog"];
 // Chaughadiya starts by weekday (0=Sun): (start-index in the 7-cycle for the first day slot)
 const CHAUGHADIYA_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun→Udveg,Mon→Amrit,Tue→Rog,Wed→Labh,Thu→Shubh,Fri→Chal,Sat→Kaal
-const CHAUGHADIYA_NIGHT_START = [4, 0, 3, 6, 2, 5, 1];
+// Night chaughadiya first slot per weekday (Sun→Shubh, Mon→Chal, Tue→Kaal, Wed→Udveg, Thu→Amrit, Fri→Rog, Sat→Labh)
+const CHAUGHADIYA_NIGHT_START = [5, 1, 4, 0, 3, 6, 2];
 const CHAUGHADIYA_NATURE: Record<string, "good" | "bad" | "neutral"> = {
   Udveg: "bad", Chal: "neutral", Labh: "good", Amrit: "good", Kaal: "bad", Shubh: "good", Rog: "bad",
 };
@@ -160,7 +161,7 @@ export function computePanchang(input: PanchangInput): Panchang {
   let abhijit: [Date, Date] | null = null;
   if (sunrise && sunset) {
     const noon = sunrise.getTime() + (sunset.getTime() - sunrise.getTime()) / 2;
-    const half = 12 * 60 * 1000; // 12 min
+    const half = 24 * 60 * 1000; // ±24 min → 48 min (1 muhurta)
     abhijit = [new Date(noon - half), new Date(noon + half)];
   }
   // Brahma Muhurat: 96 → 48 min before sunrise
