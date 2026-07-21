@@ -370,7 +370,7 @@ function CardForm({ card, deck, onCancel, onSaved }: { card: Partial<Card>; deck
         <Field label="Position"><Input value={String(c.position ?? 0)} onChange={(v) => set("position", Number(v) || 0)} /></Field>
         <Field label="Arcana"><Input value={c.arcana ?? ""} onChange={(v) => set("arcana", v)} placeholder="major, minor" /></Field>
         <Field label="Suit"><Input value={c.suit ?? ""} onChange={(v) => set("suit", v)} placeholder="wands, cups, swords, pentacles" /></Field>
-        <Field label="Number"><Input value={c.number ?? ""} onChange={(v) => set("number", v)} placeholder="I, II, Page, Queen…" /></Field>
+        <Field label="Number"><Input value={c.number ?? ""} onChange={(v) => set("number", v)} placeholder="1, 2, Page, Queen…" /></Field>
         <Field label="Element"><Input value={c.element ?? ""} onChange={(v) => set("element", v)} /></Field>
         <Field label="Planet"><Input value={c.planet ?? ""} onChange={(v) => set("planet", v)} /></Field>
         <Field label="Zodiac"><Input value={c.zodiac ?? ""} onChange={(v) => set("zodiac", v)} /></Field>
