@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { withSupremeSystem } from "@/lib/ai-system";
 import { createClient } from "@supabase/supabase-js";
 
 type Body = {
@@ -48,9 +49,10 @@ export const Route = createFileRoute("/api/chat")({
         const systemBase =
           body.system?.trim() ||
           "You are Taromaya's personal AI Guide — a warm, precise Vedic astrologer and Tarot reader. Use markdown.";
-        const system = body.context
+        const contextual = body.context
           ? `${systemBase}\n\n=== CONTEXT (grounding facts — trust these) ===\n${body.context}\n=== END CONTEXT ===`
           : systemBase;
+        const system = withSupremeSystem(contextual);
 
         const gateway = createLovableAiGatewayProvider(key);
         const model = gateway("google/gemini-3.5-flash");

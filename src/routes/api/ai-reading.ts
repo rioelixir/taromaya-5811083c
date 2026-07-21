@@ -3,6 +3,7 @@ import { streamText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
+import { withSupremeSystem } from "@/lib/ai-system";
 
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
@@ -109,7 +110,7 @@ export const Route = createFileRoute("/api/ai-reading")({
           const gateway = createLovableAiGatewayProvider(key);
           const result = streamText({
             model: gateway(modelId),
-            system: (effectiveSystem + GUARDRAIL).slice(0, 8000),
+            system: withSupremeSystem((effectiveSystem + GUARDRAIL)).slice(0, 12000),
             prompt: prompt.slice(0, 4000),
             abortSignal: abort.signal,
           });

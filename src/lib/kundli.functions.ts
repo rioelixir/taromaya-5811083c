@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
+import { withSupremeSystem } from "./ai-system";
 
 const PlanetSchema = z.object({
   name: z.string(),
@@ -56,7 +57,7 @@ ${table}`;
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.5"),
-      system,
+      system: withSupremeSystem(system),
       prompt: user,
     });
 
