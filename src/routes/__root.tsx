@@ -238,17 +238,44 @@ function RootComponent() {
           <Outlet />
         </main>
         {!chromeHidden && (
-          <footer className="border-t border-border/40 bg-background/60 py-6 pb-24 text-center text-xs text-muted-foreground backdrop-blur-sm">
-            <nav className="mx-auto max-w-2xl flex flex-wrap justify-center gap-x-5 gap-y-1 mb-2">
-              <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
-              <Link to="/blog" className="hover:text-primary">Blog</Link>
-              <Link to="/faq" className="hover:text-primary">FAQ</Link>
-              <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
-              <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
-              <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
-            </nav>
-            {branding.footerLine1 && <p>{branding.footerLine1}</p>}
-            {branding.footerLine2 && <p>{branding.footerLine2}</p>}
+          <footer className="relative mt-8 border-t border-gold/20 bg-background/60 pb-24 pt-8 backdrop-blur-sm">
+            <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+            <div className="mx-auto grid w-full max-w-5xl gap-8 px-6 md:grid-cols-3">
+              <div className="text-center md:text-left">
+                <div className="font-display text-lg gold-text tracking-wide">Taromaya</div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {branding.footerLine1 || "2026 • Taromaya."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {branding.footerLine2 || "App created by Riaa."}
+                </p>
+              </div>
+              <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+                <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
+                <Link to="/blog" className="hover:text-primary">Blog</Link>
+                <Link to="/faq" className="hover:text-primary">FAQ</Link>
+                <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
+                <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
+                <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
+              </nav>
+              <div className="text-center md:text-right">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Reference by</div>
+                <a
+                  href="https://www.theplanetstoday.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-2 font-display text-sm gold-text hover:opacity-80"
+                >
+                  <span aria-hidden>✦</span>
+                  THEPLANETSTODAY.COM
+                  <span aria-hidden>✦</span>
+                </a>
+              </div>
+            </div>
+            <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+            <p className="mt-3 text-center text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
+              Made with love · Cosmic wisdom, modern craft
+            </p>
           </footer>
         )}
         {!chromeHidden && <BottomNav />}
