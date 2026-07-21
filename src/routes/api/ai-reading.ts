@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/ai-reading")({
         // Resolve system + model from DB prompt library when a key is provided
         // and it exists + is active. Falls back to inline system otherwise.
         let effectiveSystem = system ?? "";
-        let modelId = "google/gemini-3.1-flash-lite";
+        let modelId = "google/gemini-3.5-flash";
 
         if (promptKey) {
           try {
