@@ -366,6 +366,18 @@
   overflow: hidden;
 }
 
+@utility container-page {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .container-page { padding-inline: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .container-page { padding-inline: 2.5rem; }
+}
+
 @keyframes float-slow {
   0%, 100% { transform: translateY(0) }
   50% { transform: translateY(-8px) }
