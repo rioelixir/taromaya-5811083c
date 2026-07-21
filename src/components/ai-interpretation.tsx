@@ -101,20 +101,40 @@ export function AIInterpretation({
     }
   }
 
+  const confidence = (() => {
+    const m = /Confidence:\s*(HIGH|MEDIUM|LOW)/i.exec(text);
+    return m ? m[1].toUpperCase() : null;
+  })();
+  const confidenceColor =
+    confidence === "HIGH"
+      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/40"
+      : confidence === "MEDIUM"
+      ? "bg-amber-500/15 text-amber-700 border-amber-500/40"
+      : confidence === "LOW"
+      ? "bg-rose-500/15 text-rose-700 border-rose-500/40"
+      : "";
+
   return (
     <section className="mt-8 glass rounded-3xl p-6 sm:p-8 border border-primary/20">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.35em] text-primary/80">
-            AI Interpretation
+          <div className="flex items-center gap-2">
+            <div className="text-[10px] uppercase tracking-[0.35em] text-primary/80">
+              AI Interpretation
+            </div>
+            {confidence && (
+              <span className={`text-[10px] uppercase tracking-widest border rounded-full px-2 py-0.5 ${confidenceColor}`}>
+                {confidence} confidence
+              </span>
+            )}
           </div>
           <h2 className="mt-1 font-display text-2xl">
-            <span className="gold-text">Your simple {module} reading</span>
+            <span className="gold-text">Your {module} reading</span>
           </h2>
           <p className="mt-1 text-sm text-foreground/80">
             {profile
-              ? `Made just for ${profile.full_name} — in easy words.`
-              : "Save your birth details for a personal reading."}
+              ? `Grounded in ${profile.full_name}'s real chart + today's sky.`
+              : "Save your birth details for a personalized, chart-grounded reading."}
           </p>
         </div>
         <Button
@@ -131,6 +151,7 @@ export function AIInterpretation({
           )}
         </Button>
       </div>
+
 
       {error && (
         <div className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
