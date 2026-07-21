@@ -108,6 +108,25 @@ function AvakhadaPage() {
 
         {av && chart && (
           <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-end gap-2 print:hidden">
+              <button
+                onClick={copySummary}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-pearl hover:bg-white/10 transition-colors"
+                aria-label="Copy Avakhada summary"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-gold" /> : <Copy className="h-3.5 w-3.5 text-gold" />}
+                {copied ? "Copied" : "Copy summary"}
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-pearl hover:bg-white/10 transition-colors"
+                aria-label="Print Avakhada"
+              >
+                <Printer className="h-3.5 w-3.5 text-gold" />
+                Print / Save PDF
+              </button>
+            </div>
+
             <GlassCard>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Cell label="Lagna" value={av.ascendant.rashi} sub={`Lord: ${av.ascendant.lord}`} />
