@@ -204,8 +204,8 @@ function KundliPage() {
             <>
               <GlassCard>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <NorthIndianLagnaChart chart={chart} />
-                  <SouthIndianChart chart={chart} />
+                  <ChartZoom label="Lagna Chart · North Indian"><NorthIndianLagnaChart chart={chart} /></ChartZoom>
+                  <ChartZoom label="Rashi Chart · South Indian"><SouthIndianChart chart={chart} /></ChartZoom>
                 </div>
               </GlassCard>
               <ChartSummary chart={chart} />
