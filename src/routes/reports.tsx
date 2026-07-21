@@ -131,12 +131,15 @@ function ReportsPage() {
         })}
       </div>
 
+      <ShareLinkPanel birth={birth} />
+
       <div className="mt-6 text-xs text-muted-foreground">
         Reports render locally in your browser — nothing about your birth chart is uploaded during PDF generation. Non-admin members may download up to 10 report PDFs per calendar month.
       </div>
     </PageShell>
   );
 }
+
 
 export function QuotaBadge({ status, loading, label }: {
   status: { used: number; limit: number | null; isAdmin: boolean; remaining: number | null } | undefined;
