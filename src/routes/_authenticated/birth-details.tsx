@@ -5,6 +5,7 @@ import { useBirthProfile, useSaveBirthProfile } from "@/hooks/use-birth-profile"
 import { useEffect, useState } from "react";
 import { Loader2, Save, Lock, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
+import { birthDetailsSchema, fieldErrors } from "@/lib/validation";
 
 export const Route = createFileRoute("/_authenticated/birth-details")({
   component: () => (
@@ -45,19 +46,29 @@ function BirthDetailsPage() {
     }
   }, [profile]);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const payload = {
+      full_name: form.full_name.trim(),
+      gender: form.gender || null,
+      birth_date: form.birth_date,
+      birth_time: form.birth_time.length === 5 ? `${form.birth_time}:00` : form.birth_time,
+      tz_offset_hours: Number(form.tz_offset_hours),
+      place: form.place.trim(),
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+    };
+    const errs = fieldErrors(birthDetailsSchema, payload);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast.error(Object.values(errs)[0] ?? "Please fix the highlighted fields.");
+      return;
+    }
+    setErrors({});
     try {
-      await save.mutateAsync({
-        full_name: form.full_name.trim(),
-        gender: form.gender || null,
-        birth_date: form.birth_date,
-        birth_time: form.birth_time.length === 5 ? `${form.birth_time}:00` : form.birth_time,
-        tz_offset_hours: Number(form.tz_offset_hours),
-        place: form.place.trim(),
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
-      });
+      await save.mutateAsync(payload);
       toast.success("Birth details saved — private to you.");
       nav({ to: "/deep-jyotish" });
     } catch (e) {
