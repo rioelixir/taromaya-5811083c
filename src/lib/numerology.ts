@@ -237,7 +237,10 @@ export function computeNumerology(
 
   return {
     system,
-    lifePath, destiny, soulUrge, personality, birthday, maturity,
+    lifePath, destiny, destinyCompound: destinyRaw,
+    soulUrge, soulUrgeCompound: soulUrgeRaw,
+    personality, personalityCompound: personalityRaw,
+    birthday, maturity,
     personalYear, personalMonth, personalDay,
     karmicDebts: uniq(karmicDebts),
     masterNumbers: uniq(masterNumbers),
