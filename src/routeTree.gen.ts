@@ -42,7 +42,6 @@ import { Route as LifeDashboardRouteImport } from './routes/life-dashboard'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
-import { Route as HowToUseRouteImport } from './routes/how-to-use'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HealthRouteImport } from './routes/health'
@@ -247,11 +246,6 @@ const KarmaRoute = KarmaRouteImport.update({
 const KaalsarpRoute = KaalsarpRouteImport.update({
   id: '/kaalsarp',
   path: '/kaalsarp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HowToUseRoute = HowToUseRouteImport.update({
-  id: '/how-to-use',
-  path: '/how-to-use',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
@@ -480,7 +474,6 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -555,7 +548,6 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -632,7 +624,6 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
-  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -709,7 +700,6 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
-    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -784,7 +774,6 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
-    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -860,7 +849,6 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
-    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -937,7 +925,6 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
-  HowToUseRoute: typeof HowToUseRoute
   KaalsarpRoute: typeof KaalsarpRoute
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
@@ -1211,13 +1198,6 @@ declare module '@tanstack/react-router' {
       path: '/kaalsarp'
       fullPath: '/kaalsarp'
       preLoaderRoute: typeof KaalsarpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/how-to-use': {
-      id: '/how-to-use'
-      path: '/how-to-use'
-      fullPath: '/how-to-use'
-      preLoaderRoute: typeof HowToUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/horoscope': {
@@ -1564,7 +1544,6 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
-  HowToUseRoute: HowToUseRoute,
   KaalsarpRoute: KaalsarpRoute,
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
