@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
+import { TutorialModule } from "@/components/tutorial-module";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -67,6 +68,9 @@ function Home() {
           Ask the oracle
         </Link>
       </div>
+
+      {/* Tutorial — How to Use Taromaya */}
+      <TutorialModule />
 
       {/* Quick actions — 4 large tiles */}
       <section className="mt-12">
