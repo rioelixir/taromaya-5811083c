@@ -161,7 +161,7 @@ export function computePanchang(input: PanchangInput): Panchang {
   let abhijit: [Date, Date] | null = null;
   if (sunrise && sunset) {
     const noon = sunrise.getTime() + (sunset.getTime() - sunrise.getTime()) / 2;
-    const half = 12 * 60 * 1000; // 12 min
+    const half = 24 * 60 * 1000; // ±24 min → 48 min (1 muhurta)
     abhijit = [new Date(noon - half), new Date(noon + half)];
   }
   // Brahma Muhurat: 96 → 48 min before sunrise
