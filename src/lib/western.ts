@@ -172,9 +172,12 @@ export function computeWesternChart(
   });
   const tropAsc = ascendantTrop(date, input.latitude, input.longitude);
   const mc = mcTropical(date, input.longitude);
+  const gastH = A.SiderealTime(date);
+  const RAMCdeg = norm360(gastH * 15 + input.longitude);
+  const epsDeg = trueObliquity(date);
   const cusps = houseSystem === "whole-sign" ? wholeSignCusps(tropAsc)
     : houseSystem === "equal" ? equalCusps(tropAsc)
-    : placidusCusps(tropAsc, mc);
+    : placidusCusps(tropAsc, mc, RAMCdeg, epsDeg, input.latitude);
   return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem };
 }
 
