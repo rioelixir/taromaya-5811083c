@@ -80,7 +80,7 @@ ${cardList}`;
 
     const { text } = await generateText({
       model: gateway(modelId),
-      system,
+      system: withSupremeSystem(system),
       prompt: user,
     });
 
