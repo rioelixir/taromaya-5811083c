@@ -112,7 +112,13 @@ export function PageShell({
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
       <div className={`relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pb-16 ${collapsed ? "pt-4" : "pt-16 lg:pt-12"}`}>
-        <PageNav collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+        <PageNav
+          collapsed={collapsed}
+          onToggle={() => setCollapsed((v) => !v)}
+          teachModule={aiModule ?? title}
+          teachSnapshot={aiSnapshot}
+          hideAI={hideAI}
+        />
         {!collapsed && (
           <header className="mb-6 sm:mb-8">
             {eyebrow && (
