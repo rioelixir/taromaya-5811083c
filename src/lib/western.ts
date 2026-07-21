@@ -9,6 +9,8 @@ export type WesternChart = KundliChart & {
   midheaven: number;
   cusps: number[]; // 12 house cusps in tropical longitudes
   houseSystem: HouseSystem;
+  /** UTC instant of the chart, used for precession-of-catalog operations. */
+  epochUtc: string; // ISO string
 };
 
 export type HouseSystem = "whole-sign" | "placidus" | "equal";
