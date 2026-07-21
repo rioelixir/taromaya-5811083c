@@ -238,8 +238,11 @@ export function computeKundli(input: KundliInput): KundliChart {
   const planets: Planet[] = bodies.map((name) => {
     const b = AE_BODY[name as Exclude<PlanetName,"Rahu"|"Ketu">];
     const tropNow = tropicalLongitude(b, date);
-    const tropNext = tropicalLongitude(b, new Date(date.getTime() + 86400000));
-    const delta = ((tropNext - tropNow + 540) % 360) - 180;
+    // Centered 12-hour difference — more accurate around stations than a
+    // one-day forward diff.
+    const tropPrev = tropicalLongitude(b, new Date(date.getTime() - 43200000));
+    const tropNext = tropicalLongitude(b, new Date(date.getTime() + 43200000));
+    const delta = ((tropNext - tropPrev + 540) % 360) - 180;
     const retrograde = name !== "Sun" && name !== "Moon" && delta < 0;
     const sid = norm360(tropNow - ayan);
     const parts = toParts(sid);
