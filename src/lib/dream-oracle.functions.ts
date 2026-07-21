@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { liveSkySnapshot, signName } from "./live-sky";
 import { requirePremium } from "./premium-guard";
+import { withSupremeSystem } from "./ai-system";
 
 const Input = z.object({
   dream: z.string().min(4).max(4000),
