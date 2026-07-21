@@ -393,11 +393,27 @@ export const FIXED_STARS: { name: string; longitude: number; meaning: string }[]
   { name: "Scheat", longitude: 359.24, meaning: "Leg of Pegasus — extreme misfortune or genius." },
 ];
 
+// General precession in ecliptic longitude: 50.2879″/yr → deg/yr.
+// Catalog longitudes are epoch J2000; precess linearly to chart date. Linear
+// term dominates on decadal scales (2nd-order term is <0.1″/century²).
+const PRECESSION_DEG_PER_YEAR = 50.2879 / 3600;
+
+/** Precess a J2000 ecliptic longitude to the epoch of `date`. */
+export function precessFromJ2000(baseLon: number, date: Date): number {
+  const jd = 2440587.5 + date.getTime() / 86400000;
+  const years = (jd - 2451545.0) / 365.25;
+  return ((baseLon + PRECESSION_DEG_PER_YEAR * years) % 360 + 360) % 360;
+}
+
 export function fixedStarsNearPlanets(chart: WesternChart, orb = 1.5) {
   const hits: { star: string; planet: PlanetName; orb: number; meaning: string }[] = [];
+  // Chart date used to precess catalog J2000 longitudes to the chart epoch.
+  const localMs = Date.UTC(chart.year, chart.month - 1, chart.day, chart.hour, chart.minute);
+  const chartDate = new Date(localMs - chart.tzOffsetHours * 3600000);
   for (const p of chart.tropicalPlanets) {
     for (const s of FIXED_STARS) {
-      let d = Math.abs(p.tropicalLongitude - s.longitude);
+      const sLon = precessFromJ2000(s.longitude, chartDate);
+      let d = Math.abs(p.tropicalLongitude - sLon);
       if (d > 180) d = 360 - d;
       if (d <= orb) hits.push({ star: s.name, planet: p.name, orb: d, meaning: s.meaning });
     }
