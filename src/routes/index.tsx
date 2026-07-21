@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon } from "lucide-react";
+import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Compass, Feather } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -88,6 +88,38 @@ function Home() {
           <InfoTile icon={Sun} label="Sun" value="Cancer 24°" />
           <InfoTile icon={Moon} label="Moon" value="Rohini · Taurus" />
           <InfoTile icon={Sparkles} label="Tithi" value="Shukla Saptami" />
+        </div>
+      </section>
+
+      {/* Guides — visible to everyone */}
+      <section className="mt-10">
+        <h2 className="mb-4 font-display text-xl">Guides</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <Link
+            to="/how-to-use"
+            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
+              <Compass className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-medium text-foreground">How to Use TAROMAYA</div>
+              <div className="text-xs text-muted-foreground">Guided tour + video tutorials</div>
+            </div>
+          </Link>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
+            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
+              <Feather className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-medium text-foreground">Author's Note</div>
+              <div className="text-xs text-muted-foreground">A message from Riaa</div>
+            </div>
+          </button>
         </div>
       </section>
 
