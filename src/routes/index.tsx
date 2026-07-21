@@ -117,7 +117,7 @@ function Home() {
             </div>
             <div className="min-w-0">
               <div className="font-medium text-foreground">Author's Note</div>
-              <div className="text-xs text-muted-foreground">A message from Riaa</div>
+              <div className="text-xs text-muted-foreground">A message from Giaa Sharma</div>
             </div>
           </button>
         </div>
