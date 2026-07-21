@@ -134,10 +134,28 @@ function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number,
   const cusps = new Array(12).fill(0);
   cusps[0] = asc; cusps[9] = mc;
   cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
-  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11);
-  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12);
-  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2);
-  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3);
+  const ic = norm360(mc + 180);
+  // The δ-iteration returns λ in the principal atan2 branch which at high
+  // latitudes may land on the antipode of the intended cusp. Constrain each
+  // cusp to the classical forward arc it must inhabit:
+  //   11, 12 → between MC and Asc (going forward through the zodiac)
+  //   2, 3   → between Asc and IC
+  const inForwardArc = (x: number, from: number, to: number) => {
+    const d = ((to - from) % 360 + 360) % 360;   // forward-arc size
+    const p = ((x  - from) % 360 + 360) % 360;   // position along that arc
+    return p > 0 && p < d;
+  };
+  const selectBranch = (raw: number | null, from: number, to: number): number | null => {
+    if (raw == null) return null;
+    if (inForwardArc(raw, from, to)) return raw;
+    const flip = norm360(raw + 180);
+    if (inForwardArc(flip, from, to)) return flip;
+    return null;
+  };
+  const c11 = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11), mc, asc);
+  const c12 = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12), mc, asc);
+  const c2  = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2),  asc, ic);
+  const c3  = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3),  asc, ic);
   if (c11 == null || c12 == null || c2 == null || c3 == null) {
     return porphyryCusps(asc, mc);
   }
