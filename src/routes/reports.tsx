@@ -15,6 +15,7 @@ import { loShuGrid } from "@/lib/numerology-deep";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
 import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
+import { ShareLinkPanel } from "@/components/share-link-panel";
 import { FileText, Download, Loader2, Infinity as InfIcon } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
