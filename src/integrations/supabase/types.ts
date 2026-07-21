@@ -420,6 +420,42 @@ export type Database = {
         }
         Relationships: []
       }
+      engine_validation_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          details: Json
+          drift: Json
+          engine_version: string
+          failed: number
+          id: string
+          passed: number
+          suite: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          details?: Json
+          drift?: Json
+          engine_version: string
+          failed?: number
+          id?: string
+          passed?: number
+          suite: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          details?: Json
+          drift?: Json
+          engine_version?: string
+          failed?: number
+          id?: string
+          passed?: number
+          suite?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           body: string
@@ -1088,6 +1124,54 @@ export type Database = {
           tagline?: string | null
           thumbnail_url?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tutorials: {
+        Row: {
+          captions_url: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          language: string
+          poster_url: string | null
+          published: boolean
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+          video_url: string
+        }
+        Insert: {
+          captions_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          language?: string
+          poster_url?: string | null
+          published?: boolean
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          video_url: string
+        }
+        Update: {
+          captions_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          language?: string
+          poster_url?: string | null
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          video_url?: string
         }
         Relationships: []
       }

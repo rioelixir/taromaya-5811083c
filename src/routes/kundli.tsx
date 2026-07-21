@@ -32,6 +32,9 @@ import {
   Sparkles, Loader2, MapPin, Save, Check, AlertTriangle,
   CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
+import { CalcSettingsPanel, type CalcSettings } from "@/components/calc-settings-panel";
+import { AccuracyPanel } from "@/components/accuracy-panel";
+
 
 export const Route = createFileRoute("/kundli")({
   component: () => (<PremiumGate featureName="Kundli"><KundliPage /></PremiumGate>),
@@ -274,6 +277,11 @@ function KundliPage() {
             {tab === "lalkitab" && <LalKitabTab chart={chart} />}
             {tab === "gems" && <GemstonesTab chart={chart} />}
             {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
+          </div>
+
+          <div className="mt-6 space-y-3">
+            <CalcSettingsPanel settings={buildCalcSettings(chart, form, birthDate)} />
+            <AccuracyPanel compact />
           </div>
         </div>
       )}
@@ -1362,3 +1370,31 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
 
   return pdf;
 }
+
+function buildCalcSettings(chart: KundliChart, form: FormState, birthDate: Date | null): CalcSettings {
+  const tz = Number(form.tz) || 0;
+  const local = birthDate ?? new Date();
+  const utc = new Date(local.getTime() - tz * 3600 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const localIso = `${local.getFullYear()}-${pad(local.getMonth()+1)}-${pad(local.getDate())}T${pad(local.getHours())}:${pad(local.getMinutes())}:${pad(local.getSeconds())}${tz >= 0 ? "+" : "-"}${pad(Math.floor(Math.abs(tz)))}:${pad(Math.round((Math.abs(tz)%1)*60))}`;
+  return {
+    zodiac: form.ayanamsa === "tropical" ? "Tropical" : "Sidereal",
+    config: {
+      ayanamsa: form.ayanamsa as CalcSettings["config"]["ayanamsa"],
+      houseSystem: form.houseSystem as CalcSettings["config"]["houseSystem"],
+      nodeType: form.nodeType as CalcSettings["config"]["nodeType"],
+      elevationMeters: Number(form.elevation) || 0,
+      topocentric: false,
+    },
+    latitude: Number(form.lat),
+    longitude: Number(form.lon),
+    placeLabel: form.place,
+    localTimeIso: localIso,
+    utcTimeIso: utc.toISOString(),
+    tzOffsetHours: tz,
+    ascendantLongitude: chart.ascendant.longitude,
+    ascendantSign: RASHIS[chart.ascendant.rashi],
+    computedAt: new Date().toISOString(),
+  };
+}
+

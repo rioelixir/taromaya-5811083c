@@ -42,6 +42,7 @@ import { Route as LifeDashboardRouteImport } from './routes/life-dashboard'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
+import { Route as HowToUseRouteImport } from './routes/how-to-use'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HealthRouteImport } from './routes/health'
@@ -76,6 +77,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPrashnaRouteImport } from './routes/_authenticated/prashna'
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
+import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenticated/diagnostics'
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -247,6 +249,11 @@ const KaalsarpRoute = KaalsarpRouteImport.update({
   path: '/kaalsarp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowToUseRoute = HowToUseRouteImport.update({
+  id: '/how-to-use',
+  path: '/how-to-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HoroscopeRoute = HoroscopeRouteImport.update({
   id: '/horoscope',
   path: '/horoscope',
@@ -416,6 +423,12 @@ const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDiagnosticsRoute =
+  AuthenticatedDiagnosticsRouteImport.update({
+    id: '/diagnostics',
+    path: '/diagnostics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDeepJyotishRoute =
   AuthenticatedDeepJyotishRouteImport.update({
     id: '/deep-jyotish',
@@ -467,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -503,6 +517,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
   '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
+  '/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
@@ -540,6 +555,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -576,6 +592,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
   '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
+  '/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/meditation': typeof AuthenticatedMeditationRoute
   '/prashna': typeof AuthenticatedPrashnaRoute
@@ -615,6 +632,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/kaalsarp': typeof KaalsarpRoute
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
@@ -651,6 +669,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/birth-details': typeof AuthenticatedBirthDetailsRoute
   '/_authenticated/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
+  '/_authenticated/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/prashna': typeof AuthenticatedPrashnaRoute
@@ -690,6 +709,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
+    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -726,6 +746,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/birth-details'
     | '/deep-jyotish'
+    | '/diagnostics'
     | '/journal'
     | '/meditation'
     | '/prashna'
@@ -763,6 +784,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
+    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -799,6 +821,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/birth-details'
     | '/deep-jyotish'
+    | '/diagnostics'
     | '/journal'
     | '/meditation'
     | '/prashna'
@@ -837,6 +860,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/history'
     | '/horoscope'
+    | '/how-to-use'
     | '/kaalsarp'
     | '/karma'
     | '/kundli'
@@ -873,6 +897,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/birth-details'
     | '/_authenticated/deep-jyotish'
+    | '/_authenticated/diagnostics'
     | '/_authenticated/journal'
     | '/_authenticated/meditation'
     | '/_authenticated/prashna'
@@ -912,6 +937,7 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
+  HowToUseRoute: typeof HowToUseRoute
   KaalsarpRoute: typeof KaalsarpRoute
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
@@ -1187,6 +1213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KaalsarpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-to-use': {
+      id: '/how-to-use'
+      path: '/how-to-use'
+      fullPath: '/how-to-use'
+      preLoaderRoute: typeof HowToUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/horoscope': {
       id: '/horoscope'
       path: '/horoscope'
@@ -1425,6 +1458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJournalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/diagnostics': {
+      id: '/_authenticated/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/diagnostics'
+      preLoaderRoute: typeof AuthenticatedDiagnosticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/deep-jyotish': {
       id: '/_authenticated/deep-jyotish'
       path: '/deep-jyotish'
@@ -1467,6 +1507,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBirthDetailsRoute: typeof AuthenticatedBirthDetailsRoute
   AuthenticatedDeepJyotishRoute: typeof AuthenticatedDeepJyotishRoute
+  AuthenticatedDiagnosticsRoute: typeof AuthenticatedDiagnosticsRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
   AuthenticatedPrashnaRoute: typeof AuthenticatedPrashnaRoute
@@ -1478,6 +1519,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBirthDetailsRoute: AuthenticatedBirthDetailsRoute,
   AuthenticatedDeepJyotishRoute: AuthenticatedDeepJyotishRoute,
+  AuthenticatedDiagnosticsRoute: AuthenticatedDiagnosticsRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
   AuthenticatedPrashnaRoute: AuthenticatedPrashnaRoute,
@@ -1522,6 +1564,7 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
+  HowToUseRoute: HowToUseRoute,
   KaalsarpRoute: KaalsarpRoute,
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
