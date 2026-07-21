@@ -672,7 +672,7 @@ function PlacedCardView({
                 src={cardImage(card.card.id)}
                 alt={card.card.name}
                 draggable={false}
-                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
               />
             ) : (
               <div className="flex-1 flex items-center justify-center">
