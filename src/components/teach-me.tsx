@@ -20,77 +20,42 @@ function profileToRow(p: BirthProfile): SavedKundliRow {
 }
 
 const TEACHER_SCHEMA = [
-  "## 1. ELI10 (10-year-old friend voice)",
-  "## 2. Intermediate (curious student)",
-  "## 3. Advanced (serious seeker)",
-  "## 4. Master (occult scholar)",
-  "## 5. Core Symbols on this page",
-  "## 6. Hidden meanings & archetypes",
-  "## 7. Psychological meaning (Jung, shadow, self)",
-  "## 8. Spiritual meaning (soul, karma, dharma)",
-  "## 9. Mythology & scripture references",
-  "## 10. History & lineage",
-  "## 11. How it is calculated (plain math)",
-  "## 12. Common mistakes & misreadings",
-  "## 13. Practice — 3 tiny exercises",
-  "## 14. Journal prompts (3)",
-  "## 15. Meditation / mantra / mudra",
-  "## 16. Ethics & when NOT to use it",
-  "## 17. Glossary (5 key words, one-line each)",
-  "## 18. Mini-quiz (3 questions with answers)",
-  "## 19. Flashcards (5 term → meaning pairs)",
-  "## 20. Cross-links (related modules to visit next)",
-  "## 21. Real-life example (short story)",
-  "## 22. Red flags in interpretation",
-  "## 23. Deepening roadmap (beginner → master)",
-  "## 24. Recommended reading (books/tantras)",
+  "## 1. What is this page? (purpose, goal, why it exists, what to learn)",
+  "## 2. Explain like I'm 10 (zero jargon, tiny words)",
+  "## 3. Beginner explanation (from absolute zero, no skipped steps)",
+  "## 4. Intermediate explanation (how the ideas connect)",
+  "## 5. Advanced explanation (deeper symbolism, esoteric meaning, hidden philosophy)",
+  "## 6. Master level (why teachers teach this — psychological, spiritual, philosophical)",
+  "## 7. Historical background (origins, lineages, schools of thought)",
+  "## 8. Symbol breakdown (every symbol, color, number, direction, shape, element visible)",
+  "## 9. Hidden meanings (archetypes, sacred geometry, numerology, Kabbalah, Hermetics — only if evidenced)",
+  "## 10. Psychological meaning (Jung: archetypes, shadow, persona, anima/animus, collective unconscious)",
+  "## 11. Spiritual meaning (inner growth, transformation, initiation — marked as interpretation, not fact)",
+  "## 12. Practical meaning (daily life, decisions, relationships, career, health, habits)",
+  "## 13. Common beginner mistakes (what they are, why they happen, how to avoid)",
+  "## 14. FAQ (5 beginner questions with simple answers)",
+  "## 15. Real examples (daily life, story, relationship, personal growth)",
+  "## 16. Analogies (school, cooking, gaming, sports, nature — pick 3)",
+  "## 17. Memory tricks (mnemonics, visual memory, associations)",
+  "## 18. Summary (one paragraph, then 5 bullet points, then one sentence)",
+  "## 19. Quiz (3 beginner + 3 intermediate + 3 advanced, with answers explained)",
+  "## 20. Flashcards (6 cards: Question → Answer → Meaning → Memory trick)",
+  "## 21. Connections (how this links to Tarot / Astrology / Numerology / Yoga / Psychology / Mythology)",
+  "## 22. Learning roadmap (first, second, third… up to mastery)",
+  "## 23. Glossary (every difficult word: definition + tiny example + pronunciation)",
+  "## 24. Visual / UX description (layout, icons, colors, how design supports learning)",
   "## 25. One-line takeaway",
 ].join("\n");
-
-export function TeachMe({
-  module,
-  snapshot,
-}: {
-  module: string;
-  snapshot?: string;
-}) {
-  const { data: profile } = useBirthProfile();
-  const lang = useLang();
-  const [open, setOpen] = useState(false);
-  const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
-
-  useEffect(() => () => abortRef.current?.abort(), []);
-
-  function stop() {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    setLoading(false);
-  }
-
-  async function teach() {
-    setLoading(true);
-    setError(null);
-    setText("");
-    try {
-      const row = profile ? profileToRow(profile) : null;
-      const context = buildGuideContext(row);
-      const langInstr =
-        lang === "hi"
-          ? "Write the ENTIRE lesson in Hindi (Devanagari)."
-          : lang === "hr"
-          ? "Write the ENTIRE lesson in Roman Hinglish."
-          : "Write the lesson in simple English.";
+...
       const system = [
-        `You are Taromaya's Occult Master Teacher for the "${module}" module.`,
-        "You are a warm, precise, deeply-read guide: part Vedic acharya, part Jungian analyst, part tarot elder.",
+        `You are Taromaya's Occult Master, Teacher & Researcher for the "${module}" module.`,
+        "You are an internationally respected scholar and practitioner with 40+ years across Tarot, Astrology, Numerology, Kabbalah, Hermeticism, Alchemy, Golden Dawn, Thelema, Jungian psychology, sacred geometry, chakras, Hindu Tantra, Kashmir Shaivism, Vedanta, Yoga philosophy, Buddhism, Taoism, I Ching, Feng Shui, Egyptian/Greek/Norse/Celtic mysteries, planetary magic, angelology, symbols, archetypes, dreams and meditation.",
+        "TEACHING VOICE: warm, precise, plain English. Assume the student is intelligent but brand new. Explain every technical word the moment you use it. Never use unnecessary jargon.",
         langInstr,
-        "Teach the CURRENT PAGE only. Ground every claim in CONTEXT + PAGE DATA. Never invent scriptures, dates, or quotes.",
-        "OUTPUT SCHEMA — use exactly these 25 markdown headings, in this order. Keep each section tight (2-6 lines). Skip nothing.",
+        "RESEARCH RULES: Teach the CURRENT PAGE only, grounded in CONTEXT + PAGE DATA. Never invent scriptures, dates, quotes, lineages, or 'hidden meanings' that aren't reasonably supported. Clearly separate historical fact vs symbolism vs interpretation vs belief. Mark uncertainty. Compare traditions fairly. Educational, not persuasive. No medical/legal/exam predictions. No fear language. No unsupported mystical claims.",
+        "OUTPUT SCHEMA — use EXACTLY these 25 markdown headings, in this order. Skip nothing. Keep each section tight (3-7 lines). Use tables or ASCII diagrams where they clarify.",
         TEACHER_SCHEMA,
-        "Rules: no emojis in headings, no medical/legal/exam predictions, no fear language, total under 1200 words.",
+        "Formatting: no emojis in headings, use **bold** for key terms on first mention, total under 1600 words.",
       ].join("\n");
       const prompt = [
         `MODULE: ${module}`,
