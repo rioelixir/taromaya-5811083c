@@ -1,111 +1,86 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
   BookOpen, FileText, History, Bookmark, User, Settings,
-  Sun, Users, LineChart, Compass, ChevronDown, LogOut, LogIn, Menu, X,
+  Users, LineChart, Compass, LogOut, LogIn, Menu, X, Search,
   Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
-  Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock,
+  Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock, Sun, Shield,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
 import { useT } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
-function BrandMark() {
-  const logo = useAppLogo();
-  if (logo) {
-    return (
-      <div className="relative h-9 w-9 rounded-full overflow-hidden gold-border">
-        <img src={logo} alt="Logo" className="h-full w-full object-cover" />
-      </div>
-    );
-  }
-  return (
-    <div className="relative h-9 w-9 rounded-full gold-border grid place-items-center">
-      <Sparkles className="h-4 w-4 text-gold" />
-      <div className="absolute inset-0 rounded-full animate-twinkle bg-gold/10" />
-    </div>
-  );
-}
-
 type Item = { to: string; label: string; icon: typeof Sparkles };
-type Group = { label: string; items: Item[]; defaultOpen?: boolean };
+type Group = { label: string; items: Item[] };
 
-const groups: Group[] = [
+const CATALOG: Group[] = [
   {
-    label: "Home",
-    defaultOpen: true,
+    label: "Essentials",
     items: [
-      { to: "/", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/birth-details", label: "Birth Details", icon: Lock },
-      { to: "/life-dashboard", label: "Life Dashboard", icon: LayoutGrid },
-      { to: "/deep-jyotish", label: "Deep Jyotish", icon: Stars },
+      { to: "/", label: "Home", icon: LayoutDashboard },
+      { to: "/tarot", label: "Tarot", icon: Sparkles },
+      { to: "/kundli", label: "Kundli", icon: Moon },
       { to: "/ai", label: "AI Guide", icon: Bot },
-    ],
-  },
-  {
-    label: "Horoscopes",
-    defaultOpen: true,
-    items: [
-      { to: "/horoscope", label: "Horoscope", icon: Sun },
+      { to: "/history", label: "History", icon: History },
+      { to: "/profile", label: "Profile", icon: User },
+      { to: "/birth-details", label: "Birth Details", icon: Lock },
     ],
   },
   {
     label: "Vedic",
-    defaultOpen: true,
     items: [
-      { to: "/kundli", label: "Kundli", icon: Moon },
-      { to: "/avakhada", label: "Avakhada", icon: Stars },
-      { to: "/strength", label: "Shadbala & AV", icon: Gauge },
       { to: "/astrology", label: "Astrology", icon: Stars },
+      { to: "/avakhada", label: "Avakhada", icon: Stars },
+      { to: "/strength", label: "Shadbala & Ashtakavarga", icon: Gauge },
       { to: "/panchang", label: "Panchang", icon: CalendarDays },
       { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
-      { to: "/remedies", label: "Remedies", icon: Flame },
-      { to: "/compatibility", label: "Matching", icon: Heart },
       { to: "/varshphal", label: "Varshphal", icon: Sun },
       { to: "/prashna", label: "Prashna", icon: CalendarClock },
+      { to: "/deep-jyotish", label: "Deep Jyotish", icon: Stars },
+      { to: "/nakshatra", label: "Nakshatra", icon: Stars },
+      { to: "/nakshatra-location", label: "Nakshatra for Location", icon: Compass },
+    ],
+  },
+  {
+    label: "Doshas & Remedies",
+    items: [
+      { to: "/remedies", label: "Remedies", icon: Flame },
+      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
+      { to: "/kaalsarp", label: "Kaal Sarp", icon: Waves },
+      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
+      { to: "/yantra", label: "Yantra", icon: Triangle },
+      { to: "/dharma", label: "Dharma", icon: Crown },
+    ],
+  },
+  {
+    label: "Life",
+    items: [
+      { to: "/horoscope", label: "Horoscope", icon: Sun },
+      { to: "/compatibility", label: "Compatibility", icon: Heart },
+      { to: "/numerology", label: "Numerology", icon: Hash },
+      { to: "/baby-names", label: "Baby Names", icon: Baby },
+      { to: "/festivals", label: "Festivals", icon: Flame },
+      { to: "/career", label: "Career", icon: Briefcase },
+      { to: "/finance", label: "Finance", icon: Coins },
+      { to: "/health", label: "Health", icon: Activity },
       { to: "/ayurveda", label: "Ayurveda", icon: Leaf },
       { to: "/chakra", label: "Chakra", icon: Zap },
       { to: "/karma", label: "Karma", icon: InfIcon },
       { to: "/vastu", label: "Vastu", icon: HomeIcon },
-      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
-      { to: "/kaalsarp", label: "Kaal Sarp", icon: Waves },
-      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
-      { to: "/dharma", label: "Dharma", icon: Crown },
-      { to: "/yantra", label: "Yantra", icon: Triangle },
-      { to: "/career", label: "Career", icon: Briefcase },
-      { to: "/finance", label: "Finance", icon: Coins },
-      { to: "/health", label: "Health", icon: Activity },
+      { to: "/life-dashboard", label: "Life Dashboard", icon: LayoutGrid },
     ],
   },
   {
-    label: "Tarot",
-    defaultOpen: true,
-    items: [
-      { to: "/tarot", label: "Tarot Board", icon: Sparkles },
-    ],
-  },
-  {
-    label: "Divination",
-    defaultOpen: true,
-    items: [
-      { to: "/numerology", label: "Numerology", icon: Hash },
-      { to: "/baby-names", label: "Baby Names", icon: Baby },
-      { to: "/festivals", label: "Festivals", icon: Flame },
-    ],
-  },
-  {
-    label: "Advanced",
+    label: "Sky & Transits",
     items: [
       { to: "/transits", label: "Transits", icon: LineChart },
       { to: "/vedic-transits", label: "Vedic Transits", icon: Moon },
       { to: "/progressions", label: "Progressions", icon: LineChart },
       { to: "/synastry", label: "Synastry", icon: Compass },
-      { to: "/astrology", label: "Natal Chart", icon: Stars },
       { to: "/timeline", label: "Timeline", icon: CalendarClock },
       { to: "/rectification", label: "Rectification", icon: Target },
       { to: "/astrocartography", label: "Astrocartography", icon: Globe2 },
@@ -113,8 +88,6 @@ const groups: Group[] = [
       { to: "/weather", label: "Cosmic Weather", icon: CloudSun },
       { to: "/dreams", label: "Dream Oracle", icon: Feather },
       { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
-      { to: "/nakshatra", label: "Nakshatra", icon: Stars },
-      { to: "/nakshatra-location", label: "Nakshatra for Location", icon: Compass },
       { to: "/reports", label: "Reports", icon: FileText },
     ],
   },
@@ -122,11 +95,11 @@ const groups: Group[] = [
     label: "Library",
     items: [
       { to: "/saved", label: "Saved Charts", icon: Bookmark },
-      { to: "/history", label: "History", icon: History },
       { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
+      { to: "/blog", label: "Blog", icon: BookOpen },
+      { to: "/faq", label: "FAQ", icon: BookOpen },
     ],
   },
-
   {
     label: "Account",
     items: [
@@ -137,165 +110,202 @@ const groups: Group[] = [
   },
 ];
 
+function BrandMark() {
+  const logo = useAppLogo();
+  if (logo) {
+    return (
+      <div className="relative h-9 w-9 rounded-full overflow-hidden gold-border shrink-0">
+        <img src={logo} alt="Taromaya" className="h-full w-full object-cover" />
+      </div>
+    );
+  }
+  return (
+    <div className="relative h-9 w-9 rounded-full gold-border grid place-items-center shrink-0">
+      <Sparkles className="h-4 w-4 text-gold" />
+    </div>
+  );
+}
+
+/**
+ * Sidebar — kept as export name for API compatibility with __root.tsx.
+ * Now renders a floating hamburger trigger + a full drawer with search.
+ * No permanent sidebar column.
+ */
 export function Sidebar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Close on route change
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  // Close whenever the route changes
+  useEffect(() => { setOpen(false); }, [pathname]);
+
+  // Escape to close
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <>
-      {/* Mobile trigger */}
       <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 h-10 w-10 grid place-items-center rounded-full glass gold-border"
+        onClick={() => setOpen(true)}
+        className="fixed top-3 left-3 z-40 h-11 w-11 grid place-items-center rounded-full glass gold-border hover:bg-white/40 transition"
         aria-label="Open menu"
       >
-        <Menu className="h-4 w-4 text-gold" />
+        <Menu className="h-5 w-5 text-gold" />
       </button>
+      {open && <ModuleDrawer onClose={() => setOpen(false)} />}
+    </>
+  );
+}
 
-      {/* Overlay */}
-      {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+function ModuleDrawer({ onClose }: { onClose: () => void }) {
+  const [q, setQ] = useState("");
+  const { t } = useT();
+  const { isAdmin } = useIsAdmin();
 
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return CATALOG;
+    return CATALOG.map((g) => ({
+      ...g,
+      items: g.items.filter((i) => i.label.toLowerCase().includes(needle)),
+    })).filter((g) => g.items.length > 0);
+  }, [q]);
+
+  return (
+    <>
+      <div
+        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden
+      />
       <aside
-        className={[
-          "fixed left-0 top-0 h-dvh w-72 flex-col z-50 border-r border-white/5 bg-cosmic/80 backdrop-blur-2xl",
-          "transition-transform duration-300 ease-out",
-          "lg:flex lg:translate-x-0 lg:w-64",
-          mobileOpen ? "flex translate-x-0" : "flex -translate-x-full lg:translate-x-0",
-        ].join(" ")}
+        className="fixed left-0 top-0 z-50 h-dvh w-[min(92vw,420px)] flex flex-col bg-background/98 backdrop-blur-2xl border-r border-border/40 shadow-2xl animate-in slide-in-from-left duration-200"
+        role="dialog"
+        aria-label="All modules"
       >
-        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3 px-5 pt-5 pb-3">
+          <Link to="/" onClick={onClose} className="flex items-center gap-2.5 min-w-0">
             <BrandMark />
-            <div>
-              <div className="font-display text-xl tracking-widest gold-text leading-none">
-                TAROMAYA
-              </div>
-              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1">
-                Cosmic Intelligence
+            <div className="min-w-0">
+              <div className="font-display text-xl leading-none gold-text">TAROMAYA</div>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1 truncate">
+                All Modules
               </div>
             </div>
           </Link>
           <button
-            className="lg:hidden text-muted-foreground"
-            onClick={() => setMobileOpen(false)}
+            onClick={onClose}
+            className="ml-auto h-9 w-9 grid place-items-center rounded-full hover:bg-black/5"
             aria-label="Close menu"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-1">
-          {groups.map((g) => (
-            <NavGroup key={g.label} group={g} pathname={pathname} />
+        <div className="px-5 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              autoFocus
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search modules…"
+              className="w-full rounded-xl border border-border/40 bg-white/60 pl-9 pr-3 py-2.5 text-sm"
+            />
+          </div>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-4">
+          {filtered.map((group) => (
+            <div key={group.label}>
+              <div className="px-3 pb-1.5 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                {t(group.label)}
+              </div>
+              <div className="space-y-0.5">
+                {group.items.map(({ to, label, icon: Icon }) => (
+                  <Link
+                    key={to + label}
+                    to={to}
+                    onClick={onClose}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+                  >
+                    <Icon className="h-4 w-4 text-primary shrink-0" />
+                    <span className="truncate">{t(label)}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
-          <AdminNavGroup pathname={pathname} />
+          {isAdmin && (
+            <div>
+              <div className="px-3 pb-1.5 text-[10px] uppercase tracking-[0.3em] text-gold">
+                {t("Admin")}
+              </div>
+              <Link
+                to="/admin"
+                onClick={onClose}
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+              >
+                <Shield className="h-4 w-4 text-gold shrink-0" />
+                <span>{t("Control Room")}</span>
+              </Link>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(new Event("taromaya:open-authors-note"));
+              onClose();
+            }}
+            className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+          >
+            <Feather className="h-4 w-4 text-primary shrink-0" />
+            <span>{t("Author's Note")}</span>
+          </button>
         </nav>
 
-        <div className="px-3 pb-2">
+        <div className="px-4 pb-3 pt-2 border-t border-border/40">
           <LanguageSwitcher />
         </div>
-        <AuthFooter />
+        <AuthFooter onClose={onClose} />
       </aside>
     </>
   );
 }
 
-function NavGroup({ group, pathname }: { group: Group; pathname: string }) {
-  const { t } = useT();
-  const containsActive = group.items.some(
-    (i) => pathname === i.to || (i.to !== "/" && pathname.startsWith(i.to)),
-  );
-  const [open, setOpen] = useState(group.defaultOpen ?? containsActive);
-  useEffect(() => {
-    if (containsActive) setOpen(true);
-  }, [containsActive]);
-
-  return (
-    <div>
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-muted-foreground/80 hover:text-pearl"
-      >
-        <span>{t(group.label)}</span>
-        <ChevronDown className={`h-3 w-3 transition-transform ${open ? "" : "-rotate-90"}`} />
-      </button>
-      {open && (
-        <div className="space-y-0.5 mt-0.5">
-          {group.items.map(({ to, label, icon: Icon }) => {
-            const active = pathname === to || (to !== "/" && pathname === to);
-            return (
-              <Link
-                key={to + label}
-                to={to}
-                className={[
-                  "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all",
-                  active
-                    ? "bg-gradient-to-r from-gold/15 to-galaxy/10 text-pearl gold-border"
-                    : "text-muted-foreground hover:text-pearl hover:bg-white/5",
-                ].join(" ")}
-              >
-                <Icon
-                  className={[
-                    "h-4 w-4 shrink-0 transition-colors",
-                    active ? "text-gold" : "text-muted-foreground group-hover:text-gold-soft",
-                  ].join(" ")}
-                />
-                <span className="truncate">{t(label)}</span>
-              </Link>
-            );
-          })}
-          {group.label === "Home" && (
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
-              className="w-full group flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground hover:text-pearl hover:bg-white/5 transition-all"
-            >
-              <Feather className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-gold-soft" />
-              <span className="truncate">{t("Author's Note")}</span>
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-function AuthFooter() {
+function AuthFooter({ onClose }: { onClose: () => void }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-
   const onSignOut = async () => {
     await supabase.auth.signOut();
+    onClose();
     navigate({ to: "/auth", replace: true });
   };
-
   return (
-    <div className="px-4 py-4 border-t border-white/5">
+    <div className="px-4 pb-4 pt-2 border-t border-border/40">
       {loading ? (
-        <div className="h-10 rounded-xl bg-white/5 animate-pulse" />
+        <div className="h-10 rounded-xl bg-black/5 animate-pulse" />
       ) : user ? (
         <div className="glass rounded-2xl p-3 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-gold/30 to-galaxy/30 grid place-items-center gold-border shrink-0">
-            <User className="h-4 w-4 text-gold" />
+          <div className="h-9 w-9 rounded-full bg-primary/15 grid place-items-center shrink-0">
+            <User className="h-4 w-4 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-xs text-pearl truncate">
+            <div className="text-xs truncate">
               {user.user_metadata?.full_name ?? user.email?.split("@")[0]}
             </div>
             <div className="text-[10px] text-muted-foreground truncate">{user.email}</div>
           </div>
           <button
             onClick={onSignOut}
-            className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-pearl"
+            className="p-2 rounded-lg hover:bg-black/5"
             aria-label="Sign out"
             title="Sign out"
           >
@@ -305,26 +315,24 @@ function AuthFooter() {
       ) : (
         <Link
           to="/auth"
-          className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 text-sm"
+          onClick={onClose}
+          className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-white font-medium py-2.5 text-sm"
         >
-          <LogIn className="h-4 w-4" /> <SignInLabel />
+          <LogIn className="h-4 w-4" /> Sign in
         </Link>
       )}
     </div>
   );
 }
 
-function SignInLabel() {
-  const { t } = useT();
-  return <>{t("Sign in")}</>;
-}
-
+/**
+ * Bottom navigation — 4 tabs only. Visible on all screen sizes.
+ */
 const bottomNav = [
-  { to: "/", label: "Home", icon: LayoutDashboard },
+  { to: "/", label: "Home", icon: HomeIcon },
   { to: "/tarot", label: "Tarot", icon: Sparkles },
-  { to: "/kundli", label: "Kundli", icon: Moon },
-  { to: "/ai", label: "AI", icon: Bot },
-  { to: "/profile", label: "Me", icon: User },
+  { to: "/history", label: "History", icon: History },
+  { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
 export function BottomNav() {
@@ -332,10 +340,10 @@ export function BottomNav() {
   const { t } = useT();
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-white/5 bg-cosmic/85 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/40 bg-background/90 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]"
       aria-label="Primary"
     >
-      <ul className="grid grid-cols-5">
+      <ul className="mx-auto grid max-w-md grid-cols-4">
         {bottomNav.map(({ to, label, icon: Icon }) => {
           const active = pathname === to || (to !== "/" && pathname.startsWith(to));
           return (
@@ -348,14 +356,12 @@ export function BottomNav() {
                 <span
                   className={[
                     "grid place-items-center h-9 w-9 rounded-full transition-all",
-                    active
-                      ? "bg-gradient-to-br from-gold/25 to-galaxy/20 gold-border"
-                      : "text-muted-foreground",
+                    active ? "bg-primary/12 text-primary" : "text-muted-foreground",
                   ].join(" ")}
                 >
-                  <Icon className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
+                  <Icon className="h-5 w-5" />
                 </span>
-                <span className={active ? "text-pearl" : "text-muted-foreground"}>
+                <span className={active ? "text-primary font-medium" : "text-muted-foreground"}>
                   {t(label)}
                 </span>
               </Link>
@@ -367,29 +373,5 @@ export function BottomNav() {
   );
 }
 
-// keep imports referenced (Users used in future groups)
+// keep imports referenced
 void Users;
-
-function AdminNavGroup({ pathname }: { pathname: string }) {
-  const { isAdmin } = useIsAdmin();
-  const { t } = useT();
-  if (!isAdmin) return null;
-  const active = pathname === "/admin" || pathname.startsWith("/admin");
-  return (
-    <div className="pt-2 mt-2 border-t border-white/5">
-      <div className="px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-gold/80">{t("Admin")}</div>
-      <Link
-        to="/admin"
-        className={[
-          "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all",
-          active
-            ? "bg-gradient-to-r from-gold/20 to-galaxy/15 text-pearl gold-border"
-            : "text-muted-foreground hover:text-pearl hover:bg-white/5",
-        ].join(" ")}
-      >
-        <Shield className={active ? "h-4 w-4 text-gold" : "h-4 w-4"} />
-        <span>{t("Control Room")}</span>
-      </Link>
-    </div>
-  );
-}
