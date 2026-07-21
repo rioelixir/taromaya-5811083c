@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { computeAvakhada } from "@/lib/avakhada";
-import { MapPin } from "lucide-react";
+import { MapPin, Copy, Check, Printer } from "lucide-react";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/avakhada")({
   component: () => (
@@ -50,6 +51,35 @@ function AvakhadaPage() {
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+  const [copied, setCopied] = useState(false);
+
+  async function copySummary() {
+    if (!av) return;
+    const lines = [
+      `Avakhada Chakra — ${form.place}`,
+      `Born: ${form.date} ${form.time} (UTC${Number(form.tz) >= 0 ? "+" : ""}${form.tz})`,
+      "",
+      `Lagna: ${av.ascendant.rashi} (Lord: ${av.ascendant.lord})`,
+      `Rashi (Moon): ${av.moonSign.rashi} (Lord: ${av.moonSign.lord})`,
+      `Sun Sign: ${av.sunSign.rashi} (Lord: ${av.sunSign.lord})`,
+      `Nakshatra: ${av.nakshatra.name} · Pada ${av.nakshatra.pada} · Lord ${av.nakshatra.lord}`,
+      `Name Syllable: ${av.nameSyllable} (Charan ${av.nakshatra.charan})`,
+      `Tatva: ${av.tatvaLabel} (${av.tatva})`,
+      "",
+      `Varna: ${av.varna} | Vashya: ${av.vashya} | Yoni: ${av.yoni}`,
+      `Gana: ${av.gana} | Nadi: ${av.nadi} | Paya: ${av.paya} | Yunja: ${av.yunja}`,
+      `Gandanta: ${av.ganda ? "Yes — " + av.gandaReason : "No"}`,
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(lines);
+      setCopied(true);
+      toast.success("Avakhada summary copied");
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Copy failed");
+    }
+  }
+
 
   return (
     <PageShell
@@ -78,6 +108,25 @@ function AvakhadaPage() {
 
         {av && chart && (
           <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-end gap-2 print:hidden">
+              <button
+                onClick={copySummary}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-pearl hover:bg-white/10 transition-colors"
+                aria-label="Copy Avakhada summary"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-gold" /> : <Copy className="h-3.5 w-3.5 text-gold" />}
+                {copied ? "Copied" : "Copy summary"}
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-pearl hover:bg-white/10 transition-colors"
+                aria-label="Print Avakhada"
+              >
+                <Printer className="h-3.5 w-3.5 text-gold" />
+                Print / Save PDF
+              </button>
+            </div>
+
             <GlassCard>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Cell label="Lagna" value={av.ascendant.rashi} sub={`Lord: ${av.ascendant.lord}`} />
