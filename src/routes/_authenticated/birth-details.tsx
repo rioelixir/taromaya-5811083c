@@ -226,8 +226,8 @@ function BirthDetailsPage() {
   );
 }
 
-function Field({ label, required, children }: {
-  label: string; required?: boolean; children: React.ReactNode;
+function Field({ label, required, error, children }: {
+  label: string; required?: boolean; error?: string; children: React.ReactNode;
 }) {
   return (
     <label className="block space-y-1.5">
@@ -235,6 +235,11 @@ function Field({ label, required, children }: {
         {label}{required && <span className="text-accent"> *</span>}
       </span>
       {children}
+      {error && (
+        <span role="alert" className="block text-[11px] text-red-600 font-medium">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
