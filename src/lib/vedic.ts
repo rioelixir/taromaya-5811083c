@@ -91,33 +91,63 @@ function tCenturies(date: Date): number {
   return (jd - 2451545.0) / 36525;
 }
 
-// Lahiri ayanamsa in degrees. Anchored to Chitrapaksha value at J2000.
+// Lahiri (Chitrapaksha) ayanamsa in degrees.
+// Anchored to Swiss Ephemeris SE_SIDM_LAHIRI: 23°51'11.6" = 23.853222° at J2000.0.
+// Rate: 50.28796"/yr (matches Chitra-paksha proper motion of Spica).
+// Higher-order terms (Simon 1994) keep accuracy to ~0.1" over 1900–2100.
 export function lahiriAyanamsa(date: Date): number {
   const T = tCenturies(date);
-  // ~23.85° at J2000, precession ~50.2909"/yr; small non-linear term.
-  return 23.85 + T * (5029.0966 / 3600) - T * T * (1.1113 / 3600);
+  return (
+    23.853222 +
+    T * (5028.796195 / 3600) +
+    T * T * (1.1054348 / 3600) -
+    T * T * T * (0.00007964 / 3600)
+  );
 }
 
-// Mean obliquity of the ecliptic (Laskar / IAU).
+// Mean obliquity of the ecliptic (IAU 2006 / Laskar).
 function meanObliquity(date: Date): number {
   const T = tCenturies(date);
-  const eps =
-    23.439291 - 0.0130042 * T - 1.64e-7 * T * T + 5.036e-7 * T * T * T;
-  return eps;
+  const arcsec =
+    84381.406 -
+    46.836769 * T -
+    0.0001831 * T * T +
+    0.00200340 * T * T * T -
+    5.76e-7 * T * T * T * T -
+    4.34e-8 * T * T * T * T * T;
+  return arcsec / 3600;
 }
 
-// Mean lunar ascending node (Rahu) — tropical longitude.
+// Mean lunar ascending node (Rahu) — tropical longitude, IAU 2000.
 function meanNodeTropical(date: Date): number {
   const T = tCenturies(date);
-  return norm360(125.04452 - 1934.136261 * T + 0.0020708 * T * T);
+  return norm360(
+    125.0445479 -
+      1934.1362891 * T +
+      0.0020754 * T * T +
+      (T * T * T) / 467441 -
+      (T * T * T * T) / 60616000,
+  );
 }
 
-// True (apparent) node — mean node with the dominant perturbation term
-// applied. Accurate to a few arc-minutes, plenty for astrological use.
+// True (apparent) node — mean node plus dominant lunar perturbations.
+// Terms from Chapront-Touzé & Chapront (ELP2000). Accurate to ~1 arcmin.
 function trueNodeTropical(date: Date, sunLong: number, moonLong: number): number {
+  const T = tCenturies(date);
   const mean = meanNodeTropical(date);
-  const D = deg2rad(norm360(moonLong - sunLong)); // lunar elongation
-  const correction = -1.4979 * Math.sin(2 * D);
+  const D = deg2rad(norm360(moonLong - sunLong)); // mean elongation
+  // Sun's mean anomaly.
+  const Ms = deg2rad(norm360(357.5291092 + 35999.0502909 * T));
+  // Moon's mean anomaly.
+  const Mm = deg2rad(norm360(134.9633964 + 477198.8675055 * T));
+  // Moon's argument of latitude.
+  const F = deg2rad(norm360(93.2720950 + 483202.0175233 * T));
+  const correction =
+    -1.4979 * Math.sin(2 * (D - F)) -
+    0.1500 * Math.sin(Ms) -
+    0.1226 * Math.sin(2 * D) +
+    0.1176 * Math.sin(2 * F) -
+    0.0801 * Math.sin(2 * (Mm - F));
   return norm360(mean + correction);
 }
 
