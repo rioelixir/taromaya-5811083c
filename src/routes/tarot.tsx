@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
-import { SPREADS, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { SPREADS, secureRandInt, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
 import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
 import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
@@ -45,11 +45,11 @@ function randomReversed() {
 }
 
 
-// Fisher-Yates shuffle helper (returns new array).
+// Fisher-Yates shuffle helper (CSPRNG-backed, unbiased, non-repeatable).
 function shuffle<T>(arr: T[]): T[] {
   const d = [...arr];
   for (let i = d.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = secureRandInt(i + 1);
     [d[i], d[j]] = [d[j], d[i]];
   }
   return d;
