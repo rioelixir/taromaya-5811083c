@@ -51,6 +51,35 @@ function AvakhadaPage() {
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+  const [copied, setCopied] = useState(false);
+
+  async function copySummary() {
+    if (!av) return;
+    const lines = [
+      `Avakhada Chakra — ${form.place}`,
+      `Born: ${form.date} ${form.time} (UTC${Number(form.tz) >= 0 ? "+" : ""}${form.tz})`,
+      "",
+      `Lagna: ${av.ascendant.rashi} (Lord: ${av.ascendant.lord})`,
+      `Rashi (Moon): ${av.moonSign.rashi} (Lord: ${av.moonSign.lord})`,
+      `Sun Sign: ${av.sunSign.rashi} (Lord: ${av.sunSign.lord})`,
+      `Nakshatra: ${av.nakshatra.name} · Pada ${av.nakshatra.pada} · Lord ${av.nakshatra.lord}`,
+      `Name Syllable: ${av.nameSyllable} (Charan ${av.nakshatra.charan})`,
+      `Tatva: ${av.tatvaLabel} (${av.tatva})`,
+      "",
+      `Varna: ${av.varna} | Vashya: ${av.vashya} | Yoni: ${av.yoni}`,
+      `Gana: ${av.gana} | Nadi: ${av.nadi} | Paya: ${av.paya} | Yunja: ${av.yunja}`,
+      `Gandanta: ${av.ganda ? "Yes — " + av.gandaReason : "No"}`,
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(lines);
+      setCopied(true);
+      toast.success("Avakhada summary copied");
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Copy failed");
+    }
+  }
+
 
   return (
     <PageShell
