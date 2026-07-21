@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { withSupremeSystem } from "@/lib/ai-system";
 import { createClient } from "@supabase/supabase-js";
 
 type Body = {
