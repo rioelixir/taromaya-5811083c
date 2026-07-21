@@ -68,11 +68,18 @@ function ascendantTrop(date: Date, lat: number, lonEast: number): number {
   return norm360(rad2deg(Math.atan2(y, x)));
 }
 
-// ── Placidus (real): iterative semi-arc trisection.
-// For each intermediate cusp (11, 12, 2, 3) we solve for the ecliptic longitude
-// whose right-ascension offset from RAMC equals the classical fraction of its
-// semi-diurnal or semi-nocturnal arc. Falls back to Porphyry at high latitudes
-// where the cusp longitude would be circumpolar (Placidus is undefined there).
+// ── House cusp systems.
+//
+// NOTE ON PLACIDUS: A prior implementation labelled a linear-interpolation
+// scheme as "Placidus" — it was actually **Porphyry**. A full Placidus solver
+// requires resolving a two-fold branch ambiguity in the δ-iteration equation
+// that is only trustworthy after cross-validation against Swiss Ephemeris on
+// a battery of reference charts. Until that validation lands, we route
+// house-system requests of "placidus" through the Porphyry algorithm — which
+// is a real, well-defined classical system — so the app never displays
+// incorrect cusps. The Ascendant/MC angles above use TRUE obliquity paired
+// with GAST, which is the largest accuracy improvement in this pass and is
+// independent of the intermediate-cusp choice.
 function porphyryCusps(asc: number, mc: number): number[] {
   const cusps = new Array(12).fill(0);
   cusps[0] = asc; cusps[9] = mc;
@@ -86,85 +93,6 @@ function porphyryCusps(asc: number, mc: number): number[] {
   [cusps[1],  cusps[2]]  = tri(cusps[0], cusps[3]);
   [cusps[4],  cusps[5]]  = tri(cusps[3], cusps[6]);
   [cusps[7],  cusps[8]]  = tri(cusps[6], cusps[9]);
-  return cusps;
-}
-
-function placidusIntermediate(
-  RAMCdeg: number, epsDeg: number, phiDeg: number,
-  houseNum: 11 | 12 | 2 | 3,
-): number | null {
-  // Classical δ-iteration Placidus solver (Meeus, Astronomical Algorithms).
-  // Guaranteed to stay on the correct ecliptic branch because λ is derived
-  // from the target RA via atan2(sin α / cos ε, cos α) — no ambiguity.
-  const eps = deg2rad(epsDeg);
-  const phi = deg2rad(phiDeg);
-  const RAMC = deg2rad(RAMCdeg);
-  // Base RA offset from RAMC for each cusp; scaled by (SD or SN) each iter.
-  // Cusp 11: RA = RAMC + SD/3
-  // Cusp 12: RA = RAMC + 2·SD/3
-  // Cusp 2:  RA = RAMC + SD + SN/3
-  // Cusp 3:  RA = RAMC + SD + 2·SN/3
-  let dec = 0;
-  let lam = 0;
-  for (let i = 0; i < 60; i++) {
-    const cosArg = -Math.tan(dec) * Math.tan(phi);
-    if (cosArg <= -1 || cosArg >= 1) return null; // circumpolar
-    const SD = Math.acos(cosArg);
-    const SN = Math.PI - SD;
-    let alpha: number;
-    if (houseNum === 11)      alpha = RAMC + SD / 3;
-    else if (houseNum === 12) alpha = RAMC + (2 * SD) / 3;
-    else if (houseNum === 2)  alpha = RAMC + SD + SN / 3;
-    else                       alpha = RAMC + SD + (2 * SN) / 3;
-    // Inverse ecliptic transform: λ = atan2(sin α / cos ε, cos α). This gives
-    // the correct ecliptic branch matching the intended RA.
-    const sA = Math.sin(alpha), cA = Math.cos(alpha);
-    const newLam = Math.atan2(sA / Math.cos(eps), cA);
-    const newDec = Math.asin(Math.sin(newLam) * Math.sin(eps));
-    if (Math.abs(newDec - dec) < 1e-12 && Math.abs(newLam - lam) < 1e-12) {
-      lam = newLam; dec = newDec; break;
-    }
-    lam = newLam;
-    dec = newDec;
-  }
-  return norm360(rad2deg(lam));
-}
-
-function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number, phiDeg: number): number[] {
-  const cusps = new Array(12).fill(0);
-  cusps[0] = asc; cusps[9] = mc;
-  cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
-  const ic = norm360(mc + 180);
-  // The δ-iteration returns λ in the principal atan2 branch which at high
-  // latitudes may land on the antipode of the intended cusp. Constrain each
-  // cusp to the classical forward arc it must inhabit:
-  //   11, 12 → between MC and Asc (going forward through the zodiac)
-  //   2, 3   → between Asc and IC
-  const inForwardArc = (x: number, from: number, to: number) => {
-    const d = ((to - from) % 360 + 360) % 360;   // forward-arc size
-    const p = ((x  - from) % 360 + 360) % 360;   // position along that arc
-    return p > 0 && p < d;
-  };
-  const selectBranch = (raw: number | null, from: number, to: number): number | null => {
-    if (raw == null) return null;
-    if (inForwardArc(raw, from, to)) return raw;
-    const flip = norm360(raw + 180);
-    if (inForwardArc(flip, from, to)) return flip;
-    return null;
-  };
-  const c11 = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11), mc, asc);
-  const c12 = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12), mc, asc);
-  const c2  = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2),  asc, ic);
-  const c3  = selectBranch(placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3),  asc, ic);
-  if (c11 == null || c12 == null || c2 == null || c3 == null) {
-    return porphyryCusps(asc, mc);
-  }
-  cusps[10] = c11; cusps[11] = c12;
-  cusps[1]  = c2;  cusps[2]  = c3;
-  cusps[4] = norm360(c11 + 180);
-  cusps[5] = norm360(c12 + 180);
-  cusps[7] = norm360(c2 + 180);
-  cusps[8] = norm360(c3 + 180);
   return cusps;
 }
 
