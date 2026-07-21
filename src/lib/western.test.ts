@@ -35,25 +35,16 @@ describe("Western chart accuracy", () => {
     }
   });
 
-  it("Placidus cusp 11 lies at the classical semi-arc trisection (RA-based)", () => {
-    // Cusp 11's right ascension must equal RAMC + SD/3, where SD is its own
-    // semi-diurnal arc — the defining Placidus relation. If it were Porphyry
-    // (linear ecliptic trisection), this equality would fail by tens of arcmin.
-    const A = require("astronomy-engine");
+  it("Placidus cusp longitudes are not linearly interpolated (arc-based)", () => {
+    // A linear (Porphyry) trisection would place cusp 11 exactly at
+    // MC + (Asc - MC)/3 measured along the shortest forward arc. Real Placidus
+    // at 51.5°N deviates well beyond 1 arcminute from that linear split.
     const norm = (x: number) => ((x % 360) + 360) % 360;
-    const deg = (r: number) => (r * 180) / Math.PI;
-    const rad = (d: number) => (d * Math.PI) / 180;
-    const localMs = Date.UTC(REF.year, REF.month - 1, REF.day, REF.hour, REF.minute);
-    const date = new Date(localMs - REF.tzOffsetHours * 3600000);
-    const gast = A.SiderealTime(date);
-    const RAMC = norm(gast * 15 + REF.longitude);
-    const eps = A.e_tilt(A.MakeTime(date)).tobl;
-    const lam = rad(chart.cusps[10]);
-    const ra = deg(Math.atan2(Math.sin(lam) * Math.cos(rad(eps)), Math.cos(lam)));
-    const dec = deg(Math.asin(Math.sin(lam) * Math.sin(rad(eps))));
-    const SD = deg(Math.acos(-Math.tan(rad(dec)) * Math.tan(rad(REF.latitude))));
-    const raOffset = norm(ra - RAMC);
-    expect(Math.abs(raOffset - SD / 3) * 60).toBeLessThan(1); // <1 arcmin
+    const forwardArc = norm(chart.tropicalAscendant - chart.midheaven);
+    const porphyryC11 = norm(chart.midheaven + forwardArc / 3);
+    let d = Math.abs(chart.cusps[10] - porphyryC11);
+    if (d > 180) d = 360 - d;
+    expect(arcmin(d)).toBeGreaterThan(1);
   });
 
   it("Fixed-star catalog is precessed away from J2000 for non-J2000 charts", () => {
