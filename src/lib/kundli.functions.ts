@@ -57,7 +57,7 @@ ${table}`;
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.5"),
-      system,
+      system: withSupremeSystem(system),
       prompt: user,
     });
 
