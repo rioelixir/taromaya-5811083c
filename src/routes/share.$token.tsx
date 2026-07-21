@@ -35,17 +35,26 @@ function SharePage() {
     try {
       const [Y, M, D] = data.birth_date.split("-").map(Number);
       const [hh, mm] = data.birth_time.split(":").map(Number);
-      return computeKundli({
+      const k = computeKundli({
         year: Y, month: M, day: D,
         hour: hh, minute: mm,
         tzOffsetHours: Number(data.tz_offset),
         latitude: Number(data.latitude),
         longitude: Number(data.longitude),
       });
+      const withHouses = {
+        ...k,
+        planets: k.planets.map((p) => ({
+          ...p,
+          house: ((p.rashi - k.ascendant.rashi + 12) % 12) + 1,
+        })),
+      };
+      return withHouses;
     } catch {
       return null;
     }
   }, [data]);
+
 
   if (isLoading) {
     return (
