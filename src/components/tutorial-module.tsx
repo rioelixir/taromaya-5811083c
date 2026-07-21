@@ -414,6 +414,24 @@ export function TutorialModule() {
               </div>
             ) : null}
 
+            {current.link && (
+              <div className="mt-5">
+                <Link
+                  to={current.link.to}
+                  search={current.link.tour ? { tour: current.link.tour } as never : undefined}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 transition"
+                >
+                  <Compass className="h-4 w-4" />
+                  {current.link.label}
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+                <div className="mt-1.5 text-[11px] text-muted-foreground">
+                  Opens the page and highlights the exact spot for a few seconds.
+                </div>
+              </div>
+            )}
+
+
             {/* FAQ on the last step */}
             {step === total - 1 && (
               <div className="mt-6 rounded-2xl border border-border/40 bg-white/60 p-4">
