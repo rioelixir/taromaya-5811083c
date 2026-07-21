@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { liveSkySnapshot, signName } from "./live-sky";
+import { requirePremium } from "./premium-guard";
 
 const Input = z.object({
   dream: z.string().min(4).max(4000),
@@ -19,6 +20,7 @@ const FOCUS_PROMPTS: Record<z.infer<typeof Input>["focus"], string> = {
 };
 
 export const interpretDream = createServerFn({ method: "POST" })
+  .middleware([requirePremium])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;

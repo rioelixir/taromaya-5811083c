@@ -21,6 +21,7 @@ const KundliInterpretSchema = z.object({
 });
 
 export const interpretKundli = createServerFn({ method: "POST" })
+  .middleware([requirePremium])
   .inputValidator((data: unknown) => KundliInterpretSchema.parse(data))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
