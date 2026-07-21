@@ -270,7 +270,7 @@ function RootComponent() {
             </p>
           </footer>
         )}
-        {!chromeHidden && <BottomNav />}
+        
       </div>
 
     </QueryClientProvider>
