@@ -150,23 +150,29 @@ export function AIInterpretation({
       : "";
 
   return (
-    <section className="mt-8 glass rounded-3xl p-6 sm:p-8 border border-primary/20">
+    <section
+      aria-labelledby="ai-reading-heading"
+      className="mt-8 glass rounded-3xl p-6 sm:p-8 border border-primary/20"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-primary/80">
+            <div className="text-[10px] uppercase tracking-[0.35em] text-primary">
               AI Interpretation
             </div>
             {confidence && (
-              <span className={`text-[10px] uppercase tracking-widest border rounded-full px-2 py-0.5 ${confidenceColor}`}>
+              <span
+                aria-label={`Reading confidence: ${confidence}`}
+                className={`text-[10px] uppercase tracking-widest border rounded-full px-2 py-0.5 ${confidenceColor}`}
+              >
                 {confidence} confidence
               </span>
             )}
           </div>
-          <h2 className="mt-1 font-display text-2xl">
+          <h2 id="ai-reading-heading" className="mt-1 font-display text-2xl">
             <span className="gold-text">Your {module} reading</span>
           </h2>
-          <p className="mt-1 text-sm text-foreground/80">
+          <p className="mt-1 text-sm text-foreground">
             {profile
               ? `Grounded in ${profile.full_name}'s real chart + today's sky.`
               : "Save your birth details for a personalized, chart-grounded reading."}
@@ -181,7 +187,7 @@ export function AIInterpretation({
               aria-label="Stop reading"
               className="min-h-11"
             >
-              <StopCircle className="mr-2 h-4 w-4" /> Stop
+              <StopCircle className="mr-2 h-4 w-4" aria-hidden="true" /> Stop
             </Button>
           )}
           <Button
@@ -191,11 +197,11 @@ export function AIInterpretation({
             className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11"
           >
             {loading ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> Reading…</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Reading…</>
             ) : text ? (
-              <><RefreshCw className="mr-2 h-4 w-4" aria-hidden /> Read again</>
+              <><RefreshCw className="mr-2 h-4 w-4" aria-hidden="true" /> Read again</>
             ) : (
-              <><Sparkles className="mr-2 h-4 w-4" aria-hidden /> Reveal reading</>
+              <><Sparkles className="mr-2 h-4 w-4" aria-hidden="true" /> Reveal reading</>
             )}
           </Button>
         </div>
@@ -206,7 +212,7 @@ export function AIInterpretation({
         <div
           role="alert"
           aria-live="assertive"
-          className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+          className="mt-4 rounded-xl border border-destructive/60 bg-destructive/10 p-3 text-sm text-destructive"
         >
           {error}
         </div>
@@ -217,18 +223,19 @@ export function AIInterpretation({
           data-no-translate
           aria-live="polite"
           aria-busy={loading}
+          aria-label={`${module} reading content`}
           className="mt-6 space-y-3 text-foreground leading-relaxed
 
           [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
           [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-xl [&_h2]:text-primary
           [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-lg
-          [&_p]:text-foreground/90
+          [&_p]:text-foreground
           [&_strong]:text-primary [&_strong]:font-semibold
           [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1
           [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1
-          [&_li]:text-foreground/90
+          [&_li]:text-foreground
           [&_a]:text-primary [&_a]:underline
-          [&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-4 [&_blockquote]:italic">
+          [&_blockquote]:border-l-2 [&_blockquote]:border-primary/60 [&_blockquote]:pl-4 [&_blockquote]:italic">
           <ReactMarkdown>{text}</ReactMarkdown>
         </article>
       )}
