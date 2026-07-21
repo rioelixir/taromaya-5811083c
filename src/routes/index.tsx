@@ -69,6 +69,9 @@ function Home() {
         </Link>
       </div>
 
+      {/* Tutorial — How to Use Taromaya */}
+      <TutorialModule />
+
       {/* Quick actions — 4 large tiles */}
       <section className="mt-12">
         <div className="mb-4 flex items-center justify-between">
