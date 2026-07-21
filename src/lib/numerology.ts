@@ -76,8 +76,11 @@ export type NumerologyReport = {
   system: "Pythagorean" | "Chaldean";
   lifePath: number;
   destiny: number;   // expression
+  destinyCompound: number;  // pre-reduction total (meaningful in Chaldean)
   soulUrge: number;
+  soulUrgeCompound: number;
   personality: number;
+  personalityCompound: number;
   birthday: number;
   maturity: number;
   personalYear: number;
@@ -93,6 +96,7 @@ export type NumerologyReport = {
   compatibleNumbers: number[];
   planetRuler: string;
 };
+
 
 const NUMBER_TO_PLANET: Record<number, string> = {
   1: "Sun", 2: "Moon", 3: "Jupiter", 4: "Rahu", 5: "Mercury",
