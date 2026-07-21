@@ -148,7 +148,6 @@ function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number,
   cusps[7] = norm360(c2 + 180);
   cusps[8] = norm360(c3 + 180);
   return cusps;
-  return cusps;
 }
 
 function equalCusps(asc: number): number[] {
