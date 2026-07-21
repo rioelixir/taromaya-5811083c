@@ -582,14 +582,22 @@ function TarotPage() {
             </button>
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
+              className="relative rounded-3xl border border-gold/50 overflow-hidden bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
               style={{
                 width: "min(92vw, calc(92dvh * 0.66))",
                 height: "min(92dvh, calc(92vw * 1.5))",
                 transform: zc.reversed ? "rotate(180deg)" : undefined,
               }}
             >
-              <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
+              {cardImage(zc.card.id) ? (
+                <img
+                  src={cardImage(zc.card.id)}
+                  alt={zc.card.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
+              )}
             </div>
           </div>
         );
