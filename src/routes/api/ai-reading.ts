@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { streamText } from "ai";
+import { streamText, generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
