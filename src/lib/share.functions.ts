@@ -96,21 +96,11 @@ export type PublicShare = {
 export const getPublicShare = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ token: z.string().min(4).max(64) }).parse(input))
   .handler(async ({ data }): Promise<PublicShare | null> => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
-    const supabase = createClient(process.env.SUPABASE_URL!, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        fetch: (input, init) => {
-          const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
-          h.set("apikey", key);
-          return fetch(input, { ...init, headers: h });
-        },
-      },
-    });
+    // Capability-URL pattern: token is a secret, so read via service role and
+    // never expose a listable anon SELECT policy on shared_reports.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: row, error } = await supabase
+    const { data: row, error } = await supabaseAdmin
       .from("shared_reports")
       .select("token, display_name, birth_date, birth_time, tz_offset, latitude, longitude, place, kind, views, created_at, expires_at")
       .eq("token", data.token)
@@ -119,12 +109,12 @@ export const getPublicShare = createServerFn({ method: "GET" })
     if (error || !row) return null;
     if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) return null;
 
-    // Best-effort view increment; ignore errors.
-    void supabase.rpc; // hint for tree-shaking safety
-    await supabase
+    // Best-effort view increment; ignore failures.
+    await supabaseAdmin
       .from("shared_reports")
       .update({ views: (row.views ?? 0) + 1 })
       .eq("token", data.token);
 
     return row as PublicShare;
   });
+
