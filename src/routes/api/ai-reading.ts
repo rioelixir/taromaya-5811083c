@@ -108,17 +108,46 @@ export const Route = createFileRoute("/api/ai-reading")({
 
         try {
           const gateway = createLovableAiGatewayProvider(key);
+          const model = gateway(modelId);
+          const finalSystem = withSupremeSystem(effectiveSystem + GUARDRAIL).slice(0, 12000);
+          const finalPrompt = prompt.slice(0, 4000);
           const result = streamText({
-            model: gateway(modelId),
-            system: withSupremeSystem((effectiveSystem + GUARDRAIL)).slice(0, 12000),
-            prompt: prompt.slice(0, 4000),
+            model,
+            system: finalSystem,
+            prompt: finalPrompt,
             abortSignal: abort.signal,
+            onError({ error }) {
+              // eslint-disable-next-line no-console
+              console.error("[ai-reading] streamText error:", error);
+            },
           });
-          return result.toTextStreamResponse();
+          // Buffer the stream so upstream errors surface as HTTP errors
+          // instead of the client silently receiving an empty 200 body.
+          let acc = "";
+          try {
+            for await (const chunk of result.textStream) acc += chunk;
+          } catch (streamErr) {
+            const msg = streamErr instanceof Error ? streamErr.message : String(streamErr);
+            const s = /429|rate/i.test(msg) ? 429 : /402|credit|payment/i.test(msg) ? 402 : 502;
+            return new Response(msg || "AI stream failed", { status: s });
+          }
+          if (!acc) {
+            // Fallback to non-streaming call to get a concrete error / body.
+            const gen = await generateText({
+              model,
+              system: finalSystem,
+              prompt: finalPrompt,
+              abortSignal: abort.signal,
+            });
+            acc = gen.text;
+          }
+          return new Response(acc, {
+            status: 200,
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          });
         } catch (err) {
           const message =
             err instanceof Error ? err.message : "AI request failed";
-          // Surface known gateway signals so the client can react precisely.
           const status = /429|rate/i.test(message)
             ? 429
             : /402|credit|payment/i.test(message)
