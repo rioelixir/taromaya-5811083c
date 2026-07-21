@@ -74,16 +74,13 @@ function filterRW(mode: RWMode): TarotCard[] {
   }
 }
 
-// Build the initial per-deck stacks, each independently shuffled.
+// Build the initial Rider-Waite stack.
 function makeDeckStacks(rwMode: RWMode = "full"): Record<DeckKey, TarotCard[]> {
   return {
     "rider-waite": shuffle(filterRW(rwMode)),
-    "nakshatra":   shuffle(DECKS["nakshatra"]),
-    "health":      shuffle(DECKS["health"]),
-    "lost-found":  shuffle(DECKS["lost-found"]),
-    "soulmates":   shuffle(DECKS["soulmates"]),
   };
 }
+
 
 
 function TarotPage() {

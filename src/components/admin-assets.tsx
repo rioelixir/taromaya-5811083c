@@ -8,11 +8,8 @@ const BUCKET = "app-assets";
 
 const DECK_KEYS = [
   { key: "rider-waite",    name: "Rider Waite",    expected: 78 },
-  { key: "soulmates",      name: "Soulmates",      expected: 90 },
-  { key: "health",         name: "Health",         expected: 78 },
-  { key: "lost-and-found", name: "Lost and Found", expected: 78 },
-  { key: "nakshatra",      name: "Nakshatra",      expected: 27 },
 ] as const;
+
 
 type DeckCard = { path: string; name: string };
 type DeckValue = { name: string; expected: number; cards: DeckCard[] };
