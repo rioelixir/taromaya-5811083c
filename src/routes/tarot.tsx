@@ -45,11 +45,11 @@ function randomReversed() {
 }
 
 
-// Fisher-Yates shuffle helper (returns new array).
+// Fisher-Yates shuffle helper (CSPRNG-backed, unbiased, non-repeatable).
 function shuffle<T>(arr: T[]): T[] {
   const d = [...arr];
   for (let i = d.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = secureRandInt(i + 1);
     [d[i], d[j]] = [d[j], d[i]];
   }
   return d;
