@@ -55,14 +55,29 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
+// Rider-Waite deck-mode isolation: full 78, majors only (22), minors only (56), courts only (16).
+export type RWMode = "full" | "major" | "minor" | "court";
+const RW_MODES: { key: RWMode; label: string }[] = [
+  { key: "full",   label: "Full 78" },
+  { key: "major",  label: "Major 22" },
+  { key: "minor",  label: "Minor 56" },
+  { key: "court",  label: "Court 16" },
+];
+
+function filterRW(mode: RWMode): TarotCard[] {
+  const all = DECKS["rider-waite"];
+  switch (mode) {
+    case "major": return all.filter((c) => c.arcana === "major");
+    case "minor": return all.filter((c) => c.arcana === "minor");
+    case "court": return all.filter(isCourtCard);
+    default:      return all;
+  }
+}
+
 // Build the initial per-deck stacks, each independently shuffled.
-// When courtOnly is on, Rider-Waite is filtered to its 16 court cards.
-function makeDeckStacks(courtOnly = false): Record<DeckKey, TarotCard[]> {
-  const rw = courtOnly
-    ? DECKS["rider-waite"].filter(isCourtCard)
-    : DECKS["rider-waite"];
+function makeDeckStacks(rwMode: RWMode = "full"): Record<DeckKey, TarotCard[]> {
   return {
-    "rider-waite": shuffle(rw),
+    "rider-waite": shuffle(filterRW(rwMode)),
     "nakshatra":   shuffle(DECKS["nakshatra"]),
     "health":      shuffle(DECKS["health"]),
     "lost-found":  shuffle(DECKS["lost-found"]),
@@ -75,8 +90,8 @@ function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [courtOnly, setCourtOnly] = useState(false);
-  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks(false));
+  const [rwMode, setRwMode] = useState<RWMode>("full");
+  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks("full"));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -147,20 +162,16 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(courtOnly));
-  }, [courtOnly]);
+    setDecks(makeDeckStacks(rwMode));
+  }, [rwMode]);
 
-  // Rebuild the Rider-Waite stack whenever the Court-Only toggle changes.
+  // Rebuild the Rider-Waite stack whenever the deck-mode changes.
   useEffect(() => {
     setDecks((prev) => ({
       ...prev,
-      "rider-waite": shuffle(
-        courtOnly
-          ? DECKS["rider-waite"].filter(isCourtCard)
-          : DECKS["rider-waite"],
-      ),
+      "rider-waite": shuffle(filterRW(rwMode)),
     }));
-  }, [courtOnly]);
+  }, [rwMode]);
 
   useEffect(() => {
     setPlaced([]);
@@ -361,17 +372,27 @@ function TarotPage() {
                   </button>
                 );
               })}
-              <button
-                onClick={() => setCourtOnly((v) => !v)}
-                className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all inline-flex items-center gap-1.5 ${
-                  courtOnly
-                    ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
-                    : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
-                }`}
-                title="Restrict the Rider-Waite deck to its 16 Court Cards (Pages, Knights, Queens, Kings)."
-              >
-                <Crown className="h-3.5 w-3.5" /> Court Cards Only
-              </button>
+              <div className="mx-1 h-6 w-px bg-white/10" aria-hidden />
+              <span className="text-[10px] uppercase tracking-widest text-gold/70 inline-flex items-center gap-1">
+                <Crown className="h-3 w-3" /> Rider-Waite
+              </span>
+              {RW_MODES.map((m) => {
+                const active = m.key === rwMode;
+                return (
+                  <button
+                    key={m.key}
+                    onClick={() => setRwMode(m.key)}
+                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
+                      active
+                        ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
+                        : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
+                    }`}
+                    title={`Restrict Rider-Waite to ${m.label}`}
+                  >
+                    {m.label}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-2 flex flex-wrap gap-2 items-center">
