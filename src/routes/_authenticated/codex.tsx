@@ -95,7 +95,7 @@ function CodexPage() {
               <TeachMe module={e.module} />
               {e.href && (
                 <Link
-                  to={e.href}
+                  to={e.href as string}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-primary/25 px-3 py-2 text-xs text-primary hover:bg-primary/10 transition"
                 >
                   Open module →
