@@ -163,7 +163,7 @@ function loadState(): Persist {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { step: 0, done: false };
-    return { step: 0, done: false, ...(JSON.parse(raw) as Persist) };
+    return { ...(JSON.parse(raw) as Persist) };
   } catch {
     return { step: 0, done: false };
   }
