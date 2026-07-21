@@ -37,9 +37,15 @@ function BirthStatusChip() {
 function PageNav({
   collapsed,
   onToggle,
+  teachModule,
+  teachSnapshot,
+  hideAI,
 }: {
   collapsed: boolean;
   onToggle: () => void;
+  teachModule?: string;
+  teachSnapshot?: string;
+  hideAI?: boolean;
 }) {
   const router = useRouter();
   return (
@@ -51,8 +57,11 @@ function PageNav({
       >
         <ArrowLeft className="h-4 w-4 text-gold" /> Back
       </button>
-      <div className="flex items-center gap-2" data-no-translate>
+      <div className="flex items-center gap-2 flex-wrap justify-end" data-no-translate>
         <BirthStatusChip />
+        {!hideAI && teachModule && (
+          <TeachMe module={teachModule} snapshot={teachSnapshot} />
+        )}
         <LanguageSwitcher compact />
         <button
           onClick={onToggle}
