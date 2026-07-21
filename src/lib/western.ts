@@ -409,9 +409,8 @@ export function precessFromJ2000(baseLon: number, date: Date): number {
 
 export function fixedStarsNearPlanets(chart: WesternChart, orb = 1.5) {
   const hits: { star: string; planet: PlanetName; orb: number; meaning: string }[] = [];
-  // Chart date used to precess catalog J2000 longitudes to the chart epoch.
-  const localMs = Date.UTC(chart.year, chart.month - 1, chart.day, chart.hour, chart.minute);
-  const chartDate = new Date(localMs - chart.tzOffsetHours * 3600000);
+  // Chart epoch (UTC) used to precess catalog J2000 longitudes to chart date.
+  const chartDate = new Date(chart.epochUtc);
   for (const p of chart.tropicalPlanets) {
     for (const s of FIXED_STARS) {
       const sLon = precessFromJ2000(s.longitude, chartDate);
