@@ -9,10 +9,14 @@ import {
 const near = (a: number, b: number, tol = 0.5) => Math.abs(a - b) <= tol;
 
 describe("lahiriAyanamsa()", () => {
-  it("at J2000.0 ≈ 23.85°", () => {
-    // J2000.0 = 2000-01-01T12:00:00 TT ≈ UT 2000-01-01T11:58:56, use noon UT.
+  it("at J2000.0 matches Swiss Ephemeris (23.8532° ± 1'')", () => {
     const j2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
-    expect(near(lahiriAyanamsa(j2000), 23.85, 0.05)).toBe(true);
+    // Swiss Ephemeris SE_SIDM_LAHIRI at J2000.0 = 23°51'11.6" = 23.853222°.
+    expect(Math.abs(lahiriAyanamsa(j2000) - 23.853222)).toBeLessThan(1 / 3600);
+  });
+  it("at 2024-01-01 matches published Lahiri value (~24.19°)", () => {
+    const d = new Date(Date.UTC(2024, 0, 1, 0, 0, 0));
+    expect(near(lahiriAyanamsa(d), 24.187, 0.01)).toBe(true);
   });
   it("increases monotonically with time (~50.29\"/yr)", () => {
     const a1 = lahiriAyanamsa(new Date(Date.UTC(2000, 0, 1)));
