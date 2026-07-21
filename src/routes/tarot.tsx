@@ -162,20 +162,16 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(courtOnly));
-  }, [courtOnly]);
+    setDecks(makeDeckStacks(rwMode));
+  }, [rwMode]);
 
-  // Rebuild the Rider-Waite stack whenever the Court-Only toggle changes.
+  // Rebuild the Rider-Waite stack whenever the deck-mode changes.
   useEffect(() => {
     setDecks((prev) => ({
       ...prev,
-      "rider-waite": shuffle(
-        courtOnly
-          ? DECKS["rider-waite"].filter(isCourtCard)
-          : DECKS["rider-waite"],
-      ),
+      "rider-waite": shuffle(filterRW(rwMode)),
     }));
-  }, [courtOnly]);
+  }, [rwMode]);
 
   useEffect(() => {
     setPlaced([]);
