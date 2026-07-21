@@ -254,9 +254,66 @@ async function grantFreeSubscription(userId: string, years = 5) {
     );
   await supabaseAdmin
     .from("profiles")
-    .update({ terms_accepted_at: new Date().toISOString() })
+    .update({ terms_accepted_at: new Date().toISOString(), is_comped: true })
     .eq("id", userId);
 }
+
+// Admin-created free-access user: creates the auth user with a chosen password,
+// pre-accepts terms, and flips profiles.is_comped=true so PremiumGate always
+// unlocks the app for them without any subscription billing.
+export const adminCreateFreeUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { email: string; password: string; fullName?: string; note?: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const email = data.email.trim().toLowerCase();
+    if (!email || !email.includes("@")) throw new Error("Valid email required");
+    if (!data.password || data.password.length < 8) throw new Error("Password must be at least 8 characters");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: data.fullName ?? email.split("@")[0],
+        terms_accepted: true,
+        staff_note: data.note ?? null,
+      },
+    });
+    if (error) throw new Error(error.message);
+    const userId = created.user!.id;
+    await grantFreeSubscription(userId);
+    return { email, userId };
+  });
+
+export const adminSetComped = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; isComped: boolean }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ is_comped: data.isComped })
+      .eq("id", data.userId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const adminSetUserPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; password: string }) => d)
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context);
+    if (!data.password || data.password.length < 8) throw new Error("Password must be at least 8 characters");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+      password: data.password,
+      email_confirm: true,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
 
 export const adminCreateStaffUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
