@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
 import { computeAvakhada } from "@/lib/avakhada";
-import { MapPin } from "lucide-react";
+import { MapPin, Copy, Check, Printer } from "lucide-react";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/avakhada")({
   component: () => (
