@@ -108,11 +108,13 @@ function placidusIntermediate(
     const SD = Math.acos(cosArg);       // semi-diurnal arc (0..π)
     const SN = Math.PI - SD;             // semi-nocturnal arc
     // Target RA offset from RAMC for each cusp (Placidus trisection).
+    // Target RA offset from RAMC (measured eastward, i.e., increasing RA):
+    //   MC → 11 → 12 → Asc → 2 → 3 → IC ≡ 0 → SD/3 → 2SD/3 → SD → SD+SN/3 → SD+2SN/3 → π
     let target: number;
     if (houseNum === 11)      target = SD / 3;
     else if (houseNum === 12) target = (2 * SD) / 3;
-    else if (houseNum === 3)  target = SD + SN / 3;
-    else                       target = SD + (2 * SN) / 3; // house 2
+    else if (houseNum === 2)  target = SD + SN / 3;
+    else                       target = SD + (2 * SN) / 3; // house 3
     let cur = ra - deg2rad(RAMCdeg);
     cur = ((cur % TWO_PI) + TWO_PI) % TWO_PI;
     let diff = target - cur;
