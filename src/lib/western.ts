@@ -122,12 +122,11 @@ export function computeWesternChart(
   });
   const tropAsc = ascendantTrop(date, input.latitude, input.longitude);
   const mc = mcTropical(date, input.longitude);
-  const gastH = A.SiderealTime(date);
-  const RAMCdeg = norm360(gastH * 15 + input.longitude);
-  const epsDeg = trueObliquity(date);
+  // NOTE: "placidus" is currently routed through Porphyry (see porphyryCusps
+  // comment) until a full Placidus solver is validated against Swiss Ephemeris.
   const cusps = houseSystem === "whole-sign" ? wholeSignCusps(tropAsc)
     : houseSystem === "equal" ? equalCusps(tropAsc)
-    : placidusCusps(tropAsc, mc, RAMCdeg, epsDeg, input.latitude);
+    : porphyryCusps(tropAsc, mc);
   return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem, epochUtc: date.toISOString() };
 }
 
