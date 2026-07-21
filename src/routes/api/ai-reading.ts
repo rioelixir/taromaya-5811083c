@@ -3,6 +3,7 @@ import { streamText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
+import { withSupremeSystem } from "@/lib/ai-system";
 
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
