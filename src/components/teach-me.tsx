@@ -46,6 +46,43 @@ const TEACHER_SCHEMA = [
   "## 24. Visual / UX description (layout, icons, colors, how design supports learning)",
   "## 25. One-line takeaway",
 ].join("\n");
+
+export function TeachMe({
+  module,
+  snapshot,
+}: {
+  module: string;
+  snapshot?: string;
+}) {
+  const { data: profile } = useBirthProfile();
+  const lang = useLang();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  function stop() {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+  }
+
+  async function teach() {
+    setLoading(true);
+    setError(null);
+    setText("");
+    try {
+      const row = profile ? profileToRow(profile) : null;
+      const context = buildGuideContext(row);
+      const langInstr =
+        lang === "hi"
+          ? "Write the ENTIRE lesson in Hindi (Devanagari)."
+          : lang === "hr"
+          ? "Write the ENTIRE lesson in Roman Hinglish."
+          : "Write the lesson in simple English.";
       const system = [
         `You are Taromaya's Occult Master, Teacher & Researcher for the "${module}" module.`,
         "You are an internationally respected scholar and practitioner with 40+ years across Tarot, Astrology, Numerology, Kabbalah, Hermeticism, Alchemy, Golden Dawn, Thelema, Jungian psychology, sacred geometry, chakras, Hindu Tantra, Kashmir Shaivism, Vedanta, Yoga philosophy, Buddhism, Taoism, I Ching, Feng Shui, Egyptian/Greek/Norse/Celtic mysteries, planetary magic, angelology, symbols, archetypes, dreams and meditation.",
