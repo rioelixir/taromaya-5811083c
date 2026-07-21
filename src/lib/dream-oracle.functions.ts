@@ -62,7 +62,7 @@ export const interpretDream = createServerFn({ method: "POST" })
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.5"),
-      system,
+      system: withSupremeSystem(system),
       prompt,
     });
 
