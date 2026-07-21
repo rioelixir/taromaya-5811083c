@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather, BookOpen } from "lucide-react";
+import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
-import { TutorialModule } from "@/components/tutorial-module";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -69,8 +68,6 @@ function Home() {
         </Link>
       </div>
 
-      {/* Tutorial — How to Use Taromaya */}
-      <TutorialModule />
 
       {/* Quick actions — 4 large tiles */}
       <section className="mt-12" data-tour="quick-actions">
@@ -114,19 +111,6 @@ function Home() {
             </div>
           </button>
 
-          <Link
-            to="/codex"
-            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
-          >
-            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
-              <BookOpen className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="font-medium text-foreground">Occult Codex</div>
-              <div className="text-xs text-muted-foreground">Every module taught in 25 layers — ELI10 to master</div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition" />
-          </Link>
         </div>
 
       </section>
