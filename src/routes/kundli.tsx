@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, type ReactNode } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
+import { ChartZoom } from "@/components/chart-zoom";
 import {
   computeKundli, formatDegree, lahiriAyanamsa,
   NAKSHATRAS, PLANET_SHORT, RASHIS, RASHI_LORDS,
