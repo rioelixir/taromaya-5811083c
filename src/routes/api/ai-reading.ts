@@ -31,6 +31,8 @@ export const Route = createFileRoute("/api/ai-reading")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const auth = await requireHttpAuth(request, { premium: true });
+        if (auth instanceof Response) return auth;
         let raw: unknown;
         try {
           raw = await request.json();
