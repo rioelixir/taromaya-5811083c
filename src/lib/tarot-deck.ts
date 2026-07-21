@@ -78,16 +78,36 @@ export const TAROT_DECK: TarotCard[] = [...major, ...minor];
 
 export type DrawnCard = { card: TarotCard; reversed: boolean; position: string };
 
+// Cryptographically-strong unbiased random integer in [0, max).
+export function secureRandInt(max: number): number {
+  if (max <= 0) return 0;
+  const g: Crypto | undefined =
+    (typeof globalThis !== "undefined" && (globalThis as unknown as { crypto?: Crypto }).crypto) || undefined;
+  if (g && typeof g.getRandomValues === "function") {
+    // Rejection sampling to avoid modulo bias.
+    const limit = Math.floor(0xffffffff / max) * max;
+    const buf = new Uint32Array(1);
+    let r: number;
+    do {
+      g.getRandomValues(buf);
+      r = buf[0];
+    } while (r >= limit);
+    return r % max;
+  }
+  return Math.floor(Math.random() * max);
+}
+
 export function shuffleAndDraw(count: number, positions: string[]): DrawnCard[] {
   const deck = [...TAROT_DECK];
-  // Fisher-Yates
+  // Fisher-Yates with CSPRNG so pulls are unbiased and non-repeatable.
   for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = secureRandInt(i + 1);
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
   return deck.slice(0, count).map((card, i) => ({
     card,
-    reversed: Math.random() < 0.3,
+    // Reversals disabled globally — upright only.
+    reversed: false,
     position: positions[i] ?? `Card ${i + 1}`,
   }));
 }
