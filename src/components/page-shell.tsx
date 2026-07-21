@@ -3,6 +3,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
+import { TeachMe } from "@/components/teach-me";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
@@ -36,9 +37,15 @@ function BirthStatusChip() {
 function PageNav({
   collapsed,
   onToggle,
+  teachModule,
+  teachSnapshot,
+  hideAI,
 }: {
   collapsed: boolean;
   onToggle: () => void;
+  teachModule?: string;
+  teachSnapshot?: string;
+  hideAI?: boolean;
 }) {
   const router = useRouter();
   return (
@@ -50,8 +57,11 @@ function PageNav({
       >
         <ArrowLeft className="h-4 w-4 text-gold" /> Back
       </button>
-      <div className="flex items-center gap-2" data-no-translate>
+      <div className="flex items-center gap-2 flex-wrap justify-end" data-no-translate>
         <BirthStatusChip />
+        {!hideAI && teachModule && (
+          <TeachMe module={teachModule} snapshot={teachSnapshot} />
+        )}
         <LanguageSwitcher compact />
         <button
           onClick={onToggle}
@@ -102,7 +112,13 @@ export function PageShell({
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
       <div className={`relative z-10 flex w-full flex-1 flex-col px-4 sm:px-6 lg:px-10 pb-16 ${collapsed ? "pt-4" : "pt-16 lg:pt-12"}`}>
-        <PageNav collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} />
+        <PageNav
+          collapsed={collapsed}
+          onToggle={() => setCollapsed((v) => !v)}
+          teachModule={aiModule ?? title}
+          teachSnapshot={aiSnapshot}
+          hideAI={hideAI}
+        />
         {!collapsed && (
           <header className="mb-6 sm:mb-8">
             {eyebrow && (

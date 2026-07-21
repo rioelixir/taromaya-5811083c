@@ -78,6 +78,7 @@ import { Route as AuthenticatedMeditationRouteImport } from './routes/_authentic
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenticated/diagnostics'
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
+import { Route as AuthenticatedCodexRouteImport } from './routes/_authenticated/codex'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
@@ -429,6 +430,11 @@ const AuthenticatedDeepJyotishRoute =
     path: '/deep-jyotish',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCodexRoute = AuthenticatedCodexRouteImport.update({
+  id: '/codex',
+  path: '/codex',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBirthDetailsRoute =
   AuthenticatedBirthDetailsRouteImport.update({
     id: '/birth-details',
@@ -509,6 +515,7 @@ export interface FileRoutesByFullPath {
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/codex': typeof AuthenticatedCodexRoute
   '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -583,6 +590,7 @@ export interface FileRoutesByTo {
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/codex': typeof AuthenticatedCodexRoute
   '/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -659,6 +667,7 @@ export interface FileRoutesById {
   '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/birth-details': typeof AuthenticatedBirthDetailsRoute
+  '/_authenticated/codex': typeof AuthenticatedCodexRoute
   '/_authenticated/deep-jyotish': typeof AuthenticatedDeepJyotishRoute
   '/_authenticated/diagnostics': typeof AuthenticatedDiagnosticsRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
@@ -735,6 +744,7 @@ export interface FileRouteTypes {
     | '/yantra'
     | '/admin'
     | '/birth-details'
+    | '/codex'
     | '/deep-jyotish'
     | '/diagnostics'
     | '/journal'
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/yantra'
     | '/admin'
     | '/birth-details'
+    | '/codex'
     | '/deep-jyotish'
     | '/diagnostics'
     | '/journal'
@@ -884,6 +895,7 @@ export interface FileRouteTypes {
     | '/yantra'
     | '/_authenticated/admin'
     | '/_authenticated/birth-details'
+    | '/_authenticated/codex'
     | '/_authenticated/deep-jyotish'
     | '/_authenticated/diagnostics'
     | '/_authenticated/journal'
@@ -1452,6 +1464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeepJyotishRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/codex': {
+      id: '/_authenticated/codex'
+      path: '/codex'
+      fullPath: '/codex'
+      preLoaderRoute: typeof AuthenticatedCodexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/birth-details': {
       id: '/_authenticated/birth-details'
       path: '/birth-details'
@@ -1486,6 +1505,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBirthDetailsRoute: typeof AuthenticatedBirthDetailsRoute
+  AuthenticatedCodexRoute: typeof AuthenticatedCodexRoute
   AuthenticatedDeepJyotishRoute: typeof AuthenticatedDeepJyotishRoute
   AuthenticatedDiagnosticsRoute: typeof AuthenticatedDiagnosticsRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
@@ -1498,6 +1518,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBirthDetailsRoute: AuthenticatedBirthDetailsRoute,
+  AuthenticatedCodexRoute: AuthenticatedCodexRoute,
   AuthenticatedDeepJyotishRoute: AuthenticatedDeepJyotishRoute,
   AuthenticatedDiagnosticsRoute: AuthenticatedDiagnosticsRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
@@ -1588,13 +1609,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
