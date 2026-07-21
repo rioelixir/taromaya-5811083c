@@ -567,16 +567,31 @@ function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate
               </div>
             </GlassCard>
             <GlassCard title="Planes (arrows)">
+              <div className="mb-3 flex flex-wrap gap-2 text-[10px]">
+                <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-emerald-200">
+                  {grid.arrows.strengths.length} strength arrow(s)
+                </span>
+                <span className="rounded-full border border-red-400/40 bg-red-500/10 px-2 py-0.5 text-red-200">
+                  {grid.arrows.weaknesses.length} weakness arrow(s)
+                </span>
+              </div>
               <div className="space-y-2 text-xs">
                 {Object.entries(grid.planes).map(([key, p]) => (
-                  <div key={key} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2">
-                    <div className="capitalize text-pearl">{key} plane</div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{p.line.join(" – ")}</span>
-                      <span className={p.complete ? "gold-text" : "text-red-300"}>
-                        {p.complete ? "✓ complete" : "✗ incomplete"}
-                      </span>
+                  <div key={key} className="rounded-lg bg-white/5 px-3 py-2">
+                    <div className="flex items-center justify-between">
+                      <div className="capitalize text-pearl">{key}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">{p.line.join(" – ")}</span>
+                        {p.strength ? (
+                          <span className="gold-text">↑ strength</span>
+                        ) : p.weakness ? (
+                          <span className="text-red-300">↓ weakness</span>
+                        ) : (
+                          <span className="text-muted-foreground">{p.present}/3</span>
+                        )}
+                      </div>
                     </div>
+                    <div className="mt-1 text-[10px] text-muted-foreground">{p.label}</div>
                   </div>
                 ))}
               </div>
