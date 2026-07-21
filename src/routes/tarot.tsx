@@ -593,7 +593,7 @@ function TarotPage() {
                 <img
                   src={cardImage(zc.card.id)}
                   alt={zc.card.name}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-contain bg-black"
                 />
               ) : (
                 <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
