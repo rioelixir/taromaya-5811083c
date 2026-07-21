@@ -355,7 +355,7 @@ function TarotPage() {
 
         {!headerCollapsed && (
           <>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2" data-tour="spread-picker">
               {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
                 const active = k === spreadKey;
                 return (
