@@ -51,6 +51,7 @@ function PageNav({
         <ArrowLeft className="h-4 w-4 text-gold" /> Back
       </button>
       <div className="flex items-center gap-2" data-no-translate>
+        <BirthStatusChip />
         <LanguageSwitcher compact />
         <button
           onClick={onToggle}
