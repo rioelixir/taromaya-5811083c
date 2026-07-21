@@ -95,7 +95,7 @@ export function ChartZoom({ children, label = "Chart" }: ChartZoomProps) {
               </div>
             </div>
           </div>
-          <div className="px-4 py-2 text-center text-white/60 text-xs border-t border-white/10">
+          <div className="px-4 py-2 text-center text-gray-600 text-xs border-t border-gray-200 bg-white">
             Drag to pan • Scroll or +/- to zoom • Double-click to reset • Esc to close
           </div>
         </div>
