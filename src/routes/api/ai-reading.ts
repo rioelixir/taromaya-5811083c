@@ -110,7 +110,7 @@ export const Route = createFileRoute("/api/ai-reading")({
           const gateway = createLovableAiGatewayProvider(key);
           const result = streamText({
             model: gateway(modelId),
-            system: (effectiveSystem + GUARDRAIL).slice(0, 8000),
+            system: withSupremeSystem((effectiveSystem + GUARDRAIL)).slice(0, 12000),
             prompt: prompt.slice(0, 4000),
             abortSignal: abort.signal,
           });
