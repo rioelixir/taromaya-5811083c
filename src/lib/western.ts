@@ -92,99 +92,62 @@ function porphyryCusps(asc: number, mc: number): number[] {
 function placidusIntermediate(
   RAMCdeg: number, epsDeg: number, phiDeg: number,
   houseNum: 11 | 12 | 2 | 3,
-  seedLon: number,
 ): number | null {
+  // Classical δ-iteration Placidus solver (Meeus, Astronomical Algorithms).
+  // Guaranteed to stay on the correct ecliptic branch because λ is derived
+  // from the target RA via atan2(sin α / cos ε, cos α) — no ambiguity.
   const eps = deg2rad(epsDeg);
   const phi = deg2rad(phiDeg);
-  const TWO_PI = 2 * Math.PI;
   const RAMC = deg2rad(RAMCdeg);
-  // f(λ) = (currentRAoffset - targetRAoffset), wrapped to (-π,π].
-  // Returns { f, ok } where ok=false means circumpolar at this λ.
-  const evalF = (lam: number): { f: number; ok: boolean } => {
-    const sL = Math.sin(lam), cL = Math.cos(lam);
-    let ra = Math.atan2(sL * Math.cos(eps), cL);
-    if (ra < 0) ra += TWO_PI;
-    const dec = Math.asin(sL * Math.sin(eps));
+  // Base RA offset from RAMC for each cusp; scaled by (SD or SN) each iter.
+  // Cusp 11: RA = RAMC + SD/3
+  // Cusp 12: RA = RAMC + 2·SD/3
+  // Cusp 2:  RA = RAMC + SD + SN/3
+  // Cusp 3:  RA = RAMC + SD + 2·SN/3
+  let dec = 0;
+  let lam = 0;
+  for (let i = 0; i < 60; i++) {
     const cosArg = -Math.tan(dec) * Math.tan(phi);
-    if (cosArg <= -1 || cosArg >= 1) return { f: 0, ok: false };
+    if (cosArg <= -1 || cosArg >= 1) return null; // circumpolar
     const SD = Math.acos(cosArg);
     const SN = Math.PI - SD;
-    let target: number;
-    if (houseNum === 11)      target = SD / 3;
-    else if (houseNum === 12) target = (2 * SD) / 3;
-    else if (houseNum === 2)  target = SD + SN / 3;
-    else                       target = SD + (2 * SN) / 3;
-    let cur = ra - RAMC;
-    cur = ((cur % TWO_PI) + TWO_PI) % TWO_PI;
-    let d = cur - target;
-    if (d > Math.PI) d -= TWO_PI;
-    if (d < -Math.PI) d += TWO_PI;
-    return { f: d, ok: true };
-  };
-  // Scan the ecliptic in 2° steps to find every sign change of f(λ),
-  // then pick the root nearest the seed (which lives in the correct
-  // forward-arc quadrant for this cusp). This is unconditionally robust
-  // and handles high-latitude cases where f is not monotone near the seed.
-  const seed = deg2rad(norm360(seedLon));
-  const STEP = deg2rad(2);
-  const samples: { lam: number; f: number; ok: boolean }[] = [];
-  for (let k = 0; k < 180; k++) {
-    const lam = k * STEP;
-    samples.push({ lam, ...evalF(lam) });
+    let alpha: number;
+    if (houseNum === 11)      alpha = RAMC + SD / 3;
+    else if (houseNum === 12) alpha = RAMC + (2 * SD) / 3;
+    else if (houseNum === 2)  alpha = RAMC + SD + SN / 3;
+    else                       alpha = RAMC + SD + (2 * SN) / 3;
+    // Inverse ecliptic transform: λ = atan2(sin α / cos ε, cos α). This gives
+    // the correct ecliptic branch matching the intended RA.
+    const sA = Math.sin(alpha), cA = Math.cos(alpha);
+    const newLam = Math.atan2(sA / Math.cos(eps), cA);
+    const newDec = Math.asin(Math.sin(newLam) * Math.sin(eps));
+    if (Math.abs(newDec - dec) < 1e-12 && Math.abs(newLam - lam) < 1e-12) {
+      lam = newLam; dec = newDec; break;
+    }
+    lam = newLam;
+    dec = newDec;
   }
-  const roots: { lo: number; hi: number }[] = [];
-  for (let k = 0; k < samples.length; k++) {
-    const a = samples[k], b = samples[(k + 1) % samples.length];
-    if (!a.ok || !b.ok) continue;
-    if (a.f === 0) { roots.push({ lo: a.lam, hi: a.lam }); continue; }
-    if (a.f * b.f < 0) roots.push({ lo: a.lam, hi: b.lam < a.lam ? b.lam + TWO_PI : b.lam });
-  }
-  if (roots.length === 0) return null;
-  // Pick the root whose midpoint is closest to the seed (shortest ecliptic arc).
-  const arcDist = (x: number) => {
-    let d = Math.abs(x - seed);
-    if (d > Math.PI) d = TWO_PI - d;
-    return d;
-  };
-  roots.sort((r1, r2) => arcDist((r1.lo + r1.hi) / 2) - arcDist((r2.lo + r2.hi) / 2));
-  let { lo, hi } = roots[0];
-  if (lo > hi) hi += TWO_PI;
-  // Bisect the chosen bracket to convergence.
-  for (let i = 0; i < 60; i++) {
-    const mid = (lo + hi) / 2;
-    const fm = evalF(mid > TWO_PI ? mid - TWO_PI : mid);
-    if (!fm.ok) return null;
-    const fl = evalF(lo > TWO_PI ? lo - TWO_PI : lo);
-    if (fl.f * fm.f <= 0) hi = mid; else lo = mid;
-    if (hi - lo < 1e-11) break;
-  }
-  let root = (lo + hi) / 2;
-  if (root >= TWO_PI) root -= TWO_PI;
-  return norm360(rad2deg(root));
+  return norm360(rad2deg(lam));
 }
 
 function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number, phiDeg: number): number[] {
   const cusps = new Array(12).fill(0);
   cusps[0] = asc; cusps[9] = mc;
   cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
-  // Seed each iteration close to its expected ecliptic position so the solver
-  // stays on the correct branch (avoiding the antipodal RA solution).
-  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11, mc + (norm360(asc - mc)) / 3);
-  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12, mc + (2 * norm360(asc - mc)) / 3);
-  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2,  asc + (norm360((mc + 180) - asc)) / 3);
-  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3,  asc + (2 * norm360((mc + 180) - asc)) / 3);
-  // If any cusp is circumpolar-undefined, fall back to Porphyry for all
-  // intermediates (mixing systems would be worse than a clean fallback).
+  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11);
+  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12);
+  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2);
+  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3);
   if (c11 == null || c12 == null || c2 == null || c3 == null) {
     return porphyryCusps(asc, mc);
   }
   cusps[10] = c11; cusps[11] = c12;
   cusps[1]  = c2;  cusps[2]  = c3;
-  // Opposing cusps (5,6,8,9) are 180° from 11,12,2,3.
-  cusps[4] = norm360(c11 + 180); // house 5 opposite 11
-  cusps[5] = norm360(c12 + 180); // house 6 opposite 12
-  cusps[7] = norm360(c2 + 180);  // house 8 opposite 2
-  cusps[8] = norm360(c3 + 180);  // house 9 opposite 3
+  cusps[4] = norm360(c11 + 180);
+  cusps[5] = norm360(c12 + 180);
+  cusps[7] = norm360(c2 + 180);
+  cusps[8] = norm360(c3 + 180);
+  return cusps;
   return cusps;
 }
 
