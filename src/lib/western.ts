@@ -9,6 +9,8 @@ export type WesternChart = KundliChart & {
   midheaven: number;
   cusps: number[]; // 12 house cusps in tropical longitudes
   houseSystem: HouseSystem;
+  /** UTC instant of the chart, used for precession-of-catalog operations. */
+  epochUtc: string; // ISO string
 };
 
 export type HouseSystem = "whole-sign" | "placidus" | "equal";
@@ -37,20 +39,28 @@ function meanObliquity(date: Date): number {
   return 23.439291 - 0.0130042 * T - 1.64e-7 * T * T + 5.036e-7 * T * T * T;
 }
 
+// TRUE obliquity (mean + nutation-in-obliquity). Pairs correctly with GAST.
+function trueObliquity(date: Date): number {
+  try {
+    return A.e_tilt(A.MakeTime(date)).tobl;
+  } catch {
+    return meanObliquity(date);
+  }
+}
+
 function mcTropical(date: Date, lonEast: number): number {
-  const gmstH = A.SiderealTime(date);
-  const lstDeg = norm360(gmstH * 15 + lonEast);
-  const eps = deg2rad(meanObliquity(date));
-  // MC longitude = atan2(sin(RAMC), cos(RAMC)*cos(eps))
+  const gastH = A.SiderealTime(date); // GAST hours
+  const lstDeg = norm360(gastH * 15 + lonEast);
+  const eps = deg2rad(trueObliquity(date));
   const ramc = deg2rad(lstDeg);
   const mc = rad2deg(Math.atan2(Math.sin(ramc), Math.cos(ramc) * Math.cos(eps)));
   return norm360(mc);
 }
 
 function ascendantTrop(date: Date, lat: number, lonEast: number): number {
-  const gmstH = A.SiderealTime(date);
-  const lstDeg = norm360(gmstH * 15 + lonEast);
-  const eps = deg2rad(meanObliquity(date));
+  const gastH = A.SiderealTime(date);
+  const lstDeg = norm360(gastH * 15 + lonEast);
+  const eps = deg2rad(trueObliquity(date));
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
   const y = -Math.cos(ramc);
@@ -58,29 +68,31 @@ function ascendantTrop(date: Date, lat: number, lonEast: number): number {
   return norm360(rad2deg(Math.atan2(y, x)));
 }
 
-// Simplified Placidus: use equal-house fallback with MC anchoring for cusps 4/10 and Asc for 1/7.
-// Full Placidus requires iterative time-of-day integration; we implement an approximation
-// using proportional semi-arc which is accurate enough for display.
-function placidusCusps(asc: number, mc: number): number[] {
+// ── House cusp systems.
+//
+// NOTE ON PLACIDUS: A prior implementation labelled a linear-interpolation
+// scheme as "Placidus" — it was actually **Porphyry**. A full Placidus solver
+// requires resolving a two-fold branch ambiguity in the δ-iteration equation
+// that is only trustworthy after cross-validation against Swiss Ephemeris on
+// a battery of reference charts. Until that validation lands, we route
+// house-system requests of "placidus" through the Porphyry algorithm — which
+// is a real, well-defined classical system — so the app never displays
+// incorrect cusps. The Ascendant/MC angles above use TRUE obliquity paired
+// with GAST, which is the largest accuracy improvement in this pass and is
+// independent of the intermediate-cusp choice.
+function porphyryCusps(asc: number, mc: number): number[] {
   const cusps = new Array(12).fill(0);
-  cusps[0] = asc;
-  cusps[9] = mc;
-  cusps[6] = norm360(asc + 180);
-  cusps[3] = norm360(mc + 180);
-  // Interpolate intermediate cusps linearly between Asc & MC across quadrants.
-  const q = (start: number, end: number) => {
+  cusps[0] = asc; cusps[9] = mc;
+  cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
+  const tri = (start: number, end: number) => {
     let d = end - start;
     if (d < 0) d += 360;
     return [norm360(start + d / 3), norm360(start + (2 * d) / 3)];
   };
-  const [c11, c12] = q(cusps[9], cusps[0]);
-  cusps[10] = c11; cusps[11] = c12;
-  const [c2, c3] = q(cusps[0], cusps[3]);
-  cusps[1] = c2; cusps[2] = c3;
-  const [c5, c6] = q(cusps[3], cusps[6]);
-  cusps[4] = c5; cusps[5] = c6;
-  const [c8, c9] = q(cusps[6], cusps[9]);
-  cusps[7] = c8; cusps[8] = c9;
+  [cusps[10], cusps[11]] = tri(cusps[9], cusps[0]);
+  [cusps[1],  cusps[2]]  = tri(cusps[0], cusps[3]);
+  [cusps[4],  cusps[5]]  = tri(cusps[3], cusps[6]);
+  [cusps[7],  cusps[8]]  = tri(cusps[6], cusps[9]);
   return cusps;
 }
 
@@ -110,10 +122,12 @@ export function computeWesternChart(
   });
   const tropAsc = ascendantTrop(date, input.latitude, input.longitude);
   const mc = mcTropical(date, input.longitude);
+  // NOTE: "placidus" is currently routed through Porphyry (see porphyryCusps
+  // comment) until a full Placidus solver is validated against Swiss Ephemeris.
   const cusps = houseSystem === "whole-sign" ? wholeSignCusps(tropAsc)
     : houseSystem === "equal" ? equalCusps(tropAsc)
-    : placidusCusps(tropAsc, mc);
-  return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem };
+    : porphyryCusps(tropAsc, mc);
+  return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem, epochUtc: date.toISOString() };
 }
 
 // ── Aspects
@@ -328,11 +342,26 @@ export const FIXED_STARS: { name: string; longitude: number; meaning: string }[]
   { name: "Scheat", longitude: 359.24, meaning: "Leg of Pegasus — extreme misfortune or genius." },
 ];
 
+// General precession in ecliptic longitude: 50.2879″/yr → deg/yr.
+// Catalog longitudes are epoch J2000; precess linearly to chart date. Linear
+// term dominates on decadal scales (2nd-order term is <0.1″/century²).
+const PRECESSION_DEG_PER_YEAR = 50.2879 / 3600;
+
+/** Precess a J2000 ecliptic longitude to the epoch of `date`. */
+export function precessFromJ2000(baseLon: number, date: Date): number {
+  const jd = 2440587.5 + date.getTime() / 86400000;
+  const years = (jd - 2451545.0) / 365.25;
+  return ((baseLon + PRECESSION_DEG_PER_YEAR * years) % 360 + 360) % 360;
+}
+
 export function fixedStarsNearPlanets(chart: WesternChart, orb = 1.5) {
   const hits: { star: string; planet: PlanetName; orb: number; meaning: string }[] = [];
+  // Chart epoch (UTC) used to precess catalog J2000 longitudes to chart date.
+  const chartDate = new Date(chart.epochUtc);
   for (const p of chart.tropicalPlanets) {
     for (const s of FIXED_STARS) {
-      let d = Math.abs(p.tropicalLongitude - s.longitude);
+      const sLon = precessFromJ2000(s.longitude, chartDate);
+      let d = Math.abs(p.tropicalLongitude - sLon);
       if (d > 180) d = 360 - d;
       if (d <= orb) hits.push({ star: s.name, planet: p.name, orb: d, meaning: s.meaning });
     }

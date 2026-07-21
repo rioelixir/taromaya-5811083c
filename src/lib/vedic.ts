@@ -175,19 +175,24 @@ function toParts(sidereal: number) {
 }
 
 // Ascendant longitude (tropical) from LST and geographic latitude.
+// Uses TRUE obliquity (mean + nutation) to stay self-consistent with the
+// apparent/GAST sidereal time returned by astronomy-engine — pairing GAST
+// with mean obliquity would leak up to ~17″ into the ascendant.
 function ascendantTropical(date: Date, lat: number, lonEast: number): number {
-  // GMST in degrees.
-  const gmstHours = A.SiderealTime(date); // hours
-  const lstDeg = norm360(gmstHours * 15 + lonEast);
-  const eps = deg2rad(meanObliquity(date));
+  const gastHours = A.SiderealTime(date); // apparent sidereal time (GAST), hours
+  const lstDeg = norm360(gastHours * 15 + lonEast);
+  let epsDeg: number;
+  try {
+    epsDeg = A.e_tilt(A.MakeTime(date)).tobl;
+  } catch {
+    epsDeg = meanObliquity(date);
+  }
+  const eps = deg2rad(epsDeg);
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
-  // Standard ascendant formula.
   const y = -Math.cos(ramc);
   const x = Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc);
-  let asc = rad2deg(Math.atan2(y, x));
-  asc = norm360(asc);
-  return asc;
+  return norm360(rad2deg(Math.atan2(y, x)));
 }
 
 /** Throws on missing / non-finite / out-of-range inputs so downstream
