@@ -236,6 +236,7 @@ function RootComponent() {
       <div className="relative min-h-dvh">
         {!chromeHidden && <Sidebar />}
         <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
+          <TourHighlighter />
           <Outlet />
         </main>
         {!chromeHidden && (
