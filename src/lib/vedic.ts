@@ -160,7 +160,33 @@ function ascendantTropical(date: Date, lat: number, lonEast: number): number {
   return asc;
 }
 
+/** Throws on missing / non-finite / out-of-range inputs so downstream
+ *  code never silently produces NaN charts. */
+export function validateKundliInput(input: KundliInput): void {
+  const req = ["year", "month", "day", "hour", "minute", "tzOffsetHours", "latitude", "longitude"] as const;
+  for (const k of req) {
+    const v = (input as unknown as Record<string, number>)[k];
+    if (v === undefined || v === null || !Number.isFinite(v)) {
+      throw new Error(`Invalid birth input: ${k} is required and must be a finite number`);
+    }
+  }
+  if (input.year < 1600 || input.year > 2999) throw new Error("Year must be between 1600 and 2999");
+  if (input.month < 1 || input.month > 12) throw new Error("Month must be 1..12");
+  if (input.day < 1 || input.day > 31) throw new Error("Day must be 1..31");
+  if (input.hour < 0 || input.hour > 23) throw new Error("Hour must be 0..23");
+  if (input.minute < 0 || input.minute > 59) throw new Error("Minute must be 0..59");
+  if (input.tzOffsetHours < -14 || input.tzOffsetHours > 14) throw new Error("Timezone offset out of range");
+  if (input.latitude < -90 || input.latitude > 90) throw new Error("Latitude must be -90..90");
+  if (input.longitude < -180 || input.longitude > 180) throw new Error("Longitude must be -180..180");
+  // Round-trip date check to reject Feb 30 etc.
+  const dt = new Date(Date.UTC(input.year, input.month - 1, input.day));
+  if (dt.getUTCFullYear() !== input.year || dt.getUTCMonth() !== input.month - 1 || dt.getUTCDate() !== input.day) {
+    throw new Error("Impossible calendar date");
+  }
+}
+
 export function computeKundli(input: KundliInput): KundliChart {
+  validateKundliInput(input);
   const cfg = { ...DEFAULT_CHART_CONFIG, ...(input.config ?? {}) };
   // Convert local birth time → UTC Date.
   const localMs = Date.UTC(
