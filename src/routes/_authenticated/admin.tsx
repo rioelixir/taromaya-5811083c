@@ -90,6 +90,10 @@ function AdminPage() {
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
         <TabBtn active={tab === "assets"} onClick={() => setTab("assets")} icon={<ImageIcon className="h-4 w-4" />}>Assets</TabBtn>
+        <TabBtn active={tab === "tutorials"} onClick={() => setTab("tutorials")} icon={<PlayCircle className="h-4 w-4" />}>Tutorials</TabBtn>
+        <Link to="/diagnostics" className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-muted-foreground hover:text-pearl hover:bg-white/5">
+          <Activity className="h-4 w-4" /> Diagnostics
+        </Link>
       </div>
 
       {tab === "overview" && <OverviewTab />}
