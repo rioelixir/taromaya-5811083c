@@ -37,10 +37,17 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         </span>
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-2 rounded-xl glass gold-border overflow-hidden z-50">
+        <div
+          role="menu"
+          className={[
+            "absolute rounded-xl glass gold-border overflow-hidden z-50 min-w-[140px]",
+            compact ? "top-full right-0 mt-2" : "bottom-full left-0 right-0 mb-2",
+          ].join(" ")}
+        >
           {LANGUAGES.map((l) => (
             <button
               key={l}
+              role="menuitem"
               onClick={() => pick(l)}
               className={[
                 "w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors",
