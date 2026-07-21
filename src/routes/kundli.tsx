@@ -381,9 +381,15 @@ const CELL_TO_RASHI: Record<string, number> = {
   "3-0": 8, "3-1": 7, "3-2": 6, "3-3": 5,
 };
 
+/** Full planet names for display (never short codes). */
+const PLANET_FULL: Record<PlanetName, string> = {
+  Sun: "Sun", Moon: "Moon", Mars: "Mars", Mercury: "Mercury", Jupiter: "Jupiter",
+  Venus: "Venus", Saturn: "Saturn", Rahu: "Rahu", Ketu: "Ketu",
+};
+
 /** North-Indian diamond Lagna chart (houses are fixed, signs rotate). */
 function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
-  const S = 300;
+  const S = 400;
   const asc = chart.ascendant.rashi;
   const planetsByHouse = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
   for (const p of chart.planets) {
@@ -399,39 +405,42 @@ function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
     7:  [S*0.50, S*0.70], 8:  [S*0.75, S*0.85], 9:  [S*0.88, S*0.70],
     10: [S*0.70, S*0.50], 11: [S*0.88, S*0.30], 12: [S*0.75, S*0.15],
   };
-  const SIGN_OFFSET: Record<number, [number, number]> = {
-    1:  [0, -S*0.10], 2:  [0, -S*0.08], 3:  [-S*0.05, 0],
-    4:  [-S*0.10, 0], 5:  [-S*0.05, 0], 6:  [0,  S*0.08],
-    7:  [0,  S*0.10], 8:  [0,  S*0.08], 9:  [ S*0.05, 0],
-    10: [ S*0.10, 0], 11: [ S*0.05, 0], 12: [0, -S*0.08],
-  };
 
   return (
     <div>
       <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">Lagna Chart · North Indian</div>
-      <div className="rounded-2xl border border-gold/30 bg-black/40 p-3">
-        <svg viewBox={`0 0 ${S} ${S}`} className="w-full">
-          <rect x={2} y={2} width={S-4} height={S-4} fill="none" stroke="currentColor" strokeOpacity={0.35} />
-          <line x1={2} y1={2} x2={S-2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
-          <line x1={S-2} y1={2} x2={2} y2={S-2} stroke="currentColor" strokeOpacity={0.35} />
-          <polygon points={`${S/2},2 ${S-2},${S/2} ${S/2},${S-2} 2,${S/2}`} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+      <div className="rounded-2xl border border-gold/30 bg-white p-3">
+        <svg viewBox={`0 0 ${S} ${S}`} className="w-full" role="img" aria-label="North Indian Lagna Chart">
+          <rect x={0} y={0} width={S} height={S} fill="#ffffff" />
+          <rect x={2} y={2} width={S-4} height={S-4} fill="none" stroke="#1a1a1a" strokeWidth={1.5} />
+          <line x1={2} y1={2} x2={S-2} y2={S-2} stroke="#1a1a1a" strokeWidth={1.5} />
+          <line x1={S-2} y1={2} x2={2} y2={S-2} stroke="#1a1a1a" strokeWidth={1.5} />
+          <polygon points={`${S/2},2 ${S-2},${S/2} ${S/2},${S-2} 2,${S/2}`} fill="none" stroke="#1a1a1a" strokeWidth={1.5} />
           {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => {
             const sign = (asc + h - 1) % 12;
             const [cx, cy] = P[h];
-            const [ox, oy] = SIGN_OFFSET[h];
             const planets = planetsByHouse.get(h) ?? [];
+            const planetCount = planets.length;
+            // Vertical stack: house# on top, then planets
+            const startY = cy - (planetCount * 6);
             return (
               <g key={h}>
-                <text x={cx + ox} y={cy + oy} textAnchor="middle" fontSize={S*0.036}
-                  className="fill-gold/80" fontFamily="serif">{RASHIS[sign].slice(0, 3)}</text>
-                {h === 1 && (
-                  <text x={cx} y={cy - S*0.05} textAnchor="middle" fontSize={S*0.028}
-                    className="fill-gold" fontFamily="serif">Lagna</text>
-                )}
+                {/* House number badge */}
+                <text x={cx} y={startY - 4} textAnchor="middle" fontSize={13}
+                  fontWeight={700} fill="#7c3aed" fontFamily="ui-sans-serif, system-ui, sans-serif">
+                  H{h}{h === 1 ? " · Asc" : ""}
+                </text>
+                {/* Sign abbreviation */}
+                <text x={cx} y={startY + 10} textAnchor="middle" fontSize={11}
+                  fill="#6b7280" fontFamily="ui-serif, serif" fontStyle="italic">
+                  {RASHIS[sign].slice(0, 3)}
+                </text>
+                {/* Full planet names, stacked */}
                 {planets.map((p, idx) => (
-                  <text key={p.name} x={cx} y={cy + (idx + 1) * S * 0.038}
-                    textAnchor="middle" fontSize={S*0.038} className="fill-pearl">
-                    {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
+                  <text key={p.name} x={cx} y={startY + 26 + idx * 14}
+                    textAnchor="middle" fontSize={12} fontWeight={600}
+                    fill="#111827" fontFamily="ui-sans-serif, system-ui, sans-serif">
+                    {PLANET_FULL[p.name]}{p.retrograde ? " (R)" : ""}
                   </text>
                 ))}
               </g>
@@ -448,7 +457,6 @@ function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
 }
 
 
-
 function SouthIndianChart({ chart }: { chart: KundliChart }) {
   const planetsByRashi = new Map<number, { name: PlanetName; retrograde: boolean }[]>();
   for (const p of chart.planets) {
@@ -459,7 +467,7 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
   return (
     <div>
       <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">Rashi Chart · South Indian</div>
-      <div className="grid grid-cols-4 grid-rows-4 aspect-square rounded-2xl overflow-hidden border border-gold/30 bg-black/40">
+      <div className="grid grid-cols-4 grid-rows-4 aspect-square rounded-2xl overflow-hidden border-2 border-gold/40 bg-white">
         {Array.from({ length: 16 }).map((_, i) => {
           const r = Math.floor(i / 4); const c = i % 4;
           const key = `${r}-${c}`;
@@ -468,11 +476,11 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
           if (isCenter) {
             if (r === 1 && c === 1) {
               return (
-                <div key={i} className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/20 bg-gradient-to-br from-midnight/40 to-cosmic/60">
+                <div key={i} className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/30 bg-gradient-to-br from-purple-50 to-amber-50">
                   <div>
-                    <div className="text-[9px] uppercase tracking-widest text-gold/70">Lagna</div>
-                    <div className="font-display text-xl text-pearl mt-1">{RASHIS[chart.ascendant.rashi]}</div>
-                    <div className="text-[11px] text-muted-foreground mt-1">{formatDegree(chart.ascendant.degreeInRashi)}</div>
+                    <div className="text-[10px] uppercase tracking-widest font-bold text-purple-700">Lagna</div>
+                    <div className="font-display text-2xl text-gray-900 mt-1 font-bold">{RASHIS[chart.ascendant.rashi]}</div>
+                    <div className="text-[11px] text-gray-600 mt-1">{formatDegree(chart.ascendant.degreeInRashi)}</div>
                   </div>
                 </div>
               );
@@ -483,15 +491,15 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
           const planets = planetsByRashi.get(rashi) ?? [];
           const houseNo = ((rashi - chart.ascendant.rashi + 12) % 12) + 1;
           return (
-            <div key={i} className={`relative border border-white/10 p-1.5 text-[10px] ${isAsc ? "bg-gold/[0.06]" : "bg-white/[0.015]"}`}>
-              <div className="flex items-start justify-between">
-                <span className="text-[9px] uppercase tracking-widest text-muted-foreground">{RASHIS[rashi].slice(0, 3)}</span>
-                <span className={`text-[9px] ${isAsc ? "text-gold" : "text-muted-foreground/60"}`}>{isAsc ? "As · " : ""}H{houseNo}</span>
+            <div key={i} className={`relative border border-gray-300 p-2 text-[10px] ${isAsc ? "bg-amber-50" : "bg-white"}`}>
+              <div className="flex items-start justify-between gap-1">
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-700">{RASHIS[rashi].slice(0, 3)}</span>
+                <span className={`text-[10px] font-bold ${isAsc ? "text-purple-700" : "text-purple-600"}`}>H{houseNo}{isAsc ? "·As" : ""}</span>
               </div>
-              <div className="mt-1 flex flex-wrap gap-1">
+              <div className="mt-1.5 flex flex-col gap-0.5">
                 {planets.map((p) => (
-                  <span key={p.name} className="inline-flex items-baseline rounded-md px-1 py-0.5 bg-white/5 text-pearl text-[10px]" title={p.name}>
-                    {PLANET_SHORT[p.name]}{p.retrograde ? "ᴿ" : ""}
+                  <span key={p.name} className="text-[11px] font-semibold text-gray-900 leading-tight" title={p.name}>
+                    {PLANET_FULL[p.name]}{p.retrograde ? " (R)" : ""}
                   </span>
                 ))}
               </div>
