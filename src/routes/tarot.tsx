@@ -653,24 +653,22 @@ function PlacedCardView({
           </div>
           {/* Front */}
           <div
-            className="absolute inset-0 rounded-2xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_40px_-10px_var(--gold)] p-2 flex flex-col"
+            className="absolute inset-0 rounded-2xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_40px_-10px_var(--gold)] overflow-hidden flex flex-col"
             style={{
               backfaceVisibility: "hidden",
               transform: `rotateY(180deg) ${card.reversed ? "rotate(180deg)" : ""}`,
             }}
           >
-            <div className="text-[9px] uppercase tracking-widest text-gold/70 text-center">
-              {card.card.arcana === "major" ? "Major" : card.card.suit}
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-4xl">{glyphFor(card.card)}</div>
-            </div>
-            <div className="font-display text-xs text-pearl text-center leading-tight">
-              {card.card.name}
-            </div>
-            {card.reversed && (
-              <div className="text-[8px] uppercase tracking-widest text-gold/60 text-center mt-0.5">
-                Reversed
+            {cardImage(card.card.id) ? (
+              <img
+                src={cardImage(card.card.id)}
+                alt={card.card.name}
+                draggable={false}
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-4xl">{glyphFor(card.card)}</div>
               </div>
             )}
           </div>
