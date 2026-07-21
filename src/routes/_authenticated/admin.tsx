@@ -2,12 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, Tag, UserPlus, Link2, Copy, Ban } from "lucide-react";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, Tag, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
 import { AdminPlansTab, AdminCouponsTab } from "@/components/admin-payments";
 import { AdminBrandingTab } from "@/components/admin-branding";
 import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
 import { AdminPagesTab, AdminFaqsTab, AdminBlogsTab } from "@/components/admin-cms";
+import { AdminTutorialsTab } from "@/components/admin-tutorials";
+import { Link } from "@tanstack/react-router";
 import {
   adminListUsers,
   adminGrantRole,
