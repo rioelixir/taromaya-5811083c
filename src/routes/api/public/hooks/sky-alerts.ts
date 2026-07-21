@@ -7,12 +7,18 @@ export const Route = createFileRoute("/api/public/hooks/sky-alerts")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Auth: require Supabase anon apikey header OR local dev bypass
-        const auth = request.headers.get("apikey") || request.headers.get("authorization") || "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY || "";
-        if (!auth || (expected && !auth.includes(expected))) {
+        // Auth: require a private CRON_SECRET (never a publishable Supabase key,
+        // which ships in the browser bundle). Constant-time-ish compare.
+        const provided = (request.headers.get("x-cron-secret") || "").trim();
+        const expected = (process.env.CRON_SECRET || "").trim();
+        if (!expected || provided.length !== expected.length) {
           return new Response("Unauthorized", { status: 401 });
         }
+        let mismatch = 0;
+        for (let i = 0; i < expected.length; i++) {
+          mismatch |= provided.charCodeAt(i) ^ expected.charCodeAt(i);
+        }
+        if (mismatch !== 0) return new Response("Unauthorized", { status: 401 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
