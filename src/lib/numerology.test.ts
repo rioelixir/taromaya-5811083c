@@ -88,8 +88,8 @@ describe("computeNumerology() — full report", () => {
     expect(r.birthday).toBe(9); // 18 → 9
   });
   it("expression = reduced full-name letter sum", () => {
-    // JOHNDOE = 1+6+5+5 + 4+6+5 = 32 → 5
-    expect(r.destiny).toBe(5);
+    // JOHNDOE = J1+O6+H8+N5 + D4+O6+E5 = 35 → 8
+    expect(r.destiny).toBe(8);
   });
   it("soul urge = vowels only", () => {
     // OOE = 6+6+5 = 17 → 8
