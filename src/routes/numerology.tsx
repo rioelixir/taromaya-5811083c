@@ -511,7 +511,10 @@ function TimelineNumerology({
 // LO SHU GRID
 // ═══════════════════════════════════════════════════════════════════
 function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate: (s: string) => void }) {
-  const grid = useMemo(() => (birthDate ? loShuGrid(birthDate) : null), [birthDate]);
+  const grid = useMemo(() => {
+    if (!birthDate) return null;
+    try { return loShuGrid(birthDate); } catch { return null; }
+  }, [birthDate]);
   // Traditional Lo Shu square positions
   const layout: number[][] = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
   return (
