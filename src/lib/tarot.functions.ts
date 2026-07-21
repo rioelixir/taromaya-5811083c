@@ -21,6 +21,7 @@ const DrawSchema = z.object({
 });
 
 export const interpretTarot = createServerFn({ method: "POST" })
+  .middleware([requirePremium])
   .inputValidator((data: unknown) => DrawSchema.parse(data))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
