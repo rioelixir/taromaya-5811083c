@@ -258,14 +258,6 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
               </Link>
             </div>
           )}
-          <Link
-            to="/how-to-use"
-            onClick={onClose}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
-          >
-            <Compass className="h-4 w-4 text-primary shrink-0" />
-            <span>{t("How to Use TAROMAYA")}</span>
-          </Link>
           <button
             type="button"
             onClick={() => {
