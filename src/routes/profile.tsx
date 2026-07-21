@@ -141,6 +141,7 @@ function ProfilePage() {
         </GlassCard>
 
         {/* Birth */}
+        <div data-tour="birth-details">
         <GlassCard title="Birth details" desc="Used for accurate charts and readings.">
           {data.birth?.date ? (
             <div className="space-y-2 text-sm">
@@ -171,6 +172,7 @@ function ProfilePage() {
             </div>
           )}
         </GlassCard>
+        </div>
 
         {/* Subscription */}
         <GlassCard title="Subscription" desc="This app is fully subscription-based.">
