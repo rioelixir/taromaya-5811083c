@@ -172,19 +172,33 @@ export function AIInterpretation({
               : "Save your birth details for a personalized, chart-grounded reading."}
           </p>
         </div>
-        <Button
-          onClick={reveal}
-          disabled={loading}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          {loading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading…</>
-          ) : text ? (
-            <><RefreshCw className="mr-2 h-4 w-4" /> Read again</>
-          ) : (
-            <><Sparkles className="mr-2 h-4 w-4" /> Reveal reading</>
+        <div className="flex items-center gap-2">
+          {loading && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={stop}
+              aria-label="Stop reading"
+              className="min-h-11"
+            >
+              <StopCircle className="mr-2 h-4 w-4" /> Stop
+            </Button>
           )}
-        </Button>
+          <Button
+            onClick={reveal}
+            disabled={loading}
+            aria-label={text ? "Regenerate reading" : "Reveal reading"}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11"
+          >
+            {loading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> Reading…</>
+            ) : text ? (
+              <><RefreshCw className="mr-2 h-4 w-4" aria-hidden /> Read again</>
+            ) : (
+              <><Sparkles className="mr-2 h-4 w-4" aria-hidden /> Reveal reading</>
+            )}
+          </Button>
+        </div>
       </div>
 
 
