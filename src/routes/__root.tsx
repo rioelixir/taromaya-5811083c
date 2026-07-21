@@ -214,6 +214,9 @@ function RootComponent() {
     return () => window.removeEventListener("taromaya:open-authors-note", open);
   }, []);
 
+  const pathname = useRouter().state.location.pathname;
+  const chromeHidden = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
@@ -230,23 +233,25 @@ function RootComponent() {
         </div>
       )}
       <div className="relative min-h-dvh">
-        <Sidebar />
-        <main className="relative min-h-dvh pb-24">
+        {!chromeHidden && <Sidebar />}
+        <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
           <Outlet />
         </main>
-        <footer className="border-t border-border/40 bg-background/60 py-6 pb-24 text-center text-xs text-muted-foreground backdrop-blur-sm">
-          <nav className="mx-auto max-w-2xl flex flex-wrap justify-center gap-x-5 gap-y-1 mb-2">
-            <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
-            <Link to="/blog" className="hover:text-primary">Blog</Link>
-            <Link to="/faq" className="hover:text-primary">FAQ</Link>
-            <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
-            <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
-            <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
-          </nav>
-          {branding.footerLine1 && <p>{branding.footerLine1}</p>}
-          {branding.footerLine2 && <p>{branding.footerLine2}</p>}
-        </footer>
-        <BottomNav />
+        {!chromeHidden && (
+          <footer className="border-t border-border/40 bg-background/60 py-6 pb-24 text-center text-xs text-muted-foreground backdrop-blur-sm">
+            <nav className="mx-auto max-w-2xl flex flex-wrap justify-center gap-x-5 gap-y-1 mb-2">
+              <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
+              <Link to="/blog" className="hover:text-primary">Blog</Link>
+              <Link to="/faq" className="hover:text-primary">FAQ</Link>
+              <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
+              <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
+              <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
+            </nav>
+            {branding.footerLine1 && <p>{branding.footerLine1}</p>}
+            {branding.footerLine2 && <p>{branding.footerLine2}</p>}
+          </footer>
+        )}
+        {!chromeHidden && <BottomNav />}
       </div>
 
     </QueryClientProvider>
