@@ -92,24 +92,25 @@ function porphyryCusps(asc: number, mc: number): number[] {
 function placidusIntermediate(
   RAMCdeg: number, epsDeg: number, phiDeg: number,
   houseNum: 11 | 12 | 2 | 3,
+  seedLon: number,   // initial ecliptic-longitude guess in degrees
 ): number | null {
   const eps = deg2rad(epsDeg);
   const phi = deg2rad(phiDeg);
-  // Initial guess along the ecliptic
-  const initOffset = { 11: 30, 12: 60, 2: 120, 3: 150 }[houseNum];
-  let lam = deg2rad(norm360(RAMCdeg + initOffset));
+  let lam = deg2rad(norm360(seedLon));
   const TWO_PI = 2 * Math.PI;
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 80; i++) {
     const sL = Math.sin(lam), cL = Math.cos(lam);
-    const ra = Math.atan2(sL * Math.cos(eps), cL); // radians
+    // Two-argument RA preserves the correct ecliptic branch (avoids collapsing
+    // λ and λ+180° to the same right ascension).
+    let ra = Math.atan2(sL * Math.cos(eps), cL);
+    if (ra < 0) ra += TWO_PI;
     const dec = Math.asin(sL * Math.sin(eps));
     const cosArg = -Math.tan(dec) * Math.tan(phi);
     if (cosArg <= -1 || cosArg >= 1) return null; // circumpolar → undefined
     const SD = Math.acos(cosArg);       // semi-diurnal arc (0..π)
     const SN = Math.PI - SD;             // semi-nocturnal arc
-    // Target RA offset from RAMC for each cusp (Placidus trisection).
-    // Target RA offset from RAMC (measured eastward, i.e., increasing RA):
-    //   MC → 11 → 12 → Asc → 2 → 3 → IC ≡ 0 → SD/3 → 2SD/3 → SD → SD+SN/3 → SD+2SN/3 → π
+    // Placidus trisection: target RA offset east of RAMC.
+    // Order:  MC → 11 → 12 → Asc → 2 → 3 → IC
     let target: number;
     if (houseNum === 11)      target = SD / 3;
     else if (houseNum === 12) target = (2 * SD) / 3;
@@ -118,11 +119,10 @@ function placidusIntermediate(
     let cur = ra - deg2rad(RAMCdeg);
     cur = ((cur % TWO_PI) + TWO_PI) % TWO_PI;
     let diff = target - cur;
-    // Wrap to (-π, π] for correct signed correction
     if (diff > Math.PI) diff -= TWO_PI;
     if (diff < -Math.PI) diff += TWO_PI;
     lam += diff;
-    if (Math.abs(diff) < 1e-10) break;
+    if (Math.abs(diff) < 1e-11) break;
   }
   return norm360(rad2deg(lam));
 }
@@ -131,10 +131,12 @@ function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number,
   const cusps = new Array(12).fill(0);
   cusps[0] = asc; cusps[9] = mc;
   cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
-  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11);
-  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12);
-  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2);
-  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3);
+  // Seed each iteration close to its expected ecliptic position so the solver
+  // stays on the correct branch (avoiding the antipodal RA solution).
+  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11, mc + (norm360(asc - mc)) / 3);
+  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12, mc + (2 * norm360(asc - mc)) / 3);
+  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2,  asc + (norm360((mc + 180) - asc)) / 3);
+  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3,  asc + (2 * norm360((mc + 180) - asc)) / 3);
   // If any cusp is circumpolar-undefined, fall back to Porphyry for all
   // intermediates (mixing systems would be worse than a clean fallback).
   if (c11 == null || c12 == null || c2 == null || c3 == null) {
