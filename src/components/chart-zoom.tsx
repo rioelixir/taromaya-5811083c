@@ -55,7 +55,7 @@ export function ChartZoom({ children, label = "Chart" }: ChartZoomProps) {
           role="dialog"
           aria-modal="true"
           aria-label={`${label} full screen`}
-          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex flex-col"
+          className="fixed inset-0 z-[9999] bg-white flex flex-col"
           onWheel={(e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? -0.15 : 0.15;
