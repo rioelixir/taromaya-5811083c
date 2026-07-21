@@ -51,7 +51,7 @@ function Home() {
       </p>
 
       {/* Primary CTA */}
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap gap-3" data-tour="hero-start">
         <Link
           to="/tarot"
           className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-all"
