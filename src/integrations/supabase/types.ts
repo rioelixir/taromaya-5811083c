@@ -648,6 +648,57 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_reports: {
+        Row: {
+          birth_date: string
+          birth_time: string
+          created_at: string
+          display_name: string
+          expires_at: string | null
+          id: string
+          kind: string
+          latitude: number
+          longitude: number
+          place: string | null
+          token: string
+          tz_offset: number
+          user_id: string
+          views: number
+        }
+        Insert: {
+          birth_date: string
+          birth_time: string
+          created_at?: string
+          display_name: string
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          latitude: number
+          longitude: number
+          place?: string | null
+          token: string
+          tz_offset: number
+          user_id: string
+          views?: number
+        }
+        Update: {
+          birth_date?: string
+          birth_time?: string
+          created_at?: string
+          display_name?: string
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          latitude?: number
+          longitude?: number
+          place?: string | null
+          token?: string
+          tz_offset?: number
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
       sky_alert_dispatch: {
         Row: {
           channel: string

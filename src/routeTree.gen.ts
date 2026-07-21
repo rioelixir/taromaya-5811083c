@@ -65,6 +65,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -360,6 +361,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PagesSlugRoute = PagesSlugRouteImport.update({
   id: '/pages/$slug',
   path: '/pages/$slug',
@@ -507,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
+  '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -579,6 +586,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
+  '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -653,6 +661,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
+  '/share/$token': typeof ShareTokenRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
@@ -727,6 +736,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
+    | '/share/$token'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
@@ -799,6 +809,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
+    | '/share/$token'
     | '/kundli/new'
     | '/api/public/hooks/sky-alerts'
   id:
@@ -872,6 +883,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
+    | '/share/$token'
     | '/_authenticated/kundli/new'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
@@ -938,6 +950,7 @@ export interface RootRouteChildren {
   ApiTranslateRoute: typeof ApiTranslateRoute
   InviteCodeRoute: typeof InviteCodeRoute
   PagesSlugRoute: typeof PagesSlugRoute
+  ShareTokenRoute: typeof ShareTokenRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1335,6 +1348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pages/$slug': {
       id: '/pages/$slug'
       path: '/pages/$slug'
@@ -1540,6 +1560,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTranslateRoute: ApiTranslateRoute,
   InviteCodeRoute: InviteCodeRoute,
   PagesSlugRoute: PagesSlugRoute,
+  ShareTokenRoute: ShareTokenRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport

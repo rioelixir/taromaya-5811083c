@@ -15,6 +15,7 @@ import { loShuGrid } from "@/lib/numerology-deep";
 import { REMEDY_CATALOG, prioritiseRemedies } from "@/lib/remedies";
 import { findStations, findIngresses, findEclipses, fmtDay } from "@/lib/transits-timeline";
 import { getPdfQuota, recordPdfDownload } from "@/lib/pdf-quota.functions";
+import { ShareLinkPanel } from "@/components/share-link-panel";
 import { FileText, Download, Loader2, Infinity as InfIcon } from "lucide-react";
 
 export const Route = createFileRoute("/reports")({
@@ -130,12 +131,15 @@ function ReportsPage() {
         })}
       </div>
 
+      <ShareLinkPanel birth={birth} />
+
       <div className="mt-6 text-xs text-muted-foreground">
         Reports render locally in your browser — nothing about your birth chart is uploaded during PDF generation. Non-admin members may download up to 10 report PDFs per calendar month.
       </div>
     </PageShell>
   );
 }
+
 
 export function QuotaBadge({ status, loading, label }: {
   status: { used: number; limit: number | null; isAdmin: boolean; remaining: number | null } | undefined;
