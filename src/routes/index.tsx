@@ -73,7 +73,7 @@ function Home() {
       <TutorialModule />
 
       {/* Quick actions — 4 large tiles */}
-      <section className="mt-12">
+      <section className="mt-12" data-tour="quick-actions">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl">Quick actions</h2>
         </div>
