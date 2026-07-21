@@ -76,8 +76,11 @@ export type NumerologyReport = {
   system: "Pythagorean" | "Chaldean";
   lifePath: number;
   destiny: number;   // expression
+  destinyCompound: number;  // pre-reduction total (meaningful in Chaldean)
   soulUrge: number;
+  soulUrgeCompound: number;
   personality: number;
+  personalityCompound: number;
   birthday: number;
   maturity: number;
   personalYear: number;
@@ -93,6 +96,7 @@ export type NumerologyReport = {
   compatibleNumbers: number[];
   planetRuler: string;
 };
+
 
 const NUMBER_TO_PLANET: Record<number, string> = {
   1: "Sun", 2: "Moon", 3: "Jupiter", 4: "Rahu", 5: "Mercury",
@@ -175,8 +179,10 @@ export function computeNumerology(
 
   const destinyRaw = nameValue(fullName, map);
   const destiny = reduce(destinyRaw, true);
-  const soulUrge = reduce(nameValue(fullName, map, (l) => VOWELS.has(l)), true);
-  const personality = reduce(nameValue(fullName, map, (l) => !VOWELS.has(l)), true);
+  const soulUrgeRaw = nameValue(fullName, map, (l) => VOWELS.has(l));
+  const soulUrge = reduce(soulUrgeRaw, true);
+  const personalityRaw = nameValue(fullName, map, (l) => !VOWELS.has(l));
+  const personality = reduce(personalityRaw, true);
   const birthday = reduce(d, true);
   const maturity = reduce(lifePath + destiny, true);
 
@@ -210,11 +216,15 @@ export function computeNumerology(
   const c4 = reduce(Math.abs(rmNoMaster - ryNoMaster), false);
   const challenges = parsed ? [c1, c2, c3, c4] : [0, 0, 0, 0];
 
-  // Karmic debts: check pre-reduction totals for 13/14/16/19.
+  // Karmic debts: check pre-reduction totals for 13/14/16/19 on all core numbers.
   const karmicDebts: number[] = [];
-  const lifePathPreReduce = rm + rd + ry;
+  const lifePathPreReduce = digitsSum(y) + m + d;
   if (KARMIC.has(lifePathPreReduce)) karmicDebts.push(lifePathPreReduce);
   if (KARMIC.has(destinyRaw)) karmicDebts.push(destinyRaw);
+  if (KARMIC.has(soulUrgeRaw)) karmicDebts.push(soulUrgeRaw);
+  if (KARMIC.has(personalityRaw)) karmicDebts.push(personalityRaw);
+  if (parsed && KARMIC.has(d)) karmicDebts.push(d);
+
 
   const masterNumbers = [lifePath, destiny, soulUrge, personality, maturity]
     .filter((n) => MASTER.has(n));
@@ -227,7 +237,10 @@ export function computeNumerology(
 
   return {
     system,
-    lifePath, destiny, soulUrge, personality, birthday, maturity,
+    lifePath, destiny, destinyCompound: destinyRaw,
+    soulUrge, soulUrgeCompound: soulUrgeRaw,
+    personality, personalityCompound: personalityRaw,
+    birthday, maturity,
     personalYear, personalMonth, personalDay,
     karmicDebts: uniq(karmicDebts),
     masterNumbers: uniq(masterNumbers),
