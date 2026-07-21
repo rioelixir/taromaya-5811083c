@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { requireHttpAuth } from "@/lib/http-auth.server";
 
 type Body = { lang?: "hi" | "hr"; strings?: string[] };
 
@@ -8,6 +9,8 @@ export const Route = createFileRoute("/api/translate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const auth = await requireHttpAuth(request);
+        if (auth instanceof Response) return auth;
         const body = ((await request.json()) as Body) ?? {};
         const lang = body.lang;
         const strings = Array.isArray(body.strings) ? body.strings.slice(0, 200) : [];

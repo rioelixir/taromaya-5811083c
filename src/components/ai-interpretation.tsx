@@ -91,9 +91,15 @@ export function AIInterpretation({
       const doFetch = async () => {
         const ctrl = new AbortController();
         abortRef.current = ctrl;
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: sess } = await supabase.auth.getSession();
+        const token = sess.session?.access_token;
         return fetch("/api/ai-reading", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({
             system: system.slice(0, 3000),
             prompt: prompt.slice(0, 6000),

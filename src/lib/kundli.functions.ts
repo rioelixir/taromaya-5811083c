@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { requirePremium } from "./premium-guard";
 
 const PlanetSchema = z.object({
   name: z.string(),
@@ -20,6 +21,7 @@ const KundliInterpretSchema = z.object({
 });
 
 export const interpretKundli = createServerFn({ method: "POST" })
+  .middleware([requirePremium])
   .inputValidator((data: unknown) => KundliInterpretSchema.parse(data))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;

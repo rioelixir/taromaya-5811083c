@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { streamText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { requireHttpAuth } from "@/lib/http-auth.server";
 
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
@@ -30,6 +31,8 @@ export const Route = createFileRoute("/api/ai-reading")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const auth = await requireHttpAuth(request, { premium: true });
+        if (auth instanceof Response) return auth;
         let raw: unknown;
         try {
           raw = await request.json();
