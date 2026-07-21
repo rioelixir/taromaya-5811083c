@@ -1304,6 +1304,23 @@ export type Database = {
         Returns: boolean
       }
       is_premium: { Args: { _user_id: string }; Returns: boolean }
+      redeem_coupon: {
+        Args: { _code: string; _plan_id: string }
+        Returns: {
+          amount_off_cents: number
+          coupon_id: string
+          created_at: string
+          id: string
+          plan_id: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "coupon_redemptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "user"
