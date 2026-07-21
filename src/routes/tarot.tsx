@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
 import { SPREADS, secureRandInt, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
+import { cardImage } from "@/lib/tarot-images";
 import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
 import { isCourtCard } from "@/lib/tarot-details";
 import { interpretTarot } from "@/lib/tarot.functions";
@@ -581,14 +582,22 @@ function TarotPage() {
             </button>
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative rounded-3xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
+              className="relative rounded-3xl border border-gold/50 overflow-hidden bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
               style={{
                 width: "min(92vw, calc(92dvh * 0.66))",
                 height: "min(92dvh, calc(92vw * 1.5))",
                 transform: zc.reversed ? "rotate(180deg)" : undefined,
               }}
             >
-              <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
+              {cardImage(zc.card.id) ? (
+                <img
+                  src={cardImage(zc.card.id)}
+                  alt={zc.card.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
+              )}
             </div>
           </div>
         );
@@ -652,24 +661,22 @@ function PlacedCardView({
           </div>
           {/* Front */}
           <div
-            className="absolute inset-0 rounded-2xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_40px_-10px_var(--gold)] p-2 flex flex-col"
+            className="absolute inset-0 rounded-2xl border border-gold/50 bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_40px_-10px_var(--gold)] overflow-hidden flex flex-col"
             style={{
               backfaceVisibility: "hidden",
               transform: `rotateY(180deg) ${card.reversed ? "rotate(180deg)" : ""}`,
             }}
           >
-            <div className="text-[9px] uppercase tracking-widest text-gold/70 text-center">
-              {card.card.arcana === "major" ? "Major" : card.card.suit}
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-4xl">{glyphFor(card.card)}</div>
-            </div>
-            <div className="font-display text-xs text-pearl text-center leading-tight">
-              {card.card.name}
-            </div>
-            {card.reversed && (
-              <div className="text-[8px] uppercase tracking-widest text-gold/60 text-center mt-0.5">
-                Reversed
+            {cardImage(card.card.id) ? (
+              <img
+                src={cardImage(card.card.id)}
+                alt={card.card.name}
+                draggable={false}
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-4xl">{glyphFor(card.card)}</div>
               </div>
             )}
           </div>
