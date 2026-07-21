@@ -101,6 +101,7 @@ function Home() {
         <div className="grid grid-cols-1 gap-3 sm:gap-4">
           <button
             type="button"
+            data-tour="guides"
             onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
             className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
           >
