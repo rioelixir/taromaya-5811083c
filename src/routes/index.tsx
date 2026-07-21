@@ -121,6 +121,7 @@ function Home() {
       <section className="mt-10">
         <button
           type="button"
+          data-tour="explore-all"
           onClick={() => document.querySelector<HTMLButtonElement>('[aria-label="Open menu"]')?.click()}
           className="w-full flex items-center justify-between rounded-2xl border border-border/40 bg-white/60 px-5 py-4 text-left hover:bg-white/90 transition"
         >
