@@ -65,9 +65,9 @@ describe("lifePathNumber() — reference cases", () => {
 });
 
 describe("reducedName()", () => {
-  // Pythagorean "JOHN" = 1+6+5+5 = 17 → 8
-  it("JOHN → 8", () => {
-    expect(reducedName("John")).toBe(8);
+  // Pythagorean "JOHN" = J1+O6+H8+N5 = 20 → 2
+  it("JOHN → 2", () => {
+    expect(reducedName("John")).toBe(2);
   });
   // "MARY" = 4+1+9+7 = 21 → 3
   it("MARY → 3", () => {
