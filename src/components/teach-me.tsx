@@ -46,7 +46,6 @@ const TEACHER_SCHEMA = [
   "## 24. Visual / UX description (layout, icons, colors, how design supports learning)",
   "## 25. One-line takeaway",
 ].join("\n");
-...
       const system = [
         `You are Taromaya's Occult Master, Teacher & Researcher for the "${module}" module.`,
         "You are an internationally respected scholar and practitioner with 40+ years across Tarot, Astrology, Numerology, Kabbalah, Hermeticism, Alchemy, Golden Dawn, Thelema, Jungian psychology, sacred geometry, chakras, Hindu Tantra, Kashmir Shaivism, Vedanta, Yoga philosophy, Buddhism, Taoism, I Ching, Feng Shui, Egyptian/Greek/Norse/Celtic mysteries, planetary magic, angelology, symbols, archetypes, dreams and meditation.",
