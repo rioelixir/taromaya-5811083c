@@ -121,28 +121,46 @@ function placidusIntermediate(
     if (d < -Math.PI) d += TWO_PI;
     return { f: d, ok: true };
   };
-  // Bracket around seed ±40°, then bisect. This is unconditionally robust and
-  // stays on the correct ecliptic branch as long as the seed is within ~40°.
+  // Scan the ecliptic in 2° steps to find every sign change of f(λ),
+  // then pick the root nearest the seed (which lives in the correct
+  // forward-arc quadrant for this cusp). This is unconditionally robust
+  // and handles high-latitude cases where f is not monotone near the seed.
   const seed = deg2rad(norm360(seedLon));
-  const W = deg2rad(40);
-  let lo = seed - W, hi = seed + W;
-  const flo = evalF(lo), fhi = evalF(hi);
-  if (!flo.ok || !fhi.ok) return null;
-  if (flo.f * fhi.f > 0) {
-    // No sign change in the window — widen once to ±70°.
-    lo = seed - deg2rad(70); hi = seed + deg2rad(70);
-    const a = evalF(lo), b = evalF(hi);
-    if (!a.ok || !b.ok || a.f * b.f > 0) return null;
+  const STEP = deg2rad(2);
+  const samples: { lam: number; f: number; ok: boolean }[] = [];
+  for (let k = 0; k < 180; k++) {
+    const lam = k * STEP;
+    samples.push({ lam, ...evalF(lam) });
   }
+  const roots: { lo: number; hi: number }[] = [];
+  for (let k = 0; k < samples.length; k++) {
+    const a = samples[k], b = samples[(k + 1) % samples.length];
+    if (!a.ok || !b.ok) continue;
+    if (a.f === 0) { roots.push({ lo: a.lam, hi: a.lam }); continue; }
+    if (a.f * b.f < 0) roots.push({ lo: a.lam, hi: b.lam < a.lam ? b.lam + TWO_PI : b.lam });
+  }
+  if (roots.length === 0) return null;
+  // Pick the root whose midpoint is closest to the seed (shortest ecliptic arc).
+  const arcDist = (x: number) => {
+    let d = Math.abs(x - seed);
+    if (d > Math.PI) d = TWO_PI - d;
+    return d;
+  };
+  roots.sort((r1, r2) => arcDist((r1.lo + r1.hi) / 2) - arcDist((r2.lo + r2.hi) / 2));
+  let { lo, hi } = roots[0];
+  if (lo > hi) hi += TWO_PI;
+  // Bisect the chosen bracket to convergence.
   for (let i = 0; i < 60; i++) {
     const mid = (lo + hi) / 2;
-    const fm = evalF(mid);
+    const fm = evalF(mid > TWO_PI ? mid - TWO_PI : mid);
     if (!fm.ok) return null;
-    const flo2 = evalF(lo);
-    if (flo2.f * fm.f <= 0) hi = mid; else lo = mid;
+    const fl = evalF(lo > TWO_PI ? lo - TWO_PI : lo);
+    if (fl.f * fm.f <= 0) hi = mid; else lo = mid;
     if (hi - lo < 1e-11) break;
   }
-  return norm360(rad2deg((lo + hi) / 2));
+  let root = (lo + hi) / 2;
+  if (root >= TWO_PI) root -= TWO_PI;
+  return norm360(rad2deg(root));
 }
 
 function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number, phiDeg: number): number[] {
