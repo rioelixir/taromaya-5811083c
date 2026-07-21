@@ -250,14 +250,6 @@ function RootComponent() {
                   {branding.footerLine2 || "App created by Riaa."}
                 </p>
               </div>
-              <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-                <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
-                <Link to="/blog" className="hover:text-primary">Blog</Link>
-                <Link to="/faq" className="hover:text-primary">FAQ</Link>
-                <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
-                <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
-                <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
-              </nav>
               <div className="text-center md:text-right">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Reference by</div>
                 <a
