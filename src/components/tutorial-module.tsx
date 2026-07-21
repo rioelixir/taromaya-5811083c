@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 type Callout = { kind: "tip" | "warn" | "do" | "dont" | "pro" | "note"; text: string };
+type DeepLink = { to: string; tour?: string; label: string };
 type Step = {
   id: string;
   icon: typeof Sparkles;
@@ -15,6 +16,7 @@ type Step = {
   lede: string;
   bullets: string[];
   callouts?: Callout[];
+  link?: DeepLink;
   cta?: { to: string; label: string };
 };
 
