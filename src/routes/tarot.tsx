@@ -463,7 +463,7 @@ function TarotPage() {
           ))}
 
           {/* Five deck stacks — bottom right */}
-          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none">
+          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none" data-tour="deck-picker">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
               Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
             </div>
