@@ -180,7 +180,7 @@ export function computeWesternChart(
   const cusps = houseSystem === "whole-sign" ? wholeSignCusps(tropAsc)
     : houseSystem === "equal" ? equalCusps(tropAsc)
     : placidusCusps(tropAsc, mc, RAMCdeg, epsDeg, input.latitude);
-  return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem };
+  return { ...sid, tropicalPlanets, tropicalAscendant: tropAsc, midheaven: mc, cusps, houseSystem, epochUtc: date.toISOString() };
 }
 
 // ── Aspects
