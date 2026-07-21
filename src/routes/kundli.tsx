@@ -32,6 +32,9 @@ import {
   Sparkles, Loader2, MapPin, Save, Check, AlertTriangle,
   CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
+import { CalcSettingsPanel, type CalcSettings } from "@/components/calc-settings-panel";
+import { AccuracyPanel } from "@/components/accuracy-panel";
+import { RASHIS as VEDIC_RASHIS } from "@/lib/vedic";
 
 export const Route = createFileRoute("/kundli")({
   component: () => (<PremiumGate featureName="Kundli"><KundliPage /></PremiumGate>),
