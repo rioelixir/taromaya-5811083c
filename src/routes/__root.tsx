@@ -231,26 +231,24 @@ function RootComponent() {
       )}
       <div className="relative min-h-dvh">
         <Sidebar />
-        <div className="lg:pl-64">
-          <main className="relative min-h-dvh pb-8 lg:pb-12">
-            <Outlet />
-          </main>
-          <footer className="border-t border-white/10 bg-black/20 py-5 text-center text-xs text-muted-foreground backdrop-blur-sm space-y-2">
-            <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-white/70">
-              <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-gold">About</Link>
-              <Link to="/blog" className="hover:text-gold">Blog</Link>
-              <Link to="/faq" className="hover:text-gold">FAQ</Link>
-              <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-gold">Privacy</Link>
-              <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-gold">Terms</Link>
-              <Link to="/pages/$slug" params={{ slug: "refund" }} className="hover:text-gold">Refund</Link>
-              <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-gold">Contact</Link>
-            </nav>
-            {branding.footerLine1 && <p>{branding.footerLine1}</p>}
-            {branding.footerLine2 && <p>{branding.footerLine2}</p>}
-            {branding.footerLine3 && <p>{branding.footerLine3}</p>}
-          </footer>
-        </div>
+        <main className="relative min-h-dvh pb-24">
+          <Outlet />
+        </main>
+        <footer className="border-t border-border/40 bg-background/60 py-6 pb-24 text-center text-xs text-muted-foreground backdrop-blur-sm">
+          <nav className="mx-auto max-w-2xl flex flex-wrap justify-center gap-x-5 gap-y-1 mb-2">
+            <Link to="/pages/$slug" params={{ slug: "about" }} className="hover:text-primary">About</Link>
+            <Link to="/blog" className="hover:text-primary">Blog</Link>
+            <Link to="/faq" className="hover:text-primary">FAQ</Link>
+            <Link to="/pages/$slug" params={{ slug: "privacy" }} className="hover:text-primary">Privacy</Link>
+            <Link to="/pages/$slug" params={{ slug: "terms" }} className="hover:text-primary">Terms</Link>
+            <Link to="/pages/$slug" params={{ slug: "contact" }} className="hover:text-primary">Contact</Link>
+          </nav>
+          {branding.footerLine1 && <p>{branding.footerLine1}</p>}
+          {branding.footerLine2 && <p>{branding.footerLine2}</p>}
+        </footer>
+        <BottomNav />
       </div>
+
     </QueryClientProvider>
   );
 }
