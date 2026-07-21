@@ -111,6 +111,7 @@ function AdminPage() {
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
       {tab === "assets" && <AdminAssetsTab />}
+      {tab === "tutorials" && <AdminTutorialsTab />}
     </PageShell>
   );
 }
