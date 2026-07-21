@@ -26,6 +26,16 @@ export function usePremium() {
         if (mounted) { setIsPremium(true); setLoading(false); }
         return;
       }
+      // comped (admin-created free-access) bypass
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_comped")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profile?.is_comped) {
+        if (mounted) { setIsPremium(true); setLoading(false); }
+        return;
+      }
       const { data: sub } = await supabase
         .from("user_subscriptions")
         .select("status, expires_at")

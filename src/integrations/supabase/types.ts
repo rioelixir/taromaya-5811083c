@@ -547,6 +547,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          is_comped: boolean
           terms_accepted_at: string | null
           updated_at: string
         }
@@ -556,6 +557,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          is_comped?: boolean
           terms_accepted_at?: string | null
           updated_at?: string
         }
@@ -565,6 +567,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          is_comped?: boolean
           terms_accepted_at?: string | null
           updated_at?: string
         }

@@ -190,8 +190,15 @@ function ascendantTropical(date: Date, lat: number, lonEast: number): number {
   const eps = deg2rad(epsDeg);
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
-  const y = -Math.cos(ramc);
-  const x = Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc);
+  // Ecliptic longitude of the Ascendant (Meeus, Astronomical Algorithms).
+  // The rising point satisfies tan(λ) = -cos(H) / (sin ε · tan φ + cos ε · sin H),
+  // but that identity admits two solutions 180° apart (ascendant and
+  // descendant). The correct branch is atan2(cos H, -(sin ε tan φ + cos ε sin H)),
+  // which lands on the rising point in every non-polar chart. Using atan2 on
+  // the raw (numerator, denominator) form silently returns the descendant
+  // (a 180° sign flip in the resulting Lagna) about half the time.
+  const y = Math.cos(ramc);
+  const x = -(Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc));
   return norm360(rad2deg(Math.atan2(y, x)));
 }
 
