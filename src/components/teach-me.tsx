@@ -177,7 +177,7 @@ export function TeachMe({
           <div className="h-full w-full max-w-2xl overflow-y-auto bg-background border-l border-primary/20 shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-primary/15 bg-background/95 backdrop-blur px-5 py-3">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.35em] text-primary">Occult Codex</div>
+                <div className="text-[10px] uppercase tracking-[0.35em] text-primary">Teach me</div>
                 <div className="font-display text-lg gold-text">Teach me: {module}</div>
               </div>
               <div className="flex items-center gap-2">
