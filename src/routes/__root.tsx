@@ -17,6 +17,7 @@ import { useBackgroundImage } from "@/hooks/use-background-image";
 import { AutoTranslator } from "@/components/auto-translator";
 import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
 import { useBranding } from "@/hooks/use-branding";
+import { TourHighlighter } from "@/components/tour-highlighter";
 
 function NotFoundComponent() {
   return (
@@ -235,6 +236,7 @@ function RootComponent() {
       <div className="relative min-h-dvh">
         {!chromeHidden && <Sidebar />}
         <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
+          <TourHighlighter />
           <Outlet />
         </main>
         {!chromeHidden && (

@@ -51,7 +51,7 @@ function Home() {
       </p>
 
       {/* Primary CTA */}
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap gap-3" data-tour="hero-start">
         <Link
           to="/tarot"
           className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-all"
@@ -73,7 +73,7 @@ function Home() {
       <TutorialModule />
 
       {/* Quick actions — 4 large tiles */}
-      <section className="mt-12">
+      <section className="mt-12" data-tour="quick-actions">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl">Quick actions</h2>
         </div>
@@ -101,6 +101,7 @@ function Home() {
         <div className="grid grid-cols-1 gap-3 sm:gap-4">
           <button
             type="button"
+            data-tour="guides"
             onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
             className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
           >
@@ -120,6 +121,7 @@ function Home() {
       <section className="mt-10">
         <button
           type="button"
+          data-tour="explore-all"
           onClick={() => document.querySelector<HTMLButtonElement>('[aria-label="Open menu"]')?.click()}
           className="w-full flex items-center justify-between rounded-2xl border border-border/40 bg-white/60 px-5 py-4 text-left hover:bg-white/90 transition"
         >

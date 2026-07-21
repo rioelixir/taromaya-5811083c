@@ -154,6 +154,7 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setOpen(true)}
+        data-tour="menu-button"
         className="fixed top-3 left-3 z-40 h-11 w-11 grid place-items-center rounded-full glass gold-border hover:bg-white/40 transition"
         aria-label="Open menu"
       >

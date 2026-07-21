@@ -419,3 +419,18 @@
   animation: shoot 14s linear infinite;
   opacity: 0;
 }
+
+/* Tutorial deep-link highlight */
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.55), 0 0 0 6px rgba(168, 85, 247, 0.15); }
+  50%      { box-shadow: 0 0 0 8px rgba(168, 85, 247, 0.15), 0 0 0 16px rgba(168, 85, 247, 0.0); }
+}
+.tour-highlight {
+  position: relative;
+  border-radius: 14px;
+  animation: tour-pulse 1.6s ease-in-out infinite;
+  outline: 2px solid rgba(168, 85, 247, 0.85);
+  outline-offset: 4px;
+  scroll-margin-top: 96px;
+  z-index: 30;
+}

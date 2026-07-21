@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 type Callout = { kind: "tip" | "warn" | "do" | "dont" | "pro" | "note"; text: string };
+type DeepLink = { to: string; tour?: string; label: string };
 type Step = {
   id: string;
   icon: typeof Sparkles;
@@ -15,6 +16,7 @@ type Step = {
   lede: string;
   bullets: string[];
   callouts?: Callout[];
+  link?: DeepLink;
   cta?: { to: string; label: string };
 };
 
@@ -32,6 +34,7 @@ const STEPS: Step[] = [
     callouts: [
       { kind: "pro", text: "Enter your birth details once — every module autofills privately from your profile." },
     ],
+    link: { to: "/", tour: "hero-start", label: "Show me the home hero" },
   },
   {
     id: "dashboard",
@@ -46,6 +49,7 @@ const STEPS: Step[] = [
     callouts: [
       { kind: "tip", text: "Tap “Explore all modules” at the bottom to open the full menu drawer." },
     ],
+    link: { to: "/", tour: "quick-actions", label: "Highlight Quick Actions" },
   },
   {
     id: "navigation",
@@ -61,6 +65,7 @@ const STEPS: Step[] = [
     callouts: [
       { kind: "note", text: "Language toggle (English • हिंदी • Roman Hindi) lives in the header menu." },
     ],
+    link: { to: "/", tour: "menu-button", label: "Point to the Menu button" },
   },
   {
     id: "birth",
@@ -76,6 +81,7 @@ const STEPS: Step[] = [
       { kind: "warn", text: "Accurate time of birth matters — even a few minutes changes the ascendant." },
       { kind: "do", text: "Use place-of-birth autocomplete to lock the correct latitude/longitude/timezone." },
     ],
+    link: { to: "/profile", tour: "birth-details", label: "Open Birth details" },
   },
   {
     id: "features",
@@ -92,6 +98,7 @@ const STEPS: Step[] = [
     callouts: [
       { kind: "pro", text: "Every chart is pinch-to-zoom and pan-friendly — tap the chart to open fullscreen." },
     ],
+    link: { to: "/tarot", tour: "deck-picker", label: "Show me the deck picker" },
   },
   {
     id: "workflow",
@@ -108,6 +115,7 @@ const STEPS: Step[] = [
     callouts: [
       { kind: "tip", text: "Every reading is stored in History — reopen it any time from your profile." },
     ],
+    link: { to: "/tarot", tour: "spread-picker", label: "Highlight the spread picker" },
   },
   {
     id: "best",
@@ -121,6 +129,7 @@ const STEPS: Step[] = [
       "Privacy — your birth data is encrypted at rest and never shown to other users.",
       "Accuracy — use the Diagnostics panel (admins) to verify calculation versions.",
     ],
+    link: { to: "/", tour: "guides", label: "Open the Guides section" },
   },
   {
     id: "faq",
@@ -132,6 +141,7 @@ const STEPS: Step[] = [
       "Share readings via a public link.",
       "Download up to 10 PDF reports per month (unlimited for staff).",
     ],
+    link: { to: "/", tour: "explore-all", label: "Show all modules" },
     cta: { to: "/tarot", label: "Start using Taromaya" },
   },
 ];
@@ -403,6 +413,24 @@ export function TutorialModule() {
                 })}
               </div>
             ) : null}
+
+            {current.link && (
+              <div className="mt-5">
+                <Link
+                  to={current.link.to}
+                  search={current.link.tour ? { tour: current.link.tour } as never : undefined}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 transition"
+                >
+                  <Compass className="h-4 w-4" />
+                  {current.link.label}
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+                <div className="mt-1.5 text-[11px] text-muted-foreground">
+                  Opens the page and highlights the exact spot for a few seconds.
+                </div>
+              </div>
+            )}
+
 
             {/* FAQ on the last step */}
             {step === total - 1 && (

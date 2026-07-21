@@ -355,7 +355,7 @@ function TarotPage() {
 
         {!headerCollapsed && (
           <>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2" data-tour="spread-picker">
               {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
                 const active = k === spreadKey;
                 return (
@@ -463,7 +463,7 @@ function TarotPage() {
           ))}
 
           {/* Five deck stacks — bottom right */}
-          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none">
+          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none" data-tour="deck-picker">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
               Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
             </div>
