@@ -37,20 +37,28 @@ function meanObliquity(date: Date): number {
   return 23.439291 - 0.0130042 * T - 1.64e-7 * T * T + 5.036e-7 * T * T * T;
 }
 
+// TRUE obliquity (mean + nutation-in-obliquity). Pairs correctly with GAST.
+function trueObliquity(date: Date): number {
+  try {
+    return A.e_tilt(A.MakeTime(date)).tobl;
+  } catch {
+    return meanObliquity(date);
+  }
+}
+
 function mcTropical(date: Date, lonEast: number): number {
-  const gmstH = A.SiderealTime(date);
-  const lstDeg = norm360(gmstH * 15 + lonEast);
-  const eps = deg2rad(meanObliquity(date));
-  // MC longitude = atan2(sin(RAMC), cos(RAMC)*cos(eps))
+  const gastH = A.SiderealTime(date); // GAST hours
+  const lstDeg = norm360(gastH * 15 + lonEast);
+  const eps = deg2rad(trueObliquity(date));
   const ramc = deg2rad(lstDeg);
   const mc = rad2deg(Math.atan2(Math.sin(ramc), Math.cos(ramc) * Math.cos(eps)));
   return norm360(mc);
 }
 
 function ascendantTrop(date: Date, lat: number, lonEast: number): number {
-  const gmstH = A.SiderealTime(date);
-  const lstDeg = norm360(gmstH * 15 + lonEast);
-  const eps = deg2rad(meanObliquity(date));
+  const gastH = A.SiderealTime(date);
+  const lstDeg = norm360(gastH * 15 + lonEast);
+  const eps = deg2rad(trueObliquity(date));
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
   const y = -Math.cos(ramc);
@@ -58,29 +66,83 @@ function ascendantTrop(date: Date, lat: number, lonEast: number): number {
   return norm360(rad2deg(Math.atan2(y, x)));
 }
 
-// Simplified Placidus: use equal-house fallback with MC anchoring for cusps 4/10 and Asc for 1/7.
-// Full Placidus requires iterative time-of-day integration; we implement an approximation
-// using proportional semi-arc which is accurate enough for display.
-function placidusCusps(asc: number, mc: number): number[] {
+// ── Placidus (real): iterative semi-arc trisection.
+// For each intermediate cusp (11, 12, 2, 3) we solve for the ecliptic longitude
+// whose right-ascension offset from RAMC equals the classical fraction of its
+// semi-diurnal or semi-nocturnal arc. Falls back to Porphyry at high latitudes
+// where the cusp longitude would be circumpolar (Placidus is undefined there).
+function porphyryCusps(asc: number, mc: number): number[] {
   const cusps = new Array(12).fill(0);
-  cusps[0] = asc;
-  cusps[9] = mc;
-  cusps[6] = norm360(asc + 180);
-  cusps[3] = norm360(mc + 180);
-  // Interpolate intermediate cusps linearly between Asc & MC across quadrants.
-  const q = (start: number, end: number) => {
+  cusps[0] = asc; cusps[9] = mc;
+  cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
+  const tri = (start: number, end: number) => {
     let d = end - start;
     if (d < 0) d += 360;
     return [norm360(start + d / 3), norm360(start + (2 * d) / 3)];
   };
-  const [c11, c12] = q(cusps[9], cusps[0]);
+  [cusps[10], cusps[11]] = tri(cusps[9], cusps[0]);
+  [cusps[1],  cusps[2]]  = tri(cusps[0], cusps[3]);
+  [cusps[4],  cusps[5]]  = tri(cusps[3], cusps[6]);
+  [cusps[7],  cusps[8]]  = tri(cusps[6], cusps[9]);
+  return cusps;
+}
+
+function placidusIntermediate(
+  RAMCdeg: number, epsDeg: number, phiDeg: number,
+  houseNum: 11 | 12 | 2 | 3,
+): number | null {
+  const eps = deg2rad(epsDeg);
+  const phi = deg2rad(phiDeg);
+  // Initial guess along the ecliptic
+  const initOffset = { 11: 30, 12: 60, 2: 120, 3: 150 }[houseNum];
+  let lam = deg2rad(norm360(RAMCdeg + initOffset));
+  const TWO_PI = 2 * Math.PI;
+  for (let i = 0; i < 60; i++) {
+    const sL = Math.sin(lam), cL = Math.cos(lam);
+    const ra = Math.atan2(sL * Math.cos(eps), cL); // radians
+    const dec = Math.asin(sL * Math.sin(eps));
+    const cosArg = -Math.tan(dec) * Math.tan(phi);
+    if (cosArg <= -1 || cosArg >= 1) return null; // circumpolar → undefined
+    const SD = Math.acos(cosArg);       // semi-diurnal arc (0..π)
+    const SN = Math.PI - SD;             // semi-nocturnal arc
+    // Target RA offset from RAMC for each cusp (Placidus trisection).
+    let target: number;
+    if (houseNum === 11)      target = SD / 3;
+    else if (houseNum === 12) target = (2 * SD) / 3;
+    else if (houseNum === 3)  target = SD + SN / 3;
+    else                       target = SD + (2 * SN) / 3; // house 2
+    let cur = ra - deg2rad(RAMCdeg);
+    cur = ((cur % TWO_PI) + TWO_PI) % TWO_PI;
+    let diff = target - cur;
+    // Wrap to (-π, π] for correct signed correction
+    if (diff > Math.PI) diff -= TWO_PI;
+    if (diff < -Math.PI) diff += TWO_PI;
+    lam += diff;
+    if (Math.abs(diff) < 1e-10) break;
+  }
+  return norm360(rad2deg(lam));
+}
+
+function placidusCusps(asc: number, mc: number, RAMCdeg: number, epsDeg: number, phiDeg: number): number[] {
+  const cusps = new Array(12).fill(0);
+  cusps[0] = asc; cusps[9] = mc;
+  cusps[6] = norm360(asc + 180); cusps[3] = norm360(mc + 180);
+  const c11 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 11);
+  const c12 = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 12);
+  const c2  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 2);
+  const c3  = placidusIntermediate(RAMCdeg, epsDeg, phiDeg, 3);
+  // If any cusp is circumpolar-undefined, fall back to Porphyry for all
+  // intermediates (mixing systems would be worse than a clean fallback).
+  if (c11 == null || c12 == null || c2 == null || c3 == null) {
+    return porphyryCusps(asc, mc);
+  }
   cusps[10] = c11; cusps[11] = c12;
-  const [c2, c3] = q(cusps[0], cusps[3]);
-  cusps[1] = c2; cusps[2] = c3;
-  const [c5, c6] = q(cusps[3], cusps[6]);
-  cusps[4] = c5; cusps[5] = c6;
-  const [c8, c9] = q(cusps[6], cusps[9]);
-  cusps[7] = c8; cusps[8] = c9;
+  cusps[1]  = c2;  cusps[2]  = c3;
+  // Opposing cusps (5,6,8,9) are 180° from 11,12,2,3.
+  cusps[4] = norm360(c11 + 180); // house 5 opposite 11
+  cusps[5] = norm360(c12 + 180); // house 6 opposite 12
+  cusps[7] = norm360(c2 + 180);  // house 8 opposite 2
+  cusps[8] = norm360(c3 + 180);  // house 9 opposite 3
   return cusps;
 }
 
