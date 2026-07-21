@@ -690,16 +690,6 @@ function PlacedCardView({
             <Lock className="h-3 w-3 text-gold" />
           </div>
         )}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="rounded-full bg-black/70 border border-white/20 p-1 hover:bg-red-500/40"
-          title="Remove"
-        >
-          <X className="h-3 w-3" />
-        </button>
       </div>
 
       {card.flipped ? null : (
