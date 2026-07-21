@@ -17,30 +17,50 @@ const PYTH: Record<string, number> = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// LO SHU GRID (Chinese numerology from date of birth)
+// LO SHU GRID (Vedic numerology from date of birth)
 // ─────────────────────────────────────────────────────────────
-// Traditional 3×3 magic square positions:
+// Traditional 3×3 magic square (every row, column & diagonal = 15):
 //   4 9 2
 //   3 5 7
 //   8 1 6
-export type LoShuGrid = {
-  counts: Record<number, number>;  // 1..9 occurrences in DOB digits (with driver+conductor)
-  driver: number;                  // day-of-month reduced (mulank)
-  conductor: number;               // full-DOB reduced (bhagyank)
-  missing: number[];
-  strong: number[];                // 3+ occurrences
-  planes: {
-    mind: { line: [3, 9, 5]; count: number; complete: boolean };
-    soul: { line: [2, 5, 8]; count: number; complete: boolean };
-    practical: { line: [1, 5, 9]; count: number; complete: boolean };
-    thought: { line: [4, 9, 2]; count: number; complete: boolean };
-    will: { line: [3, 5, 7]; count: number; complete: boolean };
-    action: { line: [8, 1, 6]; count: number; complete: boolean };
-    golden: { line: [4, 3, 8]; count: number; complete: boolean };
-    silver: { line: [2, 7, 6]; count: number; complete: boolean };
-  };
-  interpretation: { number: number; strength: "missing" | "weak" | "balanced" | "strong"; note: string }[];
+//
+// Ruleset used throughout the app (fixed for internal consistency):
+//   • Digits pooled from DOB (day + month + full year) PLUS the mulank
+//     (driver = reduced day) and bhagyank (conductor = reduced full DOB).
+//     This is the widely taught Vedic Lo Shu convention. Other schools use
+//     only raw DOB digits — noted here so results are reproducible, not
+//     presented as the only valid rule.
+//   • Only digits 1..9 are placed (0 is ignored — it has no cell).
+//   • Strength buckets:   0 → missing • 1 → weak • 2 → balanced • ≥3 → strong.
+//   • An "arrow" line is any of the 8 magic-square lines (3 rows, 3 columns,
+//     2 diagonals). A line is a STRENGTH arrow if all three cells are
+//     present, a WEAKNESS arrow if all three cells are missing.
+export type LoShuStrength = "missing" | "weak" | "balanced" | "strong";
+export type LoShuLineKey =
+  | "thought" | "emotion" | "action"
+  | "intellect" | "will" | "feelings"
+  | "prosperity" | "spirituality";
+export type LoShuLine = {
+  line: [number, number, number];
+  count: number;      // total digit occurrences across the three cells
+  present: number;    // how many of the three cells have ≥1 occurrence
+  strength: boolean;  // all three present → strength arrow
+  weakness: boolean;  // all three missing → weakness arrow
+  label: string;
+  // Back-compat with older UI code that read `.complete`.
+  complete: boolean;
 };
+export type LoShuGrid = {
+  counts: Record<number, number>;
+  driver: number;
+  conductor: number;
+  missing: number[];
+  strong: number[];
+  planes: Record<LoShuLineKey, LoShuLine>;
+  arrows: { strengths: LoShuLineKey[]; weaknesses: LoShuLineKey[] };
+  interpretation: { number: number; strength: LoShuStrength; note: string }[];
+};
+
 const NOTES: Record<number, string> = {
   1: "Sun — identity, willpower, leadership.",
   2: "Moon — intuition, sensitivity, partnership.",
@@ -52,8 +72,37 @@ const NOTES: Record<number, string> = {
   8: "Saturn — responsibility, karma, wealth cycles.",
   9: "Mars — courage, ambition, completion.",
 };
+
+const LINE_DEFS: { key: LoShuLineKey; line: [number, number, number]; label: string }[] = [
+  { key: "thought",      line: [4, 9, 2], label: "Mental plane (row): thinking & memory" },
+  { key: "emotion",      line: [3, 5, 7], label: "Emotional plane (row): feelings & will" },
+  { key: "action",       line: [8, 1, 6], label: "Practical plane (row): doing & manifesting" },
+  { key: "intellect",    line: [4, 3, 8], label: "Plane of intellect (column): analytical mind" },
+  { key: "will",         line: [9, 5, 1], label: "Plane of will (column): determination" },
+  { key: "feelings",     line: [2, 7, 6], label: "Plane of feelings (column): sensitivity" },
+  { key: "prosperity",   line: [4, 5, 6], label: "Plane of prosperity (diagonal): work & wealth" },
+  { key: "spirituality", line: [2, 5, 8], label: "Plane of spirituality (diagonal): soul path" },
+];
+
+function parseBirthDate(birthDate: string): { y: number; m: number; d: number } {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate.trim());
+  if (!match) throw new Error("Lo Shu: birthDate must be YYYY-MM-DD");
+  const y = Number(match[1]);
+  const m = Number(match[2]);
+  const d = Number(match[3]);
+  if (m < 1 || m > 12) throw new Error("Lo Shu: month out of range");
+  // Validate against actual calendar (rejects 31 Feb, 29 Feb non-leap, etc.)
+  const probe = new Date(Date.UTC(y, m - 1, d));
+  if (
+    probe.getUTCFullYear() !== y ||
+    probe.getUTCMonth() !== m - 1 ||
+    probe.getUTCDate() !== d
+  ) throw new Error("Lo Shu: invalid calendar date");
+  return { y, m, d };
+}
+
 export function loShuGrid(birthDate: string): LoShuGrid {
-  const [y, m, d] = birthDate.split("-").map(Number);
+  const { y, m, d } = parseBirthDate(birthDate);
   const driver = reduce(d);
   const conductor = reduce(dsum(y) + dsum(m) + dsum(d));
   const digits = [
@@ -65,31 +114,46 @@ export function loShuGrid(birthDate: string): LoShuGrid {
   ].filter((x) => x >= 1 && x <= 9);
   const counts: Record<number, number> = {};
   for (let i = 1; i <= 9; i++) counts[i] = 0;
-  digits.forEach((n) => (counts[n] = (counts[n] ?? 0) + 1));
+  digits.forEach((n) => { counts[n] += 1; });
   const missing = Object.entries(counts).filter(([, v]) => v === 0).map(([k]) => Number(k));
   const strong = Object.entries(counts).filter(([, v]) => v >= 3).map(([k]) => Number(k));
-  const line = (a: number, b: number, c: number) => counts[a] + counts[b] + counts[c];
-  const planes = {
-    mind:      { line: [3, 9, 5] as [3,9,5], count: line(3,9,5), complete: counts[3]>0 && counts[9]>0 && counts[5]>0 },
-    soul:      { line: [2, 5, 8] as [2,5,8], count: line(2,5,8), complete: counts[2]>0 && counts[5]>0 && counts[8]>0 },
-    practical: { line: [1, 5, 9] as [1,5,9], count: line(1,5,9), complete: counts[1]>0 && counts[5]>0 && counts[9]>0 },
-    thought:   { line: [4, 9, 2] as [4,9,2], count: line(4,9,2), complete: counts[4]>0 && counts[9]>0 && counts[2]>0 },
-    will:      { line: [3, 5, 7] as [3,5,7], count: line(3,5,7), complete: counts[3]>0 && counts[5]>0 && counts[7]>0 },
-    action:    { line: [8, 1, 6] as [8,1,6], count: line(8,1,6), complete: counts[8]>0 && counts[1]>0 && counts[6]>0 },
-    golden:    { line: [4, 3, 8] as [4,3,8], count: line(4,3,8), complete: counts[4]>0 && counts[3]>0 && counts[8]>0 },
-    silver:    { line: [2, 7, 6] as [2,7,6], count: line(2,7,6), complete: counts[2]>0 && counts[7]>0 && counts[6]>0 },
-  };
+
+  const planes = {} as Record<LoShuLineKey, LoShuLine>;
+  const strengths: LoShuLineKey[] = [];
+  const weaknesses: LoShuLineKey[] = [];
+  for (const def of LINE_DEFS) {
+    const [a, b, c] = def.line;
+    const count = counts[a] + counts[b] + counts[c];
+    const present = (counts[a] > 0 ? 1 : 0) + (counts[b] > 0 ? 1 : 0) + (counts[c] > 0 ? 1 : 0);
+    const isStrength = present === 3;
+    const isWeakness = present === 0;
+    planes[def.key] = {
+      line: def.line,
+      count,
+      present,
+      strength: isStrength,
+      weakness: isWeakness,
+      label: def.label,
+      complete: isStrength,
+    };
+    if (isStrength) strengths.push(def.key);
+    if (isWeakness) weaknesses.push(def.key);
+  }
+
   const interpretation = Array.from({ length: 9 }, (_, i) => {
     const n = i + 1;
     const c = counts[n];
-    const strength = c === 0 ? "missing" : c === 1 ? "weak" : c === 2 ? "balanced" : "strong";
+    const strength: LoShuStrength =
+      c === 0 ? "missing" : c === 1 ? "weak" : c === 2 ? "balanced" : "strong";
     const notePrefix =
-      strength === "missing" ? "Karmic gap — cultivate consciously. " :
-      strength === "strong"  ? "Amplified vibration — channel wisely. " :
-      strength === "balanced"? "Balanced expression. " : "Present but subtle. ";
-    return { number: n, strength: strength as LoShuGrid["interpretation"][number]["strength"], note: notePrefix + NOTES[n] };
+      strength === "missing"  ? "Karmic gap — cultivate consciously. " :
+      strength === "strong"   ? "Amplified vibration — channel wisely. " :
+      strength === "balanced" ? "Balanced expression. " :
+                                "Present but subtle. ";
+    return { number: n, strength, note: notePrefix + NOTES[n] };
   });
-  return { counts, driver, conductor, missing, strong, planes, interpretation };
+
+  return { counts, driver, conductor, missing, strong, planes, arrows: { strengths, weaknesses }, interpretation };
 }
 
 // ─────────────────────────────────────────────────────────────
