@@ -48,32 +48,41 @@ export function AIInterpretation({
           ? "Write the ENTIRE reading in Roman Hinglish — Hindi words written in Latin/English script, natural and conversational."
           : "Write the reading in simple English.";
       const system = [
-        `You are Taromaya's friendly guide for the "${module}" module.`,
+        `You are Taromaya's master ${module} interpreter — an experienced Vedic astrologer + tarot reader speaking to a curious 10-year-old best friend.`,
         langInstr,
-        "Write like you're talking to a curious 10-year-old best friend: super simple everyday words, short sentences, warm and kind. NO jargon. If you must use a special word, explain it in 4-5 words right after.",
-        "Use clean markdown: ## short headings, **bold** the key idea, tiny paragraphs (1-2 lines), bullet points.",
-        "Ground every point in the CONTEXT and MODULE DATA. Never invent numbers, dates, or placements.",
-        "Structure: ## What's happening (2 lines) → ## What it means for you (3 bullets) → ## What to do this week (3 tiny tips).",
-        "Keep the whole reading under 220 words. No fluff. No death, medical, or legal predictions.",
-      ].join(" ");
+        "Voice: warm, precise, ELI10. Short sentences. Concrete images. Explain any jargon in 4-5 words.",
+        "You MUST ground every claim in the CONTEXT + MODULE DATA blocks. Never invent numbers, degrees, dasha lords, dates, or placements.",
+        "OUTPUT SCHEMA — use exactly these markdown headings in this order, and skip any section that CONTEXT does not support:",
+        "## Summary  (2 short lines)",
+        "## What the chart is saying  (3-4 bullets, each cites the placement e.g. **Moon in Cancer** or **Saturn Mahadasha**)",
+        "## Why (planetary reasoning)  (1-2 bullets — houses, lords, aspects, dignity)",
+        "## Right now (transits + dasha)  (1-2 bullets tying today's sky to natal chart)",
+        "## What to do this week  (3 tiny, doable steps)",
+        "## Things to gently avoid  (2 bullets)",
+        "## Lucky today  Colors: … · Numbers: … · Best time-window: …",
+        "## Simple remedy  (1 line — mantra / gesture / offering, no quantities you weren't given)",
+        "## Confidence  A single line: `Confidence: HIGH` or `MEDIUM` or `LOW` — HIGH only when CONTEXT gives full birth chart + dasha + transits.",
+        "Rules: total under 320 words. No emojis in headings. No death/medical/legal/exam predictions. No fabricated Sanskrit quotes.",
+      ].join("\n");
       const prompt = [
         `MODULE: ${module}`,
         intent ? `USER INTENT: ${intent}` : "",
         "",
-        "=== CONTEXT ===",
+        "=== CONTEXT (birth chart + today's sky) ===",
         context,
         "",
-        "=== MODULE DATA ===",
+        "=== MODULE DATA (this page's live values) ===",
         snapshot?.trim() || "(no page data — read the module from context)",
         "",
-        "Write the super-simple reading now.",
+        "Write the reading now, following the exact heading order above.",
       ].filter(Boolean).join("\n");
 
       const res = await fetch("/api/ai-reading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ system: system.slice(0, 2000), prompt: prompt.slice(0, 4000) }),
+        body: JSON.stringify({ system: system.slice(0, 3000), prompt: prompt.slice(0, 6000) }),
       });
+
       if (!res.ok || !res.body) throw new Error(await res.text().catch(() => "Failed"));
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -92,20 +101,40 @@ export function AIInterpretation({
     }
   }
 
+  const confidence = (() => {
+    const m = /Confidence:\s*(HIGH|MEDIUM|LOW)/i.exec(text);
+    return m ? m[1].toUpperCase() : null;
+  })();
+  const confidenceColor =
+    confidence === "HIGH"
+      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/40"
+      : confidence === "MEDIUM"
+      ? "bg-amber-500/15 text-amber-700 border-amber-500/40"
+      : confidence === "LOW"
+      ? "bg-rose-500/15 text-rose-700 border-rose-500/40"
+      : "";
+
   return (
     <section className="mt-8 glass rounded-3xl p-6 sm:p-8 border border-primary/20">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.35em] text-primary/80">
-            AI Interpretation
+          <div className="flex items-center gap-2">
+            <div className="text-[10px] uppercase tracking-[0.35em] text-primary/80">
+              AI Interpretation
+            </div>
+            {confidence && (
+              <span className={`text-[10px] uppercase tracking-widest border rounded-full px-2 py-0.5 ${confidenceColor}`}>
+                {confidence} confidence
+              </span>
+            )}
           </div>
           <h2 className="mt-1 font-display text-2xl">
-            <span className="gold-text">Your simple {module} reading</span>
+            <span className="gold-text">Your {module} reading</span>
           </h2>
           <p className="mt-1 text-sm text-foreground/80">
             {profile
-              ? `Made just for ${profile.full_name} — in easy words.`
-              : "Save your birth details for a personal reading."}
+              ? `Grounded in ${profile.full_name}'s real chart + today's sky.`
+              : "Save your birth details for a personalized, chart-grounded reading."}
           </p>
         </div>
         <Button
@@ -122,6 +151,7 @@ export function AIInterpretation({
           )}
         </Button>
       </div>
+
 
       {error && (
         <div className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

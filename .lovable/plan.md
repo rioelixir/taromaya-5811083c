@@ -1,50 +1,38 @@
-## Redesign roadmap (phased)
+# Taromaya Master Overhaul — Execution Plan
 
-You picked "Everything, phased" + keep light purple + hamburger for deep modules. I'll ship one phase per turn so nothing that works today breaks silently. This plan is Phase 1; later phases follow the same pattern.
+The prompt covers 15 phases. Trying to ship all of them in one turn produces shallow changes everywhere and regressions. I'll batch by user-visible impact, ship each batch fully verified, then move to the next.
 
-### Phase 1 — Shell, Home, Design system (this turn)
+Where we already are (recent turns): Kundli UI fixed, Dasha/Panchang/Vargas verified, Tarot rebuilt with strict deck modes + CSPRNG, Numerology audit (Chaldean + Pythagorean) with karmic-debt coverage + compound numbers, a11y clean, tests green.
 
-**Design tokens (`src/styles.css`)**
-- Introduce a real type scale (display / h1 / h2 / body / caption) with consistent line-heights.
-- Introduce a real spacing scale (`--space-1 … --space-12`) so pages stop inventing paddings.
-- Introduce a single elevation scale (2 levels only) and remove nested-glass shadow stacking.
-- Keep the light purple palette; nudge contrast so body text passes AA on the aurora background.
-- Add a `.container-page` utility so every page has the same max-width and horizontal rhythm.
+## Batch A — AI quality + accuracy (Phases 2, 3, 9)
+The single biggest lever for "feels like $10M".
+1. Rewrite the master AI prompt (`ai_prompts` table + `src/routes/api/ai-reading.ts`) to require: Summary → Detailed Analysis → Planetary Reasoning → Supporting Houses/Yogas/Dasha → Current Transit Effect → Confidence Score → Recommended Actions → Avoid → Best Dates → Lucky Colors/Numbers → Remedies → Spiritual Guidance. ELI10 tone preserved.
+2. Feed every AI call the user's real chart context (Lagna, Moon, Sun, current Mahadasha/Antardasha, active transits, nakshatra+pada, dominant yogas/doshas) from the private profile — not just name+DOB.
+3. AI Chat (`/ai-guide`): add conversation memory (send full history), astrology-grounded system prompt, follow-up prompting, and citation of chart factors.
+4. Add a `confidence` field surfaced in the UI.
 
-**Navigation (`src/components/nav.tsx` + `__root.tsx`)**
-- Bottom tabs cut to **4**: Home · Tarot · History · Profile.
-- New hamburger sheet on every screen (mobile + desktop) that opens the full 40-module catalog, grouped and searchable. Sidebar becomes hamburger-triggered only — no more permanent 256px sidebar eating desktop width.
-- Desktop layout collapses to a centered container (max-w-6xl) instead of `pl-64`.
+## Batch B — Module completeness sweep (Phases 4, 10, 15)
+Walk every route in `src/routes/`, fix broken/empty states, ensure each has: birth autofill → calculation → chart → AI interpretation → remedies. Replace any remaining placeholder copy. Add error boundaries + retry on every loader.
 
-**Home (`src/routes/index.tsx`)**
-- Strip the 3 module grids (24 tarot tiles) → replaced by a single "Quick Actions" row (Tarot · Kundli · Panchang · AI).
-- Above it: greeting + one primary CTA ("Start a Reading") + today's date.
-- Below it: "Today" glance (sun sign · moon · nakshatra), then "Recent" (last reading if any), then "Explore all modules →" link that opens the hamburger catalog.
-- Remove the celestial mandala backdrop from home (it's decorative noise on first paint).
+## Batch C — Premium features (Phase 13)
+- PDF export polish across all reports (already have quota).
+- Share report links (public read via `TO anon` on a `shared_reports` table with random slug + expiry).
+- Transit Calendar route.
+- Saved bookmarks table + UI.
+- Push notifications (browser Push API) opt-in for daily horoscope.
 
-**Routing bug fix**
-Console shows `Could not find match for matchId "//"`. Audit `<Link to="…">` calls with empty or trailing-slash paths and fix them.
+## Batch D — Perf, security, tests (Phases 6, 8, 11, 12)
+- Lazy-load heavy chart components; preload LCP hero.
+- Run `security--run_security_scan`; fix findings.
+- Add Vitest coverage for `vedic.ts`, `panchang.ts`, `numerology.ts`, `tarot-deck.ts`.
+- TypeScript strict pass; remove dead code.
 
-### Phase 2 — Reading flow (next turn)
-Tarot flow: choose type → shuffle → reveal → interpret, no intermediate screens. Simplify canvas UI, remove duplicate deck selectors, one-tap spread switching.
+## Out of scope this pass (needs your input)
+- Payments/subscription pricing changes (Phase 4 payments) — you already set fixed admin pricing; leave as-is unless you say otherwise.
+- Voice reading + full multilingual expansion beyond current EN/HI/Roman — heavy scope, propose as a later batch.
+- Analytics tracking (Phase 14) — needs a provider choice (PostHog vs. built-in Supabase logging).
 
-### Phase 3 — Module pages pass (next)
-Apply the new design tokens to Kundli / Panchang / Numerology / Compatibility / AI — remove nested cards, cut duplicate CTAs, one heading per page.
+## Recommended start
+**Batch A first.** It's the phase that most directly changes how the app "feels" and is the one every other module depends on (every module page renders an AI interpretation). One turn = new prompt schema + chart-context injection + AI chat memory + confidence field.
 
-### Phase 4 — Date service + perf pass (last)
-Central `src/lib/date.ts` with UTC storage / local display helpers, replace every ad-hoc `new Date(str)`. Route-level code splitting audit, memo audit, image lazy loading. You never described the specific date symptom so I'll fix the general timezone drift across birth-date storage + panchang day boundaries; if you have a specific repro, drop it before Phase 4.
-
-### What stays
-
-- All existing modules and their data (I'm redesigning the shell, not deleting features).
-- Light purple palette + gold accents.
-- Author's note flow.
-- Admin panel, auth, subscription gate, all backend behavior.
-
-### Technical notes
-
-- Files touched in Phase 1: `src/styles.css`, `src/routes/__root.tsx`, `src/components/nav.tsx` (rewritten), `src/routes/index.tsx` (rewritten), one new `src/components/module-catalog.tsx` for the hamburger sheet.
-- No DB migrations. No new dependencies.
-- No changes to `_authenticated/*` or the 40+ module routes yet — Phase 3.
-
-Reply "go" to run Phase 1, or tell me what to change.
+Reply **A**, **B**, **C**, or **D** to pick a batch, or name specific phases to prioritize differently.
