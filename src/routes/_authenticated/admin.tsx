@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "staff" | "plan" | "coupons" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding";
+type Tab = "overview" | "users" | "staff" | "plan" | "coupons" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
