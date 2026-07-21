@@ -5,6 +5,7 @@ import { useBirthProfile, useSaveBirthProfile } from "@/hooks/use-birth-profile"
 import { useEffect, useState } from "react";
 import { Loader2, Save, Lock, Sparkles, Check } from "lucide-react";
 import { toast } from "sonner";
+import { birthDetailsSchema, fieldErrors } from "@/lib/validation";
 
 export const Route = createFileRoute("/_authenticated/birth-details")({
   component: () => (
@@ -45,19 +46,29 @@ function BirthDetailsPage() {
     }
   }, [profile]);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const payload = {
+      full_name: form.full_name.trim(),
+      gender: form.gender || null,
+      birth_date: form.birth_date,
+      birth_time: form.birth_time.length === 5 ? `${form.birth_time}:00` : form.birth_time,
+      tz_offset_hours: Number(form.tz_offset_hours),
+      place: form.place.trim(),
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+    };
+    const errs = fieldErrors(birthDetailsSchema, payload);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast.error(Object.values(errs)[0] ?? "Please fix the highlighted fields.");
+      return;
+    }
+    setErrors({});
     try {
-      await save.mutateAsync({
-        full_name: form.full_name.trim(),
-        gender: form.gender || null,
-        birth_date: form.birth_date,
-        birth_time: form.birth_time.length === 5 ? `${form.birth_time}:00` : form.birth_time,
-        tz_offset_hours: Number(form.tz_offset_hours),
-        place: form.place.trim(),
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
-      });
+      await save.mutateAsync(payload);
       toast.success("Birth details saved — private to you.");
       nav({ to: "/deep-jyotish" });
     } catch (e) {
@@ -83,7 +94,7 @@ function BirthDetailsPage() {
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
-              <Field label="Full name (as you'd like it read)" required>
+              <Field label="Full name (as you'd like it read)" required error={errors.full_name}>
                 <input
                   className="input"
                   value={form.full_name}
@@ -106,9 +117,9 @@ function BirthDetailsPage() {
                     <option>Prefer not to say</option>
                   </select>
                 </Field>
-                <Field label="Timezone offset (hrs from UTC)" required>
+                <Field label="Timezone offset (hrs from UTC)" required error={errors.tz_offset_hours}>
                   <input
-                    type="number" step="0.25" className="input"
+                    type="number" step="0.25" min={-14} max={14} className="input"
                     value={form.tz_offset_hours}
                     onChange={(e) => setForm((f) => ({ ...f, tz_offset_hours: Number(e.target.value) }))}
                     required
@@ -117,15 +128,17 @@ function BirthDetailsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Birth date" required>
+                <Field label="Birth date" required error={errors.birth_date}>
                   <input
                     type="date" className="input"
+                    min="1900-01-01"
+                    max={new Date().toISOString().slice(0, 10)}
                     value={form.birth_date}
                     onChange={(e) => setForm((f) => ({ ...f, birth_date: e.target.value }))}
                     required
                   />
                 </Field>
-                <Field label="Birth time (24h, local)" required>
+                <Field label="Birth time (24h, local)" required error={errors.birth_time}>
                   <input
                     type="time" className="input"
                     value={form.birth_time}
@@ -135,7 +148,7 @@ function BirthDetailsPage() {
                 </Field>
               </div>
 
-              <Field label="Place (city, country)" required>
+              <Field label="Place (city, country)" required error={errors.place}>
                 <input
                   className="input"
                   value={form.place}
@@ -145,23 +158,24 @@ function BirthDetailsPage() {
               </Field>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Latitude" required>
+                <Field label="Latitude" required error={errors.latitude}>
                   <input
-                    type="number" step="0.0001" className="input"
+                    type="number" step="0.0001" min={-90} max={90} className="input"
                     value={form.latitude}
                     onChange={(e) => setForm((f) => ({ ...f, latitude: Number(e.target.value) }))}
                     required
                   />
                 </Field>
-                <Field label="Longitude" required>
+                <Field label="Longitude" required error={errors.longitude}>
                   <input
-                    type="number" step="0.0001" className="input"
+                    type="number" step="0.0001" min={-180} max={180} className="input"
                     value={form.longitude}
                     onChange={(e) => setForm((f) => ({ ...f, longitude: Number(e.target.value) }))}
                     required
                   />
                 </Field>
               </div>
+
 
               <div className="flex items-center justify-between gap-3 pt-2">
                 <p className="text-[11px] text-muted-foreground max-w-md">
@@ -212,8 +226,8 @@ function BirthDetailsPage() {
   );
 }
 
-function Field({ label, required, children }: {
-  label: string; required?: boolean; children: React.ReactNode;
+function Field({ label, required, error, children }: {
+  label: string; required?: boolean; error?: string; children: React.ReactNode;
 }) {
   return (
     <label className="block space-y-1.5">
@@ -221,6 +235,11 @@ function Field({ label, required, children }: {
         {label}{required && <span className="text-accent"> *</span>}
       </span>
       {children}
+      {error && (
+        <span role="alert" className="block text-[11px] text-red-600 font-medium">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
