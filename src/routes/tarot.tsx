@@ -90,8 +90,8 @@ function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [courtOnly, setCourtOnly] = useState(false);
-  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks(false));
+  const [rwMode, setRwMode] = useState<RWMode>("full");
+  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks("full"));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
