@@ -55,21 +55,21 @@ export function ChartZoom({ children, label = "Chart" }: ChartZoomProps) {
           role="dialog"
           aria-modal="true"
           aria-label={`${label} full screen`}
-          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex flex-col"
+          className="fixed inset-0 z-[9999] bg-white flex flex-col"
           onWheel={(e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? -0.15 : 0.15;
             setScale((s) => Math.min(6, Math.max(0.5, s + delta)));
           }}
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <span className="text-white font-semibold">{label}</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
+            <span className="text-gray-900 font-semibold">{label}</span>
             <div className="flex items-center gap-2">
-              <button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white" aria-label="Zoom out"><ZoomOut className="w-4 h-4" /></button>
-              <span className="text-white text-xs w-12 text-center">{Math.round(scale * 100)}%</span>
-              <button onClick={() => setScale((s) => Math.min(6, s + 0.25))} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white" aria-label="Zoom in"><ZoomIn className="w-4 h-4" /></button>
-              <button onClick={reset} className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white" aria-label="Reset zoom"><RotateCcw className="w-4 h-4" /></button>
-              <button onClick={() => setOpen(false)} className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white" aria-label="Close full screen"><X className="w-5 h-5" /></button>
+              <button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900" aria-label="Zoom out"><ZoomOut className="w-4 h-4" /></button>
+              <span className="text-gray-900 text-xs w-12 text-center font-semibold">{Math.round(scale * 100)}%</span>
+              <button onClick={() => setScale((s) => Math.min(6, s + 0.25))} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900" aria-label="Zoom in"><ZoomIn className="w-4 h-4" /></button>
+              <button onClick={reset} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900" aria-label="Reset zoom"><RotateCcw className="w-4 h-4" /></button>
+              <button onClick={() => setOpen(false)} className="p-2 rounded-full bg-gray-900 hover:bg-black text-white" aria-label="Close full screen"><X className="w-5 h-5" /></button>
             </div>
           </div>
           <div
@@ -95,7 +95,7 @@ export function ChartZoom({ children, label = "Chart" }: ChartZoomProps) {
               </div>
             </div>
           </div>
-          <div className="px-4 py-2 text-center text-white/60 text-xs border-t border-white/10">
+          <div className="px-4 py-2 text-center text-gray-600 text-xs border-t border-gray-200 bg-white">
             Drag to pan • Scroll or +/- to zoom • Double-click to reset • Esc to close
           </div>
         </div>
