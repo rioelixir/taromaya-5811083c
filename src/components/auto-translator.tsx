@@ -86,9 +86,13 @@ async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<
   for (let i = 0; i < strings.length; i += CHUNK) {
     const batch = strings.slice(i, i + CHUNK);
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) return {};
       const res = await fetch("/api/translate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ lang, strings: batch }),
       });
       if (!res.ok) continue;
