@@ -94,7 +94,7 @@ function BirthDetailsPage() {
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
-              <Field label="Full name (as you'd like it read)" required>
+              <Field label="Full name (as you'd like it read)" required error={errors.full_name}>
                 <input
                   className="input"
                   value={form.full_name}
@@ -117,9 +117,9 @@ function BirthDetailsPage() {
                     <option>Prefer not to say</option>
                   </select>
                 </Field>
-                <Field label="Timezone offset (hrs from UTC)" required>
+                <Field label="Timezone offset (hrs from UTC)" required error={errors.tz_offset_hours}>
                   <input
-                    type="number" step="0.25" className="input"
+                    type="number" step="0.25" min={-14} max={14} className="input"
                     value={form.tz_offset_hours}
                     onChange={(e) => setForm((f) => ({ ...f, tz_offset_hours: Number(e.target.value) }))}
                     required
@@ -128,15 +128,17 @@ function BirthDetailsPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Birth date" required>
+                <Field label="Birth date" required error={errors.birth_date}>
                   <input
                     type="date" className="input"
+                    min="1900-01-01"
+                    max={new Date().toISOString().slice(0, 10)}
                     value={form.birth_date}
                     onChange={(e) => setForm((f) => ({ ...f, birth_date: e.target.value }))}
                     required
                   />
                 </Field>
-                <Field label="Birth time (24h, local)" required>
+                <Field label="Birth time (24h, local)" required error={errors.birth_time}>
                   <input
                     type="time" className="input"
                     value={form.birth_time}
@@ -146,7 +148,7 @@ function BirthDetailsPage() {
                 </Field>
               </div>
 
-              <Field label="Place (city, country)" required>
+              <Field label="Place (city, country)" required error={errors.place}>
                 <input
                   className="input"
                   value={form.place}
@@ -156,23 +158,24 @@ function BirthDetailsPage() {
               </Field>
 
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Latitude" required>
+                <Field label="Latitude" required error={errors.latitude}>
                   <input
-                    type="number" step="0.0001" className="input"
+                    type="number" step="0.0001" min={-90} max={90} className="input"
                     value={form.latitude}
                     onChange={(e) => setForm((f) => ({ ...f, latitude: Number(e.target.value) }))}
                     required
                   />
                 </Field>
-                <Field label="Longitude" required>
+                <Field label="Longitude" required error={errors.longitude}>
                   <input
-                    type="number" step="0.0001" className="input"
+                    type="number" step="0.0001" min={-180} max={180} className="input"
                     value={form.longitude}
                     onChange={(e) => setForm((f) => ({ ...f, longitude: Number(e.target.value) }))}
                     required
                   />
                 </Field>
               </div>
+
 
               <div className="flex items-center justify-between gap-3 pt-2">
                 <p className="text-[11px] text-muted-foreground max-w-md">
