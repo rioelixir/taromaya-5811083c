@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
@@ -33,6 +33,16 @@ export function AIInterpretation({
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Cancel any in-flight stream if the component unmounts.
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  function stop() {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+  }
 
   async function reveal() {
     setLoading(true);
@@ -77,13 +87,36 @@ export function AIInterpretation({
         "Write the reading now, following the exact heading order above.",
       ].filter(Boolean).join("\n");
 
-      const res = await fetch("/api/ai-reading", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ system: system.slice(0, 3000), prompt: prompt.slice(0, 6000) }),
-      });
+      // Retry once on transient network / 5xx; surface 402/429 verbatim.
+      const doFetch = async () => {
+        const ctrl = new AbortController();
+        abortRef.current = ctrl;
+        return fetch("/api/ai-reading", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system: system.slice(0, 3000),
+            prompt: prompt.slice(0, 6000),
+          }),
+          signal: ctrl.signal,
+        });
+      };
 
-      if (!res.ok || !res.body) throw new Error(await res.text().catch(() => "Failed"));
+      let res = await doFetch();
+      if (!res.ok && res.status >= 500) {
+        await new Promise((r) => setTimeout(r, 600));
+        res = await doFetch();
+      }
+      if (!res.ok || !res.body) {
+        const body = await res.text().catch(() => "");
+        if (res.status === 402) {
+          throw new Error("The AI service is out of credits. Please try again later.");
+        }
+        if (res.status === 429) {
+          throw new Error("Too many readings right now — please wait a moment and try again.");
+        }
+        throw new Error(body || `Reading failed (${res.status}).`);
+      }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let acc = "";
@@ -95,16 +128,18 @@ export function AIInterpretation({
         setText(acc);
       }
     } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "Failed to generate reading");
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
   }
 
-  const confidence = (() => {
+  const confidence = useMemo(() => {
     const m = /Confidence:\s*(HIGH|MEDIUM|LOW)/i.exec(text);
     return m ? m[1].toUpperCase() : null;
-  })();
+  }, [text]);
   const confidenceColor =
     confidence === "HIGH"
       ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/40"
