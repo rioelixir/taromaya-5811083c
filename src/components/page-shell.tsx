@@ -1,9 +1,37 @@
 import { useState, type ReactNode } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Home, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { useBirthProfile } from "@/hooks/use-birth-profile";
+import { useAuth } from "@/hooks/use-auth";
+
+function BirthStatusChip() {
+  const { user } = useAuth();
+  const { data: profile, isLoading } = useBirthProfile();
+  if (!user || isLoading) return null;
+  if (profile) {
+    return (
+      <Link
+        to="/birth-details"
+        className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] uppercase tracking-widest text-emerald-200 hover:bg-emerald-500/15 transition"
+        title="Every module autofills from your saved details"
+      >
+        <Check className="h-3 w-3" /> Using saved details
+      </Link>
+    );
+  }
+  return (
+    <Link
+      to="/birth-details"
+      className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-1 text-[10px] uppercase tracking-widest text-gold hover:bg-gold/15 transition"
+      title="Save your birth details once — every module will autofill"
+    >
+      <Sparkles className="h-3 w-3" /> Save birth details
+    </Link>
+  );
+}
 
 function PageNav({
   collapsed,
