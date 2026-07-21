@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
+import { withSupremeSystem } from "./ai-system";
 
 const DrawSchema = z.object({
   spreadLabel: z.string(),
