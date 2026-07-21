@@ -28,7 +28,7 @@ export const DEFAULT_BRANDING: Branding = {
     "Enter the cosmic portal — tarot, Vedic astrology, kundli, panchang, numerology and an AI oracle in one luxury platform.",
   footerLine1: "2026 • Taromaya.",
   footerLine2: "App created by Riaa.",
-  footerLine3: "Reference from theplanetstoday.com",
+  footerLine3: "Reference by THEPLANETSTODAY.COM",
   theme: {},
 };
 

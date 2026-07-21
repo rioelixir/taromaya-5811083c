@@ -13,7 +13,7 @@ const BRAND_FIELDS: Field[] = [
   { key: "brand.hero.description", label: "Home hero description", multiline: true, placeholder: "Enter the cosmic portal…" },
   { key: "brand.footer.line1", label: "Footer line 1", placeholder: "2026 • Taromaya." },
   { key: "brand.footer.line2", label: "Footer line 2", placeholder: "App created by Riaa." },
-  { key: "brand.footer.line3", label: "Footer line 3", placeholder: "Reference from theplanetstoday.com" },
+  { key: "brand.footer.line3", label: "Footer line 3", placeholder: "Reference by THEPLANETSTODAY.COM" },
 ];
 
 const THEME_FIELDS: Field[] = [
