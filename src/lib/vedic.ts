@@ -190,9 +190,15 @@ function ascendantTropical(date: Date, lat: number, lonEast: number): number {
   const eps = deg2rad(epsDeg);
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
+  // Meeus, Astronomical Algorithms, formula for ecliptic longitude of the
+  // Ascendant. tan(λ) = -cos(RAMC) / (sin(ε)·tan(φ) + cos(ε)·sin(RAMC)).
+  // atan2 alone picks the wrong 180° branch when the denominator is negative;
+  // apply Meeus's explicit correction so we always land on the rising point.
   const y = -Math.cos(ramc);
   const x = Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc);
-  return norm360(rad2deg(Math.atan2(y, x)));
+  let asc = Math.atan(y / x);
+  if (x < 0) asc += Math.PI;
+  return norm360(rad2deg(asc));
 }
 
 /** Throws on missing / non-finite / out-of-range inputs so downstream
