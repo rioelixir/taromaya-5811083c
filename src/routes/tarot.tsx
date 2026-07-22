@@ -621,7 +621,6 @@ function PlacedCardView({
   card,
   onPointerDown,
   onFlip,
-  onRemove,
   onZoom,
 }: {
   card: PlacedCard;
