@@ -621,7 +621,6 @@ function PlacedCardView({
   card,
   onPointerDown,
   onFlip,
-  onRemove,
   onZoom,
 }: {
   card: PlacedCard;
@@ -632,17 +631,25 @@ function PlacedCardView({
 }) {
   return (
     <div
-      className="absolute"
+      className="absolute group"
       style={{ left: card.x, top: card.y, width: CARD_W, height: CARD_H, zIndex: card.locked ? 20 : 30 }}
     >
       <div
         onPointerDown={onPointerDown}
         onClick={() => {
-          if (card.flipped && card.locked) onZoom();
+          // Tap-to-flip: first tap reveals; subsequent tap on a revealed card zooms.
+          if (!card.flipped) onFlip();
+          else if (card.locked) onZoom();
         }}
-        className={`relative w-full h-full ${card.locked ? "cursor-zoom-in" : "cursor-grab active:cursor-grabbing"}`}
+        className={`relative w-full h-full transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-hover:scale-[1.04] active:scale-[0.98] ${
+          card.locked ? "cursor-zoom-in" : "cursor-grab active:cursor-grabbing"
+        }`}
         style={{ perspective: "1000px" }}
       >
+        {/* Hover glow */}
+        <div className="pointer-events-none absolute -inset-2 rounded-3xl opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-70"
+          style={{ background: "radial-gradient(closest-side, var(--gold), transparent 70%)" }}
+        />
         <div
           className="absolute inset-0 transition-transform duration-700"
           style={{
@@ -656,7 +663,7 @@ function PlacedCardView({
             style={{ backfaceVisibility: "hidden" }}
           >
             <div className="absolute inset-2 rounded-xl border border-gold/20 flex items-center justify-center">
-              <div className="text-gold/70 font-display text-3xl">✦</div>
+              <div className="text-gold/70 font-display text-3xl transition-transform duration-300 group-hover:scale-110">✦</div>
             </div>
           </div>
           {/* Front */}
@@ -692,20 +699,16 @@ function PlacedCardView({
         )}
       </div>
 
-      {card.flipped ? null : (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onFlip();
-          }}
-          className="absolute inset-x-0 -bottom-6 mx-auto text-[10px] uppercase tracking-widest text-gold/70 hover:text-gold"
-        >
-          Reveal
-        </button>
-      )}
+      {/* Hint label */}
+      <div className="pointer-events-none absolute inset-x-0 -bottom-5 mx-auto text-center text-[10px] uppercase tracking-widest text-gold/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {card.flipped ? (card.locked ? "Tap to zoom" : "Tap to flip") : "Tap to reveal"}
+      </div>
     </div>
   );
 }
+
+
+
 
 function glyphFor(card: { arcana: string; suit?: string }) {
   if (card.arcana === "major") return "✦";
