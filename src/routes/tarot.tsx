@@ -707,9 +707,8 @@ function PlacedCardView({
   );
 }
 
-// silence unused-warning for onRemove prop, kept for API compatibility
-void 0 as unknown as typeof removeCardNoop;
-function removeCardNoop() {}
+
+
 
 function glyphFor(card: { arcana: string; suit?: string }) {
   if (card.arcana === "major") return "✦";
