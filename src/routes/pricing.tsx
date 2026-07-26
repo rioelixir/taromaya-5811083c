@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/page-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageShell, GlassCard } from "@/components/page-shell";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
