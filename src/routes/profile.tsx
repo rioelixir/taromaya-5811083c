@@ -174,43 +174,17 @@ function ProfilePage() {
         </GlassCard>
         </div>
 
-        {/* Subscription */}
-        <GlassCard title="Subscription" desc="This app is fully subscription-based.">
-          {data.isAdmin ? (
-            <>
-              <div className="font-display text-lg gold-text">Admin — unlimited access</div>
-              <div className="mt-1 text-xs text-muted-foreground">All features unlocked.</div>
-            </>
-          ) : isPremium ? (
-            <>
-              <div className="font-display text-lg gold-text capitalize">
-                {data.subscription?.plan || "Premium"} · Active
-              </div>
-              {data.subscription?.expiresAt && (
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Renews / expires on {new Date(data.subscription.expiresAt).toLocaleDateString()}
-                </div>
-              )}
-              <Link to="/pricing" className="mt-3 inline-flex items-center gap-1 text-xs text-gold hover:underline">
-                Manage plan <ArrowRight className="h-3 w-3" />
-              </Link>
-            </>
-          ) : (
-            <>
-              <div className="font-display text-lg text-pearl">No active plan</div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                A subscription is required to use TAROMAYA.
-              </div>
-              <Link
-                to="/pricing"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-gold-soft px-5 py-2 text-sm font-medium text-cosmic"
-              >
-                <Sparkles className="h-4 w-4" /> Choose a plan
-              </Link>
-            </>
-          )}
+        {/* Access */}
+        <GlassCard title="Access" desc="TAROMAYA is free for everyone.">
+          <div className="font-display text-lg gold-text">
+            {data.isAdmin ? "Admin — unlimited access" : "Full access unlocked"}
+          </div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            Every module is available. No subscription required.
+          </div>
         </GlassCard>
       </div>
+
 
       {data.isAdmin && (
         <div className="mt-6">
