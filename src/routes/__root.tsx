@@ -180,15 +180,8 @@ function RootComponent() {
           }
           return;
         }
-        // Subscription enforcement — this app is fully subscription-based.
-        const { data: isPremium } = await supabase.rpc("is_premium", { _user_id: user.id });
-        const SUBSCRIPTION_ALLOWED = ["/pricing", "/profile", "/terms", "/accept-terms"];
-        const allowedForNonPremium = SUBSCRIPTION_ALLOWED.some(
-          (p) => path === p || path.startsWith(p + "/"),
-        );
-        if (!isPremium && !allowedForNonPremium) {
-          router.navigate({ to: "/pricing" });
-        }
+        // Subscription enforcement removed — app is free for everyone.
+
       };
 
       await enforce();
