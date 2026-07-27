@@ -1,4 +1,6 @@
-// Subscription removed — everyone is premium.
+// Back-compat wrapper. Real access check lives in use-paywall.
+import { useHasAccess } from "./use-paywall";
 export function usePremium() {
-  return { isPremium: true, loading: false };
+  const { hasAccess, loading } = useHasAccess();
+  return { isPremium: hasAccess, loading };
 }

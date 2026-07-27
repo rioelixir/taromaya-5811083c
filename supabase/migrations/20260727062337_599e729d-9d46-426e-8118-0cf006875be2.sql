@@ -1,0 +1,1 @@
+INSERT INTO public.app_settings (key, value) VALUES ('app.paywall', jsonb_build_object('enabled', false, 'amount_inr', 1973, 'upi_id', '', 'payee_name', 'TAROMAYA', 'qr_url', '', 'note', 'Scan the QR or pay via UPI. Your access will unlock once payment is verified.')) ON CONFLICT (key) DO NOTHING;
