@@ -19,6 +19,7 @@ export const Route = createFileRoute("/api/public/bootstrap-admins")({
           (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
         if (provided !== secret) return new Response("Unauthorized", { status: 401 });
 
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         const results: Array<{ email: string; status: string; id?: string; error?: string }> = [];
@@ -29,30 +30,33 @@ export const Route = createFileRoute("/api/public/bootstrap-admins")({
             email_confirm: true,
           });
           if (error) {
-            // If already exists, look up and update password + confirm.
+            // Already exists — look them up and ensure profile + admin role.
             const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
             const existing = list?.users.find((u) => u.email?.toLowerCase() === a.email.toLowerCase());
-            if (existing) {
-              const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
-                password: a.password,
-                email_confirm: true,
-              });
-              if (updErr) {
-                results.push({ email: a.email, status: "update_failed", error: updErr.message });
-                continue;
-              }
-              // Ensure admin role row exists (trigger only fires on confirm event).
-              await supabaseAdmin
-                .from("user_roles")
-                .upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
-              results.push({ email: a.email, status: "updated", id: existing.id });
-            } else {
+            if (!existing) {
               results.push({ email: a.email, status: "create_failed", error: error.message });
+              continue;
             }
+            await supabaseAdmin
+              .from("profiles")
+              .upsert(
+                { id: existing.id, email: a.email, is_comped: true, terms_accepted_at: new Date().toISOString() },
+                { onConflict: "id" },
+              );
+            await supabaseAdmin
+              .from("user_roles")
+              .upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
+            results.push({ email: a.email, status: "backfilled", id: existing.id });
             continue;
           }
           const uid = data.user?.id;
           if (uid) {
+            await supabaseAdmin
+              .from("profiles")
+              .upsert(
+                { id: uid, email: a.email, is_comped: true, terms_accepted_at: new Date().toISOString() },
+                { onConflict: "id" },
+              );
             await supabaseAdmin
               .from("user_roles")
               .upsert({ user_id: uid, role: "admin" }, { onConflict: "user_id,role" });
