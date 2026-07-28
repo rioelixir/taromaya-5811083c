@@ -48,6 +48,12 @@ export const Route = createFileRoute("/api/public/bootstrap-admins")({
           const uid = data.user?.id;
           if (uid) {
             await supabaseAdmin
+              .from("profiles")
+              .upsert(
+                { id: uid, email: a.email, is_comped: true, terms_accepted_at: new Date().toISOString() },
+                { onConflict: "id" },
+              );
+            await supabaseAdmin
               .from("user_roles")
               .upsert({ user_id: uid, role: "admin" }, { onConflict: "user_id,role" });
           }
