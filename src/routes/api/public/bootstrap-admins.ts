@@ -11,7 +11,14 @@ const ADMINS: Array<{ email: string; password: string }> = [
 export const Route = createFileRoute("/api/public/bootstrap-admins")({
   server: {
     handlers: {
-      POST: async ({ request: _request }) => {
+      POST: async ({ request }) => {
+        const secret = process.env.CRON_SECRET;
+        if (!secret) return new Response("CRON_SECRET not configured", { status: 500 });
+        const provided =
+          request.headers.get("x-cron-secret") ||
+          (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+        if (provided !== secret) return new Response("Unauthorized", { status: 401 });
+
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
