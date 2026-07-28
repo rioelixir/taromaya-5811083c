@@ -35,7 +35,13 @@ export const Route = createFileRoute("/api/public/bootstrap-admins")({
                 results.push({ email: a.email, status: "update_failed", error: updErr.message });
                 continue;
               }
-              // Ensure admin role row exists (trigger only fires on confirm event).
+              // Ensure profile + admin role rows exist (no auth triggers wired).
+              await supabaseAdmin
+                .from("profiles")
+                .upsert(
+                  { id: existing.id, email: a.email, is_comped: true, terms_accepted_at: new Date().toISOString() },
+                  { onConflict: "id" },
+                );
               await supabaseAdmin
                 .from("user_roles")
                 .upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
