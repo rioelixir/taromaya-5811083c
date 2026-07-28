@@ -70,10 +70,6 @@ function AdminPage() {
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
         <TabBtn active={tab === "staff"} onClick={() => setTab("staff")} icon={<UserPlus className="h-4 w-4" />}>Employees & Invites</TabBtn>
-        <TabBtn active={tab === "paywall"} onClick={() => setTab("paywall")} icon={<CreditCard className="h-4 w-4" />}>Paywall (UPI/QR)</TabBtn>
-        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plans</TabBtn>
-        <TabBtn active={tab === "coupons"} onClick={() => setTab("coupons")} icon={<Tag className="h-4 w-4" />}>Coupons</TabBtn>
-        <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
         <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
         <TabBtn active={tab === "branding"} onClick={() => setTab("branding")} icon={<Palette className="h-4 w-4" />}>Branding & Theme</TabBtn>
@@ -92,10 +88,6 @@ function AdminPage() {
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
       {tab === "staff" && <StaffTab />}
-      {tab === "paywall" && <AdminPaywallTab />}
-      {tab === "plan" && <AdminPlansTab />}
-      {tab === "coupons" && <AdminCouponsTab />}
-      {tab === "subs" && <SubscriptionsTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
       {tab === "prompts" && <AdminPromptsTab />}
       {tab === "branding" && <AdminBrandingTab />}
