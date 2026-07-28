@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { PageShell, GlassCard } from "@/components/page-shell";
-import { User, Crown, LogOut, MapPin, Calendar, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
+import { User, LogOut, MapPin, Calendar, ShieldCheck, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
