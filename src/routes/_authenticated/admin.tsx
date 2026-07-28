@@ -2,9 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, Tag, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
-import { AdminPlansTab, AdminCouponsTab } from "@/components/admin-payments";
-import { AdminPaywallTab } from "@/components/admin-paywall";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
 import { AdminBrandingTab } from "@/components/admin-branding";
 import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
@@ -31,20 +29,13 @@ import {
   adminRevokeStaffInvite,
   adminDeleteStaffInvite,
 } from "@/lib/admin.functions";
-import {
-  getActivePlan,
-  adminUpdatePlan,
-  adminListSubscriptions,
-  adminSetSubscription,
-  adminDeleteSubscription,
-} from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "staff" | "paywall" | "plan" | "coupons" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
+type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
