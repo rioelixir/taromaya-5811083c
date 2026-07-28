@@ -29,7 +29,6 @@ import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as RectificationRouteImport } from './routes/rectification'
 import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as ObservatoryRouteImport } from './routes/observatory'
 import { Route as NumerologyRouteImport } from './routes/numerology'
@@ -181,11 +180,6 @@ const ProgressionsRoute = ProgressionsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PanchangRoute = PanchangRouteImport.update({
@@ -486,7 +480,6 @@ export interface FileRoutesByFullPath {
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
-  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/rectification': typeof RectificationRoute
@@ -560,7 +553,6 @@ export interface FileRoutesByTo {
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
-  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/rectification': typeof RectificationRoute
@@ -636,7 +628,6 @@ export interface FileRoutesById {
   '/numerology': typeof NumerologyRoute
   '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
-  '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/progressions': typeof ProgressionsRoute
   '/rectification': typeof RectificationRoute
@@ -712,7 +703,6 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/observatory'
     | '/panchang'
-    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/rectification'
@@ -786,7 +776,6 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/observatory'
     | '/panchang'
-    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/rectification'
@@ -861,7 +850,6 @@ export interface FileRouteTypes {
     | '/numerology'
     | '/observatory'
     | '/panchang'
-    | '/pricing'
     | '/profile'
     | '/progressions'
     | '/rectification'
@@ -937,7 +925,6 @@ export interface RootRouteChildren {
   NumerologyRoute: typeof NumerologyRoute
   ObservatoryRoute: typeof ObservatoryRoute
   PanchangRoute: typeof PanchangRoute
-  PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ProgressionsRoute: typeof ProgressionsRoute
   RectificationRoute: typeof RectificationRoute
@@ -1107,13 +1094,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/panchang': {
@@ -1556,7 +1536,6 @@ const rootRouteChildren: RootRouteChildren = {
   NumerologyRoute: NumerologyRoute,
   ObservatoryRoute: ObservatoryRoute,
   PanchangRoute: PanchangRoute,
-  PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ProgressionsRoute: ProgressionsRoute,
   RectificationRoute: RectificationRoute,
@@ -1588,13 +1567,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
