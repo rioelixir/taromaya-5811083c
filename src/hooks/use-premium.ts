@@ -1,6 +1,4 @@
-// Back-compat wrapper. Real access check lives in use-paywall.
-import { useHasAccess } from "./use-paywall";
+// Payments removed — every signed-in user has full access.
 export function usePremium() {
-  const { hasAccess, loading } = useHasAccess();
-  return { isPremium: hasAccess, loading };
+  return { isPremium: true, loading: false };
 }

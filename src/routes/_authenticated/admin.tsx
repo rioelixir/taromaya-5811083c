@@ -2,9 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Crown, CreditCard, Check, X, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, Tag, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
-import { AdminPlansTab, AdminCouponsTab } from "@/components/admin-payments";
-import { AdminPaywallTab } from "@/components/admin-paywall";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
 import { AdminBrandingTab } from "@/components/admin-branding";
 import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
@@ -31,20 +29,13 @@ import {
   adminRevokeStaffInvite,
   adminDeleteStaffInvite,
 } from "@/lib/admin.functions";
-import {
-  getActivePlan,
-  adminUpdatePlan,
-  adminListSubscriptions,
-  adminSetSubscription,
-  adminDeleteSubscription,
-} from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "staff" | "paywall" | "plan" | "coupons" | "subs" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
+type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
@@ -79,10 +70,6 @@ function AdminPage() {
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
         <TabBtn active={tab === "staff"} onClick={() => setTab("staff")} icon={<UserPlus className="h-4 w-4" />}>Employees & Invites</TabBtn>
-        <TabBtn active={tab === "paywall"} onClick={() => setTab("paywall")} icon={<CreditCard className="h-4 w-4" />}>Paywall (UPI/QR)</TabBtn>
-        <TabBtn active={tab === "plan"} onClick={() => setTab("plan")} icon={<Crown className="h-4 w-4" />}>Plans</TabBtn>
-        <TabBtn active={tab === "coupons"} onClick={() => setTab("coupons")} icon={<Tag className="h-4 w-4" />}>Coupons</TabBtn>
-        <TabBtn active={tab === "subs"} onClick={() => setTab("subs")} icon={<CreditCard className="h-4 w-4" />}>Subscriptions</TabBtn>
         <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
         <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
         <TabBtn active={tab === "branding"} onClick={() => setTab("branding")} icon={<Palette className="h-4 w-4" />}>Branding & Theme</TabBtn>
@@ -101,10 +88,6 @@ function AdminPage() {
       {tab === "overview" && <OverviewTab />}
       {tab === "users" && <UsersTab />}
       {tab === "staff" && <StaffTab />}
-      {tab === "paywall" && <AdminPaywallTab />}
-      {tab === "plan" && <AdminPlansTab />}
-      {tab === "coupons" && <AdminCouponsTab />}
-      {tab === "subs" && <SubscriptionsTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
       {tab === "prompts" && <AdminPromptsTab />}
       {tab === "branding" && <AdminBrandingTab />}
@@ -484,304 +467,6 @@ function KundlisTab() {
         </div>
       )}
     </GlassCard>
-  );
-}
-
-// ============ Plan & Price ============
-type PlanRow = {
-  id: string;
-  name: string;
-  description: string | null;
-  price_cents: number;
-  currency: string;
-  billing_period: string;
-  features: string[];
-  payment_link: string | null;
-  is_active: boolean;
-};
-
-function PlanTab() {
-  const [plan, setPlan] = useState<PlanRow | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [ok, setOk] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    getActivePlan().then((p) => setPlan(p as PlanRow | null)).finally(() => setLoading(false));
-  }, []);
-
-  const save = async () => {
-    if (!plan) return;
-    setSaving(true); setErr(null); setOk(false);
-    try {
-      await adminUpdatePlan({ data: {
-        id: plan.id,
-        name: plan.name,
-        description: plan.description ?? "",
-        price_cents: Math.round(plan.price_cents),
-        currency: plan.currency,
-        billing_period: plan.billing_period,
-        features: plan.features,
-        payment_link: plan.payment_link,
-        is_active: plan.is_active,
-      }});
-      setOk(true);
-    } catch (e) { setErr(e instanceof Error ? e.message : "Save failed"); }
-    finally { setSaving(false); }
-  };
-
-  if (loading) return <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading plan…</div>;
-  if (!plan) return <GlassCard title="No plan found" desc="A default plan should have been seeded." />;
-
-  const priceMajor = (plan.price_cents / 100).toString();
-  return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <GlassCard title="Plan details" desc="Everything on this card is what users see on the pricing page.">
-        <div className="space-y-3">
-          <Field label="Plan name">
-            <input className={inputCls} value={plan.name} onChange={(e) => setPlan({ ...plan, name: e.target.value })} />
-          </Field>
-          <Field label="Description">
-            <textarea rows={3} className={inputCls} value={plan.description ?? ""} onChange={(e) => setPlan({ ...plan, description: e.target.value })} />
-          </Field>
-          <div className="grid grid-cols-3 gap-3">
-            <Field label="Price">
-              <input
-                type="number" min="0" step="0.01"
-                className={inputCls}
-                value={priceMajor}
-                onChange={(e) => setPlan({ ...plan, price_cents: Math.round((parseFloat(e.target.value) || 0) * 100) })}
-              />
-            </Field>
-            <Field label="Currency">
-              <input className={inputCls} value={plan.currency} onChange={(e) => setPlan({ ...plan, currency: e.target.value.toUpperCase() })} />
-            </Field>
-            <Field label="Period">
-              <select
-                className={inputCls}
-                value={plan.billing_period}
-                onChange={(e) => setPlan({ ...plan, billing_period: e.target.value })}
-              >
-                <option value="monthly">monthly</option>
-                <option value="yearly">yearly</option>
-                <option value="weekly">weekly</option>
-                <option value="lifetime">lifetime</option>
-              </select>
-            </Field>
-          </div>
-          <Field label="Payment link (optional — Razorpay / Stripe / UPI URL)">
-            <input
-              className={inputCls}
-              placeholder="https://…"
-              value={plan.payment_link ?? ""}
-              onChange={(e) => setPlan({ ...plan, payment_link: e.target.value || null })}
-            />
-          </Field>
-          <label className="flex items-center gap-2 text-sm text-pearl">
-            <input
-              type="checkbox"
-              checked={plan.is_active}
-              onChange={(e) => setPlan({ ...plan, is_active: e.target.checked })}
-            />
-            Plan is active
-          </label>
-        </div>
-      </GlassCard>
-
-      <GlassCard title="Features" desc="Bullet points shown on the pricing card.">
-        <FeatureEditor value={plan.features} onChange={(features) => setPlan({ ...plan, features })} />
-
-        <div className="mt-6 flex items-center gap-3">
-          <button
-            onClick={save}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic px-4 py-2 text-sm font-medium disabled:opacity-40"
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Save plan
-          </button>
-          {ok && <span className="text-xs text-aurora">Saved</span>}
-          {err && <span className="text-xs text-red-300">{err}</span>}
-        </div>
-      </GlassCard>
-    </div>
-  );
-}
-
-function FeatureEditor({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  const [draft, setDraft] = useState("");
-  const add = () => { if (!draft.trim()) return; onChange([...value, draft.trim()]); setDraft(""); };
-  return (
-    <div className="space-y-2">
-      {value.map((f, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <input
-            className={inputCls}
-            value={f}
-            onChange={(e) => onChange(value.map((v, idx) => idx === i ? e.target.value : v))}
-          />
-          <button onClick={() => onChange(value.filter((_, idx) => idx !== i))} className="p-2 rounded-lg border border-red-500/20 text-red-300 hover:bg-red-500/10">
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      ))}
-      <div className="flex gap-2">
-        <input className={inputCls} placeholder="Add a feature…" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())} />
-        <button onClick={add} className="inline-flex items-center gap-1 rounded-xl border border-white/10 px-3 text-sm text-pearl hover:bg-white/5"><Plus className="h-3.5 w-3.5" /> Add</button>
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{label}</div>
-      {children}
-    </label>
-  );
-}
-
-const inputCls =
-  "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
-
-// ============ Subscriptions ============
-type SubRow = {
-  id: string;
-  user_id: string;
-  email: string;
-  status: string;
-  started_at: string | null;
-  expires_at: string | null;
-  notes: string | null;
-  created_at: string;
-};
-
-function SubscriptionsTab() {
-  const [rows, setRows] = useState<SubRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState("");
-
-  const refresh = () => {
-    setLoading(true);
-    adminListSubscriptions().then((d) => setRows(d as SubRow[])).finally(() => setLoading(false));
-  };
-  useEffect(refresh, []);
-
-  const activate = async (userId: string, months: number) => {
-    await adminSetSubscription({ data: { userId, status: "active", months } });
-    refresh();
-  };
-  const cancel = async (userId: string) => {
-    await adminSetSubscription({ data: { userId, status: "canceled" } });
-    refresh();
-  };
-  const del = async (userId: string) => {
-    if (!confirm("Delete this subscription record?")) return;
-    await adminDeleteSubscription({ data: { userId } });
-    refresh();
-  };
-
-  const filtered = rows.filter((r) => !q || r.email.toLowerCase().includes(q.toLowerCase()));
-  const pending = filtered.filter((r) => r.status === "pending");
-  const others = filtered.filter((r) => r.status !== "pending");
-
-  return (
-    <div className="space-y-4">
-      <GlassCard>
-        <input
-          placeholder="Search by email…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className={inputCls}
-        />
-      </GlassCard>
-
-      {loading ? (
-        <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
-      ) : (
-        <>
-          <GlassCard title={`Pending requests (${pending.length})`} desc="Users who requested Premium — activate to grant access.">
-            {pending.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No pending requests.</div>
-            ) : (
-              <ul className="divide-y divide-white/5">
-                {pending.map((r) => (
-                  <li key={r.id} className="py-3 flex flex-wrap items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-pearl truncate">{r.email}</div>
-                      <div className="text-[11px] text-muted-foreground">Requested {new Date(r.created_at).toLocaleDateString()}</div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => activate(r.user_id, 1)} className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-gold to-gold-soft text-cosmic px-3 py-1.5 text-xs font-medium">
-                        <Check className="h-3 w-3" /> Activate 1mo
-                      </button>
-                      <button onClick={() => activate(r.user_id, 12)} className="inline-flex items-center gap-1 rounded-lg gold-border bg-gold/10 px-3 py-1.5 text-xs text-pearl">
-                        Activate 1yr
-                      </button>
-                      <button onClick={() => cancel(r.user_id)} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-muted-foreground hover:text-pearl">
-                        <X className="h-3 w-3" /> Deny
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </GlassCard>
-
-          <GlassCard title={`All subscriptions (${others.length})`}>
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-sm">
-                <thead className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                  <tr>
-                    <th className="text-left px-2 py-2">Email</th>
-                    <th className="text-left px-2 py-2">Status</th>
-                    <th className="text-left px-2 py-2">Expires</th>
-                    <th className="text-right px-2 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {others.map((r) => (
-                    <tr key={r.id} className="border-t border-white/5">
-                      <td className="px-2 py-3 text-pearl">{r.email}</td>
-                      <td className="px-2 py-3">
-                        <span className={[
-                          "inline-flex items-center rounded-full px-2 py-0.5 text-[11px]",
-                          r.status === "active" ? "gold-border text-gold bg-gold/10" :
-                          r.status === "canceled" ? "border border-red-500/20 text-red-300" :
-                          "border border-white/10 text-muted-foreground",
-                        ].join(" ")}>{r.status}</span>
-                      </td>
-                      <td className="px-2 py-3 text-muted-foreground text-xs">
-                        {r.expires_at ? new Date(r.expires_at).toLocaleDateString() : "—"}
-                      </td>
-                      <td className="px-2 py-3">
-                        <div className="flex justify-end gap-2">
-                          {r.status !== "active" && (
-                            <button onClick={() => activate(r.user_id, 1)} className="inline-flex items-center gap-1 rounded-lg gold-border bg-gold/10 px-2.5 py-1 text-xs text-pearl">
-                              <Check className="h-3 w-3" /> Activate
-                            </button>
-                          )}
-                          {r.status === "active" && (
-                            <button onClick={() => cancel(r.user_id)} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2.5 py-1 text-xs text-muted-foreground hover:text-pearl">
-                              Cancel
-                            </button>
-                          )}
-                          <button onClick={() => del(r.user_id)} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2.5 py-1 text-xs text-red-300 hover:bg-red-500/10">
-                            <Trash2 className="h-3 w-3" /> Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </GlassCard>
-        </>
-      )}
-    </div>
   );
 }
 

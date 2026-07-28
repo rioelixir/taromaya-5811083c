@@ -1,7 +1,5 @@
-import { createMiddleware } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// Subscription removed — only auth is required.
-export const requirePremium = createMiddleware({ type: "function" })
-  .middleware([requireSupabaseAuth])
-  .server(async ({ next }) => next());
+// Payments removed — only auth is required. Kept as a re-export for existing
+// server-function imports so we don't have to touch every callsite.
+export const requirePremium = requireSupabaseAuth;

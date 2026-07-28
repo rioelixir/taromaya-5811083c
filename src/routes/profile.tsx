@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { PageShell, GlassCard } from "@/components/page-shell";
-import { User, Crown, LogOut, MapPin, Calendar, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
+import { User, LogOut, MapPin, Calendar, ShieldCheck, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -43,10 +43,9 @@ function ProfilePage() {
         if (mounted) setLoading(false);
         return;
       }
-      const [{ data: profile }, { data: role }, { data: sub }, { data: birth }] = await Promise.all([
+      const [{ data: profile }, { data: role }, { data: birth }] = await Promise.all([
         supabase.from("profiles").select("email, display_name, avatar_url").eq("id", user.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
-        supabase.from("user_subscriptions").select("status, plan_id, expires_at").eq("user_id", user.id).maybeSingle(),
         supabase.from("user_birth_profile").select("full_name, birth_date, birth_time, place, latitude, longitude").eq("user_id", user.id).maybeSingle(),
       ]);
       if (!mounted) return;
@@ -55,7 +54,7 @@ function ProfilePage() {
         displayName: profile?.display_name ?? user.user_metadata?.full_name ?? null,
         avatarUrl: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
         isAdmin: !!role,
-        subscription: sub ? { status: sub.status, plan: sub.plan_id, expiresAt: sub.expires_at } : null,
+        subscription: null,
         birth: birth ? {
           fullName: birth.full_name,
           date: birth.birth_date,
@@ -96,12 +95,8 @@ function ProfilePage() {
     );
   }
 
-  const subActive = data.subscription?.status === "active" &&
-    (!data.subscription.expiresAt || new Date(data.subscription.expiresAt) > new Date());
-  const isPremium = data.isAdmin || subActive;
-
   return (
-    <PageShell hideAI eyebrow="Profile" title="Your cosmic identity" subtitle="Manage your birth details, subscription and preferences.">
+    <PageShell hideAI eyebrow="Profile" title="Your cosmic identity" subtitle="Manage your birth details and preferences.">
       <div className="grid gap-4 md:grid-cols-3">
         {/* Identity */}
         <GlassCard>
@@ -122,11 +117,6 @@ function ProfilePage() {
                 {data.isAdmin && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
                     <ShieldCheck className="h-3 w-3" /> Admin
-                  </span>
-                )}
-                {isPremium && !data.isAdmin && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2 py-0.5 text-[10px] uppercase tracking-widest text-gold">
-                    <Crown className="h-3 w-3" /> Premium
                   </span>
                 )}
               </div>
