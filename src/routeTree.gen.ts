@@ -79,6 +79,7 @@ import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicBootstrapAdminsRouteImport } from './routes/api/public/bootstrap-admins'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
 
@@ -434,6 +435,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicBootstrapAdminsRoute =
+  ApiPublicBootstrapAdminsRouteImport.update({
+    id: '/api/public/bootstrap-admins',
+    path: '/api/public/bootstrap-admins',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedKundliNewRoute = AuthenticatedKundliNewRouteImport.update({
   id: '/kundli/new',
   path: '/kundli/new',
@@ -516,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
+  '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -589,6 +597,7 @@ export interface FileRoutesByTo {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
+  '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -664,6 +673,7 @@ export interface FileRoutesById {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
+  '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -739,6 +749,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/kundli/new'
+    | '/api/public/bootstrap-admins'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -812,6 +823,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/kundli/new'
+    | '/api/public/bootstrap-admins'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -886,6 +898,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/_authenticated/kundli/new'
+    | '/api/public/bootstrap-admins'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -951,6 +964,7 @@ export interface RootRouteChildren {
   InviteCodeRoute: typeof InviteCodeRoute
   PagesSlugRoute: typeof PagesSlugRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1446,6 +1460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/bootstrap-admins': {
+      id: '/api/public/bootstrap-admins'
+      path: '/api/public/bootstrap-admins'
+      fullPath: '/api/public/bootstrap-admins'
+      preLoaderRoute: typeof ApiPublicBootstrapAdminsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/kundli/new': {
       id: '/_authenticated/kundli/new'
       path: '/kundli/new'
@@ -1562,18 +1583,9 @@ const rootRouteChildren: RootRouteChildren = {
   InviteCodeRoute: InviteCodeRoute,
   PagesSlugRoute: PagesSlugRoute,
   ShareTokenRoute: ShareTokenRoute,
+  ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
