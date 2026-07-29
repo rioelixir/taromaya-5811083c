@@ -23,7 +23,7 @@ export const Route = createFileRoute("/tarot")({
 
 type PlacedCard = {
   uid: string;
-  card: TarotCard;
+  card: UploadedCard;
   deckKey: DeckKey;
   reversed: boolean;
   x: number; // canvas px
@@ -37,8 +37,10 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 130;
 const CARD_H = 200;
-const MINI_W = 62;
-const MINI_H = 96;
+const MINI_W = 52;
+const MINI_H = 80;
+
+type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
 function randomReversed() {
   return false;
@@ -55,40 +57,19 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
-// Rider-Waite deck-mode isolation: full 78, majors only (22), minors only (56), courts only (16).
-export type RWMode = "full" | "major" | "minor" | "court";
-const RW_MODES: { key: RWMode; label: string }[] = [
-  { key: "full",   label: "Full 78" },
-  { key: "major",  label: "Major 22" },
-  { key: "minor",  label: "Minor 56" },
-  { key: "court",  label: "Court 16" },
-];
-
-function filterRW(mode: RWMode): TarotCard[] {
-  const all = DECKS["rider-waite"];
-  switch (mode) {
-    case "major": return all.filter((c) => c.arcana === "major");
-    case "minor": return all.filter((c) => c.arcana === "minor");
-    case "court": return all.filter(isCourtCard);
-    default:      return all;
-  }
+// Shuffle each admin-uploaded deck into a draw stack.
+function makeDeckStacks(source: DeckStacks): DeckStacks {
+  return Object.fromEntries(
+    DECK_LIST.map((m) => [m.key, shuffle(source[m.key] ?? [])]),
+  ) as unknown as DeckStacks;
 }
-
-// Build the initial Rider-Waite stack.
-function makeDeckStacks(rwMode: RWMode = "full"): Record<DeckKey, TarotCard[]> {
-  return {
-    "rider-waite": shuffle(filterRW(rwMode)),
-  };
-}
-
-
 
 function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [rwMode, setRwMode] = useState<RWMode>("full");
-  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks("full"));
+  const { decks: uploaded, loading: loadingDecks } = useUploadedDecks();
+  const [decks, setDecks] = useState<DeckStacks>(() => makeDeckStacks({} as DeckStacks));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
