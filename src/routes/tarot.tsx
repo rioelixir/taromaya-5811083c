@@ -266,6 +266,18 @@ function TarotPage() {
   useEffect(() => {
     if (!draggingUid) return;
 
+    let frame = 0;
+    let pending: { x: number; y: number } | null = null;
+
+    const flush = () => {
+      frame = 0;
+      const st = dragState.current;
+      if (!st.uid || !pending) return;
+      const { x, y } = pending;
+      pending = null;
+      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+    };
+
     const move = (e: PointerEvent) => {
       const st = dragState.current;
       if (!st.uid) return;
@@ -275,16 +287,19 @@ function TarotPage() {
         st.moved = true;
       }
       const r = canvasEl.getBoundingClientRect();
-      const x = e.clientX - r.left - st.offsetX;
-      const y = e.clientY - r.top - st.offsetY;
-      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+      pending = { x: e.clientX - r.left - st.offsetX, y: e.clientY - r.top - st.offsetY };
+      if (!frame) frame = requestAnimationFrame(flush);
     };
+
 
     const up = () => {
       const st = dragState.current;
       const uid = st.uid;
       const wasTap = !st.moved;
       const fromDeck = st.fromDeck;
+      const last = pending;
+      pending = null;
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
       dragState.current = { uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false };
       setDraggingUid(null);
       if (!uid) return;
@@ -292,8 +307,9 @@ function TarotPage() {
       setPlaced((prev) => {
         const idx = prev.findIndex((p) => p.uid === uid);
         if (idx < 0) return prev;
-        const card = prev[idx];
+        const card = last ? { ...prev[idx], ...last } : prev[idx];
         const next = [...prev];
+
 
         // Tap on a deck (no drag) → the card slides up to its spot on the board.
         if (wasTap && fromDeck) {
@@ -650,7 +666,7 @@ function TarotPage() {
             >
               <img
                 src={zc.card.image}
-                alt={zc.card.name}
+                alt=""
                 className="absolute inset-0 w-full h-full object-contain bg-black"
               />
             </div>
@@ -745,7 +761,7 @@ function PlacedCardView({
           >
             <img
               src={card.card.image}
-              alt={card.card.name}
+              alt=""
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
             />
@@ -762,13 +778,6 @@ function PlacedCardView({
         )}
       </div>
 
-      {/* Always-visible, easy-to-read card name */}
-      <div
-        className="pointer-events-none absolute inset-x-[-14px] -bottom-[22px] text-center text-[13px] sm:text-sm font-medium leading-tight text-pearl"
-        style={{ textShadow: "0 2px 8px rgba(0,0,0,0.95)" }}
-      >
-        {card.flipped ? card.card.name : "Tap to reveal"}
-      </div>
     </div>
   );
 }
