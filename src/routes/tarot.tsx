@@ -291,7 +291,7 @@ function TarotPage() {
             name: c.card.name,
             position: c.position,
             reversed: c.reversed,
-            keywords: c.reversed ? c.card.keywordsReversed : c.card.keywords,
+            keywords: [],
           })),
         },
       });
