@@ -20,10 +20,10 @@ export type DeckMeta = {
 
 export const DECK_LIST: DeckMeta[] = [
   { key: "rider-waite",    name: "Rider Waite",     shortName: "Rider Waite", tagline: "the classic 78-card deck",     accent: "#F5C56B", glyph: "✦", expected: 78 },
-  { key: "soulmates",      name: "Soulmates Deck",  shortName: "Soulmates",   tagline: "love, union and connection",   accent: "#F08FA8", glyph: "❥", expected: 44 },
-  { key: "lost-and-found", name: "Lost & Found Deck", shortName: "Lost & Found", tagline: "what's missing, what returns", accent: "#8FC7F0", glyph: "❂", expected: 44 },
+  { key: "soulmates",      name: "Soulmates Deck",  shortName: "Soulmates",   tagline: "love, union and connection",   accent: "#F08FA8", glyph: "❥", expected: 90 },
+  { key: "lost-and-found", name: "Lost & Found Deck", shortName: "Lost & Found", tagline: "what's missing, what returns", accent: "#8FC7F0", glyph: "❂", expected: 78 },
   { key: "nakshatra",      name: "Nakshatra Deck",  shortName: "Nakshatra",   tagline: "27 lunar mansions",            accent: "#B79CF0", glyph: "☾", expected: 27 },
-  { key: "health",         name: "Health Deck",     shortName: "Health",      tagline: "body, breath and vitality",    accent: "#8FE0B4", glyph: "❦", expected: 44 },
+  { key: "health",         name: "Health Deck",     shortName: "Health",      tagline: "body, breath and vitality",    accent: "#8FE0B4", glyph: "❦", expected: 78 },
 ];
 
 export const DECK_KEYS = DECK_LIST.map((d) => d.key);
