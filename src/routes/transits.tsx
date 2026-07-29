@@ -1,5 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/transits")({
   }),
 });
 
-const DEFAULT_FORM = { name: "", date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090" };
+const DEFAULT_FORM = { name: "", date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090", place: "New Delhi, Delhi, India" };
 const ASPECT_COLORS: Record<string, string> = {
   conjunction: "text-gold", opposition: "text-red-400", trine: "text-cyan-300",
   square: "text-red-400", sextile: "text-sky-300", quincunx: "text-fuchsia-300",
@@ -89,8 +90,7 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["Name", "name", "text"], ["Date", "date", "date"], ["Time", "time", "time"],
-            ["Timezone offset", "tz", "text"], ["Latitude", "lat", "text"], ["Longitude", "lon", "text"],
-          ].map(([label, key, type]) => (
+            ].map(([label, key, type]) => (
             <label key={key} className="block">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
               <input type={type} value={(form as Record<string, string>)[key]}
@@ -98,6 +98,14 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
                 className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
             </label>
           ))}
+        </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
+            onChange={(pl) => setForm((f) => ({ ...f, place: pl.place, lat: pl.lat, lon: pl.lon, tz: pl.tz }))}
+            forDate={form.date}
+            forTime={form.time}
+          />
         </div>
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <div className="text-xs text-muted-foreground">Snapshot moment: <span className="text-pearl">{now.toLocaleString()}</span></div>

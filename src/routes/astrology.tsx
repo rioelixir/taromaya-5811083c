@@ -1,5 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/astrology")({
 
 const DEFAULT_FORM = {
   name: "", date: "1995-06-15", time: "07:45",
-  tz: "5.5", lat: "28.6139", lon: "77.2090",
+  tz: "5.5", lat: "28.6139", lon: "77.2090", place: "New Delhi, Delhi, India",
 };
 
 const ASPECT_COLORS: Record<string, string> = {
@@ -110,10 +111,7 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
             ["Name", "name", "text", ""],
             ["Date", "date", "date", ""],
             ["Time", "time", "time", ""],
-            ["Timezone offset", "tz", "text", "+5.5"],
-            ["Latitude", "lat", "text", ""],
-            ["Longitude", "lon", "text", ""],
-          ].map(([label, key, type, ph]) => (
+            ].map(([label, key, type, ph]) => (
             <label key={key} className="block">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
               <input
@@ -171,6 +169,14 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
                         <div key={e.name} className="flex justify-between"><span>{e.name}</span><span className="gold-text">{e.count}</span></div>
                       ))}
                     </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
+            onChange={(pl) => setForm((f) => ({ ...f, place: pl.place, lat: pl.lat, lon: pl.lon, tz: pl.tz }))}
+            forDate={form.date}
+            forTime={form.time}
+          />
+        </div>
                     <div>
                       <div className="text-muted-foreground mb-1">Modes</div>
                       {dominants.modes.map((m) => (
