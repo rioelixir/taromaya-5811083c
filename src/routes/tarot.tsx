@@ -140,16 +140,14 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(rwMode));
-  }, [rwMode]);
+    setDecks(makeDeckStacks(uploaded));
+  }, [uploaded]);
 
-  // Rebuild the Rider-Waite stack whenever the deck-mode changes.
+  // Rebuild the draw stacks whenever the admin-uploaded decks load or change.
   useEffect(() => {
-    setDecks((prev) => ({
-      ...prev,
-      "rider-waite": shuffle(filterRW(rwMode)),
-    }));
-  }, [rwMode]);
+    setPlaced([]);
+    setDecks(makeDeckStacks(uploaded));
+  }, [uploaded]);
 
   useEffect(() => {
     setPlaced([]);
