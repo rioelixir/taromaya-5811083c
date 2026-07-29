@@ -1,14 +1,13 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
-import { SPREADS, secureRandInt, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
-import { cardImage } from "@/lib/tarot-images";
-import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
-import { isCourtCard } from "@/lib/tarot-details";
+import { SPREADS, secureRandInt, type SpreadKey } from "@/lib/tarot-deck";
+import { DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
+import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
