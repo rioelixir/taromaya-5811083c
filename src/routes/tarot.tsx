@@ -666,7 +666,7 @@ function TarotPage() {
             >
               <img
                 src={zc.card.image}
-                alt={zc.card.name}
+                alt=""
                 className="absolute inset-0 w-full h-full object-contain bg-black"
               />
             </div>
