@@ -155,18 +155,62 @@ function TarotPage() {
     setError(null);
   }, [spreadKey]);
 
-  // -------- Drag from deck --------
+  // -------- Drag engine (window-level pointer tracking) --------
   const dragState = useRef<{
     uid: string | null;
+    pointerId: number | null;
     offsetX: number;
     offsetY: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
     fromDeck: boolean;
-  }>({ uid: null, offsetX: 0, offsetY: 0, fromDeck: false });
+  }>({ uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false });
+
+  const [draggingUid, setDraggingUid] = useState<string | null>(null);
+
+  const clampToCanvas = useCallback(
+    (x: number, y: number) => {
+      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
+      const maxY = Math.max(0, canvasSize.h - CARD_H - 26);
+      return {
+        x: Math.min(Math.max(0, x), maxX),
+        y: Math.min(Math.max(0, y), maxY),
+      };
+    },
+    [canvasSize.w, canvasSize.h],
+  );
+
+  // Where a card should rest when it is tapped (not dragged) out of a deck:
+  // the next free spread slot, or a tidy grid that fits ~15 cards for freestyle.
+  const restingSpot = useCallback(
+    (existing: PlacedCard[]) => {
+      if (!isFreestyle) {
+        const used = new Set(existing.map((p) => p.slotIndex).filter((i) => i !== null));
+        const free = slots.find((s) => !used.has(s.index));
+        if (free) return { x: free.x, y: free.y, slotIndex: free.index };
+      }
+      const perRow = Math.max(1, Math.floor((canvasSize.w - 40) / (CARD_W + 16)));
+      const i = existing.length;
+      const row = Math.floor(i / perRow);
+      const col = i % perRow;
+      const rowCount = Math.min(perRow, Math.max(1, existing.length + 1 - row * perRow));
+      const rowW = rowCount * CARD_W + (rowCount - 1) * 16;
+      const x = canvasSize.w / 2 - rowW / 2 + col * (CARD_W + 16);
+      const y = 24 + row * (CARD_H + 40);
+      const c = clampToCanvas(x, y);
+      return { x: c.x, y: c.y, slotIndex: null as number | null };
+    },
+    [isFreestyle, slots, canvasSize.w, clampToCanvas],
+  );
 
   const beginDragFromDeck = (e: React.PointerEvent, deckKey: DeckKey) => {
+    e.preventDefault();
     const source = decks[deckKey];
     if (!source || source.length === 0) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+    const canvasRect = canvasEl.getBoundingClientRect();
     const card = source[0];
     const uid = `p_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const x = e.clientX - canvasRect.left - CARD_W / 2;
@@ -184,66 +228,117 @@ function TarotPage() {
     };
     setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].slice(1) }));
     setPlaced((p) => [...p, newPlaced]);
-    dragState.current = { uid, offsetX: CARD_W / 2, offsetY: CARD_H / 2, fromDeck: true };
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragState.current = {
+      uid,
+      pointerId: e.pointerId,
+      offsetX: CARD_W / 2,
+      offsetY: CARD_H / 2,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false,
+      fromDeck: true,
+    };
+    setDraggingUid(uid);
   };
 
   const beginDragPlaced = (e: React.PointerEvent, uid: string) => {
     const target = placed.find((p) => p.uid === uid);
-    if (!target || target.locked) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
+    if (!target) return;
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+    e.preventDefault();
+    const canvasRect = canvasEl.getBoundingClientRect();
     dragState.current = {
       uid,
+      pointerId: e.pointerId,
       offsetX: e.clientX - canvasRect.left - target.x,
       offsetY: e.clientY - canvasRect.top - target.y,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false,
       fromDeck: false,
     };
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    setDraggingUid(uid);
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    const st = dragState.current;
-    if (!st.uid) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
-    const x = e.clientX - canvasRect.left - st.offsetX;
-    const y = e.clientY - canvasRect.top - st.offsetY;
-    setPlaced((prev) =>
-      prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)),
-    );
-  };
+  // Global listeners: dragging keeps working even if the pointer leaves the
+  // original element or the deck stack re-renders under the finger.
+  useEffect(() => {
+    if (!draggingUid) return;
 
-  const onPointerUp = () => {
-    const st = dragState.current;
-    if (!st.uid) return;
-    const uid = st.uid;
-    dragState.current = { uid: null, offsetX: 0, offsetY: 0, fromDeck: false };
+    const move = (e: PointerEvent) => {
+      const st = dragState.current;
+      if (!st.uid) return;
+      const canvasEl = canvasRef.current;
+      if (!canvasEl) return;
+      if (Math.abs(e.clientX - st.startX) > 4 || Math.abs(e.clientY - st.startY) > 4) {
+        st.moved = true;
+      }
+      const r = canvasEl.getBoundingClientRect();
+      const x = e.clientX - r.left - st.offsetX;
+      const y = e.clientY - r.top - st.offsetY;
+      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+    };
 
-    setPlaced((prev) => {
-      const idx = prev.findIndex((p) => p.uid === uid);
-      if (idx < 0) return prev;
-      const card = prev[idx];
+    const up = () => {
+      const st = dragState.current;
+      const uid = st.uid;
+      const wasTap = !st.moved;
+      const fromDeck = st.fromDeck;
+      dragState.current = { uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false };
+      setDraggingUid(null);
+      if (!uid) return;
 
-      const GRID = 20;
-      const sx = Math.round(card.x / GRID) * GRID;
-      const sy = Math.round(card.y / GRID) * GRID;
+      setPlaced((prev) => {
+        const idx = prev.findIndex((p) => p.uid === uid);
+        if (idx < 0) return prev;
+        const card = prev[idx];
+        const next = [...prev];
 
-      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
-      const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
-      const clampedX = Math.min(Math.max(0, sx), maxX);
-      const clampedY = Math.min(Math.max(0, sy), maxY);
+        // Tap on a deck (no drag) → the card slides up to its spot on the board.
+        if (wasTap && fromDeck) {
+          const spot = restingSpot(prev.filter((p) => p.uid !== uid));
+          next[idx] = { ...card, ...spot, flipped: true, locked: true };
+          return next;
+        }
 
-      const next = [...prev];
-      next[idx] = {
-        ...card,
-        x: clampedX,
-        y: clampedY,
-        flipped: true,
-        locked: true,
-        slotIndex: null,
-      };
-      return next;
-    });
-  };
+        // Dragged → snap to the nearest empty spread slot if close, else free place.
+        const { x: cx, y: cy } = clampToCanvas(card.x, card.y);
+        const used = new Set(prev.filter((p) => p.uid !== uid).map((p) => p.slotIndex));
+        let bestSlot: Slot | null = null;
+        let bestDist = Infinity;
+        for (const s of slots) {
+          if (used.has(s.index)) continue;
+          const d = Math.hypot(s.x - cx, s.y - cy);
+          if (d < bestDist) { bestDist = d; bestSlot = s; }
+        }
+        if (bestSlot && bestDist < CARD_W * 1.1) {
+          next[idx] = { ...card, x: bestSlot.x, y: bestSlot.y, slotIndex: bestSlot.index, flipped: true, locked: true };
+          return next;
+        }
+
+        const GRID = 10;
+        next[idx] = {
+          ...card,
+          x: Math.round(cx / GRID) * GRID,
+          y: Math.round(cy / GRID) * GRID,
+          flipped: true,
+          locked: true,
+          slotIndex: null,
+        };
+        return next;
+      });
+    };
+
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [draggingUid, slots, clampToCanvas, restingSpot]);
 
   const removeCard = (uid: string) => {
     setPlaced((prev) => {
