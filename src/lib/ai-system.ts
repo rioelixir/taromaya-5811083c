@@ -1,3 +1,5 @@
+import { PLAIN_ELI10_RULES } from "./ai-format";
+
 // Taromaya Supreme Intelligence System — shared operating system prepended to
 // every AI system prompt across the app. Improves consistency, reduces
 // hallucination, and forces the model to quantify uncertainty. Does not
