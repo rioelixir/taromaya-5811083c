@@ -349,26 +349,9 @@ function TarotPage() {
                 );
               })}
               <div className="mx-1 h-6 w-px bg-white/10" aria-hidden />
-              <span className="text-[10px] uppercase tracking-widest text-gold/70 inline-flex items-center gap-1">
-                <Crown className="h-3 w-3" /> Rider-Waite
+              <span className="text-[10px] uppercase tracking-widest text-gold/70">
+                5 decks · any spread
               </span>
-              {RW_MODES.map((m) => {
-                const active = m.key === rwMode;
-                return (
-                  <button
-                    key={m.key}
-                    onClick={() => setRwMode(m.key)}
-                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
-                      active
-                        ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
-                        : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
-                    }`}
-                    title={`Restrict Rider-Waite to ${m.label}`}
-                  >
-                    {m.label}
-                  </button>
-                );
-              })}
             </div>
 
             <div className="mt-2 flex flex-wrap gap-2 items-center">
