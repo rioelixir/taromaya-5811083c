@@ -9,7 +9,6 @@ import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
-import { z } from "zod";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
@@ -71,6 +70,7 @@ function makeDeckStacks(source: DeckStacks): DeckStacks {
 }
 
 function TarotPage() {
+  const search = Route.useSearch();
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
@@ -389,6 +389,44 @@ function TarotPage() {
     [decks],
   );
 
+  // Auto-pull: another module (e.g. today's Nakshatra) can send us straight to
+  // the board with one exact card, which then slides up on its own.
+  const autoPulled = useRef<string | null>(null);
+  useEffect(() => {
+    const deckKey = search.deck as DeckKey | undefined;
+    const wanted = search.card;
+    if (!deckKey || !wanted) return;
+    const key = `${deckKey}|${wanted}`;
+    if (autoPulled.current === key) return;
+    const stack = decks[deckKey];
+    if (!stack || stack.length === 0) return;
+    const want = wanted.trim().toLowerCase();
+    const found = stack.find((c) => c.name.trim().toLowerCase() === want)
+      ?? stack.find((c) => c.name.trim().toLowerCase().includes(want));
+    if (!found) return;
+    autoPulled.current = key;
+
+    const uid = `auto_${Date.now()}`;
+    const startX = canvasSize.w / 2 - CARD_W / 2;
+    const startY = Math.max(0, canvasSize.h - CARD_H - 20);
+    setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].filter((c) => c !== found) }));
+    setPlaced((prev) => [
+      ...prev,
+      { uid, card: found, deckKey, reversed: false, x: startX, y: startY, slotIndex: null, locked: true, flipped: false },
+    ]);
+    const timer = window.setTimeout(() => {
+      setPlaced((prev) => {
+        const idx = prev.findIndex((p) => p.uid === uid);
+        if (idx < 0) return prev;
+        const spot = restingSpot(prev.filter((p) => p.uid !== uid));
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...spot, flipped: true };
+        return next;
+      });
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [search.deck, search.card, decks, canvasSize.w, canvasSize.h, restingSpot]);
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
@@ -542,6 +580,16 @@ function TarotPage() {
               onZoom={() => p.flipped && setZoomedUid(p.uid)}
             />
           ))}
+
+          {/* Always-there Ask AI button, so it works even with the top bar hidden */}
+          <button
+            onClick={requestReading}
+            disabled={!readyToInterpret || loadingReading}
+            className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+          >
+            {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Ask AI
+          </button>
 
           {/* Five deck stacks — bottom right */}
           <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none" data-tour="deck-picker">
