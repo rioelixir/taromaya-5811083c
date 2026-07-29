@@ -10,7 +10,7 @@ type DeckValue = { name?: string; expected?: number; cards?: StoredCard[] };
 export type UploadedDecks = Record<DeckKey, UploadedCard[]>;
 
 function emptyDecks(): UploadedDecks {
-  return Object.fromEntries(DECK_LIST.map((d) => [d.key, []])) as UploadedDecks;
+  return Object.fromEntries(DECK_LIST.map((d) => [d.key, [] as UploadedCard[]])) as unknown as UploadedDecks;
 }
 
 /**
