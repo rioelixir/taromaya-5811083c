@@ -232,39 +232,19 @@ function RootComponent() {
           <TourHighlighter />
           <Outlet />
         </main>
-        {!chromeHidden && (
-          <footer className="relative mt-8 border-t border-gold/20 bg-background/60 pb-24 pt-8 backdrop-blur-sm">
-            <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
-            <div className="mx-auto grid w-full max-w-5xl gap-8 px-6 md:grid-cols-3">
-              <div className="text-center md:text-left">
-                <div className="font-display text-lg gold-text tracking-wide">Taromaya</div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {branding.footerLine1 || "2026 • Taromaya."}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {branding.footerLine2 || "App created by Riaa."}
-                </p>
-              </div>
-              <div className="text-center md:text-right">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Reference by</div>
-                <a
-                  href="https://www.theplanetstoday.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-flex items-center gap-2 font-display text-sm gold-text hover:opacity-80"
-                >
-                  <span aria-hidden>✦</span>
-                  THEPLANETSTODAY.COM
-                  <span aria-hidden>✦</span>
-                </a>
-              </div>
+        {!chromeHidden && !pathname.startsWith("/tarot") && (
+          <footer className="relative mt-8 border-t border-gold/15 bg-background/40 pb-24 pt-6">
+            <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-1 px-6 text-center">
+              <p className="text-xs text-muted-foreground">
+                {branding.footerLine1 || "2026 • Taromaya."}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {branding.footerLine2 || "App created by Riaa."}
+              </p>
             </div>
-            <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-            <p className="mt-3 text-center text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
-              Made with love · Cosmic wisdom, modern craft
-            </p>
           </footer>
         )}
+
         
       </div>
 
