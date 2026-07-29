@@ -600,7 +600,7 @@ function TarotPage() {
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
               {!loadingDecks && totalCards === 0
                 ? "No card images uploaded yet — add them in Admin → Assets."
-                : "Drag any deck onto the board"}
+                : "Tap or drag a deck onto the board"}
             </div>
           </div>
         </div>
