@@ -185,12 +185,16 @@ const DICT: Record<string, Entry> = {
   "common.sign_in_required": { en: "Sign in to save",          hi: "सहेजने के लिए लॉगिन करें", hr: "Save karne ke liye sign in karo" },
 };
 
-/** Translate a key (or English string). Falls back to the key itself. */
+/**
+ * Translate a key (or English string). Languages without a hand-written entry
+ * fall back to English here and are translated live by the AI translator.
+ */
 export function t(key: string, lang: Lang): string {
   const entry = DICT[key];
   if (!entry) return key;
-  return entry[lang] ?? entry.en;
+  return (entry as Record<string, string | undefined>)[lang] ?? entry.en;
 }
+
 
 /** React hook returning a bound translator. */
 export function useT() {
