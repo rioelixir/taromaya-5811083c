@@ -36,10 +36,10 @@ type PlacedCard = {
 
 type Slot = { index: number; label: string; x: number; y: number };
 
-const CARD_W = 130;
-const CARD_H = 200;
-const MINI_W = 52;
-const MINI_H = 80;
+const CARD_W = 86;
+const CARD_H = 132;
+const MINI_W = 46;
+const MINI_H = 70;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
