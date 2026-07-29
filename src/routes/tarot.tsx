@@ -297,6 +297,9 @@ function TarotPage() {
       const uid = st.uid;
       const wasTap = !st.moved;
       const fromDeck = st.fromDeck;
+      const last = pending;
+      pending = null;
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
       dragState.current = { uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false };
       setDraggingUid(null);
       if (!uid) return;
@@ -304,8 +307,9 @@ function TarotPage() {
       setPlaced((prev) => {
         const idx = prev.findIndex((p) => p.uid === uid);
         if (idx < 0) return prev;
-        const card = prev[idx];
+        const card = last ? { ...prev[idx], ...last } : prev[idx];
         const next = [...prev];
+
 
         // Tap on a deck (no drag) → the card slides up to its spot on the board.
         if (wasTap && fromDeck) {
