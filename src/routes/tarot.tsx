@@ -633,18 +633,12 @@ function PlacedCardView({
               transform: `rotateY(180deg) ${card.reversed ? "rotate(180deg)" : ""}`,
             }}
           >
-            {cardImage(card.card.id) ? (
-              <img
-                src={cardImage(card.card.id)}
-                alt={card.card.name}
-                draggable={false}
-                className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
-              />
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-4xl">{glyphFor(card.card)}</div>
-              </div>
-            )}
+            <img
+              src={card.card.image}
+              alt={card.card.name}
+              draggable={false}
+              className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
+            />
           </div>
         </div>
       </div>
