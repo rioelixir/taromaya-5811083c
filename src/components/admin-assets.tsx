@@ -316,7 +316,7 @@ function DeckEditor({ deckKey, label, expected }: { deckKey: string; label: stri
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/jpg,image/png"
             multiple
             className="hidden"
             onChange={(e) => { const f = e.target.files; if (f && f.length) onUpload(f); e.target.value = ""; }}
