@@ -422,18 +422,18 @@ function TarotPage() {
           ))}
 
           {/* Five deck stacks — bottom right */}
-          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none" data-tour="deck-picker">
+          <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none" data-tour="deck-picker">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
-              Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
+              {loadingDecks ? "Loading decks…" : `Pick a deck · ${totalCards} cards`}
             </div>
-            <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
+            <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
               {DECK_LIST.map((meta, di) => {
-                const subDeck = decks[meta.key];
+                const subDeck = decks[meta.key] ?? [];
                 const empty = subDeck.length === 0;
                 return (
                   <div
                     key={meta.key}
-                    className="relative flex flex-col items-center"
+                    className="relative flex flex-col items-center flex-shrink-0"
                     style={{ width: MINI_W }}
                     title={`${meta.name} — ${meta.tagline}`}
                   >
@@ -481,14 +481,16 @@ function TarotPage() {
                       {meta.shortName}
                     </div>
                     <div className="text-[9px] text-muted-foreground leading-none">
-                      {subDeck.length}/{meta.count}
+                      {subDeck.length}/{meta.expected}
                     </div>
                   </div>
                 );
               })}
             </div>
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
-              Drag any deck onto the board
+              {!loadingDecks && totalCards === 0
+                ? "No card images uploaded yet — add them in Admin → Assets."
+                : "Drag any deck onto the board"}
             </div>
           </div>
         </div>
