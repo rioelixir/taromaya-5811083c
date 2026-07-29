@@ -1,5 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
