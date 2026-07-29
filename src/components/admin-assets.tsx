@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { GlassCard } from "@/components/page-shell";
 import { Loader2, Upload, Trash2, Image as ImageIcon, Check } from "lucide-react";
 import { compressImage, PRESETS } from "@/lib/image-compress";
+import { DECK_LIST } from "@/lib/tarot-decks";
 
 const BUCKET = "app-assets";
 
