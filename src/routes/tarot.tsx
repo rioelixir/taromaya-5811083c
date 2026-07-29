@@ -688,31 +688,45 @@ function TarotPage() {
 
 function PlacedCardView({
   card,
+  dragging,
   onPointerDown,
   onFlip,
   onZoom,
 }: {
   card: PlacedCard;
+  dragging: boolean;
   onPointerDown: (e: React.PointerEvent) => void;
   onFlip: () => void;
   onRemove: () => void;
   onZoom: () => void;
 }) {
+  const down = useRef({ x: 0, y: 0 });
   return (
     <div
       className="absolute group"
-      style={{ left: card.x, top: card.y, width: CARD_W, height: CARD_H, zIndex: card.locked ? 20 : 30 }}
+      style={{
+        left: card.x,
+        top: card.y,
+        width: CARD_W,
+        height: CARD_H,
+        zIndex: dragging ? 40 : card.locked ? 20 : 30,
+        transition: dragging ? "none" : "left 420ms cubic-bezier(.22,1,.36,1), top 420ms cubic-bezier(.22,1,.36,1)",
+      }}
     >
       <div
-        onPointerDown={onPointerDown}
-        onClick={() => {
-          // Tap-to-flip: first tap reveals; subsequent tap on a revealed card zooms.
-          if (!card.flipped) onFlip();
-          else if (card.locked) onZoom();
+        onPointerDown={(e) => {
+          down.current = { x: e.clientX, y: e.clientY };
+          onPointerDown(e);
         }}
-        className={`relative w-full h-full transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-hover:scale-[1.04] active:scale-[0.98] ${
-          card.locked ? "cursor-zoom-in" : "cursor-grab active:cursor-grabbing"
-        }`}
+        onClick={(e) => {
+          // Ignore the click that ends a drag.
+          if (Math.abs(e.clientX - down.current.x) > 4 || Math.abs(e.clientY - down.current.y) > 4) return;
+          if (!card.flipped) onFlip();
+          else onZoom();
+        }}
+        className={`relative w-full h-full transition-transform duration-300 ease-out ${
+          dragging ? "scale-[1.08]" : "group-hover:-translate-y-1.5 group-hover:scale-[1.04]"
+        } cursor-grab active:cursor-grabbing`}
         style={{ perspective: "1000px" }}
       >
         {/* Hover glow */}
@@ -732,7 +746,7 @@ function PlacedCardView({
             style={{ backfaceVisibility: "hidden" }}
           >
             <div className="absolute inset-2 rounded-xl border border-gold/20 flex items-center justify-center">
-              <div className="text-gold/70 font-display text-3xl transition-transform duration-300 group-hover:scale-110">✦</div>
+              <div className="text-gold/70 font-display text-2xl transition-transform duration-300 group-hover:scale-110">✦</div>
             </div>
           </div>
           {/* Front */}
@@ -756,15 +770,18 @@ function PlacedCardView({
       {/* Overlay controls */}
       <div className="absolute -top-2 -right-2 flex gap-1 z-10">
         {card.locked && (
-          <div className="rounded-full bg-gold/20 border border-gold/40 p-1" title="Locked">
+          <div className="rounded-full bg-gold/20 border border-gold/40 p-1" title="Placed">
             <Lock className="h-3 w-3 text-gold" />
           </div>
         )}
       </div>
 
-      {/* Hint label */}
-      <div className="pointer-events-none absolute inset-x-0 -bottom-5 mx-auto text-center text-[10px] uppercase tracking-widest text-gold/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        {card.flipped ? (card.locked ? "Tap to zoom" : "Tap to flip") : "Tap to reveal"}
+      {/* Always-visible, easy-to-read card name */}
+      <div
+        className="pointer-events-none absolute inset-x-[-14px] -bottom-[22px] text-center text-[13px] sm:text-sm font-medium leading-tight text-pearl"
+        style={{ textShadow: "0 2px 8px rgba(0,0,0,0.95)" }}
+      >
+        {card.flipped ? card.card.name : "Tap to reveal"}
       </div>
     </div>
   );
