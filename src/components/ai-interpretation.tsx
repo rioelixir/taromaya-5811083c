@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { Sparkles, Loader2, RefreshCw, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
+import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
+import { PlainAIText } from "@/components/plain-ai-text";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
 import { useLang } from "@/lib/i18n";
 
