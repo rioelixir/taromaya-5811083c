@@ -266,6 +266,18 @@ function TarotPage() {
   useEffect(() => {
     if (!draggingUid) return;
 
+    let frame = 0;
+    let pending: { x: number; y: number } | null = null;
+
+    const flush = () => {
+      frame = 0;
+      const st = dragState.current;
+      if (!st.uid || !pending) return;
+      const { x, y } = pending;
+      pending = null;
+      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+    };
+
     const move = (e: PointerEvent) => {
       const st = dragState.current;
       if (!st.uid) return;
@@ -275,10 +287,10 @@ function TarotPage() {
         st.moved = true;
       }
       const r = canvasEl.getBoundingClientRect();
-      const x = e.clientX - r.left - st.offsetX;
-      const y = e.clientY - r.top - st.offsetY;
-      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+      pending = { x: e.clientX - r.left - st.offsetX, y: e.clientY - r.top - st.offsetY };
+      if (!frame) frame = requestAnimationFrame(flush);
     };
+
 
     const up = () => {
       const st = dragState.current;
