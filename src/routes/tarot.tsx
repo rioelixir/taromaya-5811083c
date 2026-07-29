@@ -1,14 +1,13 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
-import { SPREADS, secureRandInt, type SpreadKey, type TarotCard } from "@/lib/tarot-deck";
-import { cardImage } from "@/lib/tarot-images";
-import { DECKS, DECK_LIST, type DeckKey } from "@/lib/tarot-decks";
-import { isCourtCard } from "@/lib/tarot-details";
+import { SPREADS, secureRandInt, type SpreadKey } from "@/lib/tarot-deck";
+import { DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
+import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, Crown, ChevronUp, ChevronDown } from "lucide-react";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
@@ -24,7 +23,7 @@ export const Route = createFileRoute("/tarot")({
 
 type PlacedCard = {
   uid: string;
-  card: TarotCard;
+  card: UploadedCard;
   deckKey: DeckKey;
   reversed: boolean;
   x: number; // canvas px
@@ -38,8 +37,10 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 130;
 const CARD_H = 200;
-const MINI_W = 62;
-const MINI_H = 96;
+const MINI_W = 52;
+const MINI_H = 80;
+
+type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
 function randomReversed() {
   return false;
@@ -56,40 +57,19 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
-// Rider-Waite deck-mode isolation: full 78, majors only (22), minors only (56), courts only (16).
-export type RWMode = "full" | "major" | "minor" | "court";
-const RW_MODES: { key: RWMode; label: string }[] = [
-  { key: "full",   label: "Full 78" },
-  { key: "major",  label: "Major 22" },
-  { key: "minor",  label: "Minor 56" },
-  { key: "court",  label: "Court 16" },
-];
-
-function filterRW(mode: RWMode): TarotCard[] {
-  const all = DECKS["rider-waite"];
-  switch (mode) {
-    case "major": return all.filter((c) => c.arcana === "major");
-    case "minor": return all.filter((c) => c.arcana === "minor");
-    case "court": return all.filter(isCourtCard);
-    default:      return all;
-  }
+// Shuffle each admin-uploaded deck into a draw stack.
+function makeDeckStacks(source: DeckStacks): DeckStacks {
+  return Object.fromEntries(
+    DECK_LIST.map((m) => [m.key, shuffle(source[m.key] ?? [])]),
+  ) as unknown as DeckStacks;
 }
-
-// Build the initial Rider-Waite stack.
-function makeDeckStacks(rwMode: RWMode = "full"): Record<DeckKey, TarotCard[]> {
-  return {
-    "rider-waite": shuffle(filterRW(rwMode)),
-  };
-}
-
-
 
 function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const [rwMode, setRwMode] = useState<RWMode>("full");
-  const [decks, setDecks] = useState<Record<DeckKey, TarotCard[]>>(() => makeDeckStacks("full"));
+  const { decks: uploaded, loading: loadingDecks } = useUploadedDecks();
+  const [decks, setDecks] = useState<DeckStacks>(() => makeDeckStacks({} as DeckStacks));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -160,16 +140,14 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(rwMode));
-  }, [rwMode]);
+    setDecks(makeDeckStacks(uploaded));
+  }, [uploaded]);
 
-  // Rebuild the Rider-Waite stack whenever the deck-mode changes.
+  // Rebuild the draw stacks whenever the admin-uploaded decks load or change.
   useEffect(() => {
-    setDecks((prev) => ({
-      ...prev,
-      "rider-waite": shuffle(filterRW(rwMode)),
-    }));
-  }, [rwMode]);
+    setPlaced([]);
+    setDecks(makeDeckStacks(uploaded));
+  }, [uploaded]);
 
   useEffect(() => {
     setPlaced([]);
@@ -285,6 +263,11 @@ function TarotPage() {
     });
   }, []);
 
+  const totalCards = useMemo(
+    () => DECK_LIST.reduce((n, m) => n + (decks[m.key]?.length ?? 0), 0),
+    [decks],
+  );
+
 
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
@@ -313,7 +296,7 @@ function TarotPage() {
             name: c.card.name,
             position: c.position,
             reversed: c.reversed,
-            keywords: c.reversed ? c.card.keywordsReversed : c.card.keywords,
+            keywords: [],
           })),
         },
       });
@@ -371,26 +354,9 @@ function TarotPage() {
                 );
               })}
               <div className="mx-1 h-6 w-px bg-white/10" aria-hidden />
-              <span className="text-[10px] uppercase tracking-widest text-gold/70 inline-flex items-center gap-1">
-                <Crown className="h-3 w-3" /> Rider-Waite
+              <span className="text-[10px] uppercase tracking-widest text-gold/70">
+                5 decks · any spread
               </span>
-              {RW_MODES.map((m) => {
-                const active = m.key === rwMode;
-                return (
-                  <button
-                    key={m.key}
-                    onClick={() => setRwMode(m.key)}
-                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
-                      active
-                        ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
-                        : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
-                    }`}
-                    title={`Restrict Rider-Waite to ${m.label}`}
-                  >
-                    {m.label}
-                  </button>
-                );
-              })}
             </div>
 
             <div className="mt-2 flex flex-wrap gap-2 items-center">
@@ -461,18 +427,18 @@ function TarotPage() {
           ))}
 
           {/* Five deck stacks — bottom right */}
-          <div className="absolute bottom-4 right-3 sm:right-4 flex flex-col items-end gap-2 pointer-events-none" data-tour="deck-picker">
+          <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none" data-tour="deck-picker">
             <div className="text-[10px] uppercase tracking-widest text-gold/70">
-              Pick a deck · {DECK_LIST.reduce((n, m) => n + decks[m.key].length, 0)} cards
+              {loadingDecks ? "Loading decks…" : `Pick a deck · ${totalCards} cards`}
             </div>
-            <div className="pointer-events-auto flex items-end gap-2 sm:gap-2.5">
+            <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
               {DECK_LIST.map((meta, di) => {
-                const subDeck = decks[meta.key];
+                const subDeck = decks[meta.key] ?? [];
                 const empty = subDeck.length === 0;
                 return (
                   <div
                     key={meta.key}
-                    className="relative flex flex-col items-center"
+                    className="relative flex flex-col items-center flex-shrink-0"
                     style={{ width: MINI_W }}
                     title={`${meta.name} — ${meta.tagline}`}
                   >
@@ -520,14 +486,16 @@ function TarotPage() {
                       {meta.shortName}
                     </div>
                     <div className="text-[9px] text-muted-foreground leading-none">
-                      {subDeck.length}/{meta.count}
+                      {subDeck.length}/{meta.expected}
                     </div>
                   </div>
                 );
               })}
             </div>
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
-              Drag any deck onto the board
+              {!loadingDecks && totalCards === 0
+                ? "No card images uploaded yet — add them in Admin → Assets."
+                : "Drag any deck onto the board"}
             </div>
           </div>
         </div>
@@ -589,15 +557,11 @@ function TarotPage() {
                 transform: zc.reversed ? "rotate(180deg)" : undefined,
               }}
             >
-              {cardImage(zc.card.id) ? (
-                <img
-                  src={cardImage(zc.card.id)}
-                  alt={zc.card.name}
-                  className="absolute inset-0 w-full h-full object-contain bg-black"
-                />
-              ) : (
-                <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
-              )}
+              <img
+                src={zc.card.image}
+                alt={zc.card.name}
+                className="absolute inset-0 w-full h-full object-contain bg-black"
+              />
             </div>
           </div>
         );
@@ -674,18 +638,12 @@ function PlacedCardView({
               transform: `rotateY(180deg) ${card.reversed ? "rotate(180deg)" : ""}`,
             }}
           >
-            {cardImage(card.card.id) ? (
-              <img
-                src={cardImage(card.card.id)}
-                alt={card.card.name}
-                draggable={false}
-                className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
-              />
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-4xl">{glyphFor(card.card)}</div>
-              </div>
-            )}
+            <img
+              src={card.card.image}
+              alt={card.card.name}
+              draggable={false}
+              className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
+            />
           </div>
         </div>
       </div>
@@ -710,16 +668,7 @@ function PlacedCardView({
 
 
 
-function glyphFor(card: { arcana: string; suit?: string }) {
-  if (card.arcana === "major") return "✦";
-  switch (card.suit) {
-    case "wands": return "🜂";
-    case "cups": return "🜄";
-    case "swords": return "🜁";
-    case "pentacles": return "🜃";
-    default: return "✦";
-  }
-}
+
 
 function ReadingMarkdown({ text }: { text: string }) {
   const lines = text.split("\n");
