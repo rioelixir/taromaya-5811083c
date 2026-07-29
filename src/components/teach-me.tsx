@@ -196,20 +196,11 @@ export function TeachMe({
                 </div>
               )}
               {text && (
-                <article
-                  data-no-translate
-                  className="space-y-3 text-foreground leading-relaxed
-                    [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
-                    [&_h2]:mt-5 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-lg [&_h2]:text-primary
-                    [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-base
-                    [&_p]:text-foreground
-                    [&_strong]:text-primary [&_strong]:font-semibold
-                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1
-                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1
-                    [&_blockquote]:border-l-2 [&_blockquote]:border-primary/60 [&_blockquote]:pl-4 [&_blockquote]:italic"
-                >
-                  <ReactMarkdown>{text}</ReactMarkdown>
-                </article>
+                <PlainAIText
+                  text={text}
+                  busy={loading}
+                  label={`Lesson on ${module}`}
+                />
               )}
             </div>
           </div>
