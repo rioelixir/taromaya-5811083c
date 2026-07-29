@@ -263,6 +263,11 @@ function TarotPage() {
     });
   }, []);
 
+  const totalCards = useMemo(
+    () => DECK_LIST.reduce((n, m) => n + (decks[m.key]?.length ?? 0), 0),
+    [decks],
+  );
+
 
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
