@@ -1,5 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, NAKSHATRAS, PLANET_GLYPHS, RASHIS } from "@/lib/vedic";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/nakshatra")({
   }),
 });
 
-const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090" };
+const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090", place: "New Delhi, Delhi, India" };
 
 const TATTVA_ICON: Record<string, typeof Flame> = {
   Fire: Flame, Water: Droplet, Air: Wind, Earth: Mountain, Ether: Sparkles,
@@ -190,10 +191,7 @@ function NakshatraPage() {
           {[
             { k: "date", label: "Date", type: "date" },
             { k: "time", label: "Time", type: "time" },
-            { k: "tz", label: "TZ offset", type: "text" },
-            { k: "lat", label: "Latitude", type: "text" },
-            { k: "lon", label: "Longitude", type: "text" },
-          ].map((f) => (
+            ].map((f) => (
             <label key={f.k} className="text-xs uppercase tracking-widest text-muted-foreground">
               {f.label}
               <input
@@ -204,6 +202,14 @@ function NakshatraPage() {
               />
             </label>
           ))}
+        </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
+            onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
+            forDate={form.date}
+            forTime={form.time}
+          />
         </div>
         {chart && (
           <div className="mt-4 text-sm text-pearl flex flex-wrap gap-4">
