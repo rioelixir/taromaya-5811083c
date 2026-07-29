@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { useLang, type Lang } from "@/lib/i18n";
+import { RTL_LANGS, useLang, type Lang } from "@/lib/i18n";
 
 const CACHE_KEY = (lang: Lang) => `taromaya.translations.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
@@ -182,7 +182,8 @@ export function AutoTranslator() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    document.documentElement.lang = lang === "hi" ? "hi" : lang === "hr" ? "en-IN" : "en";
+    document.documentElement.lang = lang === "hr" ? "en-IN" : lang;
+    document.documentElement.dir = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
 
     let raf = 0;
     const schedule = () => {

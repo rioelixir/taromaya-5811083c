@@ -40,7 +40,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         <div
           role="menu"
           className={[
-            "absolute rounded-xl glass gold-border overflow-hidden z-50 min-w-[140px]",
+            "absolute rounded-xl glass gold-border overflow-y-auto overflow-x-hidden z-50 min-w-[170px] max-h-[60vh]",
             compact ? "top-full right-0 mt-2" : "bottom-full left-0 right-0 mb-2",
           ].join(" ")}
         >
