@@ -8,11 +8,16 @@ import { DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
+import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
 export const Route = createFileRoute("/tarot")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    deck: typeof search.deck === "string" ? search.deck : undefined,
+    card: typeof search.card === "string" ? search.card : undefined,
+  }),
   component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
   head: () => ({
     meta: [
@@ -38,8 +43,8 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 86;
 const CARD_H = 132;
-const MINI_W = 46;
-const MINI_H = 70;
+const MINI_W = 58;
+const MINI_H = 88;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
@@ -65,6 +70,7 @@ function makeDeckStacks(source: DeckStacks): DeckStacks {
 }
 
 function TarotPage() {
+  const search = Route.useSearch();
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
@@ -77,6 +83,10 @@ function TarotPage() {
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
+
+  // Closing the zoom must never navigate away from the board.
+  const closeZoom = useCallback(() => setZoomedUid(null), []);
+  useOverlayBackGuard(!!zoomedUid, closeZoom);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
@@ -379,6 +389,44 @@ function TarotPage() {
     [decks],
   );
 
+  // Auto-pull: another module (e.g. today's Nakshatra) can send us straight to
+  // the board with one exact card, which then slides up on its own.
+  const autoPulled = useRef<string | null>(null);
+  useEffect(() => {
+    const deckKey = search.deck as DeckKey | undefined;
+    const wanted = search.card;
+    if (!deckKey || !wanted) return;
+    const key = `${deckKey}|${wanted}`;
+    if (autoPulled.current === key) return;
+    const stack = decks[deckKey];
+    if (!stack || stack.length === 0) return;
+    const want = wanted.trim().toLowerCase();
+    const found = stack.find((c) => c.name.trim().toLowerCase() === want)
+      ?? stack.find((c) => c.name.trim().toLowerCase().includes(want));
+    if (!found) return;
+    autoPulled.current = key;
+
+    const uid = `auto_${Date.now()}`;
+    const startX = canvasSize.w / 2 - CARD_W / 2;
+    const startY = Math.max(0, canvasSize.h - CARD_H - 20);
+    setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].filter((c) => c !== found) }));
+    setPlaced((prev) => [
+      ...prev,
+      { uid, card: found, deckKey, reversed: false, x: startX, y: startY, slotIndex: null, locked: true, flipped: false },
+    ]);
+    const timer = window.setTimeout(() => {
+      setPlaced((prev) => {
+        const idx = prev.findIndex((p) => p.uid === uid);
+        if (idx < 0) return prev;
+        const spot = restingSpot(prev.filter((p) => p.uid !== uid));
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...spot, flipped: true };
+        return next;
+      });
+    }, 60);
+    return () => window.clearTimeout(timer);
+  }, [search.deck, search.card, decks, canvasSize.w, canvasSize.h, restingSpot]);
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
@@ -496,7 +544,7 @@ function TarotPage() {
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                Read the cards
+                Ask AI
               </button>
             </div>
           </>
@@ -533,10 +581,20 @@ function TarotPage() {
             />
           ))}
 
+          {/* Always-there Ask AI button, so it works even with the top bar hidden */}
+          <button
+            onClick={requestReading}
+            disabled={!readyToInterpret || loadingReading}
+            className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+          >
+            {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Ask AI
+          </button>
+
           {/* Five deck stacks — bottom right */}
           <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none" data-tour="deck-picker">
-            <div className="text-[10px] uppercase tracking-widest text-gold/70">
-              {loadingDecks ? "Loading decks…" : `Pick a deck · ${totalCards} cards`}
+            <div className="text-xs font-semibold tracking-wide text-gold">
+              {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
             </div>
             <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
               {DECK_LIST.map((meta, di) => {
@@ -546,7 +604,7 @@ function TarotPage() {
                   <div
                     key={meta.key}
                     className="relative flex flex-col items-center flex-shrink-0"
-                    style={{ width: MINI_W }}
+                    style={{ width: 78 }}
                     title={`${meta.name} — ${meta.tagline}`}
                   >
                     <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
@@ -587,22 +645,22 @@ function TarotPage() {
                       })}
                     </div>
                     <div
-                      className="mt-2 text-[9px] uppercase tracking-[0.2em] font-medium text-center leading-tight"
+                      className="mt-2 w-[76px] rounded-md bg-black/60 px-1 py-0.5 text-[13px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                       style={{ color: meta.accent }}
                     >
                       {meta.shortName}
                     </div>
-                    <div className="text-[9px] text-muted-foreground leading-none">
+                    <div className="text-[11px] font-medium text-pearl/80 leading-tight">
                       {subDeck.length}/{meta.expected}
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
+            <div className="text-xs text-pearl/70 pointer-events-auto text-center pt-1">
               {!loadingDecks && totalCards === 0
-                ? "No card images uploaded yet — add them in Admin → Assets."
-                : "Tap or drag a deck onto the board"}
+                ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                : "Tap a deck, or hold and drag a card onto the board"}
             </div>
           </div>
         </div>
@@ -645,11 +703,11 @@ function TarotPage() {
         if (!zc) return null;
         return (
           <div
-            onClick={() => setZoomedUid(null)}
+            onClick={closeZoom}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
           >
             <button
-              onClick={(e) => { e.stopPropagation(); setZoomedUid(null); }}
+              onClick={(e) => { e.stopPropagation(); closeZoom(); }}
               className="fixed top-4 right-4 z-10 rounded-full bg-black/70 border border-white/20 p-2 hover:bg-white/10"
               aria-label="Close"
             >

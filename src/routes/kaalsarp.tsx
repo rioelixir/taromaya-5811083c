@@ -1,5 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/kaalsarp")({
   }),
 });
 
-const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090" };
+const DEFAULT = { date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090", place: "New Delhi, Delhi, India" };
 
 function KaalSarpPage() {
   const [form, setForm] = useState(DEFAULT);
@@ -51,10 +52,7 @@ function KaalSarpPage() {
           {[
             { k: "date", label: "Date", type: "date" },
             { k: "time", label: "Time", type: "time" },
-            { k: "tz", label: "TZ", type: "text" },
-            { k: "lat", label: "Latitude", type: "text" },
-            { k: "lon", label: "Longitude", type: "text" },
-          ].map((f) => (
+            ].map((f) => (
             <label key={f.k} className="text-xs uppercase tracking-widest text-muted-foreground">
               {f.label}
               <input type={f.type} value={(form as Record<string,string>)[f.k]}
@@ -62,6 +60,14 @@ function KaalSarpPage() {
                 className="mt-1 w-full glass rounded-xl px-3 py-2 text-sm text-pearl outline-none focus:ring-1 focus:ring-gold/60" />
             </label>
           ))}
+        </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
+            onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
+            forDate={form.date}
+            forTime={form.time}
+          />
         </div>
       </GlassCard>
 

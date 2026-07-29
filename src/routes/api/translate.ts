@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
+import { LANGUAGE_LIST } from "@/lib/i18n";
 
-type Body = { lang?: "hi" | "hr"; strings?: string[] };
+type Body = { lang?: string; strings?: string[] };
 
 export const Route = createFileRoute("/api/translate")({
   server: {
@@ -22,16 +23,18 @@ export const Route = createFileRoute("/api/translate")({
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-        const target =
-          lang === "hi"
-            ? "Hindi in Devanagari script"
-            : "Roman Hinglish (Hindi words written in Latin script, natural conversational)";
+        const target = LANGUAGE_LIST.find((l) => l.code === lang)?.ai;
+        if (!target || lang === "en") {
+          return new Response(JSON.stringify({ translations: strings }), {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
 
         const system =
           `You are a professional translator. Translate each item from English to ${target}. ` +
           `Return ONLY a strict JSON array of the same length, no prose, no keys, no numbering. ` +
           `Preserve numbers, dates, punctuation, emojis, and proper nouns like Taromaya. ` +
-          `Keep translations short and natural for a mobile UI. ` +
+          `Keep translations short, simple and natural for a mobile UI, easy enough for a 10-year-old. ` +
           `If an item is already non-English, a symbol, or a single number, return it unchanged.`;
 
         const prompt =
