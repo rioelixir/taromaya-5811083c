@@ -552,15 +552,11 @@ function TarotPage() {
                 transform: zc.reversed ? "rotate(180deg)" : undefined,
               }}
             >
-              {cardImage(zc.card.id) ? (
-                <img
-                  src={cardImage(zc.card.id)}
-                  alt={zc.card.name}
-                  className="absolute inset-0 w-full h-full object-contain bg-black"
-                />
-              ) : (
-                <div className="text-[min(48vw,32dvh)] leading-none">{glyphFor(zc.card)}</div>
-              )}
+              <img
+                src={zc.card.image}
+                alt={zc.card.name}
+                className="absolute inset-0 w-full h-full object-contain bg-black"
+              />
             </div>
           </div>
         );
