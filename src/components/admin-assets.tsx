@@ -257,8 +257,8 @@ function DeckEditor({ deckKey, label, expected }: { deckKey: string; label: stri
       const uploaded: DeckCard[] = [];
       for (let i = 0; i < files.length; i++) {
         const raw = files[i];
-        const file = await compressImage(raw, PRESETS.card);
-        const ext = file.type === "image/webp" ? "webp" : (file.name.split(".").pop() || "png").toLowerCase();
+        const file = await compressImage(raw, { ...PRESETS.card, mime: "image/jpeg" });
+        const ext = "jpg";
         const clean = raw.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9-_]+/g, "-").slice(0, 40);
         const key = `decks/${deckKey}/${Date.now()}-${i}-${clean}.${ext}`;
         const { error } = await supabase.storage.from(BUCKET).upload(key, file, { contentType: file.type });
