@@ -492,19 +492,34 @@ function TarotPage() {
       <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
         <div
           ref={canvasRef}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
           className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
         >
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
+
+          {/* Empty spread slots */}
+          {slots.map((s) => {
+            const taken = placed.some((p) => p.slotIndex === s.index);
+            if (taken) return null;
+            return (
+              <div
+                key={s.index}
+                className="absolute rounded-2xl border border-dashed border-gold/25 bg-white/[0.02] flex items-end justify-center pb-1"
+                style={{ left: s.x, top: s.y, width: CARD_W, height: CARD_H }}
+              >
+                <span className="text-[10px] uppercase tracking-widest text-gold/50 text-center px-1 leading-tight">
+                  {s.label}
+                </span>
+              </div>
+            );
+          })}
 
           {/* Placed cards */}
           {placed.map((p) => (
             <PlacedCardView
               key={p.uid}
               card={p}
+              dragging={draggingUid === p.uid}
               onPointerDown={(e) => beginDragPlaced(e, p.uid)}
               onFlip={() =>
                 setPlaced((prev) =>
