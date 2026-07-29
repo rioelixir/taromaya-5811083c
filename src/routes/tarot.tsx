@@ -668,16 +668,7 @@ function PlacedCardView({
 
 
 
-function glyphFor(card: { arcana: string; suit?: string }) {
-  if (card.arcana === "major") return "✦";
-  switch (card.suit) {
-    case "wands": return "🜂";
-    case "cups": return "🜄";
-    case "swords": return "🜁";
-    case "pentacles": return "🜃";
-    default: return "✦";
-  }
-}
+
 
 function ReadingMarkdown({ text }: { text: string }) {
   const lines = text.split("\n");
