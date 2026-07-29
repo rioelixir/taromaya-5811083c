@@ -47,7 +47,6 @@ function randomReversed() {
   return false;
 }
 
-
 // Fisher-Yates shuffle helper (CSPRNG-backed, unbiased, non-repeatable).
 function shuffle<T>(arr: T[]): T[] {
   const d = [...arr];
@@ -269,7 +268,6 @@ function TarotPage() {
     [decks],
   );
 
-
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
@@ -393,11 +391,7 @@ function TarotPage() {
           </>
         )}
 
-
       </div>
-
-
-
 
       {/* Canvas — fills remaining viewport */}
       <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
@@ -665,9 +659,3 @@ function PlacedCardView({
     </div>
   );
 }
-
-
-
-
-
-

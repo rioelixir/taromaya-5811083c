@@ -24,10 +24,7 @@ export function PlainAIText({
     >
       {lines.map((l, i) =>
         l.kind === "heading" ? (
-          <h3
-            key={i}
-            className="mt-4 font-display text-lg text-primary first:mt-0"
-          >
+          <h3 key={i} className="mt-4 font-display text-lg text-primary first:mt-0">
             {l.text}
           </h3>
         ) : l.kind === "bullet" ? (
