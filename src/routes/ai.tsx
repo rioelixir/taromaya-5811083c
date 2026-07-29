@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { listKundlis } from "@/lib/kundli-storage.functions";
 import { buildGuideContext, GUIDE_SYSTEM_PROMPT, type SavedKundliRow } from "@/lib/ai-context";
 import { createJournalEntry } from "@/lib/journal.functions";
-import ReactMarkdown from "react-markdown";
+import { PlainAIText } from "@/components/plain-ai-text";
 
 
 export const Route = createFileRoute("/ai")({
@@ -265,11 +265,11 @@ function MessageBubble({ m }: { m: UIMessage }) {
       <div
         className={
           isAi
-            ? "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-galaxy/25 to-midnight/30 gold-border px-4 py-3 text-sm text-pearl prose prose-invert prose-sm max-w-none prose-p:my-2 prose-headings:font-display prose-headings:text-gold prose-strong:text-gold-soft relative"
+            ? "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-galaxy/25 to-midnight/30 gold-border px-4 py-3 text-sm text-pearl relative"
             : "max-w-[92%] sm:max-w-[85%] rounded-2xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-pearl whitespace-pre-wrap"
         }
       >
-        {isAi ? <ReactMarkdown>{text}</ReactMarkdown> : text}
+        {isAi ? <PlainAIText text={text} label="Assistant reply" /> : text}
         {isAi && text.trim() && (
           <button
             onClick={saveToJournal}
