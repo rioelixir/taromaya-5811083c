@@ -526,7 +526,7 @@ function TarotPage() {
                   {error}
                 </div>
               )}
-              {reading && <div className="mt-3"><ReadingMarkdown text={reading} /></div>}
+              {reading && <div className="mt-3"><PlainAIText text={reading} label="Tarot reading" /></div>}
             </div>
           </div>
         )}
