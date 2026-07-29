@@ -6,9 +6,7 @@ import { compressImage, PRESETS } from "@/lib/image-compress";
 
 const BUCKET = "app-assets";
 
-const DECK_KEYS = [
-  { key: "rider-waite",    name: "Rider Waite",    expected: 78 },
-] as const;
+const DECK_KEYS = DECK_LIST.map((d) => ({ key: d.key, name: d.name, expected: d.expected }));
 
 
 type DeckCard = { path: string; name: string };
