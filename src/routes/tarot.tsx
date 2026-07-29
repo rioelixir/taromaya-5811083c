@@ -36,10 +36,10 @@ type PlacedCard = {
 
 type Slot = { index: number; label: string; x: number; y: number };
 
-const CARD_W = 130;
-const CARD_H = 200;
-const MINI_W = 52;
-const MINI_H = 80;
+const CARD_W = 86;
+const CARD_H = 132;
+const MINI_W = 46;
+const MINI_H = 70;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
@@ -125,7 +125,7 @@ function TarotPage() {
     if (n === 1) {
       return [{ index: 0, label: spread.positions[0], x: canvasSize.w / 2 - CARD_W / 2, y: cy }];
     }
-    const gap = 40;
+    const gap = 26;
     const totalW = n * CARD_W + (n - 1) * gap;
     const startX = canvasSize.w / 2 - totalW / 2;
     return spread.positions.map((label, i) => ({
@@ -155,18 +155,62 @@ function TarotPage() {
     setError(null);
   }, [spreadKey]);
 
-  // -------- Drag from deck --------
+  // -------- Drag engine (window-level pointer tracking) --------
   const dragState = useRef<{
     uid: string | null;
+    pointerId: number | null;
     offsetX: number;
     offsetY: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
     fromDeck: boolean;
-  }>({ uid: null, offsetX: 0, offsetY: 0, fromDeck: false });
+  }>({ uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false });
+
+  const [draggingUid, setDraggingUid] = useState<string | null>(null);
+
+  const clampToCanvas = useCallback(
+    (x: number, y: number) => {
+      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
+      const maxY = Math.max(0, canvasSize.h - CARD_H - 26);
+      return {
+        x: Math.min(Math.max(0, x), maxX),
+        y: Math.min(Math.max(0, y), maxY),
+      };
+    },
+    [canvasSize.w, canvasSize.h],
+  );
+
+  // Where a card should rest when it is tapped (not dragged) out of a deck:
+  // the next free spread slot, or a tidy grid that fits ~15 cards for freestyle.
+  const restingSpot = useCallback(
+    (existing: PlacedCard[]) => {
+      if (!isFreestyle) {
+        const used = new Set(existing.map((p) => p.slotIndex).filter((i) => i !== null));
+        const free = slots.find((s) => !used.has(s.index));
+        if (free) return { x: free.x, y: free.y, slotIndex: free.index };
+      }
+      const perRow = Math.max(1, Math.floor((canvasSize.w - 40) / (CARD_W + 16)));
+      const i = existing.length;
+      const row = Math.floor(i / perRow);
+      const col = i % perRow;
+      const rowCount = Math.min(perRow, Math.max(1, existing.length + 1 - row * perRow));
+      const rowW = rowCount * CARD_W + (rowCount - 1) * 16;
+      const x = canvasSize.w / 2 - rowW / 2 + col * (CARD_W + 16);
+      const y = 24 + row * (CARD_H + 40);
+      const c = clampToCanvas(x, y);
+      return { x: c.x, y: c.y, slotIndex: null as number | null };
+    },
+    [isFreestyle, slots, canvasSize.w, clampToCanvas],
+  );
 
   const beginDragFromDeck = (e: React.PointerEvent, deckKey: DeckKey) => {
+    e.preventDefault();
     const source = decks[deckKey];
     if (!source || source.length === 0) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+    const canvasRect = canvasEl.getBoundingClientRect();
     const card = source[0];
     const uid = `p_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const x = e.clientX - canvasRect.left - CARD_W / 2;
@@ -184,66 +228,117 @@ function TarotPage() {
     };
     setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].slice(1) }));
     setPlaced((p) => [...p, newPlaced]);
-    dragState.current = { uid, offsetX: CARD_W / 2, offsetY: CARD_H / 2, fromDeck: true };
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    dragState.current = {
+      uid,
+      pointerId: e.pointerId,
+      offsetX: CARD_W / 2,
+      offsetY: CARD_H / 2,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false,
+      fromDeck: true,
+    };
+    setDraggingUid(uid);
   };
 
   const beginDragPlaced = (e: React.PointerEvent, uid: string) => {
     const target = placed.find((p) => p.uid === uid);
-    if (!target || target.locked) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
+    if (!target) return;
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+    e.preventDefault();
+    const canvasRect = canvasEl.getBoundingClientRect();
     dragState.current = {
       uid,
+      pointerId: e.pointerId,
       offsetX: e.clientX - canvasRect.left - target.x,
       offsetY: e.clientY - canvasRect.top - target.y,
+      startX: e.clientX,
+      startY: e.clientY,
+      moved: false,
       fromDeck: false,
     };
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    setDraggingUid(uid);
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    const st = dragState.current;
-    if (!st.uid) return;
-    const canvasRect = canvasRef.current!.getBoundingClientRect();
-    const x = e.clientX - canvasRect.left - st.offsetX;
-    const y = e.clientY - canvasRect.top - st.offsetY;
-    setPlaced((prev) =>
-      prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)),
-    );
-  };
+  // Global listeners: dragging keeps working even if the pointer leaves the
+  // original element or the deck stack re-renders under the finger.
+  useEffect(() => {
+    if (!draggingUid) return;
 
-  const onPointerUp = () => {
-    const st = dragState.current;
-    if (!st.uid) return;
-    const uid = st.uid;
-    dragState.current = { uid: null, offsetX: 0, offsetY: 0, fromDeck: false };
+    const move = (e: PointerEvent) => {
+      const st = dragState.current;
+      if (!st.uid) return;
+      const canvasEl = canvasRef.current;
+      if (!canvasEl) return;
+      if (Math.abs(e.clientX - st.startX) > 4 || Math.abs(e.clientY - st.startY) > 4) {
+        st.moved = true;
+      }
+      const r = canvasEl.getBoundingClientRect();
+      const x = e.clientX - r.left - st.offsetX;
+      const y = e.clientY - r.top - st.offsetY;
+      setPlaced((prev) => prev.map((p) => (p.uid === st.uid ? { ...p, x, y } : p)));
+    };
 
-    setPlaced((prev) => {
-      const idx = prev.findIndex((p) => p.uid === uid);
-      if (idx < 0) return prev;
-      const card = prev[idx];
+    const up = () => {
+      const st = dragState.current;
+      const uid = st.uid;
+      const wasTap = !st.moved;
+      const fromDeck = st.fromDeck;
+      dragState.current = { uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false };
+      setDraggingUid(null);
+      if (!uid) return;
 
-      const GRID = 20;
-      const sx = Math.round(card.x / GRID) * GRID;
-      const sy = Math.round(card.y / GRID) * GRID;
+      setPlaced((prev) => {
+        const idx = prev.findIndex((p) => p.uid === uid);
+        if (idx < 0) return prev;
+        const card = prev[idx];
+        const next = [...prev];
 
-      const maxX = Math.max(0, canvasSize.w - CARD_W - 4);
-      const maxY = Math.max(0, canvasSize.h - CARD_H - 4);
-      const clampedX = Math.min(Math.max(0, sx), maxX);
-      const clampedY = Math.min(Math.max(0, sy), maxY);
+        // Tap on a deck (no drag) → the card slides up to its spot on the board.
+        if (wasTap && fromDeck) {
+          const spot = restingSpot(prev.filter((p) => p.uid !== uid));
+          next[idx] = { ...card, ...spot, flipped: true, locked: true };
+          return next;
+        }
 
-      const next = [...prev];
-      next[idx] = {
-        ...card,
-        x: clampedX,
-        y: clampedY,
-        flipped: true,
-        locked: true,
-        slotIndex: null,
-      };
-      return next;
-    });
-  };
+        // Dragged → snap to the nearest empty spread slot if close, else free place.
+        const { x: cx, y: cy } = clampToCanvas(card.x, card.y);
+        const used = new Set(prev.filter((p) => p.uid !== uid).map((p) => p.slotIndex));
+        let bestSlot: Slot | null = null;
+        let bestDist = Infinity;
+        for (const s of slots) {
+          if (used.has(s.index)) continue;
+          const d = Math.hypot(s.x - cx, s.y - cy);
+          if (d < bestDist) { bestDist = d; bestSlot = s; }
+        }
+        if (bestSlot && bestDist < CARD_W * 1.1) {
+          next[idx] = { ...card, x: bestSlot.x, y: bestSlot.y, slotIndex: bestSlot.index, flipped: true, locked: true };
+          return next;
+        }
+
+        const GRID = 10;
+        next[idx] = {
+          ...card,
+          x: Math.round(cx / GRID) * GRID,
+          y: Math.round(cy / GRID) * GRID,
+          flipped: true,
+          locked: true,
+          slotIndex: null,
+        };
+        return next;
+      });
+    };
+
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [draggingUid, slots, clampToCanvas, restingSpot]);
 
   const removeCard = (uid: string) => {
     setPlaced((prev) => {
@@ -397,19 +492,34 @@ function TarotPage() {
       <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
         <div
           ref={canvasRef}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
           className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
         >
           {/* subtle grid glow */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
+
+          {/* Empty spread slots */}
+          {slots.map((s) => {
+            const taken = placed.some((p) => p.slotIndex === s.index);
+            if (taken) return null;
+            return (
+              <div
+                key={s.index}
+                className="absolute rounded-2xl border border-dashed border-gold/25 bg-white/[0.02] flex items-end justify-center pb-1"
+                style={{ left: s.x, top: s.y, width: CARD_W, height: CARD_H }}
+              >
+                <span className="text-[10px] uppercase tracking-widest text-gold/50 text-center px-1 leading-tight">
+                  {s.label}
+                </span>
+              </div>
+            );
+          })}
 
           {/* Placed cards */}
           {placed.map((p) => (
             <PlacedCardView
               key={p.uid}
               card={p}
+              dragging={draggingUid === p.uid}
               onPointerDown={(e) => beginDragPlaced(e, p.uid)}
               onFlip={() =>
                 setPlaced((prev) =>
@@ -490,7 +600,7 @@ function TarotPage() {
             <div className="text-[10px] text-muted-foreground pointer-events-auto text-center pt-1">
               {!loadingDecks && totalCards === 0
                 ? "No card images uploaded yet — add them in Admin → Assets."
-                : "Drag any deck onto the board"}
+                : "Tap or drag a deck onto the board"}
             </div>
           </div>
         </div>
@@ -578,31 +688,45 @@ function TarotPage() {
 
 function PlacedCardView({
   card,
+  dragging,
   onPointerDown,
   onFlip,
   onZoom,
 }: {
   card: PlacedCard;
+  dragging: boolean;
   onPointerDown: (e: React.PointerEvent) => void;
   onFlip: () => void;
   onRemove: () => void;
   onZoom: () => void;
 }) {
+  const down = useRef({ x: 0, y: 0 });
   return (
     <div
       className="absolute group"
-      style={{ left: card.x, top: card.y, width: CARD_W, height: CARD_H, zIndex: card.locked ? 20 : 30 }}
+      style={{
+        left: card.x,
+        top: card.y,
+        width: CARD_W,
+        height: CARD_H,
+        zIndex: dragging ? 40 : card.locked ? 20 : 30,
+        transition: dragging ? "none" : "left 420ms cubic-bezier(.22,1,.36,1), top 420ms cubic-bezier(.22,1,.36,1)",
+      }}
     >
       <div
-        onPointerDown={onPointerDown}
-        onClick={() => {
-          // Tap-to-flip: first tap reveals; subsequent tap on a revealed card zooms.
-          if (!card.flipped) onFlip();
-          else if (card.locked) onZoom();
+        onPointerDown={(e) => {
+          down.current = { x: e.clientX, y: e.clientY };
+          onPointerDown(e);
         }}
-        className={`relative w-full h-full transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-hover:scale-[1.04] active:scale-[0.98] ${
-          card.locked ? "cursor-zoom-in" : "cursor-grab active:cursor-grabbing"
-        }`}
+        onClick={(e) => {
+          // Ignore the click that ends a drag.
+          if (Math.abs(e.clientX - down.current.x) > 4 || Math.abs(e.clientY - down.current.y) > 4) return;
+          if (!card.flipped) onFlip();
+          else onZoom();
+        }}
+        className={`relative w-full h-full transition-transform duration-300 ease-out ${
+          dragging ? "scale-[1.08]" : "group-hover:-translate-y-1.5 group-hover:scale-[1.04]"
+        } cursor-grab active:cursor-grabbing`}
         style={{ perspective: "1000px" }}
       >
         {/* Hover glow */}
@@ -622,7 +746,7 @@ function PlacedCardView({
             style={{ backfaceVisibility: "hidden" }}
           >
             <div className="absolute inset-2 rounded-xl border border-gold/20 flex items-center justify-center">
-              <div className="text-gold/70 font-display text-3xl transition-transform duration-300 group-hover:scale-110">✦</div>
+              <div className="text-gold/70 font-display text-2xl transition-transform duration-300 group-hover:scale-110">✦</div>
             </div>
           </div>
           {/* Front */}
@@ -646,15 +770,18 @@ function PlacedCardView({
       {/* Overlay controls */}
       <div className="absolute -top-2 -right-2 flex gap-1 z-10">
         {card.locked && (
-          <div className="rounded-full bg-gold/20 border border-gold/40 p-1" title="Locked">
+          <div className="rounded-full bg-gold/20 border border-gold/40 p-1" title="Placed">
             <Lock className="h-3 w-3 text-gold" />
           </div>
         )}
       </div>
 
-      {/* Hint label */}
-      <div className="pointer-events-none absolute inset-x-0 -bottom-5 mx-auto text-center text-[10px] uppercase tracking-widest text-gold/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        {card.flipped ? (card.locked ? "Tap to zoom" : "Tap to flip") : "Tap to reveal"}
+      {/* Always-visible, easy-to-read card name */}
+      <div
+        className="pointer-events-none absolute inset-x-[-14px] -bottom-[22px] text-center text-[13px] sm:text-sm font-medium leading-tight text-pearl"
+        style={{ textShadow: "0 2px 8px rgba(0,0,0,0.95)" }}
+      >
+        {card.flipped ? card.card.name : "Tap to reveal"}
       </div>
     </div>
   );
