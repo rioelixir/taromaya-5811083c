@@ -7,6 +7,7 @@ import { SPREADS, secureRandInt, type SpreadKey } from "@/lib/tarot-deck";
 import { DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
+import { PlainAIText } from "@/components/plain-ai-text";
 import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
@@ -45,7 +46,6 @@ type DeckStacks = Record<DeckKey, UploadedCard[]>;
 function randomReversed() {
   return false;
 }
-
 
 // Fisher-Yates shuffle helper (CSPRNG-backed, unbiased, non-repeatable).
 function shuffle<T>(arr: T[]): T[] {
@@ -268,7 +268,6 @@ function TarotPage() {
     [decks],
   );
 
-
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
@@ -392,11 +391,7 @@ function TarotPage() {
           </>
         )}
 
-
       </div>
-
-
-
 
       {/* Canvas — fills remaining viewport */}
       <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
@@ -526,7 +521,7 @@ function TarotPage() {
                   {error}
                 </div>
               )}
-              {reading && <div className="mt-3"><ReadingMarkdown text={reading} /></div>}
+              {reading && <div className="mt-3"><PlainAIText text={reading} label="Tarot reading" /></div>}
             </div>
           </div>
         )}
@@ -662,53 +657,5 @@ function PlacedCardView({
         {card.flipped ? (card.locked ? "Tap to zoom" : "Tap to flip") : "Tap to reveal"}
       </div>
     </div>
-  );
-}
-
-
-
-
-
-
-function ReadingMarkdown({ text }: { text: string }) {
-  const lines = text.split("\n");
-  const out: ReactNode[] = [];
-  let para: string[] = [];
-  const flush = (key: number) => {
-    if (para.length) {
-      out.push(
-        <p key={`p${key}`} className="text-pearl/90 leading-relaxed">
-          {renderInline(para.join(" "))}
-        </p>,
-      );
-      para = [];
-    }
-  };
-  lines.forEach((ln, i) => {
-    if (ln.startsWith("### ")) {
-      flush(i);
-      out.push(
-        <h3 key={`h${i}`} className="mt-6 font-display text-lg text-gold">
-          {ln.slice(4)}
-        </h3>,
-      );
-    } else if (ln.trim() === "") {
-      flush(i);
-    } else {
-      para.push(ln);
-    }
-  });
-  flush(9999);
-  return <div className="space-y-3">{out}</div>;
-}
-
-function renderInline(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((p, i) =>
-    p.startsWith("**") && p.endsWith("**") ? (
-      <strong key={i} className="text-pearl">{p.slice(2, -2)}</strong>
-    ) : (
-      <span key={i}>{p}</span>
-    ),
   );
 }

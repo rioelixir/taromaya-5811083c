@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PremiumGate } from "@/components/premium-gate";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { PlainAIText } from "@/components/plain-ai-text";
 import { PageShell } from "@/components/page-shell";
 import { interpretDream } from "@/lib/dream-oracle.functions";
 import { Moon, Sparkles, Loader2, Feather, Wand2 } from "lucide-react";
@@ -149,8 +149,8 @@ function DreamsPage() {
                 </div>
               )}
             </div>
-            <article className="glass rounded-2xl p-6 md:p-8 prose prose-invert prose-headings:font-display prose-headings:text-gold prose-headings:tracking-wide prose-p:text-white/80 prose-strong:text-white max-w-none">
-              <ReactMarkdown>{result.text}</ReactMarkdown>
+            <article className="glass rounded-2xl p-6 md:p-8">
+              <PlainAIText text={result.text} label="Dream reading" />
             </article>
           </section>
         )}

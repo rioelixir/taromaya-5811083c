@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { GraduationCap, Loader2, StopCircle, X, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
+import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
+import { PlainAIText } from "@/components/plain-ai-text";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
 import { useLang } from "@/lib/i18n";
 
@@ -20,32 +21,15 @@ function profileToRow(p: BirthProfile): SavedKundliRow {
 }
 
 const TEACHER_SCHEMA = [
-  "## 1. What is this page? (purpose, goal, why it exists, what to learn)",
-  "## 2. Explain like I'm 10 (zero jargon, tiny words)",
-  "## 3. Beginner explanation (from absolute zero, no skipped steps)",
-  "## 4. Intermediate explanation (how the ideas connect)",
-  "## 5. Advanced explanation (deeper symbolism, esoteric meaning, hidden philosophy)",
-  "## 6. Master level (why teachers teach this — psychological, spiritual, philosophical)",
-  "## 7. Historical background (origins, lineages, schools of thought)",
-  "## 8. Symbol breakdown (every symbol, color, number, direction, shape, element visible)",
-  "## 9. Hidden meanings (archetypes, sacred geometry, numerology, Kabbalah, Hermetics — only if evidenced)",
-  "## 10. Psychological meaning (Jung: archetypes, shadow, persona, anima/animus, collective unconscious)",
-  "## 11. Spiritual meaning (inner growth, transformation, initiation — marked as interpretation, not fact)",
-  "## 12. Practical meaning (daily life, decisions, relationships, career, health, habits)",
-  "## 13. Common beginner mistakes (what they are, why they happen, how to avoid)",
-  "## 14. FAQ (5 beginner questions with simple answers)",
-  "## 15. Real examples (daily life, story, relationship, personal growth)",
-  "## 16. Analogies (school, cooking, gaming, sports, nature — pick 3)",
-  "## 17. Memory tricks (mnemonics, visual memory, associations)",
-  "## 18. Summary (one paragraph, then 5 bullet points, then one sentence)",
-  "## 19. Quiz (3 beginner + 3 intermediate + 3 advanced, with answers explained)",
-  "## 20. Flashcards (6 cards: Question → Answer → Meaning → Memory trick)",
-  "## 21. Connections (how this links to Tarot / Astrology / Numerology / Yoga / Psychology / Mythology)",
-  "## 22. Learning roadmap (first, second, third… up to mastery)",
-  "## 23. Glossary (every difficult word: definition + tiny example + pronunciation)",
-  "## 24. Visual / UX description (layout, icons, colors, how design supports learning)",
-  "## 25. One-line takeaway",
+  "📖 What this page is  (2 short lines: what it shows and why it exists)",
+  "🧒 In kid words  (2 lines, zero jargon)",
+  "👣 How to use it  (3 to 4 tiny steps, one line each, naming the real buttons or fields on this page)",
+  "🔑 Words to know  (2 to 3 words, each with a 5 word meaning)",
+  "🧩 A quick example  (2 lines using this page's own data when available)",
+  "⚠️ Common mistakes  (2 short lines)",
+  "⭐ Takeaway  (one line)",
 ].join("\n");
+
 
 export function TeachMe({
   module,
@@ -84,14 +68,14 @@ export function TeachMe({
           ? "Write the ENTIRE lesson in Roman Hinglish."
           : "Write the lesson in simple English.";
       const system = [
-        `You are Taromaya's Occult Master, Teacher & Researcher for the "${module}" module.`,
-        "You are an internationally respected scholar and practitioner with 40+ years across Tarot, Astrology, Numerology, Kabbalah, Hermeticism, Alchemy, Golden Dawn, Thelema, Jungian psychology, sacred geometry, chakras, Hindu Tantra, Kashmir Shaivism, Vedanta, Yoga philosophy, Buddhism, Taoism, I Ching, Feng Shui, Egyptian/Greek/Norse/Celtic mysteries, planetary magic, angelology, symbols, archetypes, dreams and meditation.",
-        "TEACHING VOICE: warm, precise, plain English. Assume the student is intelligent but brand new. Explain every technical word the moment you use it. Never use unnecessary jargon.",
+        `You are Taromaya's friendly teacher for the "${module}" page.`,
+        "You know Tarot, Vedic and Western astrology, numerology and symbolism deeply, but you teach a bright 10 year old how to USE this page.",
         langInstr,
-        "RESEARCH RULES: Teach the CURRENT PAGE only, grounded in CONTEXT + PAGE DATA. Never invent scriptures, dates, quotes, lineages, or 'hidden meanings' that aren't reasonably supported. Clearly separate historical fact vs symbolism vs interpretation vs belief. Mark uncertainty. Compare traditions fairly. Educational, not persuasive. No medical/legal/exam predictions. No fear language. No unsupported mystical claims.",
-        "OUTPUT SCHEMA — use EXACTLY these 25 markdown headings, in this order. Skip nothing. Keep each section tight (3-7 lines). Use tables or ASCII diagrams where they clarify.",
+        PLAIN_ELI10_RULES,
+        "TEACH THE CURRENT PAGE ONLY, grounded in CONTEXT + PAGE DATA. Never invent scriptures, dates, quotes or numbers. No medical, legal or exam predictions. No fear language.",
+        "OUTPUT — use exactly these picture-emoji section titles, each on its own line, in this order:",
         TEACHER_SCHEMA,
-        "Formatting: no emojis in headings, use **bold** for key terms on first mention, total under 1600 words.",
+        "Keep the whole lesson under 200 words. Short lines only.",
       ].join("\n");
       const prompt = [
         `MODULE: ${module}`,
@@ -102,7 +86,7 @@ export function TeachMe({
         "=== PAGE DATA (what this page currently shows) ===",
         snapshot?.trim() || "(no live values — teach the module generally)",
         "",
-        "Now teach this page using all 25 sections.",
+        "Now teach how to use this page, short and simple, following the section titles above.",
       ].join("\n");
 
       const ctrl = new AbortController();
@@ -212,20 +196,11 @@ export function TeachMe({
                 </div>
               )}
               {text && (
-                <article
-                  data-no-translate
-                  className="space-y-3 text-foreground leading-relaxed
-                    [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
-                    [&_h2]:mt-5 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-lg [&_h2]:text-primary
-                    [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-base
-                    [&_p]:text-foreground
-                    [&_strong]:text-primary [&_strong]:font-semibold
-                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1
-                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1
-                    [&_blockquote]:border-l-2 [&_blockquote]:border-primary/60 [&_blockquote]:pl-4 [&_blockquote]:italic"
-                >
-                  <ReactMarkdown>{text}</ReactMarkdown>
-                </article>
+                <PlainAIText
+                  text={text}
+                  busy={loading}
+                  label={`Lesson on ${module}`}
+                />
               )}
             </div>
           </div>

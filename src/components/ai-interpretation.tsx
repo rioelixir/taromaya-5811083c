@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { Sparkles, Loader2, RefreshCw, StopCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
+import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
+import { PlainAIText } from "@/components/plain-ai-text";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
 import { useLang } from "@/lib/i18n";
 
@@ -60,19 +61,19 @@ export function AIInterpretation({
       const system = [
         `You are Taromaya's master ${module} interpreter — an experienced Vedic astrologer + tarot reader speaking to a curious 10-year-old best friend.`,
         langInstr,
-        "Voice: warm, precise, ELI10. Short sentences. Concrete images. Explain any jargon in 4-5 words.",
+        PLAIN_ELI10_RULES,
         "You MUST ground every claim in the CONTEXT + MODULE DATA blocks. Never invent numbers, degrees, dasha lords, dates, or placements.",
-        "OUTPUT SCHEMA — use exactly these markdown headings in this order, and skip any section that CONTEXT does not support:",
-        "## Summary  (2 short lines)",
-        "## What the chart is saying  (3-4 bullets, each cites the placement e.g. **Moon in Cancer** or **Saturn Mahadasha**)",
-        "## Why (planetary reasoning)  (1-2 bullets — houses, lords, aspects, dignity)",
-        "## Right now (transits + dasha)  (1-2 bullets tying today's sky to natal chart)",
-        "## What to do this week  (3 tiny, doable steps)",
-        "## Things to gently avoid  (2 bullets)",
-        "## Lucky today  Colors: … · Numbers: … · Best time-window: …",
-        "## Simple remedy  (1 line — mantra / gesture / offering, no quantities you weren't given)",
-        "## Confidence  A single line: `Confidence: HIGH` or `MEDIUM` or `LOW` — HIGH only when CONTEXT gives full birth chart + dasha + transits.",
-        "Rules: total under 320 words. No emojis in headings. No death/medical/legal/exam predictions. No fabricated Sanskrit quotes.",
+        "OUTPUT — use exactly these picture-emoji section titles, each on its own line, in this order. Skip any section CONTEXT does not support:",
+        "⭐ Summary  (2 short lines)",
+        "🪐 What the chart says  (3 short bullets, each naming the placement, e.g. Moon in Cancer)",
+        "🔎 Why  (1 bullet — house, lord or aspect)",
+        "🕰️ Right now  (1 bullet — today's sky meeting your chart)",
+        "✅ Do this week  (3 tiny steps)",
+        "⚠️ Gently avoid  (2 short bullets)",
+        "🍀 Lucky today  (colors, numbers, best time window)",
+        "🙏 Simple remedy  (1 line)",
+        "📊 Confidence  (one line: Confidence: HIGH or MEDIUM or LOW — HIGH only with full chart + dasha + transits)",
+        "Rules: total under 220 words. No death, medical, legal or exam predictions. No made-up Sanskrit quotes.",
       ].join("\n");
       const prompt = [
         `MODULE: ${module}`,
@@ -225,25 +226,13 @@ export function AIInterpretation({
       )}
 
       {text && (
-        <article
-          data-no-translate
-          aria-live="polite"
-          aria-busy={loading}
-          aria-label={`${module} reading content`}
-          className="mt-6 space-y-3 text-foreground leading-relaxed
-
-          [&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:font-display [&_h1]:text-2xl
-          [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:font-display [&_h2]:text-xl [&_h2]:text-primary
-          [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:font-display [&_h3]:text-lg
-          [&_p]:text-foreground
-          [&_strong]:text-primary [&_strong]:font-semibold
-          [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1
-          [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1
-          [&_li]:text-foreground
-          [&_a]:text-primary [&_a]:underline
-          [&_blockquote]:border-l-2 [&_blockquote]:border-primary/60 [&_blockquote]:pl-4 [&_blockquote]:italic">
-          <ReactMarkdown>{text}</ReactMarkdown>
-        </article>
+        <div className="mt-6">
+          <PlainAIText
+            text={text}
+            busy={loading}
+            label={`${module} reading content`}
+          />
+        </div>
       )}
     </section>
   );

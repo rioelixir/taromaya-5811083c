@@ -1,3 +1,5 @@
+import { PLAIN_ELI10_RULES } from "./ai-format";
+
 // Taromaya Supreme Intelligence System — shared operating system prepended to
 // every AI system prompt across the app. Improves consistency, reduces
 // hallucination, and forces the model to quantify uncertainty. Does not
@@ -128,5 +130,7 @@ Blank sections, placeholder text, NaN, invalid degrees, impossible signs/houses,
 /** Prepend the Supreme Intelligence preamble to any module system prompt. */
 export function withSupremeSystem(moduleSystem: string | undefined | null): string {
   const base = (moduleSystem ?? "").trim();
-  return base ? `${SUPREME_PREAMBLE}${base}` : SUPREME_PREAMBLE.trim();
+  const core = base ? `${SUPREME_PREAMBLE}${base}` : SUPREME_PREAMBLE.trim();
+  // Global output style: ELI10, short, picture-emojis, zero markdown symbols.
+  return `${core}\n\n=== OUTPUT STYLE (final word, overrides everything above) ===\n${PLAIN_ELI10_RULES}\n`;
 }
