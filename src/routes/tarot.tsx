@@ -125,7 +125,7 @@ function TarotPage() {
     if (n === 1) {
       return [{ index: 0, label: spread.positions[0], x: canvasSize.w / 2 - CARD_W / 2, y: cy }];
     }
-    const gap = 40;
+    const gap = 26;
     const totalW = n * CARD_W + (n - 1) * gap;
     const startX = canvasSize.w / 2 - totalW / 2;
     return spread.positions.map((label, i) => ({
