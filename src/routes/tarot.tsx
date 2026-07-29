@@ -745,7 +745,7 @@ function PlacedCardView({
           >
             <img
               src={card.card.image}
-              alt={card.card.name}
+              alt=""
               draggable={false}
               className="absolute inset-0 w-full h-full object-contain bg-black pointer-events-none select-none"
             />
@@ -762,13 +762,6 @@ function PlacedCardView({
         )}
       </div>
 
-      {/* Always-visible, easy-to-read card name */}
-      <div
-        className="pointer-events-none absolute inset-x-[-14px] -bottom-[22px] text-center text-[13px] sm:text-sm font-medium leading-tight text-pearl"
-        style={{ textShadow: "0 2px 8px rgba(0,0,0,0.95)" }}
-      >
-        {card.flipped ? card.card.name : "Tap to reveal"}
-      </div>
     </div>
   );
 }
