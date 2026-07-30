@@ -9,7 +9,7 @@ import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
-import { NakshatraPanel } from "@/components/nakshatra-panel";
+import { NakshatraPanel, type StarContext } from "@/components/nakshatra-panel";
 import {
   Sparkles,
   RotateCcw,
@@ -101,6 +101,18 @@ function TarotPage() {
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
+  const [starCtx, setStarCtx] = useState<StarContext>({});
+  const handleStarContext = useCallback((ctx: StarContext) => {
+    setStarCtx((prev) =>
+      prev.birthNakshatra === ctx.birthNakshatra &&
+      prev.placeNakshatra === ctx.placeNakshatra &&
+      prev.placeName === ctx.placeName &&
+      prev.nakshatraCard === ctx.nakshatraCard
+        ? prev
+        : ctx,
+    );
+  }, []);
+
 
   // Closing the zoom must never navigate away from the board.
   const closeZoom = useCallback(() => setZoomedUid(null), []);
@@ -558,7 +570,12 @@ function TarotPage() {
             reversed: c.reversed,
             keywords: [],
           })),
+          birthNakshatra: starCtx.birthNakshatra,
+          placeNakshatra: starCtx.placeNakshatra,
+          placeName: starCtx.placeName,
+          nakshatraCard: starCtx.nakshatraCard,
         },
+
       });
       setReading(res.text);
     } catch (e) {
@@ -674,6 +691,7 @@ function TarotPage() {
             cards={uploaded.nakshatra ?? []}
             question={question}
             onPlaceCard={placeExactCard}
+            onContext={handleStarContext}
           />
         </aside>
 
@@ -681,7 +699,7 @@ function TarotPage() {
         <button
           onClick={() => setStarPanelOpen(true)}
           className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-xl border border-l-0 border-gold/40 bg-black/70 px-2 py-4 text-[10px] uppercase tracking-widest text-gold"
-          aria-label="Open birth star panel"
+          aria-label="Open star panel"
         >
           <Star className="mx-auto mb-1 h-4 w-4" />
           Star
@@ -690,10 +708,10 @@ function TarotPage() {
           <div className="lg:hidden fixed inset-0 z-40 flex">
             <div className="w-[86vw] max-w-[340px] border-r border-gold/25 bg-cosmic/95 backdrop-blur-md animate-in slide-in-from-left duration-300">
               <div className="flex items-center justify-between px-3 pt-3">
-                <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Birth star</span>
+                <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Stars</span>
                 <button
                   onClick={() => setStarPanelOpen(false)}
-                  aria-label="Close birth star panel"
+                  aria-label="Close star panel"
                   className="text-muted-foreground hover:text-pearl"
                 >
                   <X className="h-4 w-4" />
@@ -704,6 +722,7 @@ function TarotPage() {
                   cards={uploaded.nakshatra ?? []}
                   question={question}
                   onPlaceCard={placeExactCard}
+                  onContext={handleStarContext}
                 />
               </div>
             </div>
@@ -854,7 +873,7 @@ function TarotPage() {
                 </div>
                 {loadingReading && !reading && (
                   <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
+                    <Loader2 className="h-4 w-4 animate-spin" /> Your reading is coming…
                   </div>
                 )}
                 {error && (

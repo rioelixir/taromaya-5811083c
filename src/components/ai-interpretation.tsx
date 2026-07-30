@@ -165,7 +165,7 @@ export function AIInterpretation({
         <div>
           <div className="flex items-center gap-2">
             <div className="text-[10px] uppercase tracking-[0.35em] text-primary">
-              AI Interpretation
+              AI Reading
             </div>
             {confidence && (
               <span
