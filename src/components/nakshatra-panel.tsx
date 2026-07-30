@@ -338,7 +338,6 @@ export function NakshatraPanel({
         value={place}
         onChange={setPlace}
         label="Where are you right now?"
-        compact
       />
 
       {placeBusy && (
