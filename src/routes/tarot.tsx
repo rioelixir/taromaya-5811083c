@@ -101,6 +101,18 @@ function TarotPage() {
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
+  const [starCtx, setStarCtx] = useState<StarContext>({});
+  const handleStarContext = useCallback((ctx: StarContext) => {
+    setStarCtx((prev) =>
+      prev.birthNakshatra === ctx.birthNakshatra &&
+      prev.placeNakshatra === ctx.placeNakshatra &&
+      prev.placeName === ctx.placeName &&
+      prev.nakshatraCard === ctx.nakshatraCard
+        ? prev
+        : ctx,
+    );
+  }, []);
+
 
   // Closing the zoom must never navigate away from the board.
   const closeZoom = useCallback(() => setZoomedUid(null), []);
