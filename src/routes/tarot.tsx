@@ -9,7 +9,8 @@ import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown } from "lucide-react";
+import { NakshatraPanel } from "@/components/nakshatra-panel";
+import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown, Star } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
@@ -427,6 +428,38 @@ function TarotPage() {
     return () => window.clearTimeout(timer);
   }, [search.deck, search.card, decks, canvasSize.w, canvasSize.h, restingSpot]);
 
+  // Birth-star panel (left side on desktop, slide-out drawer on phones).
+  const [starPanelOpen, setStarPanelOpen] = useState(false);
+
+  // Slide one exact card onto the board without touching what is already there.
+  const placeExactCard = useCallback(
+    (card: UploadedCard) => {
+      const uid = `nak_${Date.now()}`;
+      const startX = canvasSize.w / 2 - CARD_W / 2;
+      const startY = Math.max(0, canvasSize.h - CARD_H - 20);
+      setDecks((prev) => ({
+        ...prev,
+        nakshatra: (prev.nakshatra ?? []).filter((c) => c.id !== card.id),
+      }));
+      setPlaced((prev) => [
+        ...prev,
+        { uid, card, deckKey: "nakshatra" as DeckKey, reversed: false, x: startX, y: startY, slotIndex: null, locked: true, flipped: false },
+      ]);
+      setStarPanelOpen(false);
+      window.setTimeout(() => {
+        setPlaced((prev) => {
+          const idx = prev.findIndex((x) => x.uid === uid);
+          if (idx < 0) return prev;
+          const spot = restingSpot(prev.filter((x) => x.uid !== uid));
+          const next = [...prev];
+          next[idx] = { ...next[idx], ...spot, flipped: true };
+          return next;
+        });
+      }, 60);
+    },
+    [canvasSize.w, canvasSize.h, restingSpot],
+  );
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
@@ -552,8 +585,41 @@ function TarotPage() {
 
       </div>
 
+      {/* Board row: birth-star panel on the left, canvas on the right */}
+      <div className="relative z-10 flex w-full flex-1 min-h-0">
+        {/* Desktop panel */}
+        <aside className="hidden lg:block w-[330px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm">
+          <NakshatraPanel cards={uploaded.nakshatra ?? []} question={question} onPlaceCard={placeExactCard} />
+        </aside>
+
+        {/* Phone drawer */}
+        <button
+          onClick={() => setStarPanelOpen(true)}
+          className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-xl border border-l-0 border-gold/40 bg-black/70 px-2 py-4 text-[10px] uppercase tracking-widest text-gold"
+          aria-label="Open birth star panel"
+        >
+          <Star className="mx-auto mb-1 h-4 w-4" />
+          Star
+        </button>
+        {starPanelOpen && (
+          <div className="lg:hidden fixed inset-0 z-40 flex">
+            <div className="w-[86vw] max-w-[340px] border-r border-gold/25 bg-cosmic/95 backdrop-blur-md animate-in slide-in-from-left duration-300">
+              <div className="flex items-center justify-between px-3 pt-3">
+                <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Birth star</span>
+                <button onClick={() => setStarPanelOpen(false)} aria-label="Close birth star panel" className="text-muted-foreground hover:text-pearl">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="h-[calc(100dvh-3rem)]">
+                <NakshatraPanel cards={uploaded.nakshatra ?? []} question={question} onPlaceCard={placeExactCard} />
+              </div>
+            </div>
+            <div className="flex-1 bg-black/60" onClick={() => setStarPanelOpen(false)} />
+          </div>
+        )}
+
       {/* Canvas — fills remaining viewport */}
-      <div className="relative z-10 flex w-full flex-1 min-h-0 flex-col">
+      <div className="relative flex flex-1 min-h-0 flex-col">
         <div
           ref={canvasRef}
           className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
@@ -695,6 +761,7 @@ function TarotPage() {
             </div>
           </div>
         )}
+      </div>
       </div>
 
       {/* Fullscreen zoom overlay — image only, no text */}
