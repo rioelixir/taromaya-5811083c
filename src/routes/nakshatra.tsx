@@ -253,7 +253,7 @@ function NakshatraPage() {
           <ProfileCard p={profile} birthPada={birthNak === activeIndex ? birthPada : undefined} />
 
           <GlassCard
-            title="Nakshatra compatibility"
+            title="Nakshatra match making"
             desc="Cross-reference this nakshatra with any other for Gana / Nadi / Yoni matching (out of 18)."
           >
             <div className="flex flex-wrap items-center gap-3">

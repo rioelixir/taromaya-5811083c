@@ -333,7 +333,7 @@ function CompatibilityNumerology() {
           <BigNum label={a.name || "A"} n={rA.lifePath} />
           <GlassCard>
             <div className="text-center">
-              <div className="text-xs uppercase tracking-widest text-muted-foreground">Compatibility</div>
+              <div className="text-xs uppercase tracking-widest text-muted-foreground">Match Making</div>
               <div className="font-display text-5xl gold-text mt-2">{compat.score}%</div>
               <div className="mt-3 text-sm text-pearl">{compat.note}</div>
             </div>

@@ -154,7 +154,7 @@ Structure: ### The bond, ### How you meet each other (Sun/Moon/Venus/Mars), ### 
             <div className="space-y-4">
               <GlassCard>
                 <div className="text-center">
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Compatibility</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Match Making</div>
                   <div className="mt-2 font-display text-6xl gold-text">{score.score}<span className="text-2xl">%</span></div>
                   <div className="mt-2 text-pearl">{score.label}</div>
                   <div className="mt-3 flex justify-center gap-6 text-xs">
@@ -233,7 +233,7 @@ Structure: ### The bond, ### How you meet each other (Sun/Moon/Venus/Mars), ### 
 
           {ashtakoot && (
             <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-              <GlassCard title="Ashtakoot Guna Milan" desc="Vedic Moon-nakshatra compatibility, 36 point system.">
+              <GlassCard title="Ashtakoot Guna Milan" desc="Vedic Moon-nakshatra match making, 36 point system.">
                 <div className="text-center">
                   <div className="font-display text-6xl gold-text">{ashtakoot.total}<span className="text-2xl">/36</span></div>
                   <div className="mt-2 text-pearl text-sm">{ashtakoot.interpretation}</div>
