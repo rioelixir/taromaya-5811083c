@@ -24,19 +24,29 @@ export type NakshatraResult = {
   meaning: string;
 };
 
+export type StarContext = {
+  birthNakshatra?: string;
+  placeNakshatra?: string;
+  placeName?: string;
+  nakshatraCard?: string;
+};
+
 /**
- * Left-side birth-star panel for the tarot board.
- * You type your birth day, time and place; the app works out your Moon star
- * and pulls the matching card from the admin's 27-card Nakshatra deck.
+ * Left-side star panel for the tarot board.
+ * Top: your birth star from your birth day, time and place.
+ * Bottom: the star of the place you are in right now.
+ * Both pull their matching card from the admin's 27-card Nakshatra deck.
  */
 export function NakshatraPanel({
   cards,
   question,
   onPlaceCard,
+  onContext,
 }: {
   cards: UploadedCard[];
   question?: string;
   onPlaceCard?: (card: UploadedCard) => void;
+  onContext?: (ctx: StarContext) => void;
 }) {
   const { meta } = useNakshatraMeta();
   const [form, setForm] = useState<BirthFieldsState>({
@@ -52,12 +62,96 @@ export function NakshatraPanel({
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<NakshatraResult | null>(null);
   const [zoom, setZoom] = useState(false);
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
   const [reading, setReading] = useState<string | null>(null);
   const [readingBusy, setReadingBusy] = useState(false);
 
-  const closeZoom = useCallback(() => setZoom(false), []);
+  // Place star (where you are right now)
+  const [place, setPlace] = useState<PlaceValue>({ place: "", lat: "", lon: "", tz: "" });
+  const [placeResult, setPlaceResult] = useState<NakshatraResult | null>(null);
+  const [placeError, setPlaceError] = useState<string | null>(null);
+  const [placeBusy, setPlaceBusy] = useState(false);
+
+  const closeZoom = useCallback(() => {
+    setZoom(false);
+    setZoomSrc(null);
+  }, []);
   useOverlayBackGuard(zoom, closeZoom);
   const interpret = useServerFn(interpretTarot);
+
+  const buildResult = useCallback(
+    (index: number, pada: number): NakshatraResult => {
+      const m = meta[String(index)];
+      const profile = nakshatraProfile(index);
+      return {
+        index,
+        pada,
+        lord: NAKSHATRA_LORDS[index],
+        card: cardForNakshatra(index, cards, m),
+        title: nakshatraTitle(index, m),
+        keywords: m?.keywords?.filter(Boolean).length
+          ? m.keywords!.filter(Boolean)
+          : profile.strengths.slice(0, 4),
+        meaning: m?.meaning?.trim() || profile.deityShort,
+      };
+    },
+    [cards, meta],
+  );
+
+  // Work out the star of the chosen place as soon as a place is picked.
+  useEffect(() => {
+    if (place.lat === "" || place.lon === "") {
+      setPlaceResult(null);
+      setPlaceError(null);
+      return;
+    }
+    let cancelled = false;
+    setPlaceBusy(true);
+    setPlaceError(null);
+    // Async so picking a place never blocks the board.
+    const id = window.setTimeout(() => {
+      try {
+        const snap = computeNakshatraForLocation({
+          date: new Date(),
+          latitude: Number(place.lat),
+          longitude: Number(place.lon),
+          timelineCount: 1,
+        });
+        if (cancelled) return;
+        setPlaceResult(buildResult(snap.moon.index, snap.moon.pada));
+      } catch {
+        if (!cancelled) {
+          setPlaceResult(null);
+          setPlaceError(
+            "We couldn't find the star for this place. Please choose another place.",
+          );
+        }
+      } finally {
+        if (!cancelled) setPlaceBusy(false);
+      }
+    }, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [place.lat, place.lon, buildResult]);
+
+  // Keep the board's Ask AI in step with both stars.
+  useEffect(() => {
+    onContext?.({
+      birthNakshatra: result
+        ? `${NAKSHATRAS[result.index]} (pada ${result.pada}, star lord ${result.lord})`
+        : undefined,
+      placeNakshatra: placeResult ? NAKSHATRAS[placeResult.index] : undefined,
+      placeName: placeResult ? place.place || undefined : undefined,
+      nakshatraCard: placeResult?.card
+        ? placeResult.title
+        : result?.card
+          ? result.title
+          : undefined,
+    });
+  }, [result, placeResult, place.place, onContext]);
+
 
   const canCalculate = useMemo(
     () => !!form.date && form.lat !== "" && form.lon !== "" && form.tz !== "",
