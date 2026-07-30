@@ -12,7 +12,7 @@ export type TourStep = {
 
 export const DEFAULT_TOUR: TourStep[] = [
   { title: "Welcome to TAROMAYA", body: "A luxury Vedic + Tarot studio. This 60-second tour shows you where everything lives." },
-  { title: "1. Save your birth details once", body: "Open Birth Details from the menu and save your date, exact time, and place. Every module (Kundli, Dasha, Panchang, Numerology, Compatibility) auto-fills from this." },
+  { title: "1. Save your birth details once", body: "Open Birth Details from the menu and save your date, exact time, and place. Every module (Kundli, Dasha, Panchang, Numerology, Match Making) auto-fills from this." },
   { title: "2. Kundli", body: "Your full Vedic chart with North / South Indian diamonds, Vargas D1–D60, Vimshottari Dasha, Yogas, Doshas, Ashtakavarga, Shadbala, and KP sub-lords." },
   { title: "3. Tarot", body: "Draw from Rider-Waite, Nakshatra, Health, Lost & Found, or Soulmates decks with 1-card, Yes/No, Past-Present-Future, or freestyle spreads. No reversed cards, no reshuffling mid-draw." },
   { title: "4. AI Reading", body: "Every module has an AI interpretation in plain English (ELI10) or Hindi. Uses your chart directly — no vague generic text." },
