@@ -541,6 +541,49 @@ function TarotPage() {
     [canvasSize.w, canvasSize.h, restingSpot],
   );
 
+  // Pick a star card up with the finger/mouse and drag it straight onto the board.
+  const beginDragExactCard = useCallback(
+    (e: React.PointerEvent, card: UploadedCard) => {
+      const canvasEl = canvasRef.current;
+      if (!canvasEl) return;
+      e.preventDefault();
+      const r = canvasEl.getBoundingClientRect();
+      const uid = `nak_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      setDecks((prev) => ({
+        ...prev,
+        nakshatra: (prev.nakshatra ?? []).filter((c) => c.id !== card.id),
+      }));
+      setPlaced((prev) => [
+        ...prev,
+        {
+          uid,
+          card,
+          deckKey: "nakshatra" as DeckKey,
+          reversed: false,
+          x: e.clientX - r.left - CARD_W / 2,
+          y: e.clientY - r.top - CARD_H / 2,
+          slotIndex: null,
+          locked: false,
+          flipped: true,
+        },
+      ]);
+      dragState.current = {
+        uid,
+        pointerId: e.pointerId,
+        offsetX: CARD_W / 2,
+        offsetY: CARD_H / 2,
+        startX: e.clientX,
+        startY: e.clientY,
+        moved: false,
+        fromDeck: true,
+      };
+      setStarPanelOpen(false);
+      setDraggingUid(uid);
+    },
+    [],
+  );
+
+
   // Ready to interpret?
   const lockedCards = placed.filter((p) => p.locked);
   const requiredCount = isFreestyle ? 1 : spread.positions.length;
