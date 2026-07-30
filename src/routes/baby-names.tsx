@@ -227,7 +227,7 @@ function BabyNamesPage() {
             className="mt-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {loading ? "Divining names…" : "Generate names"}
+            {loading ? "Finding names…" : "Create names"}
           </button>
         </GlassCard>
 

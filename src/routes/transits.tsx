@@ -190,7 +190,7 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
           {!aiText && !loading && (
             <button onClick={generate}
               className="rounded-full bg-gradient-to-r from-gold to-gold-soft px-6 py-2.5 text-sm font-medium text-primary-foreground inline-flex items-center gap-2">
-              <Sparkles className="w-4 h-4" /> Generate forecast
+              <Sparkles className="w-4 h-4" /> Create forecast
             </button>
           )}
           {loading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Reading the sky…</div>}

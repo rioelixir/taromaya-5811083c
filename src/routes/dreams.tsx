@@ -96,7 +96,7 @@ function DreamsPage() {
             </label>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-widest text-white/60 mb-2">Interpretation lens</div>
+            <div className="text-xs uppercase tracking-widest text-white/60 mb-2">Reading style</div>
             <div className="flex flex-wrap gap-2">
               {FOCI.map(f => (
                 <button
@@ -125,7 +125,7 @@ function DreamsPage() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full gold-border bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-              {loading ? "Consulting the sky…" : "Interpret dream"}
+              {loading ? "Reading the sky…" : "Read my dream"}
             </button>
           </div>
           {error && <div className="text-rose-300 text-sm">{error}</div>}
