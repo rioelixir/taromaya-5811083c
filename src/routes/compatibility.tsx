@@ -12,10 +12,10 @@ import { deepCompat } from "@/lib/compat-deep";
 import { Loader2, Sparkles, Heart, CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/compatibility")({
-  component: () => (<PremiumGate featureName="Compatibility"><CompatibilityPage /></PremiumGate>),
+  component: () => (<PremiumGate featureName="Match Making"><CompatibilityPage /></PremiumGate>),
   head: () => ({
     meta: [
-      { title: "Kundli Matching — TAROMAYA" },
+      { title: "Match Making — TAROMAYA" },
       { name: "description", content: "Ashtakoot Guna Milan out of 36 with Manglik analysis, side-by-side charts, and AI relationship reading." },
     ],
   }),
@@ -86,9 +86,9 @@ Structure: Overall Compatibility, Emotional & Mental (Gana, Bhakoot), Physical &
 
   return (
     <PageShell
-      eyebrow="Kundli Matching"
+      eyebrow="Match Making"
       title="Ashtakoot Guna Milan"
-      subtitle="Traditional 36-point Vedic compatibility with Manglik analysis and AI reading."
+      subtitle="Traditional 36-point Vedic match making with Manglik analysis and AI reading."
     >
       <div className="grid gap-4 md:grid-cols-2">
         <GlassCard title="Person A · Boy"><PersonInputs value={a} onChange={setA} /></GlassCard>
@@ -96,7 +96,7 @@ Structure: Overall Compatibility, Emotional & Mental (Gana, Bhakoot), Physical &
       </div>
       <button onClick={onCalc}
         className="mt-6 rounded-full bg-gradient-to-r from-gold to-gold-soft px-8 py-3 text-sm font-medium text-primary-foreground inline-flex items-center gap-2">
-        <Heart className="w-4 h-4" /> Calculate compatibility
+        <Heart className="w-4 h-4" /> Check match
       </button>
 
       {result && (
@@ -364,7 +364,7 @@ function DeepCompatPanel({ deep }: { deep: import("@/lib/compat-deep").DeepCompa
   ];
   return (
     <div className="mt-6">
-      <GlassCard title="Deep Vedic compatibility — parihara & yogas">
+      <GlassCard title="Deep Vedic match making — parihara & yogas">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
             <div key={it.title} className={`rounded-xl p-3 border ${it.ok ? "bg-emerald-500/10 border-emerald-400/20" : "bg-red-500/10 border-red-400/30"}`}>

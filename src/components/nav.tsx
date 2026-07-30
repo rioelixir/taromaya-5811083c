@@ -60,7 +60,7 @@ const CATALOG: Group[] = [
     label: "Life",
     items: [
       { to: "/horoscope", label: "Horoscope", icon: Sun },
-      { to: "/compatibility", label: "Compatibility", icon: Heart },
+      { to: "/compatibility", label: "Match Making", icon: Heart },
       { to: "/numerology", label: "Numerology", icon: Hash },
       { to: "/baby-names", label: "Baby Names", icon: Baby },
       { to: "/festivals", label: "Festivals", icon: Flame },
