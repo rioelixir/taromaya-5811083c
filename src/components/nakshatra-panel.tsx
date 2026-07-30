@@ -1,15 +1,18 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Sparkles, Star, X, Maximize2 } from "lucide-react";
+import { Loader2, Sparkles, Star, X, Maximize2, MapPin } from "lucide-react";
 import { BirthFields, type BirthFieldsState } from "@/components/birth-fields";
+import { PlacePicker, type PlaceValue } from "@/components/place-picker";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { computeKundli, NAKSHATRAS, NAKSHATRA_LORDS } from "@/lib/vedic";
+import { computeNakshatraForLocation } from "@/lib/nakshatra-location";
 import { nakshatraProfile } from "@/lib/nakshatra-deep";
 import { cardForNakshatra, nakshatraTitle } from "@/lib/nakshatra-deck";
 import { useNakshatraMeta } from "@/hooks/use-nakshatra-meta";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
 import { interpretTarot } from "@/lib/tarot.functions";
 import type { UploadedCard } from "@/lib/tarot-decks";
+
 
 export type NakshatraResult = {
   index: number;
