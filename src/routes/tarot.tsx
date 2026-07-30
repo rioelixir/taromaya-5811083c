@@ -691,6 +691,7 @@ function TarotPage() {
             cards={uploaded.nakshatra ?? []}
             question={question}
             onPlaceCard={placeExactCard}
+            onContext={handleStarContext}
           />
         </aside>
 
@@ -721,6 +722,7 @@ function TarotPage() {
                   cards={uploaded.nakshatra ?? []}
                   question={question}
                   onPlaceCard={placeExactCard}
+                  onContext={handleStarContext}
                 />
               </div>
             </div>
