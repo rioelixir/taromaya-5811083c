@@ -35,32 +35,21 @@ export const interpretTarot = createServerFn({ method: "POST" })
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
 
+    // Card names only — no numbering, no position labels are ever exposed.
     const cardList = data.cards
-      .map(
-        (c, i) =>
-          `${i + 1}. ${c.position} — ${c.name}${c.reversed ? " (reversed)" : ""} · keywords: ${c.keywords.join(", ")}`,
-      )
+      .map((c) => `- ${c.name}${c.reversed ? " (reversed)" : ""}`)
       .join("\n");
 
-    const fallbackSystem = `You are TAROMAYA, a warm and clear tarot reader.
+    const fallbackSystem = `You are TAROMAYA, a warm and experienced tarot reader talking to a friend.
 Write in very simple English that a 10 year old can read easily. Short sentences. Everyday words.
 
-STRICT ANTI-HALLUCINATION RULES — non-negotiable:
-1. Read ONLY the cards listed in "Cards drawn" below. Do NOT invent, add, rename, substitute, or reference any card that is not in that list.
-2. Use the EXACT card name and EXACT position label the caller provided.
-3. Every card is UPRIGHT. Do NOT describe any card as reversed unless the input explicitly says "(reversed)".
-4. Do NOT invent numbers: no percentages, probabilities, dates, ages, addresses, medical figures, or astrological degrees.
-5. Do NOT predict death, medical diagnoses, legal verdicts, pregnancy outcomes, or exact timing of outside events.
-6. For a yes/no question, answer "Yes", "No", or "Leaning yes" / "Leaning no", based only on the drawn cards.
-7. If the cards do not show something, say the cards are quiet about it instead of guessing.
-
-LENGTH AND SHAPE — non-negotiable:
-- Give 5 to 7 short lines in total. Nothing longer.
-- One line per card, in the order given, each starting with a friendly emoji.
-- Then one last line that starts with 💡 and gives one simple thing to do next.
-- No headings. No markdown. No stars, hashes, underscores or bullets.
-- Speak straight to the person as "you".`;
-
+STRICT ACCURACY RULES — non-negotiable:
+1. Use ONLY the cards listed below. Never invent, add, rename or substitute a card.
+2. Every card is upright unless the list says "(reversed)".
+3. Never invent numbers: no percentages, dates, ages, or degrees.
+4. Never predict death, illness, legal results, pregnancy results, or exact dates.
+5. For a yes or no question, say Yes, No, Leaning yes, or Leaning no.
+6. If the cards are quiet about something, say so instead of guessing.`;
 
     // Try to load the editable prompt from the admin CMS.
     let system = fallbackSystem;
@@ -80,16 +69,34 @@ LENGTH AND SHAPE — non-negotiable:
       // fall back to defaults
     }
 
-    const user = `Spread: ${data.spreadLabel}
-Question: ${data.question || "(open reading)"}
-Cards drawn:
-${cardList}`;
+    // Final word: one flowing reading, no labels of any kind.
+    const NO_LABELS = `SHAPE OF THE ANSWER — this overrides every other instruction:
+- Write ONE flowing reading, 5 to 8 short lines, like a real reader speaking out loud.
+- Never write card names, card numbers, or position labels. No "Card 1", no "Past", no "Present", no "Future", no "Position", no "The Fool:".
+- Never write section titles such as "Tarot says" or "Nakshatra says". No headings at all.
+- Blend the cards, the birth star and the place star into one single story.
+- No emojis needed at the start of every line; at most one or two in the whole reading.
+- No markdown, no stars, hashes, underscores, bullets or dashes.
+- Speak straight to the person as "you". End with one simple thing they can do next.`;
+
+    const starLines = [
+      data.birthNakshatra ? `Birth star energy: ${data.birthNakshatra}` : "",
+      data.placeNakshatra
+        ? `Star energy of where they are now${data.placeName ? ` (${data.placeName})` : ""}: ${data.placeNakshatra}`
+        : "",
+      data.nakshatraCard ? `Star card in play: ${data.nakshatraCard}` : "",
+    ].filter(Boolean);
+
+    const user = `Question: ${data.question || "(open reading)"}
+Cards in front of you (do not name them in your answer):
+${cardList}${starLines.length ? `\nExtra energy to blend in silently:\n${starLines.join("\n")}` : ""}`;
 
     const { text } = await generateText({
       model: gateway(modelId),
-      system: withSupremeSystem(system),
+      system: `${withSupremeSystem(system)}\n\n${NO_LABELS}\n`,
       prompt: user,
     });
+
 
     return { text };
   });
