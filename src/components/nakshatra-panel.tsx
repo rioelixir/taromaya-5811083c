@@ -101,14 +101,15 @@ export function NakshatraPanel({
         lord: NAKSHATRA_LORDS[index],
         card: cardForNakshatra(index, cards, m),
         title: nakshatraTitle(index, m),
-        keywords:
-          m?.keywords?.filter(Boolean).length
-            ? m.keywords!.filter(Boolean)
-            : profile.strengths.slice(0, 4),
+        keywords: m?.keywords?.filter(Boolean).length
+          ? m.keywords!.filter(Boolean)
+          : profile.strengths.slice(0, 4),
         meaning: m?.meaning?.trim() || profile.deityShort,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not work that out. Please check the details.");
+      setError(
+        e instanceof Error ? e.message : "Could not work that out. Please check the details.",
+      );
     } finally {
       setBusy(false);
     }
@@ -164,14 +165,20 @@ export function NakshatraPanel({
         Calculate birth star
       </button>
       {!canCalculate && (
-        <p className="text-[11px] text-muted-foreground">Pick a place from the list to switch this on.</p>
+        <p className="text-[11px] text-muted-foreground">
+          Pick a place from the list to switch this on.
+        </p>
       )}
 
       {notice && (
-        <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 text-xs text-pearl/85">{notice}</div>
+        <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 text-xs text-pearl/85">
+          {notice}
+        </div>
       )}
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-200">{error}</div>
+        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-200">
+          {error}
+        </div>
       )}
 
       {result && (
@@ -191,7 +198,12 @@ export function NakshatraPanel({
                 style={{ aspectRatio: "2 / 3" }}
                 aria-label="Open the card big"
               >
-                <img src={result.card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
+                <img
+                  src={result.card.image}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-contain"
+                />
                 <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
                   <Maximize2 className="h-3.5 w-3.5" />
                 </span>
@@ -207,14 +219,18 @@ export function NakshatraPanel({
             </div>
           ) : (
             <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-xs text-muted-foreground">
-              This star's picture is not added yet. An admin can add it in Admin, then Nakshatra Deck.
+              This star's picture is not added yet. An admin can add it in Admin, then Nakshatra
+              Deck.
             </div>
           )}
 
           {result.keywords.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {result.keywords.map((k) => (
-                <span key={k} className="rounded-lg border border-gold/25 px-2 py-0.5 text-[11px] text-gold/90">
+                <span
+                  key={k}
+                  className="rounded-lg border border-gold/25 px-2 py-0.5 text-[11px] text-gold/90"
+                >
                   {k}
                 </span>
               ))}
@@ -227,7 +243,11 @@ export function NakshatraPanel({
             disabled={readingBusy}
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2 text-sm text-gold hover:bg-gold/10 disabled:opacity-40"
           >
-            {readingBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {readingBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
             Ask AI about my star
           </button>
           {reading && (
@@ -244,7 +264,10 @@ export function NakshatraPanel({
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md animate-in fade-in duration-300"
         >
           <button
-            onClick={(e) => { e.stopPropagation(); closeZoom(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              closeZoom();
+            }}
             className="fixed right-4 top-4 rounded-full border border-white/20 bg-black/70 p-2"
             aria-label="Close"
           >

@@ -4,11 +4,7 @@ import { GlassCard } from "@/components/page-shell";
 import { Loader2, Check } from "lucide-react";
 import { NAKSHATRAS } from "@/lib/vedic";
 import { nakshatraProfile } from "@/lib/nakshatra-deep";
-import {
-  NAKSHATRA_META_KEY,
-  cardForNakshatra,
-  type NakshatraMetaMap,
-} from "@/lib/nakshatra-deck";
+import { NAKSHATRA_META_KEY, cardForNakshatra, type NakshatraMetaMap } from "@/lib/nakshatra-deck";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 
 /**
@@ -30,7 +26,9 @@ export function AdminNakshatraDeckTab() {
       .select("value")
       .eq("key", NAKSHATRA_META_KEY)
       .maybeSingle()
-      .then(({ data }) => setMeta(((data?.value as NakshatraMetaMap | null) ?? {}) as NakshatraMetaMap));
+      .then(({ data }) =>
+        setMeta(((data?.value as NakshatraMetaMap | null) ?? {}) as NakshatraMetaMap),
+      );
   }, []);
 
   const rows = useMemo(() => {
@@ -86,12 +84,25 @@ export function AdminNakshatraDeckTab() {
 
       <div className="space-y-3">
         {rows.map(({ i, name, m, card }) => (
-          <div key={i} className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 sm:grid-cols-[92px_1fr]">
-            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black" style={{ aspectRatio: "2 / 3" }}>
+          <div
+            key={i}
+            className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-3 sm:grid-cols-[92px_1fr]"
+          >
+            <div
+              className="relative overflow-hidden rounded-xl border border-white/10 bg-black"
+              style={{ aspectRatio: "2 / 3" }}
+            >
               {card ? (
-                <img src={card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
+                <img
+                  src={card.image}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-contain"
+                />
               ) : (
-                <div className="grid h-full place-items-center text-[10px] text-muted-foreground">No picture</div>
+                <div className="grid h-full place-items-center text-[10px] text-muted-foreground">
+                  No picture
+                </div>
               )}
             </div>
             <div className="space-y-2">
@@ -124,7 +135,9 @@ export function AdminNakshatraDeckTab() {
               >
                 <option value="">Match by card name</option>
                 {cards.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
               <input
@@ -135,7 +148,14 @@ export function AdminNakshatraDeckTab() {
               />
               <input
                 value={(m.keywords ?? []).join(", ")}
-                onChange={(e) => patch(i, { keywords: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
+                onChange={(e) =>
+                  patch(i, {
+                    keywords: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
                 placeholder={`Keywords, comma separated (default: ${nakshatraProfile(i).strengths.slice(0, 4).join(", ")})`}
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-pearl"
               />

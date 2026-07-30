@@ -10,7 +10,17 @@ import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
 import { NakshatraPanel } from "@/components/nakshatra-panel";
-import { Sparkles, RotateCcw, Loader2, Lock, X, Shuffle, ChevronUp, ChevronDown, Star } from "lucide-react";
+import {
+  Sparkles,
+  RotateCcw,
+  Loader2,
+  Lock,
+  X,
+  Shuffle,
+  ChevronUp,
+  ChevronDown,
+  Star,
+} from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
@@ -19,11 +29,18 @@ export const Route = createFileRoute("/tarot")({
     deck: typeof search.deck === "string" ? search.deck : undefined,
     card: typeof search.card === "string" ? search.card : undefined,
   }),
-  component: () => (<PremiumGate featureName="Tarot"><TarotPage /></PremiumGate>),
+  component: () => (
+    <PremiumGate featureName="Tarot">
+      <TarotPage />
+    </PremiumGate>
+  ),
   head: () => ({
     meta: [
       { title: "Tarot — TAROMAYA" },
-      { name: "description", content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from." },
+      {
+        name: "description",
+        content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from.",
+      },
     ],
   }),
 });
@@ -176,7 +193,16 @@ function TarotPage() {
     startY: number;
     moved: boolean;
     fromDeck: boolean;
-  }>({ uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false });
+  }>({
+    uid: null,
+    pointerId: null,
+    offsetX: 0,
+    offsetY: 0,
+    startX: 0,
+    startY: 0,
+    moved: false,
+    fromDeck: false,
+  });
 
   const [draggingUid, setDraggingUid] = useState<string | null>(null);
 
@@ -302,7 +328,6 @@ function TarotPage() {
       if (!frame) frame = requestAnimationFrame(flush);
     };
 
-
     const up = () => {
       const st = dragState.current;
       const uid = st.uid;
@@ -310,8 +335,20 @@ function TarotPage() {
       const fromDeck = st.fromDeck;
       const last = pending;
       pending = null;
-      if (frame) { cancelAnimationFrame(frame); frame = 0; }
-      dragState.current = { uid: null, pointerId: null, offsetX: 0, offsetY: 0, startX: 0, startY: 0, moved: false, fromDeck: false };
+      if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      dragState.current = {
+        uid: null,
+        pointerId: null,
+        offsetX: 0,
+        offsetY: 0,
+        startX: 0,
+        startY: 0,
+        moved: false,
+        fromDeck: false,
+      };
       setDraggingUid(null);
       if (!uid) return;
 
@@ -320,7 +357,6 @@ function TarotPage() {
         if (idx < 0) return prev;
         const card = last ? { ...prev[idx], ...last } : prev[idx];
         const next = [...prev];
-
 
         // Tap on a deck (no drag) → the card slides up to its spot on the board.
         if (wasTap && fromDeck) {
@@ -337,10 +373,20 @@ function TarotPage() {
         for (const s of slots) {
           if (used.has(s.index)) continue;
           const d = Math.hypot(s.x - cx, s.y - cy);
-          if (d < bestDist) { bestDist = d; bestSlot = s; }
+          if (d < bestDist) {
+            bestDist = d;
+            bestSlot = s;
+          }
         }
         if (bestSlot && bestDist < CARD_W * 1.1) {
-          next[idx] = { ...card, x: bestSlot.x, y: bestSlot.y, slotIndex: bestSlot.index, flipped: true, locked: true };
+          next[idx] = {
+            ...card,
+            x: bestSlot.x,
+            y: bestSlot.y,
+            slotIndex: bestSlot.index,
+            flipped: true,
+            locked: true,
+          };
           return next;
         }
 
@@ -380,7 +426,9 @@ function TarotPage() {
   const shuffleAll = useCallback(() => {
     setDecks((prev) => {
       const out = { ...prev };
-      (Object.keys(out) as DeckKey[]).forEach((k) => { out[k] = shuffle(out[k]); });
+      (Object.keys(out) as DeckKey[]).forEach((k) => {
+        out[k] = shuffle(out[k]);
+      });
       return out;
     });
   }, []);
@@ -402,8 +450,9 @@ function TarotPage() {
     const stack = decks[deckKey];
     if (!stack || stack.length === 0) return;
     const want = wanted.trim().toLowerCase();
-    const found = stack.find((c) => c.name.trim().toLowerCase() === want)
-      ?? stack.find((c) => c.name.trim().toLowerCase().includes(want));
+    const found =
+      stack.find((c) => c.name.trim().toLowerCase() === want) ??
+      stack.find((c) => c.name.trim().toLowerCase().includes(want));
     if (!found) return;
     autoPulled.current = key;
 
@@ -413,7 +462,17 @@ function TarotPage() {
     setDecks((prev) => ({ ...prev, [deckKey]: prev[deckKey].filter((c) => c !== found) }));
     setPlaced((prev) => [
       ...prev,
-      { uid, card: found, deckKey, reversed: false, x: startX, y: startY, slotIndex: null, locked: true, flipped: false },
+      {
+        uid,
+        card: found,
+        deckKey,
+        reversed: false,
+        x: startX,
+        y: startY,
+        slotIndex: null,
+        locked: true,
+        flipped: false,
+      },
     ]);
     const timer = window.setTimeout(() => {
       setPlaced((prev) => {
@@ -443,7 +502,17 @@ function TarotPage() {
       }));
       setPlaced((prev) => [
         ...prev,
-        { uid, card, deckKey: "nakshatra" as DeckKey, reversed: false, x: startX, y: startY, slotIndex: null, locked: true, flipped: false },
+        {
+          uid,
+          card,
+          deckKey: "nakshatra" as DeckKey,
+          reversed: false,
+          x: startX,
+          y: startY,
+          slotIndex: null,
+          locked: true,
+          flipped: false,
+        },
       ]);
       setStarPanelOpen(false);
       window.setTimeout(() => {
@@ -503,7 +572,10 @@ function TarotPage() {
   };
 
   return (
-    <div onClick={triggerDesignerNote} className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden">
+    <div
+      onClick={triggerDesignerNote}
+      className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden"
+    >
       <StarField />
 
       {/* Top control bar */}
@@ -512,7 +584,9 @@ function TarotPage() {
           <div className="flex items-baseline gap-3 flex-wrap">
             <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
             {!headerCollapsed && (
-              <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Pick a deck · pull a card</span>
+              <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+                Pick a deck · pull a card
+              </span>
             )}
           </div>
           <button
@@ -520,7 +594,11 @@ function TarotPage() {
             className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-pearl hover:bg-white/5"
             aria-label={headerCollapsed ? "Expand controls" : "Collapse controls"}
           >
-            {headerCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+            {headerCollapsed ? (
+              <ChevronDown className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronUp className="h-3.5 w-3.5" />
+            )}
             {headerCollapsed ? "Show" : "Hide"}
           </button>
         </div>
@@ -576,20 +654,27 @@ function TarotPage() {
                 disabled={!readyToInterpret || loadingReading}
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {loadingReading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
                 Ask AI
               </button>
             </div>
           </>
         )}
-
       </div>
 
       {/* Board row: birth-star panel on the left, canvas on the right */}
       <div className="relative z-10 flex w-full flex-1 min-h-0">
         {/* Desktop panel */}
         <aside className="hidden lg:block w-[330px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm">
-          <NakshatraPanel cards={uploaded.nakshatra ?? []} question={question} onPlaceCard={placeExactCard} />
+          <NakshatraPanel
+            cards={uploaded.nakshatra ?? []}
+            question={question}
+            onPlaceCard={placeExactCard}
+          />
         </aside>
 
         {/* Phone drawer */}
@@ -606,210 +691,239 @@ function TarotPage() {
             <div className="w-[86vw] max-w-[340px] border-r border-gold/25 bg-cosmic/95 backdrop-blur-md animate-in slide-in-from-left duration-300">
               <div className="flex items-center justify-between px-3 pt-3">
                 <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Birth star</span>
-                <button onClick={() => setStarPanelOpen(false)} aria-label="Close birth star panel" className="text-muted-foreground hover:text-pearl">
+                <button
+                  onClick={() => setStarPanelOpen(false)}
+                  aria-label="Close birth star panel"
+                  className="text-muted-foreground hover:text-pearl"
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
               <div className="h-[calc(100dvh-3rem)]">
-                <NakshatraPanel cards={uploaded.nakshatra ?? []} question={question} onPlaceCard={placeExactCard} />
+                <NakshatraPanel
+                  cards={uploaded.nakshatra ?? []}
+                  question={question}
+                  onPlaceCard={placeExactCard}
+                />
               </div>
             </div>
             <div className="flex-1 bg-black/60" onClick={() => setStarPanelOpen(false)} />
           </div>
         )}
 
-      {/* Canvas — fills remaining viewport */}
-      <div className="relative flex flex-1 min-h-0 flex-col">
-        <div
-          ref={canvasRef}
-          className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
-        >
-          {/* subtle grid glow */}
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
-
-
-
-
-          {/* Placed cards */}
-          {placed.map((p) => (
-            <PlacedCardView
-              key={p.uid}
-              card={p}
-              dragging={draggingUid === p.uid}
-              onPointerDown={(e) => beginDragPlaced(e, p.uid)}
-              onFlip={() =>
-                setPlaced((prev) =>
-                  prev.map((x) => (x.uid === p.uid ? { ...x, flipped: !x.flipped } : x)),
-                )
-              }
-              onRemove={() => removeCard(p.uid)}
-              onZoom={() => p.flipped && setZoomedUid(p.uid)}
-            />
-          ))}
-
-          {/* Always-there Ask AI button, so it works even with the top bar hidden */}
-          <button
-            onClick={requestReading}
-            disabled={!readyToInterpret || loadingReading}
-            className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+        {/* Canvas — fills remaining viewport */}
+        <div className="relative flex flex-1 min-h-0 flex-col">
+          <div
+            ref={canvasRef}
+            className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
           >
-            {loadingReading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Ask AI
-          </button>
+            {/* subtle grid glow */}
+            <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
 
-          {/* Five deck stacks — bottom right */}
-          <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none" data-tour="deck-picker">
-            <div className="text-xs font-semibold tracking-wide text-gold">
-              {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
-            </div>
-            <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
-              {DECK_LIST.map((meta, di) => {
-                const subDeck = decks[meta.key] ?? [];
-                const empty = subDeck.length === 0;
-                return (
-                  <div
-                    key={meta.key}
-                    className="relative flex flex-col items-center flex-shrink-0"
-                    style={{ width: 78 }}
-                    title={`${meta.name} — ${meta.tagline}`}
-                  >
-                    <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
-                      {[0, 1, 2].map((i) => {
-                        const isTop = i === 0 && !empty;
-                        const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
-                        return (
-                          <div
-                            key={i}
-                            onPointerDown={isTop ? (e) => beginDragFromDeck(e, meta.key) : undefined}
-                            className={`absolute inset-0 rounded-xl border ${
-                              empty
-                                ? "border-white/10 bg-black/30"
-                                : "bg-gradient-to-br from-midnight to-cosmic"
-                            } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
-                            style={{
-                              transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
-                              zIndex: 10 - i,
-                              borderColor: empty ? undefined : `${meta.accent}66`,
-                              boxShadow: empty || !isTop ? undefined : `0 8px 32px -12px ${meta.accent}80, inset 0 0 24px -12px ${meta.accent}`,
-                            }}
-                          >
-                            {!empty && (
-                              <div
-                                className="absolute inset-1.5 rounded-lg border flex items-center justify-center"
-                                style={{ borderColor: `${meta.accent}40` }}
-                              >
-                                <div
-                                  className="font-display text-lg"
-                                  style={{ color: `${meta.accent}` }}
-                                >
-                                  {meta.glyph}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div
-                      className="mt-2 w-[76px] rounded-md bg-black/60 px-1 py-0.5 text-[13px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
-                      style={{ color: meta.accent }}
-                    >
-                      {meta.shortName}
-                    </div>
-                    <div className="text-[11px] font-medium text-pearl/80 leading-tight">
-                      {subDeck.length}/{meta.expected}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="text-xs text-pearl/70 pointer-events-auto text-center pt-1">
-              {!loadingDecks && totalCards === 0
-                ? "No card pictures yet. An admin can add them in Admin, then Assets."
-                : "Tap a deck, or hold and drag a card onto the board"}
-            </div>
-          </div>
-        </div>
+            {/* Placed cards */}
+            {placed.map((p) => (
+              <PlacedCardView
+                key={p.uid}
+                card={p}
+                dragging={draggingUid === p.uid}
+                onPointerDown={(e) => beginDragPlaced(e, p.uid)}
+                onFlip={() =>
+                  setPlaced((prev) =>
+                    prev.map((x) => (x.uid === p.uid ? { ...x, flipped: !x.flipped } : x)),
+                  )
+                }
+                onRemove={() => removeCard(p.uid)}
+                onZoom={() => p.flipped && setZoomedUid(p.uid)}
+              />
+            ))}
 
-        {/* Reading — floating overlay */}
-        {(reading || error || loadingReading) && (
-          <div className="pointer-events-none absolute left-3 right-3 sm:left-6 sm:right-auto sm:max-w-md top-[7.5rem] z-30">
-            <div className="pointer-events-auto glass rounded-2xl p-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] max-h-[60vh] overflow-y-auto">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
-                  <Sparkles className="h-3.5 w-3.5" /> AI Reading
-                </div>
-                <button
-                  onClick={() => { setReading(null); setError(null); }}
-                  className="text-muted-foreground hover:text-pearl"
-                  aria-label="Close reading"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+            {/* Always-there Ask AI button, so it works even with the top bar hidden */}
+            <button
+              onClick={requestReading}
+              disabled={!readyToInterpret || loadingReading}
+              className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+            >
+              {loadingReading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              Ask AI
+            </button>
+
+            {/* Five deck stacks — bottom right */}
+            <div
+              className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none"
+              data-tour="deck-picker"
+            >
+              <div className="text-xs font-semibold tracking-wide text-gold">
+                {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
               </div>
-              {loadingReading && !reading && (
-                <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
-                </div>
-              )}
-              {error && (
-                <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-200">
-                  {error}
-                </div>
-              )}
-              {reading && <div className="mt-3"><PlainAIText text={reading} label="Tarot reading" /></div>}
+              <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
+                {DECK_LIST.map((meta, di) => {
+                  const subDeck = decks[meta.key] ?? [];
+                  const empty = subDeck.length === 0;
+                  return (
+                    <div
+                      key={meta.key}
+                      className="relative flex flex-col items-center flex-shrink-0"
+                      style={{ width: 78 }}
+                      title={`${meta.name} — ${meta.tagline}`}
+                    >
+                      <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
+                        {[0, 1, 2].map((i) => {
+                          const isTop = i === 0 && !empty;
+                          const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
+                          return (
+                            <div
+                              key={i}
+                              onPointerDown={
+                                isTop ? (e) => beginDragFromDeck(e, meta.key) : undefined
+                              }
+                              className={`absolute inset-0 rounded-xl border ${
+                                empty
+                                  ? "border-white/10 bg-black/30"
+                                  : "bg-gradient-to-br from-midnight to-cosmic"
+                              } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
+                              style={{
+                                transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
+                                zIndex: 10 - i,
+                                borderColor: empty ? undefined : `${meta.accent}66`,
+                                boxShadow:
+                                  empty || !isTop
+                                    ? undefined
+                                    : `0 8px 32px -12px ${meta.accent}80, inset 0 0 24px -12px ${meta.accent}`,
+                              }}
+                            >
+                              {!empty && (
+                                <div
+                                  className="absolute inset-1.5 rounded-lg border flex items-center justify-center"
+                                  style={{ borderColor: `${meta.accent}40` }}
+                                >
+                                  <div
+                                    className="font-display text-lg"
+                                    style={{ color: `${meta.accent}` }}
+                                  >
+                                    {meta.glyph}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div
+                        className="mt-2 w-[76px] rounded-md bg-black/60 px-1 py-0.5 text-[13px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                        style={{ color: meta.accent }}
+                      >
+                        {meta.shortName}
+                      </div>
+                      <div className="text-[11px] font-medium text-pearl/80 leading-tight">
+                        {subDeck.length}/{meta.expected}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-xs text-pearl/70 pointer-events-auto text-center pt-1">
+                {!loadingDecks && totalCards === 0
+                  ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                  : "Tap a deck, or hold and drag a card onto the board"}
+              </div>
             </div>
           </div>
-        )}
-      </div>
+
+          {/* Reading — floating overlay */}
+          {(reading || error || loadingReading) && (
+            <div className="pointer-events-none absolute left-3 right-3 sm:left-6 sm:right-auto sm:max-w-md top-[7.5rem] z-30">
+              <div className="pointer-events-auto glass rounded-2xl p-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.8)] max-h-[60vh] overflow-y-auto">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
+                    <Sparkles className="h-3.5 w-3.5" /> AI Reading
+                  </div>
+                  <button
+                    onClick={() => {
+                      setReading(null);
+                      setError(null);
+                    }}
+                    className="text-muted-foreground hover:text-pearl"
+                    aria-label="Close reading"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                {loadingReading && !reading && (
+                  <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Weaving your reading…
+                  </div>
+                )}
+                {error && (
+                  <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+                {reading && (
+                  <div className="mt-3">
+                    <PlainAIText text={reading} label="Tarot reading" />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Fullscreen zoom overlay — image only, no text */}
-      {zoomedUid && (() => {
-        const zc = placed.find((p) => p.uid === zoomedUid);
-        if (!zc) return null;
-        return (
-          <div
-            onClick={closeZoom}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
-          >
-            <button
-              onClick={(e) => { e.stopPropagation(); closeZoom(); }}
-              className="fixed top-4 right-4 z-10 rounded-full bg-black/70 border border-white/20 p-2 hover:bg-white/10"
-              aria-label="Close"
-            >
-              <X className="h-5 w-5 text-pearl" />
-            </button>
+      {zoomedUid &&
+        (() => {
+          const zc = placed.find((p) => p.uid === zoomedUid);
+          if (!zc) return null;
+          return (
             <div
-              onClick={(e) => e.stopPropagation()}
-              className="relative rounded-3xl border border-gold/50 overflow-hidden bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
-              style={{
-                width: "min(92vw, calc(92dvh * 0.66))",
-                height: "min(92dvh, calc(92vw * 1.5))",
-                transform: zc.reversed ? "rotate(180deg)" : undefined,
-              }}
+              onClick={closeZoom}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
             >
-              <img
-                src={zc.card.image}
-                alt=""
-                className="absolute inset-0 w-full h-full object-contain bg-black"
-              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeZoom();
+                }}
+                className="fixed top-4 right-4 z-10 rounded-full bg-black/70 border border-white/20 p-2 hover:bg-white/10"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 text-pearl" />
+              </button>
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="relative rounded-3xl border border-gold/50 overflow-hidden bg-gradient-to-b from-midnight via-cosmic to-black shadow-[0_0_180px_-20px_var(--gold)] flex items-center justify-center"
+                style={{
+                  width: "min(92vw, calc(92dvh * 0.66))",
+                  height: "min(92dvh, calc(92vw * 1.5))",
+                  transform: zc.reversed ? "rotate(180deg)" : undefined,
+                }}
+              >
+                <img
+                  src={zc.card.image}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-contain bg-black"
+                />
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* One-time designer note — pops up on first click, then fades away */}
       {designerNote && (
         <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
           <div className="glass rounded-2xl border border-gold/40 bg-cosmic/90 px-6 py-4 shadow-[0_0_80px_-20px_var(--gold)] text-center max-w-xs">
             <div className="text-xs uppercase tracking-[0.3em] text-gold/80 mb-2">Tarot Decks</div>
-            <div className="font-display text-lg sm:text-xl text-pearl">designed by Giaa Sharmaa</div>
+            <div className="font-display text-lg sm:text-xl text-pearl">
+              designed by Giaa Sharmaa
+            </div>
           </div>
         </div>
       )}
     </div>
-
   );
 }
 
@@ -837,7 +951,9 @@ function PlacedCardView({
         width: CARD_W,
         height: CARD_H,
         zIndex: dragging ? 40 : card.locked ? 20 : 30,
-        transition: dragging ? "none" : "left 420ms cubic-bezier(.22,1,.36,1), top 420ms cubic-bezier(.22,1,.36,1)",
+        transition: dragging
+          ? "none"
+          : "left 420ms cubic-bezier(.22,1,.36,1), top 420ms cubic-bezier(.22,1,.36,1)",
       }}
     >
       <div
@@ -847,7 +963,8 @@ function PlacedCardView({
         }}
         onClick={(e) => {
           // Ignore the click that ends a drag.
-          if (Math.abs(e.clientX - down.current.x) > 4 || Math.abs(e.clientY - down.current.y) > 4) return;
+          if (Math.abs(e.clientX - down.current.x) > 4 || Math.abs(e.clientY - down.current.y) > 4)
+            return;
           if (!card.flipped) onFlip();
           else onZoom();
         }}
@@ -857,7 +974,8 @@ function PlacedCardView({
         style={{ perspective: "1000px" }}
       >
         {/* Hover glow */}
-        <div className="pointer-events-none absolute -inset-2 rounded-3xl opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-70"
+        <div
+          className="pointer-events-none absolute -inset-2 rounded-3xl opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-70"
           style={{ background: "radial-gradient(closest-side, var(--gold), transparent 70%)" }}
         />
         <div
@@ -873,7 +991,9 @@ function PlacedCardView({
             style={{ backfaceVisibility: "hidden" }}
           >
             <div className="absolute inset-2 rounded-xl border border-gold/20 flex items-center justify-center">
-              <div className="text-gold/70 font-display text-2xl transition-transform duration-300 group-hover:scale-110">✦</div>
+              <div className="text-gold/70 font-display text-2xl transition-transform duration-300 group-hover:scale-110">
+                ✦
+              </div>
             </div>
           </div>
           {/* Front */}
@@ -902,7 +1022,6 @@ function PlacedCardView({
           </div>
         )}
       </div>
-
     </div>
   );
 }

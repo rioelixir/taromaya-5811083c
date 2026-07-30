@@ -46,7 +46,11 @@ const ALIASES: Record<string, string[]> = {
 };
 
 const norm = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 /** Every name form that should count as this birth star. */
 function nameForms(index: number): string[] {
