@@ -189,20 +189,7 @@ export function NakshatraPanel({
         latitude: Number(form.lat),
         longitude: Number(form.lon),
       });
-      const index = chart.moonNakshatra.index;
-      const m = meta[String(index)];
-      const profile = nakshatraProfile(index);
-      setResult({
-        index,
-        pada: chart.moonNakshatra.pada,
-        lord: NAKSHATRA_LORDS[index],
-        card: cardForNakshatra(index, cards, m),
-        title: nakshatraTitle(index, m),
-        keywords: m?.keywords?.filter(Boolean).length
-          ? m.keywords!.filter(Boolean)
-          : profile.strengths.slice(0, 4),
-        meaning: m?.meaning?.trim() || profile.deityShort,
-      });
+      setResult(buildResult(chart.moonNakshatra.index, chart.moonNakshatra.pada));
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Could not work that out. Please check the details.",
@@ -213,24 +200,25 @@ export function NakshatraPanel({
   };
 
   const askAi = async () => {
-    if (!result) return;
+    if (!result && !placeResult) return;
     setReadingBusy(true);
     setError(null);
     try {
+      const star = placeResult ?? result!;
       const res = await interpret({
         data: {
-          spreadLabel: `Birth star reading — ${NAKSHATRAS[result.index]} pada ${result.pada}`,
+          spreadLabel: "Star reading",
           question: question ?? "",
-          cards: [
-            {
-              name: result.title,
-              position: `Birth star ${result.index + 1} of 27, pada ${result.pada}, star lord ${result.lord}`,
-              reversed: false,
-              keywords: result.keywords,
-            },
-          ],
+          cards: [{ name: star.title, position: "", reversed: false, keywords: star.keywords }],
+          birthNakshatra: result
+            ? `${NAKSHATRAS[result.index]} (pada ${result.pada}, star lord ${result.lord})`
+            : undefined,
+          placeNakshatra: placeResult ? NAKSHATRAS[placeResult.index] : undefined,
+          placeName: placeResult ? place.place || undefined : undefined,
+          nakshatraCard: star.title,
         },
       });
+
       setReading(res.text);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong.";
