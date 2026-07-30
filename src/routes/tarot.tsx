@@ -570,7 +570,12 @@ function TarotPage() {
             reversed: c.reversed,
             keywords: [],
           })),
+          birthNakshatra: starCtx.birthNakshatra,
+          placeNakshatra: starCtx.placeNakshatra,
+          placeName: starCtx.placeName,
+          nakshatraCard: starCtx.nakshatraCard,
         },
+
       });
       setReading(res.text);
     } catch (e) {
