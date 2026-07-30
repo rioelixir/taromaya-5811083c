@@ -230,13 +230,48 @@ export function NakshatraPanel({
     }
   };
 
-  return (
-    <div className="flex h-full flex-col gap-3 overflow-y-auto p-3">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold/80">
-        <Star className="h-3.5 w-3.5" /> Your birth star
+  const openZoom = (src: string) => {
+    setZoomSrc(src);
+    setZoom(true);
+  };
+
+  const StarCard = ({ star }: { star: NakshatraResult }) =>
+    star.card ? (
+      <div className="space-y-2">
+        <button
+          onClick={() => openZoom(star.card!.image)}
+          className="group relative mx-auto block w-full max-w-[200px] overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02]"
+          style={{ aspectRatio: "2 / 3" }}
+          aria-label="See this card bigger"
+        >
+          <img src={star.card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
+          <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
+            <Maximize2 className="h-3.5 w-3.5" />
+          </span>
+        </button>
+        {onPlaceCard && (
+          <button
+            onClick={() => onPlaceCard(star.card!)}
+            className="w-full rounded-xl border border-white/15 px-3 py-2 text-sm text-pearl hover:bg-white/[0.06]"
+          >
+            Put this card on the board
+          </button>
+        )}
       </div>
-      <p className="text-xs text-muted-foreground">
-        Add your birth day, time and place. We find your Moon star and pull its card.
+    ) : (
+      <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-muted-foreground">
+        This star's picture is not added yet.
+      </div>
+    );
+
+  return (
+    <div className="flex h-full flex-col gap-4 overflow-y-auto p-3">
+      {/* ---------- Birth star ---------- */}
+      <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gold">
+        <Star className="h-4 w-4 shrink-0" /> Your birth star
+      </div>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        Add your birth day, time and place. We find your Moon star and its card.
       </p>
 
       <BirthFields form={form} setForm={setForm} />
@@ -244,24 +279,22 @@ export function NakshatraPanel({
       <button
         onClick={calculate}
         disabled={busy}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic disabled:opacity-40"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic disabled:opacity-40"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
-        Calculate birth star
+        Find my birth star
       </button>
       {!canCalculate && (
-        <p className="text-[11px] text-muted-foreground">
-          Pick a place from the list to switch this on.
-        </p>
+        <p className="text-sm text-muted-foreground">Pick a place from the list to switch this on.</p>
       )}
 
       {notice && (
-        <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 text-xs text-pearl/85">
+        <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 text-sm text-pearl/85">
           {notice}
         </div>
       )}
       {error && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-200">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-sm text-red-200">
           {error}
         </div>
       )}
@@ -269,52 +302,18 @@ export function NakshatraPanel({
       {result && (
         <div className="space-y-3">
           <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
-            <div className="font-display text-lg text-pearl">{result.title}</div>
-            <div className="text-xs text-muted-foreground">
-              Star {result.index + 1} of 27 · Pada {result.pada} · Star lord {result.lord}
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
+              Your birth star
             </div>
+            <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
           </div>
-
-          {result.card ? (
-            <div className="space-y-2">
-              <button
-                onClick={() => setZoom(true)}
-                className="group relative mx-auto block w-full max-w-[210px] overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02]"
-                style={{ aspectRatio: "2 / 3" }}
-                aria-label="Open the card big"
-              >
-                <img
-                  src={result.card.image}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-contain"
-                />
-                <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
-                  <Maximize2 className="h-3.5 w-3.5" />
-                </span>
-              </button>
-              {onPlaceCard && (
-                <button
-                  onClick={() => onPlaceCard(result.card!)}
-                  className="w-full rounded-xl border border-white/15 px-3 py-2 text-sm text-pearl hover:bg-white/[0.06]"
-                >
-                  Slide this card onto the board
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-xs text-muted-foreground">
-              This star's picture is not added yet. An admin can add it in Admin, then Nakshatra
-              Deck.
-            </div>
-          )}
-
+          <StarCard star={result} />
           {result.keywords.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {result.keywords.map((k) => (
                 <span
                   key={k}
-                  className="rounded-lg border border-gold/25 px-2 py-0.5 text-[11px] text-gold/90"
+                  className="rounded-lg border border-gold/25 px-2 py-0.5 text-xs text-gold/90"
                 >
                   {k}
                 </span>
@@ -322,28 +321,77 @@ export function NakshatraPanel({
             </div>
           )}
           {result.meaning && <p className="text-sm text-pearl/85">{result.meaning}</p>}
+        </div>
+      )}
 
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+
+      {/* ---------- Place star ---------- */}
+      <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gold">
+        <MapPin className="h-4 w-4 shrink-0" /> Place star
+      </div>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        Choose the place you are in right now. We find its star and card straight away.
+      </p>
+
+      <PlacePicker
+        value={place}
+        onChange={setPlace}
+        label="Where are you right now?"
+        compact
+      />
+
+      {placeBusy && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Working out the star…
+        </p>
+      )}
+      {placeError && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-sm text-red-200">
+          {placeError}
+        </div>
+      )}
+
+      {placeResult && (
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
+              Star of this place
+            </div>
+            <div className="font-display text-lg text-pearl">
+              {NAKSHATRAS[placeResult.index]}
+            </div>
+          </div>
+          <StarCard star={placeResult} />
+          {placeResult.meaning && (
+            <p className="text-sm text-pearl/85">{placeResult.meaning}</p>
+          )}
+        </div>
+      )}
+
+      {(result || placeResult) && (
+        <div className="space-y-3 pb-4">
           <button
             onClick={askAi}
             disabled={readingBusy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2 text-sm text-gold hover:bg-gold/10 disabled:opacity-40"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2 text-sm text-gold hover:bg-gold/10 disabled:opacity-40"
           >
             {readingBusy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            Ask AI about my star
+            Ask AI
           </button>
           {reading && (
             <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
-              <PlainAIText text={reading} label="Birth star reading" />
+              <PlainAIText text={reading} label="Star reading" />
             </div>
           )}
         </div>
       )}
 
-      {zoom && result?.card && (
+      {zoom && zoomSrc && (
         <div
           onClick={closeZoom}
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md animate-in fade-in duration-300"
@@ -360,12 +408,13 @@ export function NakshatraPanel({
           </button>
           <img
             onClick={(e) => e.stopPropagation()}
-            src={result.card.image}
+            src={zoomSrc}
             alt=""
             className="max-h-[92dvh] max-w-[92vw] rounded-3xl border border-gold/50 object-contain"
           />
         </div>
       )}
     </div>
+
   );
 }
