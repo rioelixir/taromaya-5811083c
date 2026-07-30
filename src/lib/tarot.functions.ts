@@ -19,7 +19,13 @@ const DrawSchema = z.object({
     )
     .min(1)
     .max(12),
+  /** Optional star context woven into the same single reading. */
+  birthNakshatra: z.string().max(200).optional(),
+  placeNakshatra: z.string().max(200).optional(),
+  placeName: z.string().max(200).optional(),
+  nakshatraCard: z.string().max(200).optional(),
 });
+
 
 export const interpretTarot = createServerFn({ method: "POST" })
   .middleware([requirePremium])
