@@ -8,6 +8,7 @@ import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
 import { AdminPagesTab, AdminFaqsTab, AdminBlogsTab } from "@/components/admin-cms";
 import { AdminTutorialsTab } from "@/components/admin-tutorials";
+import { AdminNakshatraDeckTab } from "@/components/admin-nakshatra-deck";
 import { Link } from "@tanstack/react-router";
 import {
   adminListUsers,
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials";
+type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials" | "nakshatra";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
@@ -71,6 +72,7 @@ function AdminPage() {
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>
         <TabBtn active={tab === "staff"} onClick={() => setTab("staff")} icon={<UserPlus className="h-4 w-4" />}>Employees & Invites</TabBtn>
         <TabBtn active={tab === "decks"} onClick={() => setTab("decks")} icon={<Layers className="h-4 w-4" />}>Tarot CMS</TabBtn>
+        <TabBtn active={tab === "nakshatra"} onClick={() => setTab("nakshatra")} icon={<Layers className="h-4 w-4" />}>Nakshatra Deck</TabBtn>
         <TabBtn active={tab === "prompts"} onClick={() => setTab("prompts")} icon={<Sparkles className="h-4 w-4" />}>AI Prompts</TabBtn>
         <TabBtn active={tab === "branding"} onClick={() => setTab("branding")} icon={<Palette className="h-4 w-4" />}>Branding & Theme</TabBtn>
         <TabBtn active={tab === "pages"} onClick={() => setTab("pages")} icon={<FileText className="h-4 w-4" />}>Pages</TabBtn>
@@ -89,6 +91,7 @@ function AdminPage() {
       {tab === "users" && <UsersTab />}
       {tab === "staff" && <StaffTab />}
       {tab === "decks" && <AdminTarotCmsTab />}
+      {tab === "nakshatra" && <AdminNakshatraDeckTab />}
       {tab === "prompts" && <AdminPromptsTab />}
       {tab === "branding" && <AdminBrandingTab />}
       {tab === "pages" && <AdminPagesTab />}
