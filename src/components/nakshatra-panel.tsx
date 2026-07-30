@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Sparkles, Star, X, Maximize2, MapPin } from "lucide-react";
 import { BirthFields, type BirthFieldsState } from "@/components/birth-fields";
@@ -41,11 +41,13 @@ export function NakshatraPanel({
   cards,
   question,
   onPlaceCard,
+  onDragCardStart,
   onContext,
 }: {
   cards: UploadedCard[];
   question?: string;
   onPlaceCard?: (card: UploadedCard) => void;
+  onDragCardStart?: (e: React.PointerEvent, card: UploadedCard) => void;
   onContext?: (ctx: StarContext) => void;
 }) {
   const { meta } = useNakshatraMeta();
@@ -230,6 +232,9 @@ export function NakshatraPanel({
     }
   };
 
+  const dragged = useRef(false);
+  const startPt = useRef({ x: 0, y: 0 });
+
   const openZoom = (src: string) => {
     setZoomSrc(src);
     setZoom(true);
@@ -239,10 +244,40 @@ export function NakshatraPanel({
     star.card ? (
       <div className="space-y-2">
         <button
-          onClick={() => openZoom(star.card!.image)}
-          className="group relative mx-auto block w-full max-w-[200px] overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02]"
+          onPointerDown={(e) => {
+            if (!onDragCardStart || e.button !== 0) return;
+            dragged.current = false;
+            startPt.current = { x: e.clientX, y: e.clientY };
+            const move = (ev: PointerEvent) => {
+              if (
+                Math.abs(ev.clientX - startPt.current.x) > 6 ||
+                Math.abs(ev.clientY - startPt.current.y) > 6
+              ) {
+                cleanup();
+                dragged.current = true;
+                onDragCardStart(
+                  { ...e, clientX: ev.clientX, clientY: ev.clientY } as unknown as React.PointerEvent,
+                  star.card!,
+                );
+              }
+            };
+            const cleanup = () => {
+              window.removeEventListener("pointermove", move);
+              window.removeEventListener("pointerup", cleanup);
+            };
+            window.addEventListener("pointermove", move);
+            window.addEventListener("pointerup", cleanup);
+          }}
+          onClick={() => {
+            if (dragged.current) {
+              dragged.current = false;
+              return;
+            }
+            openZoom(star.card!.image);
+          }}
+          className="group relative mx-auto block w-full max-w-[200px] cursor-grab touch-none overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02] active:cursor-grabbing"
           style={{ aspectRatio: "2 / 3" }}
-          aria-label="See this card bigger"
+          aria-label="Drag this card to the board, or tap to see it bigger"
         >
           <img src={star.card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
           <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
