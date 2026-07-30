@@ -9,7 +9,7 @@ import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
-import { NakshatraPanel } from "@/components/nakshatra-panel";
+import { NakshatraPanel, type StarContext } from "@/components/nakshatra-panel";
 import {
   Sparkles,
   RotateCcw,
