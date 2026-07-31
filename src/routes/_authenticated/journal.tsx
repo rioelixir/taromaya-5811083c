@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StarField } from "@/components/star-field";
-import { MicButton } from "@/components/mic-button";
+import { VoiceMic } from "@/components/voice-mic";
 import { useEffect, useMemo, useState } from "react";
 import {
   BookOpen, Sparkles, Trash2, Plus, Search, X, Save,
@@ -261,7 +261,7 @@ function Composer({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/40"
         />
         <div className="flex justify-end">
-          <MicButton size="sm" showLanguage={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
+          <VoiceMic size="sm" showControls={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
         </div>
         <textarea
           value={body} onChange={(e) => setBody(e.target.value)} rows={7}
@@ -347,7 +347,7 @@ function EntryModal({
             className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/40"
           />
           <div className="flex justify-end">
-            <MicButton size="sm" showLanguage={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
+            <VoiceMic size="sm" showControls={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
           </div>
           <textarea
             value={body} onChange={(e) => setBody(e.target.value)} rows={12}

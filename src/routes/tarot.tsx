@@ -1,4 +1,3 @@
-import { MicButton } from "@/components/mic-button";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
