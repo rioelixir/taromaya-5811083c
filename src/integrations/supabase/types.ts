@@ -420,6 +420,36 @@ export type Database = {
         }
         Relationships: []
       }
+      employees: {
+        Row: {
+          created_at: string
+          granted_at: string
+          granted_by: string | null
+          is_active: boolean
+          note: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          is_active?: boolean
+          note?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_at?: string
+          granted_by?: string | null
+          is_active?: boolean
+          note?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       engine_validation_runs: {
         Row: {
           created_at: string
@@ -684,6 +714,33 @@ export type Database = {
           unknown_time?: boolean
           user_id?: string
           zodiac?: string
+        }
+        Relationships: []
+      }
+      security_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          id: string
+          subject_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          subject_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          subject_id?: string | null
         }
         Relationships: []
       }
@@ -1291,11 +1348,52 @@ export type Database = {
           },
         ]
       }
+      work_sessions: {
+        Row: {
+          created_at: string
+          device: string | null
+          expires_at: string
+          id: string
+          last_seen_at: string
+          revoked_at: string | null
+          revoked_by: string | null
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          expires_at?: string
+          id?: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          expires_at?: string
+          id?: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      has_active_work_session: { Args: { _user_id: string }; Returns: boolean }
+      has_employee_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1303,6 +1401,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_employee: { Args: { _user_id: string }; Returns: boolean }
       is_premium: { Args: { _user_id: string }; Returns: boolean }
       redeem_coupon: {
         Args: { _code: string; _plan_id: string }
