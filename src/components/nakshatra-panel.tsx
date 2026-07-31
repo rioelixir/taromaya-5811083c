@@ -35,9 +35,9 @@ function nowTime(): string {
 }
 
 /**
- * Left-side star panel for the tarot board.
+ * Left-side Nakshatra panel for the tarot board.
  * The user only picks the time now and the place they are in.
- * The star of this moment, and its card from the admin's 27-card deck,
+ * The Nakshatra of this moment, and its card from the admin's 27-card deck,
  * are worked out on their own.
  */
 export function NakshatraPanel({
@@ -92,7 +92,7 @@ export function NakshatraPanel({
 
   const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time;
 
-  // As soon as a place and a time are set, work out the star of this moment.
+  // As soon as a place and a time are set, work out the Nakshatra of this moment.
   useEffect(() => {
     if (!ready) {
       setResult(null);
@@ -129,7 +129,7 @@ export function NakshatraPanel({
       } catch {
         if (!cancelled) {
           setResult(null);
-          setError("We couldn't find the star for this place. Please pick another place.");
+          setError("We couldn't find the Nakshatra for this place. Please pick another place.");
         }
       } finally {
         if (!cancelled) setBusy(false);
@@ -141,7 +141,7 @@ export function NakshatraPanel({
     };
   }, [ready, place.lat, place.lon, place.tz, time, buildResult]);
 
-  // Keep the board's Ask AI in step with the star of this moment.
+  // Keep the board's Ask AI in step with the Nakshatra of this moment.
   useEffect(() => {
     onContext?.({
       placeNakshatra: result ? NAKSHATRAS[result.index] : undefined,
@@ -157,7 +157,7 @@ export function NakshatraPanel({
     try {
       const res = await interpret({
         data: {
-          spreadLabel: "Star reading",
+          spreadLabel: "Nakshatra reading",
           question: question ?? "",
           cards: [{ name: result.title, position: "", reversed: false, keywords: result.keywords }],
           placeNakshatra: NAKSHATRAS[result.index],
@@ -184,8 +184,8 @@ export function NakshatraPanel({
     setZoom(true);
   };
 
-  const starLine = useMemo(
-    () => (result ? `${NAKSHATRAS[result.index]} · part ${result.pada} · star lord ${result.lord}` : ""),
+  const nakshatraLine = useMemo(
+    () => (result ? `${NAKSHATRAS[result.index]} · part ${result.pada} · Nakshatra lord ${result.lord}` : ""),
     [result],
   );
 
@@ -195,7 +195,7 @@ export function NakshatraPanel({
         <Star className="h-4 w-4 shrink-0" /> Current Nakshatra
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Tell us the time now and where you are. We find the Moon's star for this
+        Tell us the time now and where you are. We find the Moon's Nakshatra for this
         moment and pull its card on its own.
       </p>
 
@@ -217,7 +217,7 @@ export function NakshatraPanel({
 
       {busy && (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Working out the star…
+          <Loader2 className="h-4 w-4 animate-spin" /> Working out the Nakshatra…
         </p>
       )}
 
@@ -234,7 +234,7 @@ export function NakshatraPanel({
               Nakshatra right now
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
-            <div className="text-xs text-muted-foreground">{starLine}</div>
+            <div className="text-xs text-muted-foreground">{nakshatraLine}</div>
           </div>
 
           {result.card ? (
@@ -291,7 +291,7 @@ export function NakshatraPanel({
             </div>
           ) : (
             <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-muted-foreground">
-              This star's picture is not added yet.
+              This Nakshatra's picture is not added yet.
             </div>
           )}
 
@@ -324,7 +324,7 @@ export function NakshatraPanel({
             </button>
             {reading && (
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
-                <PlainAIText text={reading} label="Star reading" />
+                <PlainAIText text={reading} label="Nakshatra reading" />
               </div>
             )}
           </div>

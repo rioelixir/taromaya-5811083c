@@ -501,8 +501,8 @@ function TarotPage() {
     return () => window.clearTimeout(timer);
   }, [search.deck, search.card, decks, canvasSize.w, canvasSize.h, restingSpot]);
 
-  // Birth-star panel (left side on desktop, slide-out drawer on phones).
-  const [starPanelOpen, setStarPanelOpen] = useState(false);
+  // Nakshatra panel (left side on desktop, slide-out drawer on phones).
+  const [nakshatraPanelOpen, setNakshatraPanelOpen] = useState(false);
 
   // Slide one exact card onto the board without touching what is already there.
   const placeExactCard = useCallback(
@@ -528,7 +528,7 @@ function TarotPage() {
           flipped: false,
         },
       ]);
-      setStarPanelOpen(false);
+      setNakshatraPanelOpen(false);
       window.setTimeout(() => {
         setPlaced((prev) => {
           const idx = prev.findIndex((x) => x.uid === uid);
@@ -543,7 +543,7 @@ function TarotPage() {
     [canvasSize.w, canvasSize.h, restingSpot],
   );
 
-  // Pick a star card up with the finger/mouse and drag it straight onto the board.
+  // Pick a Nakshatra card up with the finger/mouse and drag it straight onto the board.
   const beginDragExactCard = useCallback(
     (e: React.PointerEvent, card: UploadedCard) => {
       const canvasEl = canvasRef.current;
@@ -579,7 +579,7 @@ function TarotPage() {
         moved: false,
         fromDeck: true,
       };
-      setStarPanelOpen(false);
+      setNakshatraPanelOpen(false);
       setDraggingUid(uid);
     },
     [],
@@ -732,7 +732,7 @@ function TarotPage() {
         )}
       </div>
 
-      {/* Board row: birth-star panel on the left, canvas on the right */}
+      {/* Board row: Nakshatra panel on the left, canvas on the right */}
       <div className="relative z-10 flex w-full flex-1 min-h-0">
         {/* Desktop panel */}
         <aside className="hidden lg:block w-[330px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm">
@@ -747,21 +747,21 @@ function TarotPage() {
 
         {/* Phone drawer */}
         <button
-          onClick={() => setStarPanelOpen(true)}
+          onClick={() => setNakshatraPanelOpen(true)}
           className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-xl border border-l-0 border-gold/40 bg-black/70 px-2 py-4 text-[10px] uppercase tracking-widest text-gold"
-          aria-label="Open star panel"
+          aria-label="Open Nakshatra panel"
         >
           <Star className="mx-auto mb-1 h-4 w-4" />
-          Star
+          Nakshatra
         </button>
-        {starPanelOpen && (
+        {nakshatraPanelOpen && (
           <div className="lg:hidden fixed inset-0 z-40 flex">
             <div className="w-[86vw] max-w-[340px] border-r border-gold/25 bg-cosmic/95 backdrop-blur-md animate-in slide-in-from-left duration-300">
               <div className="flex items-center justify-between px-3 pt-3">
-                <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Stars</span>
+                <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Nakshatra</span>
                 <button
-                  onClick={() => setStarPanelOpen(false)}
-                  aria-label="Close star panel"
+                  onClick={() => setNakshatraPanelOpen(false)}
+                  aria-label="Close Nakshatra panel"
                   className="text-muted-foreground hover:text-pearl"
                 >
                   <X className="h-4 w-4" />
@@ -777,7 +777,7 @@ function TarotPage() {
                 />
               </div>
             </div>
-            <div className="flex-1 bg-black/60" onClick={() => setStarPanelOpen(false)} />
+            <div className="flex-1 bg-black/60" onClick={() => setNakshatraPanelOpen(false)} />
           </div>
         )}
 
