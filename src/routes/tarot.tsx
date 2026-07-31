@@ -614,6 +614,7 @@ function TarotPage() {
             position: c.position,
             reversed: c.reversed,
             keywords: [],
+            image: c.card.image,
           })),
           placeNakshatra: starCtx.placeNakshatra,
           placeName: starCtx.placeName,
