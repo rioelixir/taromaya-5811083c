@@ -494,7 +494,7 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
                 <div key={i} className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/30 bg-gradient-to-br from-purple-50 to-amber-50">
                   <div>
                     <div className="text-[10px] uppercase tracking-widest font-bold text-purple-700">Lagna</div>
-                    <div className="font-display text-2xl text-gray-900 mt-1 font-bold">{RASHIS[chart.ascendant.rashi]}</div>
+                    <div className="font-display text-2xl text-gray-900 mt-1 font-bold">{chart.ascendant.rashi + 1}</div>
                     <div className="text-[11px] text-gray-600 mt-1">{formatDegree(chart.ascendant.degreeInRashi)}</div>
                   </div>
                 </div>
@@ -504,12 +504,11 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
           }
           const isAsc = rashi === chart.ascendant.rashi;
           const planets = planetsByRashi.get(rashi) ?? [];
-          const houseNo = ((rashi - chart.ascendant.rashi + 12) % 12) + 1;
           return (
             <div key={i} className={`relative border border-gray-300 p-2 text-[10px] ${isAsc ? "bg-amber-50" : "bg-white"}`}>
               <div className="flex items-start justify-between gap-1">
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-700">{RASHIS[rashi].slice(0, 3)}</span>
-                <span className={`text-[10px] font-bold ${isAsc ? "text-purple-700" : "text-purple-600"}`}>H{houseNo}{isAsc ? "·As" : ""}</span>
+                <span className="text-[11px] font-bold text-gray-800">{rashi + 1}</span>
+                {isAsc && <span className="text-[10px] font-bold text-purple-700">Asc</span>}
               </div>
               <div className="mt-1.5 flex flex-col gap-0.5">
                 {planets.map((p) => (
