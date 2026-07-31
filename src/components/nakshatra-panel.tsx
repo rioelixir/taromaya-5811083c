@@ -35,9 +35,9 @@ function nowTime(): string {
 }
 
 /**
- * Left-side star panel for the tarot board.
+ * Left-side Nakshatra panel for the tarot board.
  * The user only picks the time now and the place they are in.
- * The star of this moment, and its card from the admin's 27-card deck,
+ * The Nakshatra of this moment, and its card from the admin's 27-card deck,
  * are worked out on their own.
  */
 export function NakshatraPanel({
@@ -92,7 +92,7 @@ export function NakshatraPanel({
 
   const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time;
 
-  // As soon as a place and a time are set, work out the star of this moment.
+  // As soon as a place and a time are set, work out the Nakshatra of this moment.
   useEffect(() => {
     if (!ready) {
       setResult(null);
