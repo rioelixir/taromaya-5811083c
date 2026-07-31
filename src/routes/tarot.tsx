@@ -25,7 +25,7 @@ import {
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
 export const Route = createFileRoute("/tarot")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { deck?: string; card?: string } => ({
     deck: typeof search.deck === "string" ? search.deck : undefined,
     card: typeof search.card === "string" ? search.card : undefined,
   }),
