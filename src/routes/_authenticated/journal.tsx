@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { StarField } from "@/components/star-field";
+import { MicButton } from "@/components/mic-button";
 import { useEffect, useMemo, useState } from "react";
 import {
   BookOpen, Sparkles, Trash2, Plus, Search, X, Save,
