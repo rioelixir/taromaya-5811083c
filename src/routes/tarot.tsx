@@ -967,10 +967,10 @@ function TarotPage() {
                   e.stopPropagation();
                   closeZoom();
                 }}
-                className="fixed top-4 right-4 z-10 rounded-full bg-black/70 border border-white/20 p-2 hover:bg-white/10"
+                className="fixed top-4 right-4 z-10 rounded-full bg-white border border-white/80 p-2 shadow-lg hover:bg-gray-100"
                 aria-label="Close"
               >
-                <X className="h-5 w-5 text-pearl" />
+                <X className="h-5 w-5 text-black" />
               </button>
               <div
                 onClick={(e) => e.stopPropagation()}
