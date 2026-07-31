@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
