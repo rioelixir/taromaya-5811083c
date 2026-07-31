@@ -20,7 +20,8 @@ type Chart = {
   planets: NP[];
 };
 
-const RASHIS_SHORT = ["Ar","Ta","Ge","Cn","Le","Vi","Li","Sc","Sg","Cp","Aq","Pi"];
+// Signs are shown as plain numbers 1..12 everywhere in the app.
+const RASHIS_SHORT = ["1","2","3","4","5","6","7","8","9","10","11","12"];
 const GLYPH: Record<string, string> = {
   Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju",
   Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke", Uranus: "Ur",
@@ -229,7 +230,7 @@ function SouthIndianChartInner({
               <title>{label}</title>
               <rect x={x} y={y} width={cell} height={cell} fill="transparent" />
               <text x={x + 4} y={y + 12} fontSize={S*0.028} className="fill-primary/80" fontFamily="serif">
-                {RASHIS_SHORT[s]}{isLagna ? " · As" : ""}
+                {RASHIS_SHORT[s]}{isLagna ? " · Asc" : ""}
               </text>
               {planets.map((p, idx) => (
                 <text key={p.name} x={x + cell/2} y={y + cell/2 + idx*S*0.035 - (planets.length-1)*S*0.017}
