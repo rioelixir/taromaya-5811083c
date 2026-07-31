@@ -56,7 +56,15 @@ export function VoiceFieldMics({ onText }: { onText: (el: HTMLElement, text: str
     setSpots(found);
   }, []);
 
+  // Wait until the page has settled so we never disturb the first paint.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
+    const t = window.setTimeout(() => setReady(true), 900);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
     let frame = 0;
     const soon = () => {
       if (frame) return;
@@ -75,7 +83,7 @@ export function VoiceFieldMics({ onText }: { onText: (el: HTMLElement, text: str
       window.clearInterval(tick);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [measure]);
+  }, [measure, ready]);
 
   useEffect(() => {
     if (!voice.message) return;
