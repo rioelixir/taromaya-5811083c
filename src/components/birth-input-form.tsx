@@ -130,23 +130,7 @@ export function BirthInputForm({
         </div>
 
         <div className="grid gap-4 border-t border-white/10 pt-4 md:grid-cols-3">
-          <Field label="Ayanamsa">
-            <Select value={form.ayanamsa} onValueChange={(v) => set("ayanamsa", v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {AYANAMSAS.map((a) => <SelectItem key={a.v} value={a.v}>{a.l}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Node type">
-            <Select value={form.nodeType} onValueChange={(v) => set("nodeType", v as never)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mean">Mean Node</SelectItem>
-                <SelectItem value="true">True Node</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
+
           <Field label="Chart style">
             <Select value={form.chartStyle} onValueChange={(v) => set("chartStyle", v as never)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
