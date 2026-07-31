@@ -501,8 +501,8 @@ function TarotPage() {
     return () => window.clearTimeout(timer);
   }, [search.deck, search.card, decks, canvasSize.w, canvasSize.h, restingSpot]);
 
-  // Birth-star panel (left side on desktop, slide-out drawer on phones).
-  const [starPanelOpen, setStarPanelOpen] = useState(false);
+  // Nakshatra panel (left side on desktop, slide-out drawer on phones).
+  const [nakshatraPanelOpen, setNakshatraPanelOpen] = useState(false);
 
   // Slide one exact card onto the board without touching what is already there.
   const placeExactCard = useCallback(
