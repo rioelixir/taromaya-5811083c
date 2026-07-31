@@ -5,7 +5,7 @@ import { insertSpokenText, isTypableField } from "@/lib/voice-fields";
 import { findClickable, matchVoiceCommand } from "@/lib/voice-commands";
 
 const COMMAND_STARTERS =
-  /^\s*(open|go to|goto|show|take me to|visit|launch|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
+  /^\s*(open|go to|goto|go|show|show me|take me to|take me|visit|launch|switch to|switch|move to|jump to|bring up|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
 
 /**
  * One microphone for the whole app.
