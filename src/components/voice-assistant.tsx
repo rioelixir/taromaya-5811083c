@@ -1,29 +1,31 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { MicButton } from "@/components/mic-button";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { VoiceMic } from "@/components/voice-mic";
 import { insertSpokenText, isTypableField } from "@/lib/voice-fields";
 import { findClickable, matchVoiceCommand } from "@/lib/voice-commands";
+import { announceDetails, hasDetails, parseSpokenDetails } from "@/lib/voice-parse";
 
 const COMMAND_STARTERS =
   /^\s*(open|go to|goto|go|show|show me|take me to|take me|visit|launch|switch to|switch|move to|jump to|bring up|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
 
-
 /**
- * One microphone for the whole app.
- * Speak a page name to move around ("open kundli", "go back", "scroll down"),
- * or tap a box first and speak to fill it in.
+ * The one voice helper for the whole app.
+ * Tap the microphone and just talk: it fills the boxes on the page,
+ * moves between pages, or presses buttons for you.
+ * It never appears on the Tarot board.
  */
-export function VoiceInputLayer() {
+export function VoiceAssistant() {
   const navigate = useNavigate();
+  const path = useRouterState({ select: (s) => s.location.pathname });
   const targetRef = useRef<HTMLElement | null>(null);
   const [hasTarget, setHasTarget] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const noteTimer = useRef<number | null>(null);
+  const timer = useRef<number | null>(null);
 
-  const say = (msg: string | null, hold = 2200) => {
+  const say = (msg: string | null, hold = 2400) => {
     setNote(msg);
-    if (noteTimer.current) window.clearTimeout(noteTimer.current);
-    if (msg) noteTimer.current = window.setTimeout(() => setNote(null), hold);
+    if (timer.current) window.clearTimeout(timer.current);
+    if (msg) timer.current = window.setTimeout(() => setNote(null), hold);
   };
 
   useEffect(() => {
@@ -90,11 +92,32 @@ export function VoiceInputLayer() {
         return true;
       }
       case "help":
-        say('Say a page name like "kundli", "tarot" or "numerology" to open it.', 4000);
+        say('Say a page name like "kundli" or "numerology", or just tell me your birth details.', 4000);
         return true;
       default:
         return false;
     }
+  };
+
+  /** Fill a name / person box if the page has one. */
+  const fillName = (name: string): boolean => {
+    const boxes = Array.from(
+      document.querySelectorAll<HTMLInputElement>('input[type="text"], input:not([type])'),
+    );
+    const box = boxes.find((b) => {
+      const hay = `${b.name} ${b.id} ${b.placeholder} ${b.getAttribute("aria-label") ?? ""}`.toLowerCase();
+      return /name/.test(hay) && !/place|city|country|search/.test(hay);
+    });
+    if (!box) return false;
+    box.focus();
+    return insertSpokenText(box, name);
+  };
+
+  const fillTime = (time: string): boolean => {
+    const box = document.querySelector<HTMLInputElement>('input[type="time"]');
+    if (!box) return false;
+    box.focus();
+    return insertSpokenText(box, time);
   };
 
   const handleText = (text: string) => {
@@ -102,25 +125,44 @@ export function VoiceInputLayer() {
     const el = isTypableField(active) ? (active as HTMLElement) : targetRef.current;
     const fieldReady = !!el && el.isConnected && isTypableField(el);
 
-    // A page or button name always wins, even while a box is selected.
+    // A page or button name always wins.
     if (!fieldReady || COMMAND_STARTERS.test(text)) {
       if (runCommand(text)) return;
     }
 
+    // Birth details spoken in one breath: fill everything we understood.
+    const details = parseSpokenDetails(text);
+    if (hasDetails(details) && (details.date || details.time || details.place)) {
+      announceDetails(details); // date pickers and place boxes listen for this
+      const done: string[] = [];
+      if (details.name && fillName(details.name)) done.push(`name ${details.name}`);
+      if (details.date) done.push("date");
+      if (details.time) { fillTime(details.time); done.push("time"); }
+      if (details.place) done.push(details.place);
+      say(
+        done.length
+          ? `Filled in ${done.join(", ")} ✓ Check it, then tap the button.`
+          : "I heard you, but I could not find the right boxes here.",
+        4200,
+      );
+      return;
+    }
+
     if (!fieldReady) {
-      say('Say a page name like "kundli" or "tarot", or tap a box first to fill it.', 4000);
+      say('Tap a box and speak, or say a page name like "kundli".', 4000);
       return;
     }
     const ok = insertSpokenText(el!, text);
-    // Your words are always added to what is already there — nothing is erased.
-    say(ok ? "Added your words ✓" : "That didn't fit this box. Say it again, or type it.", 2000);
+    say(ok ? "Added your words ✓" : "That didn't fit this box. Try again, or type it.", 2200);
   };
 
+  // The Tarot board stays completely free of the microphone.
+  if (path.startsWith("/tarot")) return null;
 
   return (
     <div className="fixed bottom-28 right-4 z-40 flex flex-col items-end gap-2 sm:bottom-8">
       {note && (
-        <div className="max-w-[70vw] rounded-xl glass gold-border px-3 py-2 text-xs text-pearl">
+        <div className="max-w-[76vw] rounded-xl glass gold-border px-3 py-2 text-xs leading-relaxed text-pearl">
           {note}
         </div>
       )}
@@ -129,9 +171,7 @@ export function VoiceInputLayer() {
           Speak to fill this box
         </div>
       )}
-      <MicButton onText={handleText} size="lg" label="Tap to speak, or hold and speak" />
+      <VoiceMic onText={handleText} size="lg" label="Tap and speak" />
     </div>
   );
 }
-
-

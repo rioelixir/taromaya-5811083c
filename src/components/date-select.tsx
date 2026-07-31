@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import { VOICE_FILL_EVENT, isFirstOfKind, type SpokenDetails } from "@/lib/voice-parse";
+
 // Day / Month / Year dropdowns — no typing, no invalid dates.
 // Value and onChange use the ISO `yyyy-mm-dd` string the whole app already uses.
 
@@ -46,8 +49,22 @@ export function DateSelect({
     );
   };
 
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  // Voice: when someone speaks a date, the first date box on the page takes it.
+  useEffect(() => {
+    const onFill = (e: Event) => {
+      const d = (e as CustomEvent<SpokenDetails>).detail;
+      if (!d?.date) return;
+      if (!isFirstOfKind(boxRef.current, "[data-voice-date]")) return;
+      onChange(d.date);
+    };
+    window.addEventListener(VOICE_FILL_EVENT, onFill);
+    return () => window.removeEventListener(VOICE_FILL_EVENT, onFill);
+  }, [onChange]);
+
   return (
-    <div className="block">
+    <div ref={boxRef} data-voice-date className="block">
       {label !== "" && (
         <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
           {label} (DD / MM / YYYY)

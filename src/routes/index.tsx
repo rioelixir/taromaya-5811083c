@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,6 +27,9 @@ const today = () =>
 
 function Home() {
   const branding = useBranding();
+  // Shown after the page loads so the date always matches the reader's own clock.
+  const [dateLine, setDateLine] = useState("");
+  useEffect(() => setDateLine(today()), []);
   const { user } = useAuth();
   const first =
     (user?.user_metadata?.full_name as string | undefined)?.split(" ")[0] ??
@@ -35,8 +39,8 @@ function Home() {
   return (
     <div className="container-page pt-20 sm:pt-24 pb-12">
       {/* Greeting */}
-      <div className="text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
-        {today()}
+      <div className="min-h-[1rem] text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
+        {dateLine}
       </div>
       <h1 className="mt-3 font-display text-4xl sm:text-5xl leading-[1.05] tracking-tight">
         <span className="gold-text">
