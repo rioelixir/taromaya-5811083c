@@ -98,7 +98,9 @@ function TarotPage() {
   const [loadingReading, setLoadingReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [zoomedUid, setZoomedUid] = useState<string | null>(null);
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+  // Hidden by default: the board itself is the whole screen until the user
+  // taps "Show" to reveal the deck/spread controls.
+  const [headerCollapsed, setHeaderCollapsed] = useState(true);
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
   const [starCtx, setStarCtx] = useState<StarContext>({});
