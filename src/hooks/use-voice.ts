@@ -52,6 +52,19 @@ export function useVoice(onText: (text: string) => void) {
   } | null>(null);
   const onTextRef = useRef(onText);
   onTextRef.current = onText;
+  /** Stops listening on its own once the person goes quiet, so nobody has to tap twice. */
+  const stopRef = useRef<() => void>(() => {});
+  const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearSilence = useCallback(() => {
+    if (silenceRef.current) clearTimeout(silenceRef.current);
+    silenceRef.current = null;
+  }, []);
+  const waitForQuiet = useCallback(() => {
+    clearSilence();
+    silenceRef.current = setTimeout(() => {
+      if (activeRef.current && !pausedRef.current) stopRef.current();
+    }, 2200);
+  }, [clearSilence]);
 
   useEffect(() => {
     setAvailable(!!ctor() || !!navigator.mediaDevices?.getUserMedia);
