@@ -22,9 +22,9 @@ export const Route = createFileRoute("/compatibility")({
   }),
 });
 
-type Person = { name: string; date: string; time: string; tz: string; lat: string; lon: string };
-const DEFAULT_A: Person = { name: "", date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090" };
-const DEFAULT_B: Person = { name: "", date: "1994-11-22", time: "14:20", tz: "5.5", lat: "19.0760", lon: "72.8777" };
+type Person = { name: string; date: string; time: string; tz: string; lat: string; lon: string; place?: string };
+const DEFAULT_A: Person = { name: "", date: "1995-06-15", time: "07:45", tz: "5.5", lat: "28.6139", lon: "77.2090", place: "New Delhi, India" };
+const DEFAULT_B: Person = { name: "", date: "1994-11-22", time: "14:20", tz: "5.5", lat: "19.0760", lon: "72.8777", place: "Mumbai, India" };
 
 function CompatibilityPage() {
   const [a, setA] = useState<Person>(DEFAULT_A);
@@ -253,11 +253,13 @@ function PersonInputs({ value, onChange }: { value: Person; onChange: (p: Person
         <DateSelect label="" value={value.date} onChange={(v) => set("date", v)} />
         <input type="time" value={value.time} onChange={(e) => set("time", e.target.value)} className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-pearl" />
       </div>
-      <div className="grid grid-cols-3 gap-3">
-        <input value={value.tz} onChange={(e) => set("tz", e.target.value)} placeholder="TZ" className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-pearl" />
-        <input value={value.lat} onChange={(e) => set("lat", e.target.value)} placeholder="Lat" className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-pearl" />
-        <input value={value.lon} onChange={(e) => set("lon", e.target.value)} placeholder="Lon" className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-pearl" />
-      </div>
+      <PlacePicker
+        label="Where were they born?"
+        value={{ place: value.place ?? "", lat: value.lat, lon: value.lon, tz: value.tz }}
+        onChange={(p) => onChange({ ...value, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
+        forDate={value.date}
+        forTime={value.time}
+      />
     </div>
   );
 }
