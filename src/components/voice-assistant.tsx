@@ -135,8 +135,8 @@ export function VoiceAssistant() {
     say(ok ? "Added your words ✓" : "That didn't fit this box. Try again, or type it.", 2200);
   };
 
-  // The Tarot board stays completely free of the microphone.
-  if (path.startsWith("/tarot")) return null;
+  // The front page and the Tarot board stay completely free of microphones.
+  if (path === "/" || path.startsWith("/tarot")) return null;
 
   return (
     <>
