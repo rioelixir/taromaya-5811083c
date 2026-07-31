@@ -528,7 +528,7 @@ function TarotPage() {
           flipped: false,
         },
       ]);
-      setStarPanelOpen(false);
+      setNakshatraPanelOpen(false);
       window.setTimeout(() => {
         setPlaced((prev) => {
           const idx = prev.findIndex((x) => x.uid === uid);
@@ -543,7 +543,7 @@ function TarotPage() {
     [canvasSize.w, canvasSize.h, restingSpot],
   );
 
-  // Pick a star card up with the finger/mouse and drag it straight onto the board.
+  // Pick a Nakshatra card up with the finger/mouse and drag it straight onto the board.
   const beginDragExactCard = useCallback(
     (e: React.PointerEvent, card: UploadedCard) => {
       const canvasEl = canvasRef.current;
@@ -579,7 +579,7 @@ function TarotPage() {
         moved: false,
         fromDeck: true,
       };
-      setStarPanelOpen(false);
+      setNakshatraPanelOpen(false);
       setDraggingUid(uid);
     },
     [],
@@ -732,7 +732,7 @@ function TarotPage() {
         )}
       </div>
 
-      {/* Board row: birth-star panel on the left, canvas on the right */}
+      {/* Board row: Nakshatra panel on the left, canvas on the right */}
       <div className="relative z-10 flex w-full flex-1 min-h-0">
         {/* Desktop panel */}
         <aside className="hidden lg:block w-[330px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm">
