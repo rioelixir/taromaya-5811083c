@@ -116,13 +116,22 @@ export function BirthInputForm({
             </Select>
           </Field>
 
-          <Field label="Place of birth (city, country)">
-            <Input value={form.place} onChange={(e) => set("place", e.target.value)} placeholder="e.g. Mumbai, India" />
-          </Field>
-          <Field label="Historical timezone offset (hours east of UTC)">
-            <Input type="number" step="0.25" value={form.tzOffsetHours}
-              onChange={(e) => set("tzOffsetHours", parseFloat(e.target.value) || 0)} />
-          </Field>
+          <div className="md:col-span-2">
+            <PlacePicker
+              value={{ place: form.place, lat: String(form.latitude), lon: String(form.longitude), tz: String(form.tzOffsetHours) }}
+              onChange={(p) => {
+                setForm((f) => ({
+                  ...f,
+                  place: p.place,
+                  latitude: parseFloat(p.lat) || 0,
+                  longitude: parseFloat(p.lon) || 0,
+                  tzOffsetHours: parseFloat(p.tz) || 0,
+                }));
+              }}
+              forDate={`${form.year}-${String(form.month).padStart(2, "0")}-${String(form.day).padStart(2, "0")}`}
+              forTime={`${String(form.hour).padStart(2, "0")}:${String(form.minute).padStart(2, "0")}`}
+            />
+          </div>
 
           <div className="grid grid-cols-3 gap-2 md:col-span-2">
             <Field label="Year"><Input type="number" value={form.year} onChange={(e) => set("year", parseInt(e.target.value) || 0)} /></Field>
@@ -134,15 +143,6 @@ export function BirthInputForm({
             <Field label="Minute"><Input type="number" min={0} max={59} value={form.minute} onChange={(e) => set("minute", parseInt(e.target.value) || 0)} /></Field>
             <Field label="Second"><Input type="number" min={0} max={59} value={form.seconds} onChange={(e) => set("seconds", parseInt(e.target.value) || 0)} /></Field>
           </div>
-
-          <Field label="Latitude (°N)">
-            <Input type="number" step="0.00001" value={form.latitude}
-              onChange={(e) => set("latitude", parseFloat(e.target.value) || 0)} />
-          </Field>
-          <Field label="Longitude (°E)">
-            <Input type="number" step="0.00001" value={form.longitude}
-              onChange={(e) => set("longitude", parseFloat(e.target.value) || 0)} />
-          </Field>
         </div>
 
         <div className="grid gap-4 border-t border-white/10 pt-4 md:grid-cols-3">
@@ -193,9 +193,6 @@ export function BirthInputForm({
           <Row k="Name" v={form.name || "—"} />
           <Row k="Place" v={form.place || "—"} />
           <Row k="Local date-time" v={`${form.year}-${String(form.month).padStart(2,"0")}-${String(form.day).padStart(2,"0")}  ${String(form.hour).padStart(2,"0")}:${String(form.minute).padStart(2,"0")}:${String(form.seconds).padStart(2,"0")}`} />
-          <Row k="Timezone (hours from UTC)" v={`${form.tzOffsetHours >= 0 ? "+" : ""}${form.tzOffsetHours}`} />
-          <Row k="Converted to UTC" v={utcPreview} />
-          <Row k="Coordinates" v={`${form.latitude.toFixed(5)}°, ${form.longitude.toFixed(5)}°`} />
           <Row k="Ayanamsa" v={form.ayanamsa} />
           <Row k="Node type" v={form.nodeType} />
           <Row k="Chart style" v={form.chartStyle} />

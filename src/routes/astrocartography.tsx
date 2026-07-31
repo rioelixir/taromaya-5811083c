@@ -457,15 +457,25 @@ function BirthForm({ value, onChange }: { value: BirthInput; onChange: (v: Birth
   const set = <K extends keyof BirthInput>(k: K, v: BirthInput[K]) => onChange({ ...value, [k]: v });
   const num = (v: string) => (v === "" ? 0 : Number(v));
   return (
-    <div className="grid grid-cols-2 gap-3 text-sm">
-      <Field label="Year"><input type="number" className="acg-input" value={value.year} onChange={(e) => set("year", num(e.target.value))} /></Field>
-      <Field label="Month"><input type="number" min={1} max={12} className="acg-input" value={value.month} onChange={(e) => set("month", num(e.target.value))} /></Field>
-      <Field label="Day"><input type="number" min={1} max={31} className="acg-input" value={value.day} onChange={(e) => set("day", num(e.target.value))} /></Field>
-      <Field label="Hour"><input type="number" min={0} max={23} className="acg-input" value={value.hour} onChange={(e) => set("hour", num(e.target.value))} /></Field>
-      <Field label="Minute"><input type="number" min={0} max={59} className="acg-input" value={value.minute} onChange={(e) => set("minute", num(e.target.value))} /></Field>
-      <Field label="TZ (hours)"><input type="number" step={0.25} className="acg-input" value={value.tzOffsetHours} onChange={(e) => set("tzOffsetHours", num(e.target.value))} /></Field>
-      <Field label="Latitude"><input type="number" step={0.0001} className="acg-input" value={value.latitude} onChange={(e) => set("latitude", num(e.target.value))} /></Field>
-      <Field label="Longitude"><input type="number" step={0.0001} className="acg-input" value={value.longitude} onChange={(e) => set("longitude", num(e.target.value))} /></Field>
+    <div className="space-y-3 text-sm">
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Year"><input type="number" className="acg-input" value={value.year} onChange={(e) => set("year", num(e.target.value))} /></Field>
+        <Field label="Month"><input type="number" min={1} max={12} className="acg-input" value={value.month} onChange={(e) => set("month", num(e.target.value))} /></Field>
+        <Field label="Day"><input type="number" min={1} max={31} className="acg-input" value={value.day} onChange={(e) => set("day", num(e.target.value))} /></Field>
+        <Field label="Hour"><input type="number" min={0} max={23} className="acg-input" value={value.hour} onChange={(e) => set("hour", num(e.target.value))} /></Field>
+        <Field label="Minute"><input type="number" min={0} max={59} className="acg-input" value={value.minute} onChange={(e) => set("minute", num(e.target.value))} /></Field>
+      </div>
+      <PlacePicker
+        value={{ place: "", lat: String(value.latitude), lon: String(value.longitude), tz: String(value.tzOffsetHours) }}
+        onChange={(p) => onChange({
+          ...value,
+          latitude: parseFloat(p.lat) || 0,
+          longitude: parseFloat(p.lon) || 0,
+          tzOffsetHours: parseFloat(p.tz) || 0,
+        })}
+        forDate={`${value.year}-${String(value.month).padStart(2, "0")}-${String(value.day).padStart(2, "0")}`}
+        forTime={`${String(value.hour).padStart(2, "0")}:${String(value.minute).padStart(2, "0")}`}
+      />
       <style>{`.acg-input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:0.6rem;padding:.35rem .55rem;color:#F5F2E7;width:100%}`}</style>
     </div>
   );
