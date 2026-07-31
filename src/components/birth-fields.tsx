@@ -1,4 +1,5 @@
 import { PlacePicker, type PlaceValue } from "@/components/place-picker";
+import { DateSelect } from "@/components/date-select";
 
 export type BirthFieldsState = {
   date: string;
