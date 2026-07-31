@@ -194,7 +194,7 @@ function tidyPunctuation(text: string): string {
 export function dedupeRepeats(text: string): string {
   const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
   const key = (w: string) => w.toLowerCase().replace(/[.,!?;:]+$/, "");
-  for (let size = 4; size >= 1; size--) {
+  for (let size = 8; size >= 1; size--) {
     let i = 0;
     while (i + size * 2 <= words.length) {
       const same = () => {
