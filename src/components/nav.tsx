@@ -22,6 +22,7 @@ const CATALOG: Group[] = [
     label: "Essentials",
     items: [
       { to: "/", label: "Home", icon: LayoutDashboard },
+      { to: "/help", label: "Help — Listen", icon: HelpCircle },
       { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/kundli", label: "Kundli", icon: Moon },
       { to: "/ai", label: "AI Guide", icon: Bot },

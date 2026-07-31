@@ -43,6 +43,7 @@ import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as FestivalsRouteImport } from './routes/festivals'
@@ -253,6 +254,11 @@ const HoroscopeRoute = HoroscopeRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -485,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -561,6 +568,7 @@ export interface FileRoutesByTo {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -639,6 +647,7 @@ export interface FileRoutesById {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -717,6 +726,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -793,6 +803,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -870,6 +881,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -948,6 +960,7 @@ export interface RootRouteChildren {
   FestivalsRoute: typeof FestivalsRoute
   FinanceRoute: typeof FinanceRoute
   HealthRoute: typeof HealthRoute
+  HelpRoute: typeof HelpRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
   KaalsarpRoute: typeof KaalsarpRoute
@@ -1232,6 +1245,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -1583,6 +1603,7 @@ const rootRouteChildren: RootRouteChildren = {
   FestivalsRoute: FestivalsRoute,
   FinanceRoute: FinanceRoute,
   HealthRoute: HealthRoute,
+  HelpRoute: HelpRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
   KaalsarpRoute: KaalsarpRoute,
