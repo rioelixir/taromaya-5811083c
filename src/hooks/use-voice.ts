@@ -268,6 +268,9 @@ export function useVoice(onText: (text: string) => void) {
       await send(blob);
     }
   }, [emit, heard, send, teardown]);
+  stopRef.current = () => { void stop(); };
+
+
 
   /** Throw away what was heard and stop. */
   const clear = useCallback(() => {
