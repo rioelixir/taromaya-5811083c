@@ -99,6 +99,13 @@ export function MicButton({
     return () => window.clearTimeout(t);
   }, [hands, listening, voice.partial, finish]);
 
+  // Hints and warnings fade away on their own so nothing gets in the way.
+  useEffect(() => {
+    if (!voice.message) return;
+    const t = window.setTimeout(() => voice.clearMessage(), 4000);
+    return () => window.clearTimeout(t);
+  }, [voice.message, voice]);
+
   const px = size === "lg" ? "h-14 w-14" : size === "sm" ? "h-11 w-11" : "h-12 w-12";
   const icon = size === "lg" ? "h-6 w-6" : "h-5 w-5";
 
