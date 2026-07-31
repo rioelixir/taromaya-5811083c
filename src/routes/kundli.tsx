@@ -335,36 +335,6 @@ function BirthForm({
           forDate={form.date}
           forTime={form.time}
         />
-        <Field label="Elevation (m)">
-          <input value={form.elevation} onChange={(e) => setForm({ ...form, elevation: e.target.value })} className={inputCls} inputMode="numeric" placeholder="0" />
-        </Field>
-        <div className="grid grid-cols-3 gap-3">
-          <Field label="Ayanamsa">
-            <select value={form.ayanamsa} onChange={(e) => setForm({ ...form, ayanamsa: e.target.value })} className={inputCls}>
-              <option value="lahiri">Lahiri</option>
-              <option value="raman">Raman</option>
-              <option value="kp-old">KP (Old)</option>
-              <option value="kp-new">KP (New)</option>
-              <option value="tropical">Tropical</option>
-            </select>
-          </Field>
-          <Field label="House system">
-            <select value={form.houseSystem} onChange={(e) => setForm({ ...form, houseSystem: e.target.value })} className={inputCls}>
-              <option value="whole-sign">Whole Sign</option>
-              <option value="placidus">Placidus</option>
-              <option value="koch">Koch</option>
-              <option value="equal">Equal</option>
-              <option value="sripati">Sripati</option>
-              <option value="bhava-chalit">Bhava Chalit</option>
-            </select>
-          </Field>
-          <Field label="Rahu / Ketu">
-            <select value={form.nodeType} onChange={(e) => setForm({ ...form, nodeType: e.target.value })} className={inputCls}>
-              <option value="true">True Node</option>
-              <option value="mean">Mean Node</option>
-            </select>
-          </Field>
-        </div>
         <button
           disabled={!canSubmit} onClick={onCompute}
           className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 hover:brightness-110 transition"
