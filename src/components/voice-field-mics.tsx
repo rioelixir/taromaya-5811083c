@@ -66,9 +66,10 @@ export function VoiceFieldMics({ onText }: { onText: (el: HTMLElement, text: str
   useEffect(() => {
     if (!ready) return;
     let frame = 0;
+    // A short wait keeps us out of the way while a page is still drawing itself.
     const soon = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => { frame = 0; measure(); });
+      if (frame) window.clearTimeout(frame);
+      frame = window.setTimeout(() => { frame = 0; measure(); }, 250);
     };
     soon();
     const mo = new MutationObserver(soon);
@@ -81,7 +82,7 @@ export function VoiceFieldMics({ onText }: { onText: (el: HTMLElement, text: str
       window.removeEventListener("scroll", soon, true);
       window.removeEventListener("resize", soon);
       window.clearInterval(tick);
-      if (frame) window.cancelAnimationFrame(frame);
+      if (frame) window.clearTimeout(frame);
     };
   }, [measure, ready]);
 
