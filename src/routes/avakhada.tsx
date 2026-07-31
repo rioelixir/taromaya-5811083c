@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -90,7 +91,7 @@ function AvakhadaPage() {
         <GlassCard>
           <h3 className="mb-3 font-serif text-lg">Birth Details</h3>
           <div className="space-y-3 text-xs">
-            <Field label="Date"><input type="date" value={form.date} onChange={set("date")} className={inputCls} /></Field>
+            <Field label="Date"><DateSelect label="" value={form.date} onChange={(v) => setForm((f) => ({ ...f, date: v }))} /></Field>
             <Field label="Time"><input type="time" value={form.time} onChange={set("time")} className={inputCls} /></Field>
             <Field label="Timezone (hours east of UTC)"><input type="number" step="0.25" value={form.tz} onChange={set("tz")} className={inputCls} /></Field>
             <div className="grid grid-cols-2 gap-2">

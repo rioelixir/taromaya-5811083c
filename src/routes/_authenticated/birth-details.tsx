@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useBirthProfile, useSaveBirthProfile } from "@/hooks/use-birth-profile";
@@ -129,13 +130,11 @@ function BirthDetailsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Birth date" required error={errors.birth_date}>
-                  <input
-                    type="date" className="input"
-                    min="1900-01-01"
-                    max={new Date().toISOString().slice(0, 10)}
+                  <DateSelect
+                    label=""
+                    maxYear={new Date().getFullYear()}
                     value={form.birth_date}
-                    onChange={(e) => setForm((f) => ({ ...f, birth_date: e.target.value }))}
-                    required
+                    onChange={(v) => setForm((f) => ({ ...f, birth_date: v }))}
                   />
                 </Field>
                 <Field label="Birth time (24h, local)" required error={errors.birth_time}>

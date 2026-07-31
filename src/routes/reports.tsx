@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -172,8 +173,12 @@ function Field({ label, value, onChange, type = "text" }: { label: string; value
   return (
     <label className="text-xs uppercase tracking-widest text-muted-foreground">
       {label}
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
+      {type === "date" ? (
+        <div className="mt-1"><DateSelect label="" value={value} onChange={onChange} /></div>
+      ) : (
+        <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
+          className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
+      )}
     </label>
   );
 }

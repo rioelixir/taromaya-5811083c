@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
 import { useMemo, useState } from "react";
 import { CloudSun, Moon, Clock, Sun, Sparkles, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -63,15 +64,11 @@ function WeatherPage() {
         </div>
 
         <div className="glass rounded-2xl p-5 flex flex-wrap gap-4 items-end">
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-widest text-white/60">
-            Date
-            <input
-              type="date"
-              value={day.toISOString().slice(0, 10)}
-              onChange={e => { const nd = new Date(e.target.value); nd.setHours(0, 0, 0, 0); setDay(nd); }}
-              className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white"
-            />
-          </label>
+          <DateSelect
+            label="Date"
+            value={day.toISOString().slice(0, 10)}
+            onChange={(v) => { if (!v) return; const nd = new Date(v); nd.setHours(0, 0, 0, 0); setDay(nd); }}
+          />
           <label className="flex flex-col gap-1 text-xs uppercase tracking-widest text-white/60">
             Latitude
             <input type="number" step="0.01" value={lat} onChange={e => setLat(parseFloat(e.target.value) || 0)}
