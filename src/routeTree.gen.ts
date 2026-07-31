@@ -80,6 +80,7 @@ import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicHelpAudioRouteImport } from './routes/api/public/help-audio'
 import { Route as ApiPublicBootstrapAdminsRouteImport } from './routes/api/public/bootstrap-admins'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
@@ -441,6 +442,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHelpAudioRoute = ApiPublicHelpAudioRouteImport.update({
+  id: '/api/public/help-audio',
+  path: '/api/public/help-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBootstrapAdminsRoute =
   ApiPublicBootstrapAdminsRouteImport.update({
     id: '/api/public/bootstrap-admins',
@@ -531,6 +537,7 @@ export interface FileRoutesByFullPath {
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -606,6 +613,7 @@ export interface FileRoutesByTo {
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -683,6 +691,7 @@ export interface FileRoutesById {
   '/share/$token': typeof ShareTokenRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -760,6 +769,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -835,6 +845,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -911,6 +922,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -978,6 +990,7 @@ export interface RootRouteChildren {
   PagesSlugRoute: typeof PagesSlugRoute
   ShareTokenRoute: typeof ShareTokenRoute
   ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
+  ApiPublicHelpAudioRoute: typeof ApiPublicHelpAudioRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1480,6 +1493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/help-audio': {
+      id: '/api/public/help-audio'
+      path: '/api/public/help-audio'
+      fullPath: '/api/public/help-audio'
+      preLoaderRoute: typeof ApiPublicHelpAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/bootstrap-admins': {
       id: '/api/public/bootstrap-admins'
       path: '/api/public/bootstrap-admins'
@@ -1605,18 +1625,9 @@ const rootRouteChildren: RootRouteChildren = {
   PagesSlugRoute: PagesSlugRoute,
   ShareTokenRoute: ShareTokenRoute,
   ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
+  ApiPublicHelpAudioRoute: ApiPublicHelpAudioRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
