@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { cleanSpeech, engineLang, getVoiceLang, serverLangHint } from "@/lib/speech";
+import { cleanSpeech, dedupeRepeats, engineLang, getVoiceLang, serverLangHint } from "@/lib/speech";
 
 /**
  * One voice engine for the whole app.
@@ -36,6 +36,11 @@ export function useVoice(onText: (text: string) => void) {
 
   const recRef = useRef<Recognition | null>(null);
   const finalRef = useRef("");
+  /** Words already settled in the current listening session, kept by their slot
+   *  so the listener repeating itself can never add the same words twice. */
+  const slotsRef = useRef<string[]>([]);
+  /** Words settled before the listener restarted itself. */
+  const committedRef = useRef("");
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
   const mediaRef = useRef<{
@@ -124,6 +129,8 @@ export function useVoice(onText: (text: string) => void) {
     activeRef.current = true;
     pausedRef.current = false;
     finalRef.current = "";
+    slotsRef.current = [];
+    committedRef.current = "";
     setHeard("");
     setMessage(null);
 
@@ -140,10 +147,14 @@ export function useVoice(onText: (text: string) => void) {
           let interim = "";
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const r = e.results[i];
-            if (r.isFinal) finalRef.current += `${r[0].transcript} `;
+            // Store by slot, never append: a repeated event overwrites instead of doubling.
+            if (r.isFinal) slotsRef.current[i] = String(r[0].transcript || "").trim();
             else interim += r[0].transcript;
           }
-          setHeard((finalRef.current + interim).trim());
+          finalRef.current = dedupeRepeats(
+            `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
+          );
+          setHeard(dedupeRepeats(`${finalRef.current} ${interim}`.trim()));
         };
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
@@ -154,6 +165,11 @@ export function useVoice(onText: (text: string) => void) {
           }
         };
         rec.onend = () => {
+          // A fresh session numbers its slots from zero again, so keep what we have.
+          committedRef.current = dedupeRepeats(
+            `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
+          );
+          slotsRef.current = [];
           if (activeRef.current) {
             try { rec.start(); } catch { /* restart race */ }
           }
@@ -208,6 +224,8 @@ export function useVoice(onText: (text: string) => void) {
     const spoken = (finalRef.current || heard).trim();
     const m = teardown();
     finalRef.current = "";
+    slotsRef.current = [];
+    committedRef.current = "";
     setHeard("");
 
     if (hadRec) {
@@ -232,6 +250,8 @@ export function useVoice(onText: (text: string) => void) {
 
   /** Throw away what was heard and stop. */
   const clear = useCallback(() => {
+    slotsRef.current = [];
+    committedRef.current = "";
     const m = teardown();
     if (m) {
       m.stream.getTracks().forEach((t) => t.stop());
