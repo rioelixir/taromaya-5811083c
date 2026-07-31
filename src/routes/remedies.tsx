@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";

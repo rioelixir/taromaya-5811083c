@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
