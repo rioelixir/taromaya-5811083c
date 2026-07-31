@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Sparkles, Star, X, Maximize2, MapPin } from "lucide-react";
-import { BirthFields, type BirthFieldsState } from "@/components/birth-fields";
+import { Loader2, Sparkles, Star, X, Maximize2 } from "lucide-react";
 import { PlacePicker, type PlaceValue } from "@/components/place-picker";
 import { PlainAIText } from "@/components/plain-ai-text";
-import { computeKundli, NAKSHATRAS, NAKSHATRA_LORDS } from "@/lib/vedic";
+import { NAKSHATRAS, NAKSHATRA_LORDS } from "@/lib/vedic";
 import { computeNakshatraForLocation } from "@/lib/nakshatra-location";
 import { nakshatraProfile } from "@/lib/nakshatra-deep";
 import { cardForNakshatra, nakshatraTitle } from "@/lib/nakshatra-deck";
@@ -12,7 +11,6 @@ import { useNakshatraMeta } from "@/hooks/use-nakshatra-meta";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
 import { interpretTarot } from "@/lib/tarot.functions";
 import type { UploadedCard } from "@/lib/tarot-decks";
-
 
 export type NakshatraResult = {
   index: number;
@@ -25,17 +23,22 @@ export type NakshatraResult = {
 };
 
 export type StarContext = {
-  birthNakshatra?: string;
   placeNakshatra?: string;
   placeName?: string;
   nakshatraCard?: string;
 };
 
+/** "HH:MM" for right now, in the viewer's own clock. */
+function nowTime(): string {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 /**
  * Left-side star panel for the tarot board.
- * Top: your birth star from your birth day, time and place.
- * Bottom: the star of the place you are in right now.
- * Both pull their matching card from the admin's 27-card Nakshatra deck.
+ * The user only picks the time now and the place they are in.
+ * The star of this moment, and its card from the admin's 27-card deck,
+ * are worked out on their own.
  */
 export function NakshatraPanel({
   cards,
@@ -51,28 +54,15 @@ export function NakshatraPanel({
   onContext?: (ctx: StarContext) => void;
 }) {
   const { meta } = useNakshatraMeta();
-  const [form, setForm] = useState<BirthFieldsState>({
-    date: "",
-    time: "",
-    tz: "",
-    lat: "",
-    lon: "",
-    place: "",
-  });
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [time, setTime] = useState<string>(() => nowTime());
+  const [place, setPlace] = useState<PlaceValue>({ place: "", lat: "", lon: "", tz: "" });
   const [result, setResult] = useState<NakshatraResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(false);
   const [zoomSrc, setZoomSrc] = useState<string | null>(null);
   const [reading, setReading] = useState<string | null>(null);
   const [readingBusy, setReadingBusy] = useState(false);
-
-  // Place star (where you are right now)
-  const [place, setPlace] = useState<PlaceValue>({ place: "", lat: "", lon: "", tz: "" });
-  const [placeResult, setPlaceResult] = useState<NakshatraResult | null>(null);
-  const [placeError, setPlaceError] = useState<string | null>(null);
-  const [placeBusy, setPlaceBusy] = useState(false);
 
   const closeZoom = useCallback(() => {
     setZoom(false);
@@ -100,127 +90,81 @@ export function NakshatraPanel({
     [cards, meta],
   );
 
-  // Work out the star of the chosen place as soon as a place is picked.
+  const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time;
+
+  // As soon as a place and a time are set, work out the star of this moment.
   useEffect(() => {
-    if (place.lat === "" || place.lon === "") {
-      setPlaceResult(null);
-      setPlaceError(null);
+    if (!ready) {
+      setResult(null);
+      setError(null);
       return;
     }
     let cancelled = false;
-    setPlaceBusy(true);
-    setPlaceError(null);
-    // Async so picking a place never blocks the board.
+    setBusy(true);
+    setError(null);
     const id = window.setTimeout(() => {
       try {
+        const tz = Number(place.tz);
+        // Today's date at that place, at the chosen clock time.
+        const localNow = new Date(Date.now() + tz * 3600 * 1000);
+        const [hh, mm] = time.split(":").map(Number);
+        const utcMs =
+          Date.UTC(
+            localNow.getUTCFullYear(),
+            localNow.getUTCMonth(),
+            localNow.getUTCDate(),
+            hh || 0,
+            mm || 0,
+          ) - tz * 3600 * 1000;
+
         const snap = computeNakshatraForLocation({
-          date: new Date(),
+          date: new Date(utcMs),
           latitude: Number(place.lat),
           longitude: Number(place.lon),
           timelineCount: 1,
         });
         if (cancelled) return;
-        setPlaceResult(buildResult(snap.moon.index, snap.moon.pada));
+        setResult(buildResult(snap.moon.index, snap.moon.pada));
+        setReading(null);
       } catch {
         if (!cancelled) {
-          setPlaceResult(null);
-          setPlaceError(
-            "We couldn't find the star for this place. Please choose another place.",
-          );
+          setResult(null);
+          setError("We couldn't find the star for this place. Please pick another place.");
         }
       } finally {
-        if (!cancelled) setPlaceBusy(false);
+        if (!cancelled) setBusy(false);
       }
     }, 0);
     return () => {
       cancelled = true;
       window.clearTimeout(id);
     };
-  }, [place.lat, place.lon, buildResult]);
+  }, [ready, place.lat, place.lon, place.tz, time, buildResult]);
 
-  // Keep the board's Ask AI in step with both stars.
+  // Keep the board's Ask AI in step with the star of this moment.
   useEffect(() => {
     onContext?.({
-      birthNakshatra: result
-        ? `${NAKSHATRAS[result.index]} (pada ${result.pada}, star lord ${result.lord})`
-        : undefined,
-      placeNakshatra: placeResult ? NAKSHATRAS[placeResult.index] : undefined,
-      placeName: placeResult ? place.place || undefined : undefined,
-      nakshatraCard: placeResult?.card
-        ? placeResult.title
-        : result?.card
-          ? result.title
-          : undefined,
+      placeNakshatra: result ? NAKSHATRAS[result.index] : undefined,
+      placeName: result ? place.place || undefined : undefined,
+      nakshatraCard: result?.card ? result.title : undefined,
     });
-  }, [result, placeResult, place.place, onContext]);
-
-
-  const canCalculate = useMemo(
-    () => !!form.date && form.lat !== "" && form.lon !== "" && form.tz !== "",
-    [form],
-  );
-
-  const calculate = () => {
-    setError(null);
-    setNotice(null);
-    setReading(null);
-    if (!form.date) {
-      setError("Please add your birth date.");
-      return;
-    }
-    if (form.lat === "" || form.lon === "" || form.tz === "") {
-      setError("Please select a place from the search list.");
-      return;
-    }
-    if (!form.time) {
-      setNotice(
-        "Birth time helps improve accuracy. You can continue without it, but the result may be less precise.",
-      );
-    }
-    setBusy(true);
-    try {
-      const [y, mo, d] = form.date.split("-").map(Number);
-      const [hh, mi] = (form.time || "12:00").split(":").map(Number);
-      const chart = computeKundli({
-        year: y,
-        month: mo,
-        day: d,
-        hour: hh || 0,
-        minute: mi || 0,
-        tzOffsetHours: Number(form.tz),
-        latitude: Number(form.lat),
-        longitude: Number(form.lon),
-      });
-      setResult(buildResult(chart.moonNakshatra.index, chart.moonNakshatra.pada));
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not work that out. Please check the details.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  };
+  }, [result, place.place, onContext]);
 
   const askAi = async () => {
-    if (!result && !placeResult) return;
+    if (!result) return;
     setReadingBusy(true);
     setError(null);
     try {
-      const star = placeResult ?? result!;
       const res = await interpret({
         data: {
           spreadLabel: "Star reading",
           question: question ?? "",
-          cards: [{ name: star.title, position: "", reversed: false, keywords: star.keywords }],
-          birthNakshatra: result
-            ? `${NAKSHATRAS[result.index]} (pada ${result.pada}, star lord ${result.lord})`
-            : undefined,
-          placeNakshatra: placeResult ? NAKSHATRAS[placeResult.index] : undefined,
-          placeName: placeResult ? place.place || undefined : undefined,
-          nakshatraCard: star.title,
+          cards: [{ name: result.title, position: "", reversed: false, keywords: result.keywords }],
+          placeNakshatra: NAKSHATRAS[result.index],
+          placeName: place.place || undefined,
+          nakshatraCard: result.title,
         },
       });
-
       setReading(res.text);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Something went wrong.";
@@ -240,94 +184,43 @@ export function NakshatraPanel({
     setZoom(true);
   };
 
-  const StarCard = ({ star }: { star: NakshatraResult }) =>
-    star.card ? (
-      <div className="space-y-2">
-        <button
-          onPointerDown={(e) => {
-            if (!onDragCardStart || e.button !== 0) return;
-            dragged.current = false;
-            startPt.current = { x: e.clientX, y: e.clientY };
-            const move = (ev: PointerEvent) => {
-              if (
-                Math.abs(ev.clientX - startPt.current.x) > 6 ||
-                Math.abs(ev.clientY - startPt.current.y) > 6
-              ) {
-                cleanup();
-                dragged.current = true;
-                onDragCardStart(
-                  { ...e, clientX: ev.clientX, clientY: ev.clientY } as unknown as React.PointerEvent,
-                  star.card!,
-                );
-              }
-            };
-            const cleanup = () => {
-              window.removeEventListener("pointermove", move);
-              window.removeEventListener("pointerup", cleanup);
-            };
-            window.addEventListener("pointermove", move);
-            window.addEventListener("pointerup", cleanup);
-          }}
-          onClick={() => {
-            if (dragged.current) {
-              dragged.current = false;
-              return;
-            }
-            openZoom(star.card!.image);
-          }}
-          className="group relative mx-auto block w-full max-w-[200px] cursor-grab touch-none overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02] active:cursor-grabbing"
-          style={{ aspectRatio: "2 / 3" }}
-          aria-label="Drag this card to the board, or tap to see it bigger"
-        >
-          <img src={star.card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
-          <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
-            <Maximize2 className="h-3.5 w-3.5" />
-          </span>
-        </button>
-        {onPlaceCard && (
-          <button
-            onClick={() => onPlaceCard(star.card!)}
-            className="w-full rounded-xl border border-white/15 px-3 py-2 text-sm text-pearl hover:bg-white/[0.06]"
-          >
-            Put this card on the board
-          </button>
-        )}
-      </div>
-    ) : (
-      <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-muted-foreground">
-        This star's picture is not added yet.
-      </div>
-    );
+  const starLine = useMemo(
+    () => (result ? `${NAKSHATRAS[result.index]} · part ${result.pada} · star lord ${result.lord}` : ""),
+    [result],
+  );
 
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-3">
-      {/* ---------- Birth star ---------- */}
       <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gold">
-        <Star className="h-4 w-4 shrink-0" /> Your birth star
+        <Star className="h-4 w-4 shrink-0" /> Current star
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Add your birth day, time and place. We find your Moon star and its card.
+        Tell us the time now and where you are. We find the Moon's star for this
+        moment and pull its card on its own.
       </p>
 
-      <BirthFields form={form} setForm={setForm} />
+      <label className="block text-xs uppercase tracking-widest text-muted-foreground">
+        Current time
+        <input
+          type="time"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className="mt-1 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+        />
+      </label>
 
-      <button
-        onClick={calculate}
-        disabled={busy}
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic disabled:opacity-40"
-      >
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
-        Find my birth star
-      </button>
-      {!canCalculate && (
-        <p className="text-sm text-muted-foreground">Pick a place from the list to switch this on.</p>
+      <PlacePicker value={place} onChange={setPlace} label="Current place" />
+
+      {!ready && (
+        <p className="text-sm text-muted-foreground">Pick a place from the list to begin.</p>
       )}
 
-      {notice && (
-        <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 text-sm text-pearl/85">
-          {notice}
-        </div>
+      {busy && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Working out the star…
+        </p>
       )}
+
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-sm text-red-200">
           {error}
@@ -338,11 +231,70 @@ export function NakshatraPanel({
         <div className="space-y-3">
           <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">
-              Your birth star
+              Star right now
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
+            <div className="text-xs text-muted-foreground">{starLine}</div>
           </div>
-          <StarCard star={result} />
+
+          {result.card ? (
+            <div className="space-y-2">
+              <button
+                onPointerDown={(e) => {
+                  if (!onDragCardStart || e.button !== 0) return;
+                  dragged.current = false;
+                  startPt.current = { x: e.clientX, y: e.clientY };
+                  const move = (ev: PointerEvent) => {
+                    if (
+                      Math.abs(ev.clientX - startPt.current.x) > 6 ||
+                      Math.abs(ev.clientY - startPt.current.y) > 6
+                    ) {
+                      cleanup();
+                      dragged.current = true;
+                      onDragCardStart(
+                        { ...e, clientX: ev.clientX, clientY: ev.clientY } as unknown as React.PointerEvent,
+                        result.card!,
+                      );
+                    }
+                  };
+                  const cleanup = () => {
+                    window.removeEventListener("pointermove", move);
+                    window.removeEventListener("pointerup", cleanup);
+                  };
+                  window.addEventListener("pointermove", move);
+                  window.addEventListener("pointerup", cleanup);
+                }}
+                onClick={() => {
+                  if (dragged.current) {
+                    dragged.current = false;
+                    return;
+                  }
+                  openZoom(result.card!.image);
+                }}
+                className="group relative mx-auto block w-full max-w-[200px] cursor-grab touch-none overflow-hidden rounded-2xl border border-gold/40 bg-black transition hover:scale-[1.02] active:cursor-grabbing"
+                style={{ aspectRatio: "2 / 3" }}
+                aria-label="Drag this card to the board, or tap to see it bigger"
+              >
+                <img src={result.card.image} alt="" loading="lazy" className="h-full w-full object-contain" />
+                <span className="absolute bottom-2 right-2 rounded-lg bg-black/70 p-1.5 text-pearl opacity-80">
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </span>
+              </button>
+              {onPlaceCard && (
+                <button
+                  onClick={() => onPlaceCard(result.card!)}
+                  className="w-full rounded-xl border border-white/15 px-3 py-2 text-sm text-pearl hover:bg-white/[0.06]"
+                >
+                  Put this card on the board
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-muted-foreground">
+              This star's picture is not added yet.
+            </div>
+          )}
+
           {result.keywords.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {result.keywords.map((k) => (
@@ -356,72 +308,26 @@ export function NakshatraPanel({
             </div>
           )}
           {result.meaning && <p className="text-sm text-pearl/85">{result.meaning}</p>}
-        </div>
-      )}
 
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-
-      {/* ---------- Place star ---------- */}
-      <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gold">
-        <MapPin className="h-4 w-4 shrink-0" /> Place star
-      </div>
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        Choose the place you are in right now. We find its star and card straight away.
-      </p>
-
-      <PlacePicker
-        value={place}
-        onChange={setPlace}
-        label="Where are you right now?"
-      />
-
-      {placeBusy && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Working out the star…
-        </p>
-      )}
-      {placeError && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-2 text-sm text-red-200">
-          {placeError}
-        </div>
-      )}
-
-      {placeResult && (
-        <div className="space-y-3">
-          <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
-            <div className="text-xs uppercase tracking-widest text-muted-foreground">
-              Star of this place
-            </div>
-            <div className="font-display text-lg text-pearl">
-              {NAKSHATRAS[placeResult.index]}
-            </div>
-          </div>
-          <StarCard star={placeResult} />
-          {placeResult.meaning && (
-            <p className="text-sm text-pearl/85">{placeResult.meaning}</p>
-          )}
-        </div>
-      )}
-
-      {(result || placeResult) && (
-        <div className="space-y-3 pb-4">
-          <button
-            onClick={askAi}
-            disabled={readingBusy}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2 text-sm text-gold hover:bg-gold/10 disabled:opacity-40"
-          >
-            {readingBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
+          <div className="space-y-3 pb-4">
+            <button
+              onClick={askAi}
+              disabled={readingBusy}
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2 text-sm text-gold hover:bg-gold/10 disabled:opacity-40"
+            >
+              {readingBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              Ask AI
+            </button>
+            {reading && (
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
+                <PlainAIText text={reading} label="Star reading" />
+              </div>
             )}
-            Ask AI
-          </button>
-          {reading && (
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
-              <PlainAIText text={reading} label="Star reading" />
-            </div>
-          )}
+          </div>
         </div>
       )}
 
@@ -449,6 +355,5 @@ export function NakshatraPanel({
         </div>
       )}
     </div>
-
   );
 }
