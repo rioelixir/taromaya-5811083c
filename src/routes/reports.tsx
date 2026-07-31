@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -88,10 +89,14 @@ function ReportsPage() {
           <Field label="Name" value={birth.name} onChange={(v) => setBirth({...birth, name: v})} />
           <Field label="Date" type="date" value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
           <Field label="Time" type="time" value={birth.time} onChange={(v) => setBirth({...birth, time: v})} />
-          <Field label="TZ (h east of UTC)" value={birth.tz} onChange={(v) => setBirth({...birth, tz: v})} />
-          <Field label="Latitude" value={birth.lat} onChange={(v) => setBirth({...birth, lat: v})} />
-          <Field label="Longitude" value={birth.lon} onChange={(v) => setBirth({...birth, lon: v})} />
-          <Field label="Place" value={birth.place} onChange={(v) => setBirth({...birth, place: v})} />
+        </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: birth.place, lat: birth.lat, lon: birth.lon, tz: birth.tz }}
+            onChange={(p) => setBirth({ ...birth, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
+            forDate={birth.date}
+            forTime={birth.time}
+          />
         </div>
       </GlassCard>
 

@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { createFileRoute } from "@tanstack/react-router";
 import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
@@ -45,6 +46,7 @@ function WeatherPage() {
   });
   const [lat, setLat] = useState(28.6139);
   const [lon, setLon] = useState(77.209);
+  const [place, setPlace] = useState("New Delhi, India");
 
   const timeline = useMemo(() => dayAspectTimeline(day), [day]);
   const voc = useMemo(() => moonVoidOfCourse(day), [day]);
@@ -63,26 +65,24 @@ function WeatherPage() {
           </div>
         </div>
 
-        <div className="glass rounded-2xl p-5 flex flex-wrap gap-4 items-end">
-          <DateSelect
-            label="Date"
-            value={day.toISOString().slice(0, 10)}
-            onChange={(v) => { if (!v) return; const nd = new Date(v); nd.setHours(0, 0, 0, 0); setDay(nd); }}
+        <div className="glass rounded-2xl p-5 space-y-4">
+          <div className="flex flex-wrap gap-4 items-end">
+            <DateSelect
+              label="Date"
+              value={day.toISOString().slice(0, 10)}
+              onChange={(v) => { if (!v) return; const nd = new Date(v); nd.setHours(0, 0, 0, 0); setDay(nd); }}
+            />
+            <button
+              onClick={() => { const d = new Date(); d.setHours(0, 0, 0, 0); setDay(d); }}
+              className="ml-auto px-4 py-2 rounded-lg glass gold-border text-gold text-sm hover:bg-gold/10"
+            >Today</button>
+          </div>
+          <PlacePicker
+            label="Which place?"
+            value={{ place, lat: String(lat), lon: String(lon), tz: "0" }}
+            onChange={(p) => { setPlace(p.place); setLat(parseFloat(p.lat) || 0); setLon(parseFloat(p.lon) || 0); }}
+            forDate={day.toISOString().slice(0, 10)}
           />
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-widest text-white/60">
-            Latitude
-            <input type="number" step="0.01" value={lat} onChange={e => setLat(parseFloat(e.target.value) || 0)}
-              className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white w-32" />
-          </label>
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-widest text-white/60">
-            Longitude
-            <input type="number" step="0.01" value={lon} onChange={e => setLon(parseFloat(e.target.value) || 0)}
-              className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white w-32" />
-          </label>
-          <button
-            onClick={() => { const d = new Date(); d.setHours(0, 0, 0, 0); setDay(d); }}
-            className="ml-auto px-4 py-2 rounded-lg glass gold-border text-gold text-sm hover:bg-gold/10"
-          >Today</button>
         </div>
 
         {/* Now hour + VoC */}

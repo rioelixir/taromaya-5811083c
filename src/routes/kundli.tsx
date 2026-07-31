@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -323,22 +324,17 @@ function BirthForm({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Seconds"><input value={form.seconds} onChange={(e) => setForm({ ...form, seconds: e.target.value })} className={inputCls} inputMode="numeric" disabled={form.unknownTime} placeholder="0" /></Field>
-          <Field label="Timezone (hrs from UTC)"><input value={form.tz} onChange={(e) => setForm({ ...form, tz: e.target.value })} className={inputCls} placeholder="5.5" inputMode="decimal" /></Field>
         </div>
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
           <input type="checkbox" checked={form.unknownTime} onChange={(e) => setForm({ ...form, unknownTime: e.target.checked })} className="accent-gold" />
           Time unknown (use noon chart)
         </label>
-        <Field label="Place (for your reference)">
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input value={form.place} onChange={(e) => setForm({ ...form, place: e.target.value })} className={inputCls + " pl-9"} placeholder="City, Country" />
-          </div>
-        </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Latitude"><input value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
-          <Field label="Longitude"><input value={form.lon} onChange={(e) => setForm({ ...form, lon: e.target.value })} className={inputCls} inputMode="decimal" /></Field>
-        </div>
+        <PlacePicker
+          value={{ place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
+          onChange={(p) => setForm({ ...form, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
+          forDate={form.date}
+          forTime={form.time}
+        />
         <Field label="Elevation (m)">
           <input value={form.elevation} onChange={(e) => setForm({ ...form, elevation: e.target.value })} className={inputCls} inputMode="numeric" placeholder="0" />
         </Field>

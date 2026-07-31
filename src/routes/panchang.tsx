@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -72,26 +73,17 @@ function PanchangPage() {
       subtitle="Today's cosmic almanac — auspicious timings, planetary hours, and Vedic calendar."
     >
       <GlassCard>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date</span>
             <DateSelect label="" value={date} onChange={(v) => setDate(v)} />
           </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Place</span>
-            <input value={place} onChange={(e) => setPlace(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-          </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Latitude</span>
-            <input value={lat} onChange={(e) => setLat(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-          </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Longitude</span>
-            <input value={lon} onChange={(e) => setLon(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-          </label>
+          <PlacePicker
+            label="Which place?"
+            value={{ place, lat, lon, tz: "0" }}
+            onChange={(p2) => { setPlace(p2.place); setLat(p2.lat); setLon(p2.lon); }}
+            forDate={date}
+          />
         </div>
       </GlassCard>
 

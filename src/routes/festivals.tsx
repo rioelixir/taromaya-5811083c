@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -64,23 +65,12 @@ function FestivalsPage() {
               <input type="range" min={7} max={120} value={days} onChange={(e) => setDays(Number(e.target.value))}
                 className="mt-2 block w-full accent-gold" />
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                Latitude
-                <input value={lat} onChange={(e) => setLat(e.target.value)}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                Longitude
-                <input value={lon} onChange={(e) => setLon(e.target.value)}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-            </div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">
-              Place
-              <input value={place} onChange={(e) => setPlace(e.target.value)}
-                className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-            </label>
+            <PlacePicker
+              label="Which place?"
+              value={{ place, lat, lon, tz: "0" }}
+              onChange={(p) => { setPlace(p.place); setLat(p.lat); setLon(p.lon); }}
+              forDate={startDate}
+            />
 
             <div className="mt-2 pt-3 border-t border-white/10">
               <div className="text-[10px] uppercase tracking-[0.3em] text-gold/80 mb-2">Filter</div>

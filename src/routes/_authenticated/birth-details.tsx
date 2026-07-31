@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
@@ -104,29 +105,19 @@ function BirthDetailsPage() {
                 />
               </Field>
 
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Gender (optional)">
-                  <select
-                    className="input"
-                    value={form.gender}
-                    onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
-                  >
-                    <option value="">—</option>
-                    <option>Female</option>
-                    <option>Male</option>
-                    <option>Non-binary</option>
-                    <option>Prefer not to say</option>
-                  </select>
-                </Field>
-                <Field label="Timezone offset (hrs from UTC)" required error={errors.tz_offset_hours}>
-                  <input
-                    type="number" step="0.25" min={-14} max={14} className="input"
-                    value={form.tz_offset_hours}
-                    onChange={(e) => setForm((f) => ({ ...f, tz_offset_hours: Number(e.target.value) }))}
-                    required
-                  />
-                </Field>
-              </div>
+              <Field label="Gender (optional)">
+                <select
+                  className="input"
+                  value={form.gender}
+                  onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
+                >
+                  <option value="">—</option>
+                  <option>Female</option>
+                  <option>Male</option>
+                  <option>Non-binary</option>
+                  <option>Prefer not to say</option>
+                </select>
+              </Field>
 
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Birth date" required error={errors.birth_date}>
@@ -147,33 +138,25 @@ function BirthDetailsPage() {
                 </Field>
               </div>
 
-              <Field label="Place (city, country)" required error={errors.place}>
-                <input
-                  className="input"
-                  value={form.place}
-                  onChange={(e) => setForm((f) => ({ ...f, place: e.target.value }))}
-                  required maxLength={200}
-                />
-              </Field>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Latitude" required error={errors.latitude}>
-                  <input
-                    type="number" step="0.0001" min={-90} max={90} className="input"
-                    value={form.latitude}
-                    onChange={(e) => setForm((f) => ({ ...f, latitude: Number(e.target.value) }))}
-                    required
-                  />
-                </Field>
-                <Field label="Longitude" required error={errors.longitude}>
-                  <input
-                    type="number" step="0.0001" min={-180} max={180} className="input"
-                    value={form.longitude}
-                    onChange={(e) => setForm((f) => ({ ...f, longitude: Number(e.target.value) }))}
-                    required
-                  />
-                </Field>
-              </div>
+              <PlacePicker
+                value={{
+                  place: form.place,
+                  lat: String(form.latitude),
+                  lon: String(form.longitude),
+                  tz: String(form.tz_offset_hours),
+                }}
+                onChange={(p) =>
+                  setForm((f) => ({
+                    ...f,
+                    place: p.place,
+                    latitude: parseFloat(p.lat) || 0,
+                    longitude: parseFloat(p.lon) || 0,
+                    tz_offset_hours: parseFloat(p.tz) || 0,
+                  }))
+                }
+                forDate={form.birth_date}
+                forTime={form.birth_time}
+              />
 
 
               <div className="flex items-center justify-between gap-3 pt-2">

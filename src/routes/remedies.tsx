@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -55,30 +56,17 @@ function RemediesPage() {
               Date
               <DateSelect label="" value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                Time
-                <input type="time" value={birth.time} onChange={(e) => setBirth({...birth, time: e.target.value})}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                TZ (h)
-                <input value={birth.tz} onChange={(e) => setBirth({...birth, tz: e.target.value})}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                Latitude
-                <input value={birth.lat} onChange={(e) => setBirth({...birth, lat: e.target.value})}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">
-                Longitude
-                <input value={birth.lon} onChange={(e) => setBirth({...birth, lon: e.target.value})}
-                  className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-              </label>
-            </div>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              Time
+              <input type="time" value={birth.time} onChange={(e) => setBirth({...birth, time: e.target.value})}
+                className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
+            </label>
+            <PlacePicker
+              value={{ place: (birth as Record<string, string>).place ?? "", lat: birth.lat, lon: birth.lon, tz: birth.tz }}
+              onChange={(p) => setBirth({ ...birth, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
+              forDate={birth.date}
+              forTime={birth.time}
+            />
             <button
               onClick={() => setShowChart(true)}
               className="mt-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 hover:brightness-110"

@@ -1,3 +1,4 @@
+import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -93,17 +94,12 @@ function AvakhadaPage() {
           <div className="space-y-3 text-xs">
             <Field label="Date"><DateSelect label="" value={form.date} onChange={(v) => setForm((f) => ({ ...f, date: v }))} /></Field>
             <Field label="Time"><input type="time" value={form.time} onChange={set("time")} className={inputCls} /></Field>
-            <Field label="Timezone (hours east of UTC)"><input type="number" step="0.25" value={form.tz} onChange={set("tz")} className={inputCls} /></Field>
-            <div className="grid grid-cols-2 gap-2">
-              <Field label="Latitude"><input type="number" step="0.0001" value={form.lat} onChange={set("lat")} className={inputCls} /></Field>
-              <Field label="Longitude"><input type="number" step="0.0001" value={form.lon} onChange={set("lon")} className={inputCls} /></Field>
-            </div>
-            <Field label="Place">
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                <input value={form.place} onChange={set("place")} className={`${inputCls} pl-7`} />
-              </div>
-            </Field>
+            <PlacePicker
+              value={{ place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
+              onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
+              forDate={form.date}
+              forTime={form.time}
+            />
           </div>
         </GlassCard>
 
