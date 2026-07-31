@@ -632,7 +632,7 @@ function VargaMini({
               <div key={i} className="col-span-2 row-span-2 grid place-items-center border border-white/5 bg-cosmic/40">
                 <div className="text-center">
                   <div className="text-[9px] uppercase tracking-widest text-gold/60">{code}</div>
-                  <div className="font-display text-sm text-pearl">{RASHIS[ascSign].slice(0, 3)}</div>
+                  <div className="font-display text-sm text-pearl">{ascSign + 1}</div>
                 </div>
               </div>
             );
@@ -642,7 +642,7 @@ function VargaMini({
           const list = byRashi.get(rashi) ?? [];
           return (
             <div key={i} className={`relative border border-white/5 p-1 text-[9px] ${isAsc ? "bg-gold/[0.08]" : ""}`}>
-              <div className="text-[8px] uppercase text-muted-foreground/70">{RASHIS[rashi].slice(0, 3)}</div>
+              <div className="text-[8px] text-muted-foreground/70">{rashi + 1}</div>
               <div className="mt-1 flex flex-wrap gap-0.5">
                 {list.map((p) => (
                   <span key={p.name} className="inline-block rounded px-1 bg-white/5 text-pearl text-[9px]">
@@ -909,7 +909,7 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
                   style={{ opacity: intensity }}
                 />
                 <div className="relative">
-                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{RASHIS[i].slice(0,3)} · H{house}</div>
+                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">sign {i + 1}</div>
                   <div className="mt-1 font-display text-2xl text-pearl">{v}</div>
                 </div>
               </div>
@@ -936,7 +936,7 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
                   return (
                     <div key={i} className="flex flex-col items-center justify-end h-full" title={`${RASHIS[i]}: ${b}`}>
                       <div className={`w-full rounded-t bg-gradient-to-t ${tone}`} style={{ height: `${Math.max(6, h)}%` }} />
-                      <div className="mt-1 text-[8px] text-muted-foreground">{RASHIS[i].slice(0,2)}</div>
+                      <div className="mt-1 text-[8px] text-muted-foreground">{i + 1}</div>
                       <div className="text-[9px] font-mono text-pearl">{b}</div>
                     </div>
                   );
