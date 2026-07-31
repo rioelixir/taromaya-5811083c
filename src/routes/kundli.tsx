@@ -445,19 +445,14 @@ function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
             const startY = cy - (planetCount * 6);
             return (
               <g key={h}>
-                {/* House number badge */}
-                <text x={cx} y={startY - 4} textAnchor="middle" fontSize={13}
+                {/* Sign number only — no house numbers */}
+                <text x={cx} y={startY - 2} textAnchor="middle" fontSize={13}
                   fontWeight={700} fill="#7c3aed" fontFamily="ui-sans-serif, system-ui, sans-serif">
-                  H{h}{h === 1 ? " · Asc" : ""}
-                </text>
-                {/* Sign abbreviation */}
-                <text x={cx} y={startY + 10} textAnchor="middle" fontSize={11}
-                  fill="#6b7280" fontFamily="ui-serif, serif" fontStyle="italic">
-                  {RASHIS[sign].slice(0, 3)}
+                  {sign + 1}{h === 1 ? " · Asc" : ""}
                 </text>
                 {/* Full planet names, stacked */}
                 {planets.map((p, idx) => (
-                  <text key={p.name} x={cx} y={startY + 26 + idx * 14}
+                  <text key={p.name} x={cx} y={startY + 16 + idx * 14}
                     textAnchor="middle" fontSize={12} fontWeight={600}
                     fill="#111827" fontFamily="ui-sans-serif, system-ui, sans-serif">
                     {PLANET_FULL[p.name]}{p.retrograde ? " (R)" : ""}
