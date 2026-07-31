@@ -488,7 +488,6 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
         })}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
-        <div>Ayanamsa (Lahiri): <span className="text-pearl">{chart.ayanamsa.toFixed(4)}°</span></div>
         <div>Moon Nakshatra: <span className="text-pearl">{NAKSHATRAS[chart.moonNakshatra.index]} · pada {chart.moonNakshatra.pada}</span></div>
       </div>
     </div>
@@ -1217,7 +1216,6 @@ function buildKundliPdf(chart: KundliChart, form: FormState, birthDate: Date): j
   const sun = chart.planets.find(p => p.name === "Sun")!;
   const nak = NAKSHATRAS[chart.moonNakshatra.index];
 
-  line("Ayanamsa (Lahiri)", `${chart.ayanamsa.toFixed(4)}°`);
   line("Ascendant (Lagna)", `${ascRashi}  ${formatDegree(chart.ascendant.degreeInRashi)}`);
   line("Moon Rashi", `${RASHIS[moon.rashi]}  ${formatDegree(moon.degreeInRashi)}`);
   line("Sun Rashi", `${RASHIS[sun.rashi]}  ${formatDegree(sun.degreeInRashi)}`);

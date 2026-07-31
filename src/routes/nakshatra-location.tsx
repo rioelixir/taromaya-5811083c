@@ -467,7 +467,6 @@ function NakshatraLocationPage() {
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5 text-gold" /> {city.name} · {city.region}</span>
             <span>{parsedLat.toFixed(4)}°, {parsedLon.toFixed(4)}°</span>
-            <span>Ayanamsa (Lahiri) {snap.ayanamsa.toFixed(4)}°</span>
             <span className="inline-flex items-center gap-1"><Sun className="h-3.5 w-3.5 text-gold" /> Sun in {snap.sun.name}</span>
           </div>
         </>

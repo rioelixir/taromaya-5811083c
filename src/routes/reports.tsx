@@ -382,7 +382,6 @@ function buildPdf(key: ReportKey, b: Birth) {
     ["Name", b.name],
     ["Date & Time", `${b.date} · ${b.time} (UTC${Number(b.tz) >= 0 ? "+" : ""}${b.tz})`],
     ["Place", `${b.place}  (${b.lat}°, ${b.lon}°)`],
-    ["Ayanamsa (Lahiri)", `${chart.ayanamsa.toFixed(4)}°`],
     ["Ascendant (Lagna)", `${RASHIS[chart.ascendant.rashi]} · ${formatDegree(chart.ascendant.degreeInRashi)}`],
     ["Moon Nakshatra", `${NAKSHATRAS[chart.moonNakshatra.index]} · pada ${chart.moonNakshatra.pada} · lord ${chart.moonNakshatra.lord}`],
     ["Life Path / Destiny / Soul", `${num.lifePath}  ·  ${num.destiny}  ·  ${num.soulUrge}`],

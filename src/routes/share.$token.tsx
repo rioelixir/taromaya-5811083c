@@ -124,7 +124,6 @@ function SharePage() {
                 {moon && (
                   <div><span className="text-foreground/80">Moon Sign:</span> {RASHIS[moon.rashi]}</div>
                 )}
-                <div><span className="text-foreground/80">Ayanamsa:</span> {chart.ayanamsa.toFixed(4)}° (Lahiri)</div>
               </div>
             </section>
 
