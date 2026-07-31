@@ -43,6 +43,7 @@ import { Route as KarmaRouteImport } from './routes/karma'
 import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as FestivalsRouteImport } from './routes/festivals'
@@ -80,6 +81,7 @@ import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicHelpAudioRouteImport } from './routes/api/public/help-audio'
 import { Route as ApiPublicBootstrapAdminsRouteImport } from './routes/api/public/bootstrap-admins'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
 import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public/hooks/sky-alerts'
@@ -252,6 +254,11 @@ const HoroscopeRoute = HoroscopeRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -441,6 +448,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHelpAudioRoute = ApiPublicHelpAudioRouteImport.update({
+  id: '/api/public/help-audio',
+  path: '/api/public/help-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBootstrapAdminsRoute =
   ApiPublicBootstrapAdminsRouteImport.update({
     id: '/api/public/bootstrap-admins',
@@ -479,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -531,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -554,6 +568,7 @@ export interface FileRoutesByTo {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -606,6 +621,7 @@ export interface FileRoutesByTo {
   '/share/$token': typeof ShareTokenRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -631,6 +647,7 @@ export interface FileRoutesById {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
   '/kaalsarp': typeof KaalsarpRoute
@@ -683,6 +700,7 @@ export interface FileRoutesById {
   '/share/$token': typeof ShareTokenRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
+  '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -708,6 +726,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -760,6 +779,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -783,6 +803,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -835,6 +856,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -859,6 +881,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/help'
     | '/history'
     | '/horoscope'
     | '/kaalsarp'
@@ -911,6 +934,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
+    | '/api/public/help-audio'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -936,6 +960,7 @@ export interface RootRouteChildren {
   FestivalsRoute: typeof FestivalsRoute
   FinanceRoute: typeof FinanceRoute
   HealthRoute: typeof HealthRoute
+  HelpRoute: typeof HelpRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
   KaalsarpRoute: typeof KaalsarpRoute
@@ -978,6 +1003,7 @@ export interface RootRouteChildren {
   PagesSlugRoute: typeof PagesSlugRoute
   ShareTokenRoute: typeof ShareTokenRoute
   ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
+  ApiPublicHelpAudioRoute: typeof ApiPublicHelpAudioRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1219,6 +1245,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -1480,6 +1513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/help-audio': {
+      id: '/api/public/help-audio'
+      path: '/api/public/help-audio'
+      fullPath: '/api/public/help-audio'
+      preLoaderRoute: typeof ApiPublicHelpAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/bootstrap-admins': {
       id: '/api/public/bootstrap-admins'
       path: '/api/public/bootstrap-admins'
@@ -1563,6 +1603,7 @@ const rootRouteChildren: RootRouteChildren = {
   FestivalsRoute: FestivalsRoute,
   FinanceRoute: FinanceRoute,
   HealthRoute: HealthRoute,
+  HelpRoute: HelpRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
   KaalsarpRoute: KaalsarpRoute,
@@ -1605,6 +1646,7 @@ const rootRouteChildren: RootRouteChildren = {
   PagesSlugRoute: PagesSlugRoute,
   ShareTokenRoute: ShareTokenRoute,
   ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
+  ApiPublicHelpAudioRoute: ApiPublicHelpAudioRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport

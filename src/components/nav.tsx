@@ -5,7 +5,7 @@ import {
   BookOpen, FileText, History, Bookmark, User, Settings,
   Users, LineChart, Compass, LogOut, LogIn, Menu, X, Search,
   Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
-  Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock, Sun, Shield,
+  Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock, Sun, Shield, HelpCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -22,6 +22,7 @@ const CATALOG: Group[] = [
     label: "Essentials",
     items: [
       { to: "/", label: "Home", icon: LayoutDashboard },
+      { to: "/help", label: "Help — Listen", icon: HelpCircle },
       { to: "/tarot", label: "Tarot", icon: Sparkles },
       { to: "/kundli", label: "Kundli", icon: Moon },
       { to: "/ai", label: "AI Guide", icon: Bot },

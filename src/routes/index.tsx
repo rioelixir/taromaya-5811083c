@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather } from "lucide-react";
+import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather, Headphones } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -94,6 +94,26 @@ function Home() {
           <InfoTile icon={Moon} label="Moon" value="Rohini · Taurus" />
           <InfoTile icon={Sparkles} label="Tithi" value="Shukla Saptami" />
         </div>
+      </section>
+
+      {/* Help — audio guides for every module */}
+      <section className="mt-10">
+        <h2 className="mb-4 font-display text-xl">Need help? Just listen</h2>
+        <Link
+          to="/help"
+          className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+        >
+          <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
+            <Headphones className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-foreground">Help — listen and learn</div>
+            <div className="text-xs text-muted-foreground">
+              A short audio guide for every module. Press play and we explain it in easy words.
+            </div>
+          </div>
+          <ArrowRight className="h-4 w-4 text-primary shrink-0" />
+        </Link>
       </section>
 
       {/* Guides — visible to everyone */}
