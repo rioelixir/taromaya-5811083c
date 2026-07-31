@@ -157,7 +157,7 @@ export function NakshatraPanel({
     try {
       const res = await interpret({
         data: {
-          spreadLabel: "Star reading",
+          spreadLabel: "Nakshatra reading",
           question: question ?? "",
           cards: [{ name: result.title, position: "", reversed: false, keywords: result.keywords }],
           placeNakshatra: NAKSHATRAS[result.index],
@@ -184,8 +184,8 @@ export function NakshatraPanel({
     setZoom(true);
   };
 
-  const starLine = useMemo(
-    () => (result ? `${NAKSHATRAS[result.index]} · part ${result.pada} · star lord ${result.lord}` : ""),
+  const nakshatraLine = useMemo(
+    () => (result ? `${NAKSHATRAS[result.index]} · part ${result.pada} · Nakshatra lord ${result.lord}` : ""),
     [result],
   );
 
@@ -195,7 +195,7 @@ export function NakshatraPanel({
         <Star className="h-4 w-4 shrink-0" /> Current Nakshatra
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Tell us the time now and where you are. We find the Moon's star for this
+        Tell us the time now and where you are. We find the Moon's Nakshatra for this
         moment and pull its card on its own.
       </p>
 
@@ -217,7 +217,7 @@ export function NakshatraPanel({
 
       {busy && (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Working out the star…
+          <Loader2 className="h-4 w-4 animate-spin" /> Working out the Nakshatra…
         </p>
       )}
 
