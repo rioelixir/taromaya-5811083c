@@ -3,7 +3,7 @@
  * Scans a date range and returns matching festivals per day.
  */
 
-import { computePanchang } from "./panchang";
+import { computePanchang, WEEKDAY } from "./panchang";
 
 export type FestivalHit = {
   date: Date;
@@ -31,9 +31,9 @@ const RULES: Rule[] = [
 
   // Special weekday × nakshatra combinations
   (p, d) => cat("Sarvartha Siddhi Yoga", "vrata", "Highly auspicious day-nakshatra combination.")(p, d,
-    (d.getDay() === 0 && ["Hasta","Mula","Uttara Ashadha","Uttara Phalguni","Uttara Bhadrapada","Pushya","Ashwini"].includes(p.nakshatra.name)) ||
-    (d.getDay() === 1 && ["Rohini","Shravana","Mrigashira","Pushya","Anuradha"].includes(p.nakshatra.name)) ||
-    (d.getDay() === 4 && ["Ashwini","Punarvasu","Pushya","Anuradha","Revati"].includes(p.nakshatra.name)),
+    (WEEKDAY.indexOf(p.weekday) === 0 && ["Hasta","Mula","Uttara Ashadha","Uttara Phalguni","Uttara Bhadrapada","Pushya","Ashwini"].includes(p.nakshatra.name)) ||
+    (WEEKDAY.indexOf(p.weekday) === 1 && ["Rohini","Shravana","Mrigashira","Pushya","Anuradha"].includes(p.nakshatra.name)) ||
+    (WEEKDAY.indexOf(p.weekday) === 4 && ["Ashwini","Punarvasu","Pushya","Anuradha","Revati"].includes(p.nakshatra.name)),
   ),
 
   // Solar month starts — Makar Sankranti (~Jan 14), Mesha Sankranti (~Apr 14)

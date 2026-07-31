@@ -35,6 +35,24 @@ function letters(name: string): string[] {
   return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .toUpperCase().replace(/[^A-Z]/g, "").split("");
 }
+
+/**
+ * Y-vowel rule: Y is a vowel unless it sits directly next to another vowel
+ * letter (before or after), in which case it acts as a consonant. This is
+ * the standard simplified convention used across mainstream numerology
+ * calculators (e.g. "MARY" → Y is a vowel; "YVES"/"KAY" → Y next to a vowel
+ * acts as a consonant). W is never treated as a vowel here.
+ */
+function isVowelChar(ls: string[], i: number): boolean {
+  const l = ls[i];
+  if (l === "Y") {
+    const prev = ls[i - 1];
+    const next = ls[i + 1];
+    if ((prev && VOWELS.has(prev)) || (next && VOWELS.has(next))) return false;
+    return true;
+  }
+  return VOWELS.has(l);
+}
 function sum(a: number[]): number { return a.reduce((s, x) => s + x, 0); }
 function digitsSum(n: number): number {
   let x = Math.abs(Math.trunc(n));
@@ -56,13 +74,14 @@ export function reduce(n: number, keepMaster = true): number {
   return x;
 }
 
-function nameValue(name: string, map: Record<string, number>, filter?: (l: string) => boolean): number {
-  const ls = letters(name).filter((l) => (filter ? filter(l) : true));
+function nameValue(name: string, map: Record<string, number>, filter?: (l: string, isVowel: boolean) => boolean): number {
+  const all = letters(name);
+  const ls = all.filter((l, i) => (filter ? filter(l, isVowelChar(all, i)) : true));
   return sum(ls.map((l) => map[l] ?? 0));
 }
 
 /** Reduced letter-value of a name, master-preserving. */
-export function reducedName(name: string, system: "Pythagorean" | "Chaldean" = "Pythagorean", filter?: (l: string) => boolean): number {
+export function reducedName(name: string, system: "Pythagorean" | "Chaldean" = "Pythagorean", filter?: (l: string, isVowel: boolean) => boolean): number {
   const map = system === "Chaldean" ? CHALDEAN : PYTHAGOREAN;
   return reduce(nameValue(name, map, filter));
 }
@@ -181,9 +200,9 @@ export function computeNumerology(
 
   const destinyRaw = nameValue(fullName, map);
   const destiny = reduce(destinyRaw, true);
-  const soulUrgeRaw = nameValue(fullName, map, (l) => VOWELS.has(l));
+  const soulUrgeRaw = nameValue(fullName, map, (_l, isVowel) => isVowel);
   const soulUrge = reduce(soulUrgeRaw, true);
-  const personalityRaw = nameValue(fullName, map, (l) => !VOWELS.has(l));
+  const personalityRaw = nameValue(fullName, map, (_l, isVowel) => !isVowel);
   const personality = reduce(personalityRaw, true);
   const birthday = reduce(d, true);
   const maturity = reduce(lifePath + destiny, true);

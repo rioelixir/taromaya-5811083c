@@ -5,6 +5,7 @@
 import { computePanchang, type Panchang } from "./panchang";
 import { computeHoras, type HoraLord } from "./hora";
 import { NAKSHATRAS, RASHIS } from "./vedic";
+import { WEEKDAY } from "./panchang";
 import { scoreElectional, type BirthContext } from "./electional";
 
 export type Activity =
@@ -122,7 +123,7 @@ export function scanMuhurats(opts: {
       latitude: opts.latitude,
       longitude: opts.longitude,
     });
-    const weekdayNum = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getDay();
+    const weekdayNum = WEEKDAY.indexOf(p.weekday);
     const horas = (p.sunrise && p.sunset && nextP.sunrise)
       ? computeHoras(p.sunrise, p.sunset, nextP.sunrise, weekdayNum)
       : [];

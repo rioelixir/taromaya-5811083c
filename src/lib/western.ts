@@ -58,13 +58,17 @@ function mcTropical(date: Date, lonEast: number): number {
 }
 
 function ascendantTrop(date: Date, lat: number, lonEast: number): number {
+  // BUGFIX: this previously negated both the numerator and denominator of
+  // the standard Ascendant identity (Meeus), which flips atan2 by 180° and
+  // silently returned the DESCENDANT instead of the Ascendant. Uses the
+  // same branch-correct formula as vedic.ts's ascendantTropical().
   const gastH = A.SiderealTime(date);
   const lstDeg = norm360(gastH * 15 + lonEast);
   const eps = deg2rad(trueObliquity(date));
   const ramc = deg2rad(lstDeg);
   const phi = deg2rad(lat);
-  const y = -Math.cos(ramc);
-  const x = Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc);
+  const y = Math.cos(ramc);
+  const x = -(Math.sin(eps) * Math.tan(phi) + Math.cos(eps) * Math.sin(ramc));
   return norm360(rad2deg(Math.atan2(y, x)));
 }
 

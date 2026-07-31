@@ -5,6 +5,7 @@ import { computePanchang, type Panchang } from "./panchang";
 import {
   classifyPanchaka, bhadraInfo, tithiQuality, yogaQuality,
 } from "./panchang-deep";
+import { WEEKDAY } from "./panchang";
 
 export type AlmanacDay = {
   date: Date;
@@ -66,7 +67,7 @@ export function computeMonthAlmanac(opts: {
     if (!yq.auspicious) { score -= 14; tags.push({ label: p.yoga.name, kind: "bad" }); }
 
     // Panchaka
-    const pan = classifyPanchaka(p.nakshatra.name, d.getDay());
+    const pan = classifyPanchaka(p.nakshatra.name, WEEKDAY.indexOf(p.weekday));
     if (pan.active && pan.type) {
       score -= 12; tags.push({ label: `${pan.type} Panchaka`, kind: "bad" });
     }
