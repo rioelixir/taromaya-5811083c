@@ -59,14 +59,14 @@ function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <PageShell eyebrow="Admin" title="Access denied">
+      <PageShell hideVoice eyebrow="Admin" title="Access denied">
         <div className="text-sm text-muted-foreground">This area is restricted.</div>
       </PageShell>
     );
   }
 
   return (
-    <PageShell eyebrow="Admin Panel" title="Cosmic control room" subtitle="Manage users, roles, saved charts and app-wide settings.">
+    <PageShell hideVoice eyebrow="Admin Panel" title="Cosmic control room" subtitle="Manage users, roles, saved charts and app-wide settings.">
       <div className="mb-6 flex flex-wrap gap-2">
         <TabBtn active={tab === "overview"} onClick={() => setTab("overview")} icon={<BarChart3 className="h-4 w-4" />}>Overview</TabBtn>
         <TabBtn active={tab === "users"} onClick={() => setTab("users")} icon={<Users className="h-4 w-4" />}>Users</TabBtn>

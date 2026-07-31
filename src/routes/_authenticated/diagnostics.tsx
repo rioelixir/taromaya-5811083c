@@ -72,7 +72,7 @@ function DiagnosticsPage() {
   if (!isAdmin) return <PageShell hideAI hideVoice eyebrow="Admin" title="Access denied"><div className="text-sm text-muted-foreground">Admins only.</div></PageShell>;
 
   return (
-    <PageShell eyebrow="Admin" title="Astrology Diagnostics" subtitle="Raw engine inspection: inputs, JD, ayanamsa, planetary longitudes, house mapping, validation.">
+    <PageShell hideVoice eyebrow="Admin" title="Astrology Diagnostics" subtitle="Raw engine inspection: inputs, JD, ayanamsa, planetary longitudes, house mapping, validation.">
       <GlassCard>
         <h3 className="mb-3 font-serif text-lg">Raw birth input</h3>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
