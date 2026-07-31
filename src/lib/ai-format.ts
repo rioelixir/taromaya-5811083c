@@ -18,11 +18,11 @@ export const PLAIN_ELI10_RULES = [
   "Never write Roman numerals. Always use normal numbers like 1, 2, 3, 12, 21. Never write things like II, IV, IX, XII or XXI anywhere.",
 ].join("\n");
 
-const ROMAN_VALUES: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+const ROMAN_VALUES: Record<string, number> = { I: 1, V: 5, X: 10 };
 
-/** True Roman numeral shapes only (so words like MIX or DID are left alone). */
-const ROMAN_TOKEN =
-  /\b(?=[MDCLXVI]{2,})M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})\b/g;
+// Only the small numerals the app could ever show (2 to 39: houses, cards, chapters).
+// Keeping it to X, V and I means real words like MIX, DID or LIVID are never touched.
+const ROMAN_TOKEN = /\b(?=[XVI]{2,})X{0,3}(?:IX|IV|V?I{0,3})\b/g;
 
 function romanToArabic(roman: string): number {
   let total = 0;
