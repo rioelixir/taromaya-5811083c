@@ -45,6 +45,7 @@ function uid() { return Math.random().toString(36).slice(2, 9); }
 
 function RectificationPage() {
   const [birth, setBirth] = useState<BirthInput>(DEFAULT_BIRTH);
+  const [place, setPlace] = useState("");
   const [windowMin, setWindowMin] = useState(60);
   const [stepMin, setStepMin] = useState(4);
   const [events, setEvents] = useState<LifeEvent[]>([
