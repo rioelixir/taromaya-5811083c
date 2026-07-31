@@ -10,6 +10,7 @@ function person(moonRashi: number, nakIndex: number): Person {
   return {
     chart: {
       planets,
+      ascendant: { rashi: 0 },
       moonNakshatra: { index: nakIndex },
     } as unknown as KundliChart,
   };
