@@ -238,24 +238,6 @@ function NakshatraLocationPage() {
             </Field>
           </div>
 
-          <Field label="Latitude (°N)">
-            <input
-              className={inputCls}
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
-              placeholder="28.6139"
-              inputMode="decimal"
-            />
-          </Field>
-          <Field label="Longitude (°E)">
-            <input
-              className={inputCls}
-              value={lon}
-              onChange={(e) => setLon(e.target.value)}
-              placeholder="77.2090"
-              inputMode="decimal"
-            />
-          </Field>
 
           <Field label="Date (optional)">
             <DateSelect label="" value={customDate} onChange={(v) => { setCustomDate(v); setLive(false); }} />
