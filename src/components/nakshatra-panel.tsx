@@ -129,7 +129,7 @@ export function NakshatraPanel({
       } catch {
         if (!cancelled) {
           setResult(null);
-          setError("We couldn't find the star for this place. Please pick another place.");
+          setError("We couldn't find the Nakshatra for this place. Please pick another place.");
         }
       } finally {
         if (!cancelled) setBusy(false);
@@ -141,7 +141,7 @@ export function NakshatraPanel({
     };
   }, [ready, place.lat, place.lon, place.tz, time, buildResult]);
 
-  // Keep the board's Ask AI in step with the star of this moment.
+  // Keep the board's Ask AI in step with the Nakshatra of this moment.
   useEffect(() => {
     onContext?.({
       placeNakshatra: result ? NAKSHATRAS[result.index] : undefined,
