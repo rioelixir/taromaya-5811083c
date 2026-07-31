@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { ChevronDown, Settings2 } from "lucide-react";
-import { AYANAMSA_LABELS, HOUSE_SYSTEM_LABELS, NODE_TYPE_LABELS, ENGINE_VERSION, type ChartConfig } from "@/lib/chart-config";
+import { NODE_TYPE_LABELS, ENGINE_VERSION, type ChartConfig } from "@/lib/chart-config";
 
 export type CalcSettings = {
   zodiac: "Sidereal" | "Tropical";
@@ -33,9 +33,8 @@ export function CalcSettingsPanel({ settings }: { settings: CalcSettings }) {
   const [open, setOpen] = useState(false);
   const rows: [string, string][] = [
     ["Zodiac system", settings.zodiac],
-    ["Ayanamsa", AYANAMSA_LABELS[settings.config.ayanamsa]],
-    ["House system", HOUSE_SYSTEM_LABELS[settings.config.houseSystem]],
     ["Rahu/Ketu type", NODE_TYPE_LABELS[settings.config.nodeType]],
+
     ["Birthplace", settings.placeLabel ?? "—"],
     ["Local time", settings.localTimeIso.replace("T"," ").replace(/\.\d+Z?$/,"")],
     ["Ascendant", `${settings.ascendantSign} · ${fmtDeg(settings.ascendantLongitude % 30)}`],

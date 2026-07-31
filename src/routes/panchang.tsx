@@ -100,7 +100,6 @@ function PanchangPage() {
             <Row k="Nak. lord" v={p.nakshatra.lord} />
             <Row k="Yoga" v={p.yoga.name} />
             <Row k="Karana" v={p.karana.name} />
-            <Row k="Ayanamsa" v={`${p.ayanamsa.toFixed(4)}°`} />
             <Row k="Moon age" v={`${p.moonAge.toFixed(1)}d`} />
           </div>
         </GlassCard>
