@@ -39,7 +39,7 @@ export const Route = createFileRoute("/tarot")({
       { title: "Tarot — TAROMAYA" },
       {
         name: "description",
-        content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from.",
+        content: "Pick a deck, pull a card, get a clear reading. Four tarot decks to choose from.",
       },
     ],
   }),
@@ -815,7 +815,7 @@ function TarotPage() {
               Ask AI
             </button>
 
-            {/* Five deck stacks — bottom right */}
+            {/* Tarot deck stacks — bottom right */}
             <div
               className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none"
               data-tour="deck-picker"
