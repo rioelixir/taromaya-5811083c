@@ -5,7 +5,8 @@ import { insertSpokenText, isTypableField } from "@/lib/voice-fields";
 import { findClickable, matchVoiceCommand } from "@/lib/voice-commands";
 
 const COMMAND_STARTERS =
-  /^\s*(open|go to|goto|show|take me to|visit|launch|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
+  /^\s*(open|go to|goto|go|show|show me|take me to|take me|visit|launch|switch to|switch|move to|jump to|bring up|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
+
 
 /**
  * One microphone for the whole app.
@@ -88,6 +89,9 @@ export function VoiceInputLayer() {
         }
         return true;
       }
+      case "help":
+        say('Say a page name like "kundli", "tarot" or "numerology" to open it.', 4000);
+        return true;
       default:
         return false;
     }
@@ -98,19 +102,20 @@ export function VoiceInputLayer() {
     const el = isTypableField(active) ? (active as HTMLElement) : targetRef.current;
     const fieldReady = !!el && el.isConnected && isTypableField(el);
 
-    // A clear command always wins, even while a box is selected.
+    // A page or button name always wins, even while a box is selected.
     if (!fieldReady || COMMAND_STARTERS.test(text)) {
       if (runCommand(text)) return;
     }
 
     if (!fieldReady) {
-      say('Tap a box first to fill it, or say a page name like "open kundli".', 4000);
+      say('Say a page name like "kundli" or "tarot", or tap a box first to fill it.', 4000);
       return;
     }
     const ok = insertSpokenText(el!, text);
     // Your words are always added to what is already there — nothing is erased.
     say(ok ? "Added your words ✓" : "That didn't fit this box. Say it again, or type it.", 2000);
   };
+
 
   return (
     <div className="fixed bottom-28 right-4 z-40 flex flex-col items-end gap-2 sm:bottom-8">

@@ -66,11 +66,17 @@ export const VOICE_PAGES: { to: string; label: string; words: string[] }[] = [
   { to: "/faq", label: "FAQ", words: ["faq", "questions", "help page"] },
   { to: "/journal", label: "Journal", words: ["journal", "diary"] },
   { to: "/meditation", label: "Meditation", words: ["meditation", "meditate"] },
-  { to: "/settings", label: "Settings", words: ["settings", "options"] },
+  { to: "/settings", label: "Settings", words: ["settings", "options", "preferences"] },
   { to: "/sky", label: "Sky", words: ["sky", "live sky"] },
+  { to: "/auth", label: "Sign in", words: ["sign in", "log in", "login", "sign up", "create account"] },
+  { to: "/terms", label: "Terms", words: ["terms", "terms and conditions", "privacy"] },
 ];
 
-const OPEN_WORDS = ["open", "go to", "goto", "show", "take me to", "start", "launch", "visit", "page"];
+const OPEN_WORDS = [
+  "open", "go to", "goto", "go", "show me", "show", "take me to", "take me",
+  "start", "launch", "visit", "switch to", "switch", "move to", "jump to",
+  "bring up", "let me see", "i want", "i want to see", "give me", "page",
+];
 
 function tidy(raw: string): string {
   return raw
@@ -80,12 +86,30 @@ function tidy(raw: string): string {
     .trim();
 }
 
+const FILLER = /\b(the|a|an|my|please|now|module|page|section|screen|tab|of|for|to)\b/g;
+
+function core(s: string): string {
+  return tidy(s).replace(FILLER, " ").replace(/\s+/g, " ").trim();
+}
+
 function stripOpener(s: string): { rest: string; asked: boolean } {
-  for (const w of OPEN_WORDS) {
-    if (s === w) return { rest: "", asked: true };
-    if (s.startsWith(w + " ")) return { rest: s.slice(w.length + 1).trim(), asked: true };
+  let cur = s;
+  let asked = false;
+  // Peel off any number of polite openers: "please go to open kundli page".
+  for (let i = 0; i < 3; i++) {
+    let hit = false;
+    for (const w of OPEN_WORDS) {
+      if (cur === w) return { rest: "", asked: true };
+      if (cur.startsWith(w + " ")) {
+        cur = cur.slice(w.length + 1).trim();
+        asked = true;
+        hit = true;
+        break;
+      }
+    }
+    if (!hit) break;
   }
-  return { rest: s, asked: false };
+  return { rest: cur, asked };
 }
 
 /**
@@ -113,32 +137,80 @@ export function matchVoiceCommand(raw: string): VoiceCommand | null {
   }
 
   const press = s.match(/^(?:press|tap|click|hit|choose|select) (?:the )?(.+?)(?: button)?$/);
-  if (press) return { kind: "click", label: press[1] };
+  if (press) {
+    // "click kundli" should still open the page when nothing on screen matches.
+    const el = findClickable(press[1]);
+    if (el) return { kind: "click", label: press[1] };
+    const page = findPage(press[1]);
+    if (page) return { kind: "navigate", to: page.to, label: page.label };
+    return { kind: "click", label: press[1] };
+  }
 
   const { rest, asked } = stripOpener(s);
-  const target = rest.replace(/\b(page|module|section|screen)\b/g, " ").replace(/\s+/g, " ").trim();
-  const page = findPage(target || s);
-  if (page && (asked || page.exact)) return { kind: "navigate", to: page.to, label: page.label };
+  const page = findPage(rest || s);
+  // Any recognised page name opens it — with or without an opener word.
+  if (page) return { kind: "navigate", to: page.to, label: page.label };
 
-  // Words like "calculate" or "save" refer to a button on the page.
+  const target = core(rest);
   if (asked && target) return { kind: "click", label: target };
-  if (/^(calculate|compute|save|submit|next step|continue|reset|clear|read it|ask ai|sign out|log out|sign in|log in)$/.test(s)) {
+  if (/^(calculate|compute|save|submit|next step|continue|reset|clear|read it|ask ai|sign out|log out)$/.test(s)) {
     return { kind: "click", label: s };
   }
   return null;
 }
 
+/** Match spoken words to a page, forgiving extra words, plurals and small slips. */
 function findPage(text: string): { to: string; label: string; exact: boolean } | null {
-  const t = tidy(text);
+  const t = core(text);
   if (!t) return null;
+  const said = t.split(" ").filter(Boolean);
+
+  let best: { to: string; label: string; exact: boolean; score: number } | null = null;
+
   for (const p of VOICE_PAGES) {
-    if (p.words.some((w) => w === t)) return { ...p, exact: true };
+    const names = [...p.words, p.label].map(core).filter(Boolean);
+    for (const name of names) {
+      let score = 0;
+      let exact = false;
+      if (name === t) {
+        score = 100;
+        exact = true;
+      } else if (t.includes(name) || name.includes(t)) {
+        score = 80 - Math.abs(name.length - t.length);
+      } else {
+        const words = name.split(" ");
+        const hits = words.filter((w) => said.some((sw) => near(sw, w))).length;
+        if (hits === 0) continue;
+        score = 40 + (hits / words.length) * 30 - Math.abs(words.length - said.length);
+      }
+      if (!best || score > best.score) best = { to: p.to, label: p.label, exact, score };
+    }
   }
-  for (const p of VOICE_PAGES) {
-    if (p.words.some((w) => t.includes(w))) return { ...p, exact: false };
-  }
-  return null;
+  return best && best.score >= 40 ? { to: best.to, label: best.label, exact: best.exact } : null;
 }
+
+/** Two words are "near" if one contains the other or they differ by one slip. */
+function near(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (a.length >= 4 && b.length >= 4 && (a.startsWith(b.slice(0, 4)) || b.startsWith(a.slice(0, 4)))) return true;
+  if (a.length < 3 || b.length < 3) return false;
+  if (a.includes(b) || b.includes(a)) return true;
+  return editDistance(a, b) <= 1;
+}
+
+function editDistance(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 1) return 2;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
 
 /** Find a clickable thing on the page whose words match what was said. */
 export function findClickable(label: string): HTMLElement | null {
