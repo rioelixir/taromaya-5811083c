@@ -59,7 +59,18 @@ export function useUploadedDecks() {
 
   useEffect(() => {
     load();
+    // Picture links stay good for 1 hour, so refresh them well before that.
+    const t = setInterval(load, 40 * 60 * 1000);
+    return () => clearInterval(t);
   }, [load]);
 
-  return { decks, loading, reload: load };
+  // Decks where the admin has put in fewer pictures than the deck should have.
+  const shortages = DECK_LIST.filter((d) => decks[d.key].length > 0 && decks[d.key].length < d.expected).map((d) => ({
+    key: d.key,
+    name: d.name,
+    have: decks[d.key].length,
+    expected: d.expected,
+  }));
+
+  return { decks, loading, reload: load, shortages };
 }

@@ -19,15 +19,15 @@ const YOGAS = [
 
 const KARANAS = ["Bava","Balava","Kaulava","Taitila","Gara","Vanija","Vishti","Shakuni","Chatushpada","Naga","Kimstughna"];
 
-const WEEKDAY = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+export const WEEKDAY = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-const CHAUGHADIYA_NAMES = ["Udveg","Chal","Labh","Amrit","Kaal","Shubh","Rog"];
+const CHAUGHADIYA_NAMES = ["Udveg","Char","Labh","Amrit","Kaal","Shubh","Rog"];
 // Chaughadiya starts by weekday (0=Sun): (start-index in the 7-cycle for the first day slot)
 const CHAUGHADIYA_DAY_START = [0, 3, 6, 2, 5, 1, 4]; // Sun→Udveg,Mon→Amrit,Tue→Rog,Wed→Labh,Thu→Shubh,Fri→Chal,Sat→Kaal
 // Night chaughadiya first slot per weekday (Sun→Shubh, Mon→Chal, Tue→Kaal, Wed→Udveg, Thu→Amrit, Fri→Rog, Sat→Labh)
 const CHAUGHADIYA_NIGHT_START = [5, 1, 4, 0, 3, 6, 2];
 const CHAUGHADIYA_NATURE: Record<string, "good" | "bad" | "neutral"> = {
-  Udveg: "bad", Chal: "neutral", Labh: "good", Amrit: "good", Kaal: "bad", Shubh: "good", Rog: "bad",
+  Udveg: "bad", Char: "neutral", Labh: "good", Amrit: "good", Kaal: "bad", Shubh: "good", Rog: "bad",
 };
 
 // Rahu Kaal / Yamaganda / Gulika part indices by weekday (0=Sun)
@@ -91,31 +91,55 @@ const NAK_LORDS = ["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn",
 export function computePanchang(input: PanchangInput): Panchang {
   const { date, latitude, longitude } = input;
   const observer = new A.Observer(latitude, longitude, 0);
-  const weekday = WEEKDAY[date.getDay()];
 
-  // Sunrise/sunset within 2 days from midnight
-  const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-
-  const findRise = (body: A.Body, dir: 1 | -1) => {
+  const findRiseFrom = (body: A.Body, dir: 1 | -1, from: Date) => {
     try {
-      const t = A.SearchRiseSet(body, observer, dir, dayStart, 2);
+      const t = A.SearchRiseSet(body, observer, dir, from, 2);
       return t ? t.date : null;
     } catch { return null; }
   };
-  const sunrise = findRise(A.Body.Sun, +1);
-  const sunset = findRise(A.Body.Sun, -1);
-  const moonrise = findRise(A.Body.Moon, +1);
-  const moonset = findRise(A.Body.Moon, -1);
+  const solarNoonFrom = (from: Date) => {
+    try {
+      const t = A.SearchHourAngle(A.Body.Sun, observer, 0, from, +1);
+      return t?.time?.date ?? null;
+    } catch { return null; }
+  };
 
-  // Solar noon: search sun hour angle 0 (transit)
-  let solarNoon: Date | null = null;
-  try {
-    const t = A.SearchHourAngle(A.Body.Sun, observer, 0, dayStart, +1);
-    solarNoon = t?.time?.date ?? null;
-  } catch { /* ignore */ }
+  // The Vedic day (vara) runs from one sunrise to the next, not from
+  // midnight. Compute the calendar day's sunrise first; if the requested
+  // clock time falls before that sunrise, the Panchang actually belongs to
+  // the *previous* sunrise-to-sunrise day, so shift the reference day back.
+  const calDayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+  const calSunrise = findRiseFrom(A.Body.Sun, +1, calDayStart);
+  let dayStart = calDayStart;
+  if (calSunrise && date.getTime() < calSunrise.getTime()) {
+    dayStart = new Date(calDayStart.getTime() - 86400000);
+  }
+  const weekday = WEEKDAY[dayStart.getDay()];
 
-  // Compute Sun and Moon positions at (solarNoon or given date)
-  const refDate = solarNoon ?? date;
+  const sunrise = dayStart === calDayStart ? calSunrise : findRiseFrom(A.Body.Sun, +1, dayStart);
+  // Search sunset, moonrise, and moonset *forward* from the day's sunrise
+  // (or from dayStart if sunrise is unavailable, e.g. polar latitudes).
+  // Anchoring a backward (dir=-1) search at local midnight can walk back
+  // into the previous day's event, which broke sunrise < sunset ordering
+  // for places like New York.
+  // `dir` selects which event to find (+1 rise, -1 set); SearchRiseSet
+  // always searches *forward* in time from the given start instant (since
+  // limitDays is positive). Anchoring every search at local midnight is
+  // fine for sunrise, but for sunset/moonset it can find an event that is
+  // still *before* the day's actual sunrise/moonrise if e.g. the server's
+  // local-midnight instant doesn't line up with the place's real day
+  // boundary. Anchor sunset just after sunrise, and moonset just after
+  // moonrise, so the pair is always ordered correctly for the same day.
+  const sunset = findRiseFrom(A.Body.Sun, -1, sunrise ?? dayStart);
+  const moonrise = findRiseFrom(A.Body.Moon, +1, dayStart);
+  const moonset = findRiseFrom(A.Body.Moon, -1, moonrise ?? dayStart);
+  const solarNoon = solarNoonFrom(dayStart);
+
+  // Tithi/Nakshatra/Yoga/Karana are read at local sunrise — the classical
+  // reference moment for "the Panchang of the day" — falling back to the
+  // requested moment if sunrise couldn't be found (e.g. polar latitudes).
+  const refDate = sunrise ?? date;
   const sunSid = siderealLon(A.Body.Sun, refDate);
   const moonSid = siderealLon(A.Body.Moon, refDate);
 
@@ -155,7 +179,7 @@ export function computePanchang(input: PanchangInput): Panchang {
   const dayParts = parts();
   const partAt = (i: number): [Date, Date] | null => dayParts[i] ?? null;
 
-  const wd = date.getDay();
+  const wd = dayStart.getDay();
 
   // Abhijit Muhurat: 8th muhurta of day (~24 min around solar noon)
   let abhijit: [Date, Date] | null = null;

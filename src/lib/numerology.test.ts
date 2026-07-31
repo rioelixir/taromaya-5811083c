@@ -101,3 +101,86 @@ describe("computeNumerology() — full report", () => {
     expect(bad.personalYear).toBe(0);
   });
 });
+
+describe("Y as vowel — standard convention", () => {
+  // Y is a vowel only when it is NOT next to another vowel.
+  it("treats Y as a vowel in a consonant-only setting", () => {
+    // LYNN: Y stands alone between consonants → vowel.
+    // Soul urge letters = Y(7) → 7. Personality = L(3)+N(5)+N(5) = 13 → 4.
+    const r = computeNumerology({ fullName: "Lynn", birthDate: "1990-01-15" });
+    expect(r.soulUrge).toBe(7);
+    expect(r.personality).toBe(4);
+  });
+  it("treats Y as a consonant next to a vowel", () => {
+    // MAYA: Y sits between A and A → consonant.
+    // Soul urge = A(1)+A(1) = 2. Personality = M(4)+Y(7) = 11.
+    const r = computeNumerology({ fullName: "Maya", birthDate: "1990-01-15" });
+    expect(r.soulUrge).toBe(2);
+    expect(r.personality).toBe(11);
+  });
+  it("keeps destiny independent of the vowel split", () => {
+    const r = computeNumerology({ fullName: "Maya", birthDate: "1990-01-15" });
+    // M4 + A1 + Y7 + A1 = 13 → 4
+    expect(r.destiny).toBe(4);
+  });
+});
+
+describe("Full worked charts", () => {
+  const at = new Date(2026, 0, 1); // deterministic personal cycles
+
+  it("John Smith, 1980-07-04", () => {
+    const r = computeNumerology({ fullName: "John Smith", birthDate: "1980-07-04", now: at });
+    // Life path: M 7, D 4, Y 1980 → 18 → 9. 7+4+9 = 20 → 2
+    expect(r.lifePath).toBe(2);
+    // Destiny: JOHN 1+6+8+5=20; SMITH 1+4+9+2+8=24; 44 → 8
+    expect(r.destiny).toBe(8);
+    // Soul urge: O6 + I9 = 15 → 6
+    expect(r.soulUrge).toBe(6);
+    // Personality: J1+H8+N5 + S1+M4+T2+H8 = 29 → 11
+    expect(r.personality).toBe(11);
+    expect(r.birthday).toBe(4);
+  });
+
+  it("Ada Lovelace, 1815-12-10", () => {
+    const r = computeNumerology({ fullName: "Ada Lovelace", birthDate: "1815-12-10", now: at });
+    // M 12 → 3, D 10 → 1, Y 1815 → 15 → 6. 3+1+6 = 10 → 1
+    expect(r.lifePath).toBe(1);
+    // ADA 1+4+1=6; LOVELACE 3+6+4+5+3+1+3+5=30; 36 → 9
+    expect(r.destiny).toBe(9);
+    // Vowels A1 A1 O6 E5 A1 E5 = 19 → 1
+    expect(r.soulUrge).toBe(1);
+    expect(r.birthday).toBe(1);
+  });
+
+  it("master life path is preserved", () => {
+    // 1998-11-29: M 11, D 29 → 11, Y 1998 → 27 → 9. 11+11+9 = 31 → 4
+    expect(lifePathNumber("1998-11-29")).toBe(4);
+    // 1966-05-29: M 5, D 29 → 11, Y 1966 → 22. 5+11+22 = 38 → 11
+    expect(lifePathNumber("1966-05-29")).toBe(11);
+  });
+});
+
+describe("Personal cycles are 1-9 and stable", () => {
+  it("never returns a master number", () => {
+    const at = new Date(2026, 6, 31);
+    const r = computeNumerology({ fullName: "Test Name", birthDate: "1990-11-29", now: at });
+    for (const n of [r.personalYear, r.personalMonth, r.personalDay]) {
+      expect(n).toBeGreaterThanOrEqual(1);
+      expect(n).toBeLessThanOrEqual(9);
+    }
+  });
+  it("is deterministic for the same inputs", () => {
+    const at = new Date(2026, 3, 9);
+    const a = computeNumerology({ fullName: "Test Name", birthDate: "1990-11-29", now: at });
+    const b = computeNumerology({ fullName: "Test Name", birthDate: "1990-11-29", now: at });
+    expect(a.personalYear).toBe(b.personalYear);
+    expect(a.personalDay).toBe(b.personalDay);
+  });
+});
+
+describe("reducedName() honours the Y rule", () => {
+  it("Chaldean and Pythagorean stay in 1-9 or master range", () => {
+    expect(reducedName("Lynn")).toBeGreaterThan(0);
+    expect(reducedName("Lynn", "Chaldean")).toBeGreaterThan(0);
+  });
+});

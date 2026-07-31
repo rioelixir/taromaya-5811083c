@@ -93,7 +93,7 @@ function TarotPage() {
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
-  const { decks: uploaded, loading: loadingDecks } = useUploadedDecks();
+  const { decks: uploaded, loading: loadingDecks, shortages: deckShortages } = useUploadedDecks();
   const [decks, setDecks] = useState<DeckStacks>(() => makeDeckStacks({} as DeckStacks));
   const [reading, setReading] = useState<string | null>(null);
   const [loadingReading, setLoadingReading] = useState(false);
@@ -624,10 +624,10 @@ function TarotPage() {
       });
       setReading(res.text);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Something went wrong.";
-      if (msg.includes("429")) setError("The cosmos is busy — try again shortly.");
-      else if (msg.includes("402")) setError("AI credits exhausted. Add credits to continue.");
-      else setError(msg);
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("429")) setError("The cards need a short rest. Please try again in a minute.");
+      else if (msg.includes("402")) setError("The reading service is paused right now. Please try again later.");
+      else setError("The reading could not be made just now. Please try again.");
     } finally {
       setLoadingReading(false);
     }
@@ -830,6 +830,14 @@ function TarotPage() {
               <div className="text-xs font-semibold tracking-wide text-gold">
                 {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
               </div>
+              {deckShortages.length > 0 && (
+                <div className="max-w-[18rem] text-[11px] leading-snug text-amber-300/90 text-center sm:text-right">
+                  {deckShortages
+                    .map((s) => `${s.name} has only ${s.have} of ${s.expected} pictures`)
+                    .join(". ")}
+                  . Ask the admin to add the rest.
+                </div>
+              )}
               <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
                 {BOARD_DECK_LIST.map((meta, di) => {
                   const subDeck = decks[meta.key] ?? [];

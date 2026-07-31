@@ -99,3 +99,22 @@ describe("computeKundli() — determinism", () => {
     }
   });
 });
+
+// ────────────────────────────────────────────────────────────────
+// Cross-engine consistency: western.ts tropical ascendant minus its own
+// ayanamsa must equal vedic.ts's sidereal ascendant. This guards against
+// the western engine ever regressing into computing the Descendant
+// (a 180° flip bug found and fixed in this audit).
+// ────────────────────────────────────────────────────────────────
+describe("Western engine — ascendant agrees with Vedic engine (tropical - ayanamsa = sidereal)", () => {
+  it("tropicalAscendant - ayanamsa matches sidereal ascendant within 0.01°", async () => {
+    const { computeWesternChart } = await import("./western");
+    const input = {
+      year: 1990, month: 6, day: 15, hour: 10, minute: 30,
+      tzOffsetHours: 5.5, latitude: 28.6139, longitude: 77.2090,
+    };
+    const western = computeWesternChart(input, "whole-sign");
+    const diff = ((western.tropicalAscendant - western.ayanamsa - western.ascendant.longitude + 540) % 360) - 180;
+    expect(Math.abs(diff)).toBeLessThan(0.01);
+  });
+});

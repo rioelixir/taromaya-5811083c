@@ -332,8 +332,9 @@ export function mobileDobMatch(mobile: string, birthDate: string): MobileDobMatc
   if (!digits || !birthDate) return null;
   const { total, reduced } = analyzeMobile(digits);
   const [y, m, d] = birthDate.split("-").map(Number);
-  const driverDob = reduce(d);
-  const conductorDob = reduce(dsum(y) + dsum(m) + dsum(d));
+  // Vedic driver/conductor reduce fully to 1-9; master numbers do not apply.
+  const driverDob = reduce(d, false);
+  const conductorDob = reduce(dsum(y) + dsum(m) + dsum(d), false);
   const reducedDob = conductorDob;
 
   const mobileDigitSet = new Set(digits.split(""));

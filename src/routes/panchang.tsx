@@ -4,7 +4,7 @@ import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
-import { computePanchang, fmtTime, fmtRange, todaysFestivals } from "@/lib/panchang";
+import { computePanchang, fmtTime, fmtRange, todaysFestivals, WEEKDAY } from "@/lib/panchang";
 import { classifyPanchaka, bhadraInfo, tithiQuality, nakshatraCharacter, yogaQuality } from "@/lib/panchang-deep";
 import { computeMonthAlmanac, chaughadiyaSummary, type AlmanacDay } from "@/lib/panchang-month";
 import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
@@ -54,7 +54,7 @@ function PanchangPage() {
       longitude: Number(lon),
     });
     if (!next.sunrise) return [];
-    return computeHoras(p.sunrise, p.sunset, next.sunrise, new Date(y, m - 1, d).getDay());
+    return computeHoras(p.sunrise, p.sunset, next.sunrise, WEEKDAY.indexOf(p.weekday));
   }, [p, date, lat, lon]);
 
   const nowHora = useMemo(() => currentHora(horas), [horas]);
