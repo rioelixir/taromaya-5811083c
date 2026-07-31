@@ -179,7 +179,11 @@ export function PlacePicker({
             >
               <span className="min-w-0 truncate">
                 {h.city}
-                {h.state ? <span className="text-muted-foreground"> · {h.state}</span> : null}
+                {worldwide ? (
+                  h.country ? <span className="text-muted-foreground"> · {h.country}</span> : null
+                ) : h.state ? (
+                  <span className="text-muted-foreground"> · {h.state}</span>
+                ) : null}
               </span>
               <span className="shrink-0 text-[11px] text-gold/80">{friendlyZoneName(h.timezone, h.country)}</span>
             </button>
