@@ -40,6 +40,8 @@ export function VoiceFieldMics({ onText }: { onText: (el: HTMLElement, text: str
     const found: Spot[] = [];
     document.querySelectorAll<HTMLElement>("input, textarea, [contenteditable='true']").forEach((el) => {
       if (el.closest("[data-no-voice]")) return;
+      // Passwords and codes stay private — no microphone there.
+      if (el instanceof HTMLInputElement && (el.type === "password" || el.autocomplete === "one-time-code")) return;
       if (!isTypableField(el) || !visible(el)) return;
       const r = el.getBoundingClientRect();
       const size = Math.min(SIZE, Math.max(22, r.height - 8));
