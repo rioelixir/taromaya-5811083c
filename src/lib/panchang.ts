@@ -118,9 +118,22 @@ export function computePanchang(input: PanchangInput): Panchang {
   const weekday = WEEKDAY[dayStart.getDay()];
 
   const sunrise = dayStart === calDayStart ? calSunrise : findRiseFrom(A.Body.Sun, +1, dayStart);
-  const sunset = findRiseFrom(A.Body.Sun, -1, dayStart);
+  // Search sunset, moonrise, and moonset *forward* from the day's sunrise
+  // (or from dayStart if sunrise is unavailable, e.g. polar latitudes).
+  // Anchoring a backward (dir=-1) search at local midnight can walk back
+  // into the previous day's event, which broke sunrise < sunset ordering
+  // for places like New York.
+  // `dir` selects which event to find (+1 rise, -1 set); SearchRiseSet
+  // always searches *forward* in time from the given start instant (since
+  // limitDays is positive). Anchoring every search at local midnight is
+  // fine for sunrise, but for sunset/moonset it can find an event that is
+  // still *before* the day's actual sunrise/moonrise if e.g. the server's
+  // local-midnight instant doesn't line up with the place's real day
+  // boundary. Anchor sunset just after sunrise, and moonset just after
+  // moonrise, so the pair is always ordered correctly for the same day.
+  const sunset = findRiseFrom(A.Body.Sun, -1, sunrise ?? dayStart);
   const moonrise = findRiseFrom(A.Body.Moon, +1, dayStart);
-  const moonset = findRiseFrom(A.Body.Moon, -1, dayStart);
+  const moonset = findRiseFrom(A.Body.Moon, -1, moonrise ?? dayStart);
   const solarNoon = solarNoonFrom(dayStart);
 
   // Tithi/Nakshatra/Yoga/Karana are read at local sunrise — the classical

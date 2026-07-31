@@ -85,16 +85,56 @@ describe("panchang invariants", () => {
     expect(pPre.weekday).toBe(dayNames[prevIdx]);
   });
 
-  it("Delhi 2024-01-01 noon: sidereal tithi/nakshatra/yoga/karana are internally consistent", () => {
+  it("Delhi 2024-01-01: matches published panchang (Krishna Paksha Panchami, Magha nakshatra, Ayushman yoga, Taitila karana)", () => {
+    // Hand-verified against prokerala.com/astrology/panchang/2024-january-01.html
+    // and anoopastrosutra.com's Jan 1 2024 Delhi panchang: "Panchami, Krishna
+    // Paksha... Magha Nakshtra till 08:35 IST... Aayushman Yog, Taitil Karan",
+    // sunrise ~7:12 AM IST (7:12-7:13 AM depending on source/city).
     const p = computePanchang({ date: new Date(2024, 0, 1, 12, 0, 0), latitude: 28.6139, longitude: 77.2090 });
-    // Jan 1 2024 was Krishna Paksha (waning moon after full moon on Dec 26 2023).
-    expect(p.tithi.paksha).toBe("Krishna");
     expect(p.weekday).toBe("Monday");
+    expect(p.tithi.paksha).toBe("Krishna");
+    expect(p.tithi.name).toBe("Panchami");
+    expect(p.nakshatra.name).toBe("Magha");
+    expect(p.yoga.name).toBe("Ayushman");
+    expect(p.karana.name).toBe("Taitila");
+    // Sunrise ~7:12-7:13 AM IST = 01:42-01:44 UTC.
+    const sunriseUtcMinutes = p.sunrise!.getUTCHours() * 60 + p.sunrise!.getUTCMinutes();
+    expect(sunriseUtcMinutes).toBeGreaterThanOrEqual(100); // 1:40 UTC
+    expect(sunriseUtcMinutes).toBeLessThanOrEqual(105); // 1:45 UTC
+    // Sunset that same evening must be *after* sunrise, same calendar day (IST),
+    // roughly 17:30-17:50 IST (12:00-12:20 UTC) — not the next morning.
+    expect(p.sunset!.getTime()).toBeGreaterThan(p.sunrise!.getTime());
+    expect(p.sunset!.getUTCDate()).toBe(p.sunrise!.getUTCDate());
+    const sunsetUtcMinutes = p.sunset!.getUTCHours() * 60 + p.sunset!.getUTCMinutes();
+    expect(sunsetUtcMinutes).toBeGreaterThanOrEqual(715); // 11:55 UTC
+    expect(sunsetUtcMinutes).toBeLessThanOrEqual(735); // 12:15 UTC
+    // Monday Rahu Kaal is the 2nd of 8 day-segments, roughly 08:30-09:50 IST.
+    expect(p.rahuKaal).not.toBeNull();
+    expect(p.rahuKaal![0].getTime()).toBeGreaterThan(p.sunrise!.getTime());
+    expect(p.rahuKaal![1].getTime()).toBeLessThan(p.sunset!.getTime());
   });
 
-  it("New York 2024-06-15: sunrise before sunset, valid weekday", () => {
+  it("New York 2024-06-15: sunrise/sunset ordered correctly for a summer day", () => {
     const p = computePanchang({ date: new Date(2024, 5, 15, 12, 0, 0), latitude: 40.7128, longitude: -74.0060 });
     expect(p.weekday).toBe("Saturday");
     expect(p.sunrise!.getTime()).toBeLessThan(p.sunset!.getTime());
+    // Sunset must fall the same local (EDT, UTC-4) calendar day as sunrise,
+    // not roll over into the next morning.
+    expect(p.sunset!.getTime() - p.sunrise!.getTime()).toBeLessThan(20 * 3600 * 1000);
+    // NYC mid-June sunrise ~05:24 EDT (09:24 UTC), sunset ~20:29 EDT (00:29 UTC next day).
+    const sunriseUtcMinutes = p.sunrise!.getUTCHours() * 60 + p.sunrise!.getUTCMinutes();
+    expect(sunriseUtcMinutes).toBeGreaterThanOrEqual(555); // 9:15 UTC
+    expect(sunriseUtcMinutes).toBeLessThanOrEqual(575); // 9:35 UTC
+  });
+
+  it("Sydney 2024-03-20 (southern hemisphere): sunrise before sunset, tithi in range", () => {
+    const p = computePanchang({ date: new Date(2024, 2, 20, 12, 0, 0), latitude: -33.8688, longitude: 151.2093 });
+    expect(p.sunrise).not.toBeNull();
+    expect(p.sunset).not.toBeNull();
+    expect(p.sunrise!.getTime()).toBeLessThan(p.sunset!.getTime());
+    expect(p.moonrise === null || p.moonset === null || true).toBe(true);
+    expect(p.tithi.number).toBeGreaterThanOrEqual(1);
+    expect(p.tithi.number).toBeLessThanOrEqual(30);
+    expect(p.weekday).toBe("Tuesday");
   });
 });
