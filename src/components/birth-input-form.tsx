@@ -161,8 +161,6 @@ export function BirthInputForm({
           <Row k="Name" v={form.name || "—"} />
           <Row k="Place" v={form.place || "—"} />
           <Row k="Local date-time" v={`${form.year}-${String(form.month).padStart(2,"0")}-${String(form.day).padStart(2,"0")}  ${String(form.hour).padStart(2,"0")}:${String(form.minute).padStart(2,"0")}:${String(form.seconds).padStart(2,"0")}`} />
-          <Row k="Ayanamsa" v={form.ayanamsa} />
-          <Row k="Node type" v={form.nodeType} />
           <Row k="Chart style" v={form.chartStyle} />
         </div>
         <div className="flex gap-3">
