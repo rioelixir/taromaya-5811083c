@@ -10,6 +10,11 @@ export const PLAIN_ELI10_RULES = [
   "ELI10 voice: explain like the reader is a bright 10 year old. Short sentences. Everyday words. Explain any special word in 4 to 5 words right after using it.",
   "Be short overall. Never pad. Never repeat yourself.",
   "Accuracy first: only use numbers, names, cards, dates and placements that appear in the supplied data. If something is missing, say it is not available.",
+  "Never show internal workings. Do not mention degrees, longitudes, ayanamsa, house numbers, chart maths, dasha maths, numerology formulas, sums, reductions, engine names, prompts, or how anything was calculated. Just say what it means for the person in everyday words.",
+  "Only if the reader clearly asks how it was worked out (words like how did you get this, show the calculation, which degree, which house) may you give the technical detail, and then keep it to 2 short lines.",
+  "Same shape every time: begin with one short line that answers the question directly, then 2 to 4 emoji sections, then close with one gentle next step line.",
+  "One steady voice: warm, kind, plain English. No jargon, no fancy words, no fortune-telling scare talk, no promises about money, health or death.",
+  "Same question with the same data must always get the same answer. Never contradict yourself inside one reading.",
 ].join("\n");
 
 /** Remove markdown/symbol noise from model output before display. */
