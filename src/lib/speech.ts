@@ -189,16 +189,27 @@ function tidyPunctuation(text: string): string {
 
 /**
  * Listeners often hear the same words twice or thrice in a row
- * ("Delhi Delhi Delhi"). Keep only the first one.
+ * ("Delhi Delhi Delhi", "my name is my name is Ria"). Keep only the first one.
  */
 export function dedupeRepeats(text: string): string {
-  let out = text;
+  const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  const key = (w: string) => w.toLowerCase().replace(/[.,!?;:]+$/, "");
   for (let size = 4; size >= 1; size--) {
-    const re = new RegExp(`\\b((?:[\\p{L}\\p{N}']+(?:\\s+|$)){${size}})(?:\\1)+`, "giu");
-    out = out.replace(re, "$1");
+    let i = 0;
+    while (i + size * 2 <= words.length) {
+      const same = () => {
+        for (let k = 0; k < size; k++) {
+          if (key(words[i + k]) !== key(words[i + size + k])) return false;
+        }
+        return true;
+      };
+      if (same()) words.splice(i + size, size);
+      else i++;
+    }
   }
-  return out.replace(/\s+/g, " ").trim();
+  return words.join(" ");
 }
+
 
 /** Full clean-up used for finished speech. */
 export function cleanSpeech(raw: string, opts: { punctuate?: boolean } = {}): string {
