@@ -33,14 +33,17 @@ export const VALIDATION_CASES: ValidationCase[] = [
     id: "j2000-mumbai",
     label: "Y2K reference — Mumbai, 1 Jan 2000 12:00 IST",
     input: { year: 2000, month: 1, day: 1, hour: 12, minute: 0, tzOffsetHours: 5.5, latitude: 19.076, longitude: 72.877 },
-    expected: { ascendantSign: 1, ascendantLongitude: 55.0, tolDegrees: 3 }, // Taurus mid-range
+    // Noon chart: sidereal ascendant sits in Pisces ≈ 336°56′ (Lahiri).
+    expected: { ascendantSign: 11, ascendantLongitude: 336.9, tolDegrees: 1.5 },
   },
   {
     id: "solstice-delhi",
     label: "June solstice — Delhi, 21 Jun 2020 05:44 IST (sunrise chart)",
     input: { year: 2020, month: 6, day: 21, hour: 5, minute: 44, tzOffsetHours: 5.5, latitude: 28.6139, longitude: 77.2090 },
-    expected: { ascendantSign: 2, ascendantLongitude: 65.0, tolDegrees: 4 }, // Gemini
+    // Sunrise chart: lagna rises with the Sun in early sidereal Gemini ≈ 69°33′.
+    expected: { ascendantSign: 2, ascendantLongitude: 69.5, tolDegrees: 1.5 },
   },
+
 ];
 
 export type CaseResult = {
