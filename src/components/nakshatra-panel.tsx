@@ -192,7 +192,7 @@ export function NakshatraPanel({
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-3">
       <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gold">
-        <Star className="h-4 w-4 shrink-0" /> Current star
+        <Star className="h-4 w-4 shrink-0" /> Current Nakshatra
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
         Tell us the time now and where you are. We find the Moon's star for this
@@ -209,7 +209,7 @@ export function NakshatraPanel({
         />
       </label>
 
-      <PlacePicker value={place} onChange={setPlace} label="Current place" />
+      <PlacePicker value={place} onChange={setPlace} label="Current place" worldwide />
 
       {!ready && (
         <p className="text-sm text-muted-foreground">Pick a place from the list to begin.</p>
@@ -231,7 +231,7 @@ export function NakshatraPanel({
         <div className="space-y-3">
           <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">
-              Star right now
+              Nakshatra right now
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
             <div className="text-xs text-muted-foreground">{starLine}</div>

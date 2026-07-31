@@ -24,6 +24,7 @@ export function PlacePicker({
   forTime,
   label = "Where were you born?",
   compact = false,
+  worldwide = false,
 }: {
   value: PlaceValue;
   onChange: (v: PlaceValue) => void;
@@ -33,15 +34,18 @@ export function PlacePicker({
   forTime?: string;
   label?: string;
   compact?: boolean;
+  /** One box only: type a city and pick it — shows "City, Country". */
+  worldwide?: boolean;
 }) {
   const search = useServerFn(searchPlaces);
-  const [country, setCountry] = useState("IN");
+  const [country, setCountry] = useState(worldwide ? "" : "IN");
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<PlaceHit[]>([]);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
   const [zoneLabel, setZoneLabel] = useState<string>("");
   const boxRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -91,7 +95,9 @@ export function PlacePicker({
     const off = offsetForLocalTime(h.timezone, y || 2000, mo || 1, d || 1, hh || 12, mi || 0);
     setZoneLabel(friendlyZoneName(h.timezone, h.country));
     onChange({
-      place: [h.city, h.state, h.country].filter(Boolean).join(", "),
+      place: worldwide
+        ? [h.city, h.country].filter(Boolean).join(", ")
+        : [h.city, h.state, h.country].filter(Boolean).join(", "),
       lat: h.latitude.toFixed(4),
       lon: h.longitude.toFixed(4),
       tz: String(off),
@@ -106,31 +112,41 @@ export function PlacePicker({
       {!compact && (
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       )}
-      <div className="grid gap-2 sm:grid-cols-[minmax(0,180px)_minmax(0,1fr)]">
-        <select
-          value={country}
-          onChange={(e) => { setCountry(e.target.value); setStateFilter(""); }}
-          className="w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
-          aria-label="Country"
-        >
-          {COUNTRIES.map((c) => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
+      <div
+        className={
+          worldwide ? "grid gap-2" : "grid gap-2 sm:grid-cols-[minmax(0,180px)_minmax(0,1fr)]"
+        }
+      >
+        {!worldwide && (
+          <select
+            value={country}
+            onChange={(e) => {
+              setCountry(e.target.value);
+              setStateFilter("");
+            }}
+            className="w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Country"
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        )}
         <div className="relative min-w-0">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold/70" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => hits.length && setOpen(true)}
-            placeholder="Type your town or city"
+            placeholder={worldwide ? "Type your city" : "Type your town or city"}
             className="w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-9 text-sm text-pearl placeholder:text-muted-foreground/60 outline-none focus:border-gold/50"
           />
           {busy && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gold/70" />}
         </div>
       </div>
 
-      {states.length > 1 && open && (
+      {!worldwide && states.length > 1 && open && (
+
         <div className="flex flex-wrap gap-1.5">
           <button
             type="button"
@@ -163,7 +179,11 @@ export function PlacePicker({
             >
               <span className="min-w-0 truncate">
                 {h.city}
-                {h.state ? <span className="text-muted-foreground"> · {h.state}</span> : null}
+                {worldwide ? (
+                  h.country ? <span className="text-muted-foreground"> · {h.country}</span> : null
+                ) : h.state ? (
+                  <span className="text-muted-foreground"> · {h.state}</span>
+                ) : null}
               </span>
               <span className="shrink-0 text-[11px] text-gold/80">{friendlyZoneName(h.timezone, h.country)}</span>
             </button>
