@@ -40,8 +40,10 @@ export function useVoiceDictation(onText: (text: string) => void) {
   const onTextRef = useRef(onText);
   onTextRef.current = onText;
 
-  const available = typeof window !== "undefined" &&
-    (!!getRecognitionCtor() || !!navigator.mediaDevices?.getUserMedia);
+  const [available, setAvailable] = useState(false);
+  useEffect(() => {
+    setAvailable(!!getRecognitionCtor() || !!navigator.mediaDevices?.getUserMedia);
+  }, []);
 
   const emit = useCallback((raw: string) => {
     const text = cleanSpeech(raw);
