@@ -214,7 +214,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <WorkSessionKeeper />
       <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
+
 
 
       {bgUrl && (
