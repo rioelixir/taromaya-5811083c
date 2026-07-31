@@ -26,9 +26,23 @@ const regionNames = (() => {
   }
 })();
 
-export function countryName(code: string): string {
-  return regionNames?.of(code) ?? code;
+/**
+ * Plain, everyday country names. Different devices spell a few places
+ * differently ("Hong Kong SAR China"), so we tidy them to one simple form.
+ */
+function tidy(name: string): string {
+  return name
+    .replace(/\s*\(.*?\)\s*/g, " ")
+    .replace(/\s+(SAR\s+China|SAR|Special Administrative Region.*)$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
+
+export function countryName(code: string): string {
+  const raw = regionNames?.of(code) ?? code;
+  return tidy(raw) || code;
+}
+
 
 /** Turn "IN" into the 🇮🇳 flag emoji. */
 export function countryFlag(code: string): string {
