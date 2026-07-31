@@ -84,10 +84,12 @@ export function VoiceInputLayer() {
           insertSpokenText(box, cmd.text);
           say(`Looking for ${cmd.text}…`);
         } else {
-          say("There is nothing to search on this page.");
+          tem nothing to search on this page.");
         }
         return true;
       }
+      default:
+        return false;
     }
   };
 
