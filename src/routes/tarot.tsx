@@ -624,10 +624,10 @@ function TarotPage() {
       });
       setReading(res.text);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Something went wrong.";
-      if (msg.includes("429")) setError("The cosmos is busy — try again shortly.");
-      else if (msg.includes("402")) setError("AI credits exhausted. Add credits to continue.");
-      else setError(msg);
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("429")) setError("The cards need a short rest. Please try again in a minute.");
+      else if (msg.includes("402")) setError("The reading service is paused right now. Please try again later.");
+      else setError("The reading could not be made just now. Please try again.");
     } finally {
       setLoadingReading(false);
     }
