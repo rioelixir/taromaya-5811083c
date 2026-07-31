@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { VoiceMic } from "@/components/voice-mic";
+import { VoiceFieldMics } from "@/components/voice-field-mics";
 import { insertSpokenText, isTypableField } from "@/lib/voice-fields";
 import { findClickable, matchVoiceCommand } from "@/lib/voice-commands";
 import { announceDetails, hasDetails, parseSpokenDetails } from "@/lib/voice-parse";
@@ -10,15 +10,14 @@ const COMMAND_STARTERS =
 
 /**
  * The one voice helper for the whole app.
- * Tap the microphone and just talk: it fills the boxes on the page,
- * moves between pages, or presses buttons for you.
+ * Every box you can type in has its own small microphone. Tap the one next
+ * to a box and talk: your words go into that box, and page names or button
+ * names still work from there too.
  * It never appears on the Tarot board.
  */
 export function VoiceAssistant() {
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const targetRef = useRef<HTMLElement | null>(null);
-  const [hasTarget, setHasTarget] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const timer = useRef<number | null>(null);
 
@@ -27,19 +26,6 @@ export function VoiceAssistant() {
     if (timer.current) window.clearTimeout(timer.current);
     if (msg) timer.current = window.setTimeout(() => setNote(null), hold);
   };
-
-  useEffect(() => {
-    const onFocus = (e: FocusEvent) => {
-      const el = e.target as Element | null;
-      if (isTypableField(el)) {
-        targetRef.current = el as HTMLElement;
-        setHasTarget(true);
-        setNote(null);
-      }
-    };
-    document.addEventListener("focusin", onFocus);
-    return () => document.removeEventListener("focusin", onFocus);
-  }, []);
 
   const runCommand = (text: string): boolean => {
     const cmd = matchVoiceCommand(text);
@@ -120,39 +106,32 @@ export function VoiceAssistant() {
     return insertSpokenText(box, time);
   };
 
-  const handleText = (text: string) => {
-    const active = document.activeElement;
-    const el = isTypableField(active) ? (active as HTMLElement) : targetRef.current;
-    const fieldReady = !!el && el.isConnected && isTypableField(el);
+  const handleText = (el: HTMLElement, text: string) => {
+    const fieldReady = el.isConnected && isTypableField(el);
 
-    // A page or button name always wins.
-    if (!fieldReady || COMMAND_STARTERS.test(text)) {
-      if (runCommand(text)) return;
-    }
+    // "Open kundli", "go back", "scroll down" work from any box too.
+    if (COMMAND_STARTERS.test(text) && runCommand(text)) return;
 
-    // Birth details spoken in one breath: fill everything we understood.
+    // Birth details spoken in one breath: fill every box we understood.
     const details = parseSpokenDetails(text);
     if (hasDetails(details) && (details.date || details.time || details.place)) {
-      announceDetails(details); // date pickers and place boxes listen for this
+      announceDetails(details); // date and place boxes listen for this
       const done: string[] = [];
       if (details.name && fillName(details.name)) done.push(`name ${details.name}`);
       if (details.date) done.push("date");
       if (details.time) { fillTime(details.time); done.push("time"); }
       if (details.place) done.push(details.place);
-      say(
-        done.length
-          ? `Filled in ${done.join(", ")} ✓ Check it, then tap the button.`
-          : "I heard you, but I could not find the right boxes here.",
-        4200,
-      );
-      return;
+      if (done.length) {
+        say(`Filled in ${done.join(", ")} ✓ Check it, then tap the button.`, 4200);
+        return;
+      }
     }
 
     if (!fieldReady) {
-      say('Tap a box and speak, or say a page name like "kundli".', 4000);
+      say("That box has gone. Tap the microphone next to a box and speak again.", 3500);
       return;
     }
-    const ok = insertSpokenText(el!, text);
+    const ok = insertSpokenText(el, text);
     say(ok ? "Added your words ✓" : "That didn't fit this box. Try again, or type it.", 2200);
   };
 
@@ -160,18 +139,13 @@ export function VoiceAssistant() {
   if (path.startsWith("/tarot")) return null;
 
   return (
-    <div className="fixed bottom-28 right-4 z-40 flex flex-col items-end gap-2 sm:bottom-8">
+    <>
+      <VoiceFieldMics onText={handleText} />
       {note && (
-        <div className="max-w-[76vw] rounded-xl glass gold-border px-3 py-2 text-xs leading-relaxed text-pearl">
+        <div className="pointer-events-none fixed bottom-28 left-1/2 z-40 -translate-x-1/2 max-w-[86vw] rounded-xl glass gold-border px-3 py-2 text-center text-xs leading-relaxed text-pearl sm:bottom-8">
           {note}
         </div>
       )}
-      {hasTarget && (
-        <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-pearl/70">
-          Speak to fill this box
-        </div>
-      )}
-      <VoiceMic onText={handleText} size="lg" label="Tap and speak" />
-    </div>
+    </>
   );
 }

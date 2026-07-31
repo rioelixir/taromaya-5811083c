@@ -1,4 +1,4 @@
-import { cleanSpeech, parseSpokenDate, parseSpokenTime } from "@/lib/speech";
+import { cleanSpeech, dedupeRepeats, parseSpokenDate, parseSpokenTime } from "@/lib/speech";
 
 type Field = HTMLInputElement | HTMLTextAreaElement | HTMLElement;
 
@@ -58,8 +58,10 @@ export function insertSpokenText(el: Field, spoken: string): boolean {
     }
 
     const existing = el.value;
+    // Never say the same thing twice: if these words are already at the end, stop.
+    if (existing && existing.trim().toLowerCase().endsWith(text.trim().toLowerCase())) return true;
     const joiner = !existing ? "" : /[\s(]$/.test(existing) ? "" : " ";
-    const next = existing + joiner + text;
+    const next = dedupeRepeats(existing + joiner + text);
     setNativeValue(el, next);
     try {
       el.focus();

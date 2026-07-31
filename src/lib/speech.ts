@@ -187,10 +187,35 @@ function tidyPunctuation(text: string): string {
   return out.charAt(0).toUpperCase() + out.slice(1);
 }
 
+/**
+ * Listeners often hear the same words twice or thrice in a row
+ * ("Delhi Delhi Delhi", "my name is my name is Ria"). Keep only the first one.
+ */
+export function dedupeRepeats(text: string): string {
+  const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  const key = (w: string) => w.toLowerCase().replace(/[.,!?;:]+$/, "");
+  for (let size = 4; size >= 1; size--) {
+    let i = 0;
+    while (i + size * 2 <= words.length) {
+      const same = () => {
+        for (let k = 0; k < size; k++) {
+          if (key(words[i + k]) !== key(words[i + size + k])) return false;
+        }
+        return true;
+      };
+      if (same()) words.splice(i + size, size);
+      else i++;
+    }
+  }
+  return words.join(" ");
+}
+
+
 /** Full clean-up used for finished speech. */
 export function cleanSpeech(raw: string, opts: { punctuate?: boolean } = {}): string {
   if (!raw) return "";
   let out = raw.replace(/\s+/g, " ").trim();
+  out = dedupeRepeats(out);
   out = digitsFromWords(out);
   out = tidyTimes(out);
   out = tidyProperNames(out);
