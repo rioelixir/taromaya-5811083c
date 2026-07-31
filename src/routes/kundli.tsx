@@ -34,6 +34,8 @@ import {
 } from "lucide-react";
 import { CalcSettingsPanel, type CalcSettings } from "@/components/calc-settings-panel";
 import { AccuracyPanel } from "@/components/accuracy-panel";
+import { CurrentTransit } from "@/components/current-transit";
+import { DateSelect } from "@/components/date-select";
 
 
 export const Route = createFileRoute("/kundli")({
@@ -61,9 +63,10 @@ const DEFAULTS: FormState = {
   elevation: "0", unknownTime: false,
 };
 
-type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
+type TabId = "overview" | "transit" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
+  { id: "transit", label: "Current Transit" },
   { id: "vargas", label: "Divisional" },
   { id: "dasha", label: "Dasha" },
   { id: "yogas", label: "Yogas" },
@@ -266,6 +269,15 @@ function KundliPage() {
 
           <div className="pt-6">
             {tab === "overview" && <OverviewTab chart={chart} />}
+            {tab === "transit" && (
+              <CurrentTransit
+                chart={chart}
+                latitude={Number(form.lat)}
+                longitude={Number(form.lon)}
+                tzOffsetHours={Number(form.tz)}
+                place={form.place}
+              />
+            )}
             {tab === "vargas" && <VargasTab chart={chart} />}
             {tab === "dasha" && <DashaTab chart={chart} birthDate={birthDate} />}
             {tab === "yogas" && <YogasTab chart={chart} />}
@@ -306,7 +318,7 @@ function BirthForm({
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your name" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Date"><input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} /></Field>
+          <DateSelect value={form.date} onChange={(iso) => setForm({ ...form, date: iso })} />
           <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} disabled={form.unknownTime} /></Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
