@@ -103,8 +103,9 @@ function parseBirthDate(birthDate: string): { y: number; m: number; d: number } 
 
 export function loShuGrid(birthDate: string): LoShuGrid {
   const { y, m, d } = parseBirthDate(birthDate);
-  const driver = reduce(d);
-  const conductor = reduce(dsum(y) + dsum(m) + dsum(d));
+  // Vedic Lo Shu uses fully reduced 1-9 values; master numbers do not apply here.
+  const driver = reduce(d, false);
+  const conductor = reduce(dsum(y) + dsum(m) + dsum(d), false);
   const digits = [
     ...digitsOf(d),
     ...digitsOf(m),
