@@ -697,11 +697,6 @@ function TarotPage() {
                 placeholder="What's on your mind? (optional)"
                 className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
               />
-              <MicButton
-                size="sm"
-                showLanguage={false}
-                onText={(t) => setQuestion((v) => (v ? `${v} ${t}` : t).slice(0, 200))}
-              />
               <button
                 onClick={shuffleAll}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
