@@ -291,11 +291,6 @@ function KundliPage() {
             {tab === "gems" && <GemstonesTab chart={chart} />}
             {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
           </div>
-
-          <div className="mt-6 space-y-3">
-            <CalcSettingsPanel settings={buildCalcSettings(chart, form, birthDate)} />
-            <AccuracyPanel compact />
-          </div>
         </div>
       )}
     </PageShell>
