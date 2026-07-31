@@ -52,6 +52,19 @@ export function useVoice(onText: (text: string) => void) {
   } | null>(null);
   const onTextRef = useRef(onText);
   onTextRef.current = onText;
+  /** Stops listening on its own once the person goes quiet, so nobody has to tap twice. */
+  const stopRef = useRef<() => void>(() => {});
+  const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearSilence = useCallback(() => {
+    if (silenceRef.current) clearTimeout(silenceRef.current);
+    silenceRef.current = null;
+  }, []);
+  const waitForQuiet = useCallback((ms = 2200) => {
+    clearSilence();
+    silenceRef.current = setTimeout(() => {
+      if (activeRef.current && !pausedRef.current) stopRef.current();
+    }, ms);
+  }, [clearSilence]);
 
   useEffect(() => {
     setAvailable(!!ctor() || !!navigator.mediaDevices?.getUserMedia);
@@ -155,6 +168,7 @@ export function useVoice(onText: (text: string) => void) {
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
           setHeard(dedupeRepeats(`${finalRef.current} ${interim}`.trim()));
+          waitForQuiet();
         };
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
@@ -177,6 +191,7 @@ export function useVoice(onText: (text: string) => void) {
         recRef.current = rec;
         rec.start();
         setState("listening");
+        waitForQuiet(12000);
         return;
       } catch {
         recRef.current = null;
@@ -190,29 +205,37 @@ export function useVoice(onText: (text: string) => void) {
       const node = ctxAudio.createScriptProcessor(4096, 1, 1);
       const chunks: Float32Array[] = [];
       node.onaudioprocess = (e) => {
-        if (!pausedRef.current) chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+        if (pausedRef.current) return;
+        const frame = e.inputBuffer.getChannelData(0);
+        chunks.push(new Float32Array(frame));
+        let sum = 0;
+        for (let i = 0; i < frame.length; i += 8) sum += frame[i] * frame[i];
+        const loudness = Math.sqrt(sum / (frame.length / 8));
+        if (loudness > 0.012) waitForQuiet();
       };
       source.connect(node);
       node.connect(ctxAudio.destination);
       mediaRef.current = { stream, ctx: ctxAudio, node, source, chunks };
       setState("listening");
+      waitForQuiet(12000);
     } catch {
       activeRef.current = false;
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, []);
+  }, [waitForQuiet]);
 
   const teardown = useCallback(() => {
     activeRef.current = false;
     pausedRef.current = false;
+    clearSilence();
     const rec = recRef.current;
     recRef.current = null;
     if (rec) { try { rec.stop(); rec.abort(); } catch { /* already stopped */ } }
     const m = mediaRef.current;
     mediaRef.current = null;
     return m;
-  }, []);
+  }, [clearSilence]);
 
   /** Stop listening and hand over the words. */
   const stop = useCallback(async () => {
@@ -247,6 +270,9 @@ export function useVoice(onText: (text: string) => void) {
       await send(blob);
     }
   }, [emit, heard, send, teardown]);
+  stopRef.current = () => { void stop(); };
+
+
 
   /** Throw away what was heard and stop. */
   const clear = useCallback(() => {
