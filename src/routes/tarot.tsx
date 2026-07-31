@@ -830,6 +830,14 @@ function TarotPage() {
               <div className="text-xs font-semibold tracking-wide text-gold">
                 {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
               </div>
+              {deckShortages.length > 0 && (
+                <div className="max-w-[18rem] text-[11px] leading-snug text-amber-300/90 text-center sm:text-right">
+                  {deckShortages
+                    .map((s) => `${s.name} has only ${s.have} of ${s.expected} pictures`)
+                    .join(". ")}
+                  . Ask the admin to add the rest.
+                </div>
+              )}
               <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
                 {BOARD_DECK_LIST.map((meta, di) => {
                   const subDeck = decks[meta.key] ?? [];
