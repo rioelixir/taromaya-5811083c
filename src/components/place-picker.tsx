@@ -24,6 +24,7 @@ export function PlacePicker({
   forTime,
   label = "Where were you born?",
   compact = false,
+  worldwide = false,
 }: {
   value: PlaceValue;
   onChange: (v: PlaceValue) => void;
@@ -33,15 +34,18 @@ export function PlacePicker({
   forTime?: string;
   label?: string;
   compact?: boolean;
+  /** One box only: type a city and pick it — shows "City, Country". */
+  worldwide?: boolean;
 }) {
   const search = useServerFn(searchPlaces);
-  const [country, setCountry] = useState("IN");
+  const [country, setCountry] = useState(worldwide ? "" : "IN");
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<PlaceHit[]>([]);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
   const [zoneLabel, setZoneLabel] = useState<string>("");
   const boxRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
