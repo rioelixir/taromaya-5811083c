@@ -15,6 +15,8 @@ import { Sidebar } from "@/components/nav";
 import { StarField } from "@/components/star-field";
 import { useBackgroundImage } from "@/hooks/use-background-image";
 import { AutoTranslator } from "@/components/auto-translator";
+import { WorkSessionKeeper } from "@/components/work-session-keeper";
+
 import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
 import { useBranding } from "@/hooks/use-branding";
 import { TourHighlighter } from "@/components/tour-highlighter";
@@ -214,7 +216,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <WorkSessionKeeper />
       <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
+
 
 
       {bgUrl && (

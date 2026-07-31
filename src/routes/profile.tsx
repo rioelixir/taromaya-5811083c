@@ -3,6 +3,7 @@ import { PageShell, GlassCard } from "@/components/page-shell";
 import { User, LogOut, MapPin, Calendar, ShieldCheck, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useWorkSession, closeWorkSession } from "@/hooks/use-work-session";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
@@ -33,6 +34,7 @@ function ProfilePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ProfileData | null>(null);
+  const { status } = useWorkSession();
 
   useEffect(() => {
     let mounted = true;
@@ -70,6 +72,7 @@ function ProfilePage() {
   }, []);
 
   const signOut = async () => {
+    await closeWorkSession();
     await supabase.auth.signOut();
     router.navigate({ to: "/auth" });
   };
@@ -165,13 +168,28 @@ function ProfilePage() {
         </div>
 
         {/* Access */}
-        <GlassCard title="Access" desc="TAROMAYA is free for everyone.">
+        <GlassCard title="Access" desc="What you can open right now.">
           <div className="font-display text-lg gold-text">
-            {data.isAdmin ? "Admin — unlimited access" : "Full access unlocked"}
+            {data.isAdmin
+              ? "Admin — unlimited access"
+              : status?.employeeAccessActive
+                ? "Employee Access Active"
+                : status?.isPremium
+                  ? "Full access unlocked"
+                  : "Standard access"}
           </div>
           <div className="mt-1 text-xs text-muted-foreground">
-            Every module is available. No subscription required.
+            {status?.employeeAccessActive
+              ? "You are signed in for work, so everything is open and free. It ends by itself when you sign out."
+              : status?.isEmployee
+                ? "You are an employee. Everything unlocks while you are signed in and working."
+                : "Every module you have is ready to use."}
           </div>
+          {status?.employeeAccessActive && (
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[11px] text-emerald-300">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" /> Working session live
+            </div>
+          )}
         </GlassCard>
       </div>
 
