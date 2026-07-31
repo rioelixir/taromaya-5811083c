@@ -37,7 +37,7 @@ function FaqPage() {
   }, [rows]);
 
   return (
-    <PageShell hideAI eyebrow="Support" title="Frequently asked questions" subtitle="Everything you need to know about Taromaya.">
+    <PageShell hideAI hideVoice eyebrow="Support" title="Frequently asked questions" subtitle="Everything you need to know about Taromaya.">
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-white/60"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
       ) : !rows.length ? (

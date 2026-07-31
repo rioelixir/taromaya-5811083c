@@ -49,7 +49,7 @@ function AdminPage() {
 
   if (loading) {
     return (
-      <PageShell hideAI eyebrow="Admin" title="Loading…">
+      <PageShell hideAI hideVoice eyebrow="Admin" title="Loading…">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <Loader2 className="h-4 w-4 animate-spin" /> Verifying access…
         </div>

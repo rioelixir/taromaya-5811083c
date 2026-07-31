@@ -5,7 +5,7 @@ import { PremiumGate } from "@/components/premium-gate";
 export const Route = createFileRoute("/bookmarks")({
   component: () => (
     <PremiumGate featureName="Bookmarks">
-      <PageShell hideAI eyebrow="Bookmarks" title="Saved for later" subtitle="Cards, readings, and insights you've saved.">
+      <PageShell hideAI hideVoice eyebrow="Bookmarks" title="Saved for later" subtitle="Cards, readings, and insights you've saved.">
         <GlassCard title="Empty" desc="Save any card or reading to see it here." />
       </PageShell>
     </PremiumGate>

@@ -68,8 +68,8 @@ function DiagnosticsPage() {
 
   useEffect(() => { recalc(); runSuite(); /* eslint-disable-next-line */ }, []);
 
-  if (loading) return <PageShell hideAI eyebrow="Admin" title="Diagnostics"><Loader2 className="h-4 w-4 animate-spin" /></PageShell>;
-  if (!isAdmin) return <PageShell hideAI eyebrow="Admin" title="Access denied"><div className="text-sm text-muted-foreground">Admins only.</div></PageShell>;
+  if (loading) return <PageShell hideAI hideVoice eyebrow="Admin" title="Diagnostics"><Loader2 className="h-4 w-4 animate-spin" /></PageShell>;
+  if (!isAdmin) return <PageShell hideAI hideVoice eyebrow="Admin" title="Access denied"><div className="text-sm text-muted-foreground">Admins only.</div></PageShell>;
 
   return (
     <PageShell eyebrow="Admin" title="Astrology Diagnostics" subtitle="Raw engine inspection: inputs, JD, ayanamsa, planetary longitudes, house mapping, validation.">
