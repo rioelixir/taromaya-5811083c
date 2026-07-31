@@ -112,31 +112,41 @@ export function PlacePicker({
       {!compact && (
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       )}
-      <div className="grid gap-2 sm:grid-cols-[minmax(0,180px)_minmax(0,1fr)]">
-        <select
-          value={country}
-          onChange={(e) => { setCountry(e.target.value); setStateFilter(""); }}
-          className="w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
-          aria-label="Country"
-        >
-          {COUNTRIES.map((c) => (
-            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
-          ))}
-        </select>
+      <div
+        className={
+          worldwide ? "grid gap-2" : "grid gap-2 sm:grid-cols-[minmax(0,180px)_minmax(0,1fr)]"
+        }
+      >
+        {!worldwide && (
+          <select
+            value={country}
+            onChange={(e) => {
+              setCountry(e.target.value);
+              setStateFilter("");
+            }}
+            className="w-full min-w-0 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Country"
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+            ))}
+          </select>
+        )}
         <div className="relative min-w-0">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gold/70" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => hits.length && setOpen(true)}
-            placeholder="Type your town or city"
+            placeholder={worldwide ? "Type your city" : "Type your town or city"}
             className="w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-9 pr-9 text-sm text-pearl placeholder:text-muted-foreground/60 outline-none focus:border-gold/50"
           />
           {busy && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gold/70" />}
         </div>
       </div>
 
-      {states.length > 1 && open && (
+      {!worldwide && states.length > 1 && open && (
+
         <div className="flex flex-wrap gap-1.5">
           <button
             type="button"
