@@ -89,9 +89,22 @@ function RectificationPage() {
             <NumField label="Day" v={birth.day} onChange={(n) => setBirth({ ...birth, day: n })} />
             <NumField label="Hour (24h)" v={birth.hour} onChange={(n) => setBirth({ ...birth, hour: n })} />
             <NumField label="Minute" v={birth.minute} onChange={(n) => setBirth({ ...birth, minute: n })} />
-            <NumField label="TZ offset (h)" step={0.25} v={birth.tzOffsetHours} onChange={(n) => setBirth({ ...birth, tzOffsetHours: n })} />
-            <NumField label="Latitude" step={0.0001} v={birth.latitude} onChange={(n) => setBirth({ ...birth, latitude: n })} />
-            <NumField label="Longitude" step={0.0001} v={birth.longitude} onChange={(n) => setBirth({ ...birth, longitude: n })} />
+          </div>
+          <div className="mt-3">
+            <PlacePicker
+              value={{ place, lat: String(birth.latitude), lon: String(birth.longitude), tz: String(birth.tzOffsetHours) }}
+              onChange={(p) => {
+                setPlace(p.place);
+                setBirth({
+                  ...birth,
+                  latitude: parseFloat(p.lat) || 0,
+                  longitude: parseFloat(p.lon) || 0,
+                  tzOffsetHours: parseFloat(p.tz) || 0,
+                });
+              }}
+              forDate={`${birth.year}-${String(birth.month).padStart(2, "0")}-${String(birth.day).padStart(2, "0")}`}
+              forTime={`${String(birth.hour).padStart(2, "0")}:${String(birth.minute).padStart(2, "0")}`}
+            />
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <NumField label="Search window (± minutes)" v={windowMin} onChange={(n) => setWindowMin(Math.max(10, Math.min(180, n)))} />
