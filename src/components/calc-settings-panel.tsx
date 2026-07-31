@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { ChevronDown, Settings2 } from "lucide-react";
-import { AYANAMSA_LABELS, HOUSE_SYSTEM_LABELS, NODE_TYPE_LABELS, ENGINE_VERSION, type ChartConfig } from "@/lib/chart-config";
+import { NODE_TYPE_LABELS, ENGINE_VERSION, type ChartConfig } from "@/lib/chart-config";
 
 export type CalcSettings = {
   zodiac: "Sidereal" | "Tropical";
