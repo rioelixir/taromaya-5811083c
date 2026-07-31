@@ -168,6 +168,7 @@ export function useVoice(onText: (text: string) => void) {
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
           setHeard(dedupeRepeats(`${finalRef.current} ${interim}`.trim()));
+          waitForQuiet();
         };
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
