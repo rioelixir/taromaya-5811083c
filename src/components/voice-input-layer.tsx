@@ -7,8 +7,6 @@ import { findClickable, matchVoiceCommand } from "@/lib/voice-commands";
 const COMMAND_STARTERS =
   /^\s*(open|go to|goto|go|show|show me|take me to|take me|visit|launch|switch to|switch|move to|jump to|bring up|press|tap|click|hit|choose|select|scroll|go back|back|search|find|menu)\b/i;
 
-/** A couple of words on their own is almost always a page name, not dictation. */
-const isShortCommand = (text: string) => text.trim().split(/\s+/).length <= 3;
 
 /**
  * One microphone for the whole app.
@@ -105,7 +103,7 @@ export function VoiceInputLayer() {
     const fieldReady = !!el && el.isConnected && isTypableField(el);
 
     // A page or button name always wins, even while a box is selected.
-    if (!fieldReady || COMMAND_STARTERS.test(text) || isShortCommand(text)) {
+    if (!fieldReady || COMMAND_STARTERS.test(text)) {
       if (runCommand(text)) return;
     }
 
