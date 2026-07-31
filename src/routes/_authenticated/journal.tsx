@@ -259,6 +259,9 @@ function Composer({ onClose, onSaved }: { onClose: () => void; onSaved: () => vo
           placeholder="Title…"
           className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/40"
         />
+        <div className="flex justify-end">
+          <MicButton size="sm" showLanguage={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
+        </div>
         <textarea
           value={body} onChange={(e) => setBody(e.target.value)} rows={7}
           placeholder="What did you notice? What did the cards say?"
@@ -342,6 +345,9 @@ function EntryModal({
             value={title} onChange={(e) => setTitle(e.target.value)}
             className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/40"
           />
+          <div className="flex justify-end">
+            <MicButton size="sm" showLanguage={false} onText={(t) => setBody((v) => (v ? `${v} ${t}` : t))} />
+          </div>
           <textarea
             value={body} onChange={(e) => setBody(e.target.value)} rows={12}
             className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/40 resize-none"
