@@ -1,20 +1,54 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { guideById } from "@/lib/help-guides";
+import { LANGUAGE_LIST } from "@/lib/i18n";
 
 /**
- * Reads one help guide out loud. Public on purpose: help must work before sign in.
- * Only the fixed guide scripts can be spoken, so no free text reaches the voice model.
+ * Reads one help guide out loud, in any language the app supports.
+ * Public on purpose: help must work before sign in. Only the fixed guide
+ * scripts can be spoken, so no free text reaches the voice model.
  */
 export const Route = createFileRoute("/api/public/help-audio")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const id = new URL(request.url).searchParams.get("id") ?? "";
+        const url = new URL(request.url);
+        const id = url.searchParams.get("id") ?? "";
+        const langCode = url.searchParams.get("lang") ?? "en";
         const guide = guideById(id);
         if (!guide) return new Response("Unknown guide", { status: 404 });
+        const language = LANGUAGE_LIST.find((l) => l.code === langCode);
+        if (!language) return new Response("Unknown language", { status: 400 });
 
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Voice is not set up", { status: 500 });
+
+        let spoken = `${guide.title}. ${guide.script}`;
+
+        // Non-English listeners hear the same guide in their own language.
+        if (language.code !== "en") {
+          const t = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-3.6-flash",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    `Translate the text into ${language.ai}. Keep it very simple, as if explaining to a ten year old. Return only the translated words, plain sentences, no symbols, no stars, no hashes, no numbering.`,
+                },
+                { role: "user", content: spoken },
+              ],
+            }),
+          });
+          if (t.ok) {
+            const data = (await t.json()) as { choices?: { message?: { content?: string } }[] };
+            const out = data.choices?.[0]?.message?.content?.trim();
+            if (out) spoken = out;
+          } else {
+            console.error(`Help translate failed [${t.status}]: ${await t.text().catch(() => "")}`);
+          }
+        }
 
         const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
           method: "POST",
@@ -25,10 +59,9 @@ export const Route = createFileRoute("/api/public/help-audio")({
           body: JSON.stringify({
             model: "openai/gpt-4o-mini-tts",
             voice: "alloy",
-            input: `${guide.title}. ${guide.script}`,
+            input: spoken,
             response_format: "mp3",
-            instructions:
-              "Speak slowly, warmly and clearly, as if explaining to a ten year old who has never used an app before.",
+            instructions: `Speak in ${language.ai}. Speak slowly, warmly and clearly, as if explaining to a ten year old who has never used an app before.`,
           }),
         });
 
