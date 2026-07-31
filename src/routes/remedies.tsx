@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -52,8 +53,7 @@ function RemediesPage() {
           <div className="grid gap-3">
             <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Date
-              <input type="date" value={birth.date} onChange={(e) => setBirth({...birth, date: e.target.value})}
-                className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
+              <DateSelect label="" value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="text-xs uppercase tracking-widest text-muted-foreground">

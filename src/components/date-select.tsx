@@ -18,7 +18,7 @@ export function DateSelect({
   onChange,
   label = "Date",
   minYear = 1900,
-  maxYear = new Date().getFullYear(),
+  maxYear = new Date().getFullYear() + 5,
 }: {
   value: string;
   onChange: (iso: string) => void;
@@ -48,9 +48,11 @@ export function DateSelect({
 
   return (
     <div className="block">
-      <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-        {label} (DD / MM / YYYY)
-      </div>
+      {label !== "" && (
+        <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+          {label} (DD / MM / YYYY)
+        </div>
+      )}
       <div className="grid grid-cols-3 gap-2">
         <select
           aria-label="Day"

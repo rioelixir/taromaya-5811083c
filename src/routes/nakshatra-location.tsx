@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { PageShell } from "@/components/page-shell";
@@ -257,12 +258,7 @@ function NakshatraLocationPage() {
           </Field>
 
           <Field label="Date (optional)">
-            <input
-              type="date"
-              className={inputCls}
-              value={customDate}
-              onChange={(e) => { setCustomDate(e.target.value); setLive(false); }}
-            />
+            <DateSelect label="" value={customDate} onChange={(v) => { setCustomDate(v); setLive(false); }} />
           </Field>
           <Field label="Time">
             <input

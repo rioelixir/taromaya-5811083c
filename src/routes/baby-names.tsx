@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -202,12 +203,7 @@ function BabyNamesPage() {
           </Field>
 
           <Field label="Child birth date (for numerology, optional)">
-            <input
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-pearl"
-            />
+            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
           </Field>
 
           <Field label={`Count: ${count}`}>

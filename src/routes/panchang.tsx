@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -74,8 +75,7 @@ function PanchangPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date</span>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+            <DateSelect label="" value={date} onChange={(v) => setDate(v)} />
           </label>
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Place</span>

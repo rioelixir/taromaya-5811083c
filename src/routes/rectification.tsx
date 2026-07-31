@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -112,12 +113,7 @@ function RectificationPage() {
                       <option key={c.value} value={c.value} className="bg-background">{c.label}</option>
                     ))}
                   </select>
-                  <input
-                    type="date"
-                    value={ev.date}
-                    onChange={(e) => updateEvent(ev.id, { date: e.target.value })}
-                    className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
-                  />
+                  <DateSelect label="" value={ev.date} onChange={(v) => updateEvent(ev.id, { date: v })} />
                   <input
                     type="text"
                     placeholder="Optional note"

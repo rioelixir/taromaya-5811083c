@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -106,8 +107,7 @@ function MuhuratPage() {
           <div className="grid gap-3">
             <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Start date
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-                className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
+              <DateSelect label="" value={startDate} onChange={(v) => setStartDate(v)} />
             </label>
             <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Days ahead ({days})
