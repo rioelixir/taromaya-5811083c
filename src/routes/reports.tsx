@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { romanToArabicText } from "@/lib/ai-format";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
 import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
