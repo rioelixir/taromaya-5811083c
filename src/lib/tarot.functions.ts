@@ -15,6 +15,8 @@ const DrawSchema = z.object({
         position: z.string(),
         reversed: z.boolean(),
         keywords: z.array(z.string()),
+        /** Signed URL of the uploaded card art — the AI reads the text on it. */
+        image: z.string().url().optional(),
       }),
     )
     .min(1)
