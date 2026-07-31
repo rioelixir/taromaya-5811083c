@@ -94,8 +94,9 @@ function NewKundliPage() {
                 </ul>
               </div>
               <div className="text-[10px] text-muted-foreground">
-                {chart.meta.engineVersion} · ayanamsa {chart.meta.ayanamsa} ({chart.meta.ayanamsaValue.toFixed(4)}°)
+                {chart.meta.engineVersion}
               </div>
+
             </Card>
 
             {panchang && (
