@@ -13,13 +13,6 @@ import { toast } from "sonner";
 
 type ChartResult = Awaited<ReturnType<typeof calculateAstroChart>>["chart"];
 
-const AYANAMSAS = [
-  { v: "lahiri", l: "Lahiri (Chitrapaksha) — default" },
-  { v: "raman", l: "B.V. Raman" },
-  { v: "kp-old", l: "KP Old (Krishnamurti)" },
-  { v: "kp-new", l: "KP New" },
-  { v: "tropical", l: "Tropical (Western)" },
-];
 
 export function BirthInputForm({
   onComputed,
