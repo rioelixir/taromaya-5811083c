@@ -191,6 +191,7 @@ export function useVoice(onText: (text: string) => void) {
         recRef.current = rec;
         rec.start();
         setState("listening");
+        waitForQuiet(12000);
         return;
       } catch {
         recRef.current = null;
