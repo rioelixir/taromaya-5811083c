@@ -269,7 +269,8 @@ function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(230, 225, 210);
-    const lines = pdf.splitTextToSize(text, w - margin * 2) as string[];
+    // Plain numbers only — never Roman numerals in a report.
+    const lines = pdf.splitTextToSize(romanToArabicText(text), w - margin * 2) as string[];
     for (const ln of lines) {
       ensureRoom(size + 12);
       pdf.text(ln, margin, y);
