@@ -5,6 +5,7 @@ import { StarField } from "@/components/star-field";
 import { AIInterpretation } from "@/components/ai-interpretation";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { VoicePanel } from "@/components/voice-panel";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -84,6 +85,7 @@ export function PageShell({
   aiSnapshot,
   aiIntent,
   hideAI,
+  hideVoice,
 }: {
   eyebrow?: string;
   title: string;
@@ -97,6 +99,8 @@ export function PageShell({
   aiIntent?: string;
   /** Set to true on utility pages (auth, terms, admin) to hide the AI panel. */
   hideAI?: boolean;
+  /** Set to true to hide the speak-first panel (auth, terms, admin). */
+  hideVoice?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   return (
@@ -124,6 +128,7 @@ export function PageShell({
             )}
           </header>
         )}
+        {!hideAI && !hideVoice && <VoicePanel />}
         {children}
         {!hideAI && (
           <AIInterpretation
