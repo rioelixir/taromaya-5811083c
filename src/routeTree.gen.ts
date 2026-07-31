@@ -69,6 +69,7 @@ import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiTranslateRouteImport } from './routes/api/translate'
+import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
@@ -382,6 +383,11 @@ const ApiTranslateRoute = ApiTranslateRouteImport.update({
   path: '/api/translate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
+  id: '/api/transcribe',
+  path: '/api/transcribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -517,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -591,6 +598,7 @@ export interface FileRoutesByTo {
   '/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -667,6 +675,7 @@ export interface FileRoutesById {
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -743,6 +752,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/transcribe'
     | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
@@ -817,6 +827,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/transcribe'
     | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
@@ -892,6 +903,7 @@ export interface FileRouteTypes {
     | '/_authenticated/saved'
     | '/api/ai-reading'
     | '/api/chat'
+    | '/api/transcribe'
     | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
@@ -960,6 +972,7 @@ export interface RootRouteChildren {
   YantraRoute: typeof YantraRoute
   ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiTranslateRoute: typeof ApiTranslateRoute
   InviteCodeRoute: typeof InviteCodeRoute
   PagesSlugRoute: typeof PagesSlugRoute
@@ -1390,6 +1403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTranslateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/transcribe': {
+      id: '/api/transcribe'
+      path: '/api/transcribe'
+      fullPath: '/api/transcribe'
+      preLoaderRoute: typeof ApiTranscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -1579,6 +1599,7 @@ const rootRouteChildren: RootRouteChildren = {
   YantraRoute: YantraRoute,
   ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiTranscribeRoute: ApiTranscribeRoute,
   ApiTranslateRoute: ApiTranslateRoute,
   InviteCodeRoute: InviteCodeRoute,
   PagesSlugRoute: PagesSlugRoute,
@@ -1589,13 +1610,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
