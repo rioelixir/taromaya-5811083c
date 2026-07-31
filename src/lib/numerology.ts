@@ -163,7 +163,7 @@ export function lifePathNumber(birthDate: string): number {
 }
 
 export function computeNumerology(
-  { fullName, birthDate }: NumerologyInput,
+  { fullName, birthDate, now: nowInput }: NumerologyInput,
   system: "Pythagorean" | "Chaldean" = "Pythagorean",
 ): NumerologyReport {
   const map = system === "Chaldean" ? CHALDEAN : PYTHAGOREAN;
@@ -188,24 +188,27 @@ export function computeNumerology(
   const birthday = reduce(d, true);
   const maturity = reduce(lifePath + destiny, true);
 
-  // Personal year: reduce(birthMonth) + reduce(birthDay) + reduce(currentYear),
-  // then reduce with masters preserved.
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const currentDay = now.getDate();
-  const currentYearReduced = reduce(digitsSum(currentYear), true);
-  const personalYear = parsed
-    ? reduce(reduce(m, false) + reduce(d, false) + currentYearReduced, true)
-    : 0;
-  const personalMonth = parsed ? reduce(personalYear + currentMonth, true) : 0;
-  const personalDay = parsed ? reduce(personalMonth + currentDay, true) : 0;
-
-  // Pinnacles & Challenges — standard Pythagorean method.
-  // Pinnacles: (M+D), (D+Y), (P1+P2), (M+Y). Challenges: absolute differences.
+  // Master-free component reductions (used by cycles, pinnacles, challenges).
   const rmNoMaster = reduce(m, false);
   const rdNoMaster = reduce(d, false);
   const ryNoMaster = reduce(digitsSum(y), false);
+
+  // Personal cycles. Standard practice reduces these to 1..9 (no masters), so
+  // the same birth date + same day always yields the same, non-contradictory
+  // trio. `now` can be supplied to make the result fully deterministic.
+  const now = nowInput ?? new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const currentDay = now.getDate();
+  const currentYearReduced = reduce(digitsSum(currentYear), false);
+  const personalYear = parsed
+    ? reduce(rmNoMaster + rdNoMaster + currentYearReduced, false)
+    : 0;
+  const personalMonth = parsed ? reduce(personalYear + currentMonth, false) : 0;
+  const personalDay = parsed ? reduce(personalMonth + currentDay, false) : 0;
+
+  // Pinnacles & Challenges — standard Pythagorean method.
+  // Pinnacles: (M+D), (D+Y), (P1+P2), (M+Y). Challenges: absolute differences.
   const p1 = reduce(rmNoMaster + rdNoMaster, true);
   const p2 = reduce(rdNoMaster + ryNoMaster, true);
   const p3 = reduce(reduce(p1, false) + reduce(p2, false), true);
@@ -218,14 +221,16 @@ export function computeNumerology(
   const c4 = reduce(Math.abs(rmNoMaster - ryNoMaster), false);
   const challenges = parsed ? [c1, c2, c3, c4] : [0, 0, 0, 0];
 
-  // Karmic debts: check pre-reduction totals for 13/14/16/19 on all core numbers.
+  // Karmic debts: 13/14/16/19 appearing as the pre-reduction total of a core
+  // number, or as the day of birth itself.
   const karmicDebts: number[] = [];
-  const lifePathPreReduce = digitsSum(y) + m + d;
-  if (KARMIC.has(lifePathPreReduce)) karmicDebts.push(lifePathPreReduce);
+  const lifePathPreReduce = parsed ? rmNoMaster + rdNoMaster + ryNoMaster : 0;
+  if (parsed && KARMIC.has(lifePathPreReduce)) karmicDebts.push(lifePathPreReduce);
   if (KARMIC.has(destinyRaw)) karmicDebts.push(destinyRaw);
   if (KARMIC.has(soulUrgeRaw)) karmicDebts.push(soulUrgeRaw);
   if (KARMIC.has(personalityRaw)) karmicDebts.push(personalityRaw);
   if (parsed && KARMIC.has(d)) karmicDebts.push(d);
+
 
 
   const masterNumbers = [lifePath, destiny, soulUrge, personality, maturity]
