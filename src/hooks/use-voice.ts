@@ -217,6 +217,7 @@ export function useVoice(onText: (text: string) => void) {
       node.connect(ctxAudio.destination);
       mediaRef.current = { stream, ctx: ctxAudio, node, source, chunks };
       setState("listening");
+      waitForQuiet(12000);
     } catch {
       activeRef.current = false;
       setState("error");
