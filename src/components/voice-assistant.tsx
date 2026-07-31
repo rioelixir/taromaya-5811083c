@@ -10,8 +10,9 @@ const COMMAND_STARTERS =
 
 /**
  * The one voice helper for the whole app.
- * Tap the microphone and just talk: it fills the boxes on the page,
- * moves between pages, or presses buttons for you.
+ * Every box you can type in has its own small microphone. Tap the one next
+ * to a box and talk: your words go into that box, and page names or button
+ * names still work from there too.
  * It never appears on the Tarot board.
  */
 export function VoiceAssistant() {

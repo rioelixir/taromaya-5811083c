@@ -1,6 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { VoiceMic } from "@/components/voice-mic";
 import { Send, Sparkles, RotateCcw, Star, ChevronDown, BookmarkPlus, Check } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { useChat } from "@ai-sdk/react";
@@ -225,11 +224,6 @@ function AiPage() {
               rows={1}
               placeholder="Ask about your day, your chart, a decision…"
               className="flex-1 max-h-40 resize-none bg-transparent px-3 py-2.5 text-sm text-pearl outline-none placeholder:text-muted-foreground"
-            />
-            <VoiceMic
-              size="md"
-              showControls={false}
-              onText={(t) => setInput((v) => (v ? `${v} ${t}` : t))}
             />
             <button
               onClick={send}
