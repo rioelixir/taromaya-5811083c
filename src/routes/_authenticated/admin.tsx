@@ -2,13 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Image as ImageIcon, Layers, Sparkles, FileText, HelpCircle, Newspaper, Palette, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
+import { Shield, Users, Settings, Bookmark, Trash2, Save, Plus, Loader2, ShieldCheck, ShieldOff, BarChart3, Image as ImageIcon, Layers, Sparkles, Crown, FileText, HelpCircle, Newspaper, Palette, UserPlus, Link2, Copy, Ban, PlayCircle, Activity } from "lucide-react";
 import { AdminBrandingTab } from "@/components/admin-branding";
 import { AdminAssetsTab } from "@/components/admin-assets";
 import { AdminTarotCmsTab, AdminPromptsTab } from "@/components/admin-tarot-cms";
 import { AdminPagesTab, AdminFaqsTab, AdminBlogsTab } from "@/components/admin-cms";
 import { AdminTutorialsTab } from "@/components/admin-tutorials";
 import { AdminNakshatraDeckTab } from "@/components/admin-nakshatra-deck";
+import { AdminSubscriptionTab } from "@/components/admin-subscription";
 import { Link } from "@tanstack/react-router";
 import {
   adminListUsers,
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — TAROMAYA" }] }),
 });
 
-type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials" | "nakshatra";
+type Tab = "overview" | "users" | "staff" | "settings" | "kundlis" | "assets" | "decks" | "prompts" | "pages" | "faqs" | "blogs" | "branding" | "tutorials" | "nakshatra" | "subscription";
 
 function AdminPage() {
   const { isAdmin, loading } = useIsAdmin();
@@ -78,6 +79,7 @@ function AdminPage() {
         <TabBtn active={tab === "pages"} onClick={() => setTab("pages")} icon={<FileText className="h-4 w-4" />}>Pages</TabBtn>
         <TabBtn active={tab === "faqs"} onClick={() => setTab("faqs")} icon={<HelpCircle className="h-4 w-4" />}>FAQs</TabBtn>
         <TabBtn active={tab === "blogs"} onClick={() => setTab("blogs")} icon={<Newspaper className="h-4 w-4" />}>Blog</TabBtn>
+        <TabBtn active={tab === "subscription"} onClick={() => setTab("subscription")} icon={<Crown className="h-4 w-4" />}>Free / Paid</TabBtn>
         <TabBtn active={tab === "settings"} onClick={() => setTab("settings")} icon={<Settings className="h-4 w-4" />}>Settings</TabBtn>
         <TabBtn active={tab === "kundlis"} onClick={() => setTab("kundlis")} icon={<Bookmark className="h-4 w-4" />}>Saved Charts</TabBtn>
         <TabBtn active={tab === "assets"} onClick={() => setTab("assets")} icon={<ImageIcon className="h-4 w-4" />}>Assets</TabBtn>
@@ -97,6 +99,7 @@ function AdminPage() {
       {tab === "pages" && <AdminPagesTab />}
       {tab === "faqs" && <AdminFaqsTab />}
       {tab === "blogs" && <AdminBlogsTab />}
+      {tab === "subscription" && <AdminSubscriptionTab />}
       {tab === "settings" && <SettingsTab />}
       {tab === "kundlis" && <KundlisTab />}
       {tab === "assets" && <AdminAssetsTab />}
