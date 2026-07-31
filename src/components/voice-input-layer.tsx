@@ -17,6 +17,7 @@ export function VoiceInputLayer() {
   const targetRef = useRef<HTMLElement | null>(null);
   const [hasTarget, setHasTarget] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [help, setHelp] = useState(false);
   const noteTimer = useRef<number | null>(null);
 
   const say = (msg: string | null, hold = 2200) => {
