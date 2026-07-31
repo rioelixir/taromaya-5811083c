@@ -50,7 +50,7 @@ function HistoryList() {
       <GlassCard title="Nothing here yet" desc="Save a kundli, download a report, or write a journal note to build your timeline.">
         <div className="mt-3 flex flex-wrap gap-2">
           <Link to="/kundli" className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20">Create kundli</Link>
-          <Link to="/tarot" className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20">Draw a card</Link>
+          <Link to="/tarot" search={{}} className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary hover:bg-primary/20">Draw a card</Link>
         </div>
       </GlassCard>
     );

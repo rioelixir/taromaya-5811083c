@@ -56,7 +56,7 @@ function Home() {
       {/* Primary CTA */}
       <div className="mt-8 flex flex-wrap gap-3" data-tour="hero-start">
         <Link
-          to="/tarot"
+          to="/tarot" search={{}}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-all"
         >
           <Sparkles className="h-4 w-4" />
@@ -79,7 +79,7 @@ function Home() {
           <h2 className="font-display text-xl">Quick actions</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <QuickTile to="/tarot" label="Tarot" hint="Draw a card" icon={Sparkles} />
+          <QuickTile to="/tarot" search={{}} label="Tarot" hint="Draw a card" icon={Sparkles} />
           <QuickTile to="/kundli" label="Kundli" hint="Your birth chart" icon={Star} />
           <QuickTile to="/panchang" label="Panchang" hint="Today's almanac" icon={CalendarDays} />
           <QuickTile to="/ai" label="AI Guide" hint="Ask anything" icon={Bot} />
