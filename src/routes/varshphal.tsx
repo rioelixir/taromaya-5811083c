@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -72,7 +73,7 @@ function VarshphalPage() {
             <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Native" className={inputCls} />
           </Field>
           <Field label="Birth date">
-            <input type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} className={inputCls} />
+            <DateSelect label="" value={f.date} onChange={(v) => setF({ ...f, date: v })} />
           </Field>
           <Field label="Birth time">
             <input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} className={inputCls} />

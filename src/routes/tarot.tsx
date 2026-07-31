@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
 import { SPREADS, secureRandInt, type SpreadKey } from "@/lib/tarot-deck";
-import { DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
+import { DECK_LIST, BOARD_DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/tarot")({
       { title: "Tarot — TAROMAYA" },
       {
         name: "description",
-        content: "Pick a deck, pull a card, get a clear reading. Five decks to choose from.",
+        content: "Pick a deck, pull a card, get a clear reading. Four tarot decks to choose from.",
       },
     ],
   }),
@@ -104,7 +104,6 @@ function TarotPage() {
   const [starCtx, setStarCtx] = useState<StarContext>({});
   const handleStarContext = useCallback((ctx: StarContext) => {
     setStarCtx((prev) =>
-      prev.birthNakshatra === ctx.birthNakshatra &&
       prev.placeNakshatra === ctx.placeNakshatra &&
       prev.placeName === ctx.placeName &&
       prev.nakshatraCard === ctx.nakshatraCard
@@ -446,7 +445,7 @@ function TarotPage() {
   }, []);
 
   const totalCards = useMemo(
-    () => DECK_LIST.reduce((n, m) => n + (decks[m.key]?.length ?? 0), 0),
+    () => BOARD_DECK_LIST.reduce((n, m) => n + (decks[m.key]?.length ?? 0), 0),
     [decks],
   );
 
@@ -613,7 +612,6 @@ function TarotPage() {
             reversed: c.reversed,
             keywords: [],
           })),
-          birthNakshatra: starCtx.birthNakshatra,
           placeNakshatra: starCtx.placeNakshatra,
           placeName: starCtx.placeName,
           nakshatraCard: starCtx.nakshatraCard,
@@ -815,7 +813,7 @@ function TarotPage() {
               Ask AI
             </button>
 
-            {/* Five deck stacks — bottom right */}
+            {/* Tarot deck stacks — bottom right */}
             <div
               className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 flex flex-col items-center sm:items-end gap-2 pointer-events-none"
               data-tour="deck-picker"
@@ -824,7 +822,7 @@ function TarotPage() {
                 {loadingDecks ? "Decks are loading…" : `Pick a deck · ${totalCards} cards left`}
               </div>
               <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
-                {DECK_LIST.map((meta, di) => {
+                {BOARD_DECK_LIST.map((meta, di) => {
                   const subDeck = decks[meta.key] ?? [];
                   const empty = subDeck.length === 0;
                   return (

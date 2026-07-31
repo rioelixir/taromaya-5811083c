@@ -28,6 +28,11 @@ export const DECK_LIST: DeckMeta[] = [
 
 export const DECK_KEYS = DECK_LIST.map((d) => d.key);
 
+// Decks a user can pull from on the tarot board. The Nakshatra deck is kept
+// out of the board on purpose — it stays available to admins and to the AI
+// star panel only.
+export const BOARD_DECK_LIST: DeckMeta[] = DECK_LIST.filter((d) => d.key !== "nakshatra");
+
 export function deckMeta(key: string): DeckMeta | undefined {
   return DECK_LIST.find((d) => d.key === key);
 }

@@ -1,4 +1,5 @@
 import { PlacePicker, type PlaceValue } from "@/components/place-picker";
+import { DateSelect } from "@/components/date-select";
 
 export type BirthFieldsState = {
   date: string;
@@ -29,15 +30,11 @@ export function BirthFields<T extends BirthFieldsState>({
   return (
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-xs uppercase tracking-widest text-muted-foreground">
-          Birth date
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-            className="mt-1 w-full glass rounded-xl px-3 py-2 text-sm text-pearl outline-none focus:ring-1 focus:ring-gold/60"
-          />
-        </label>
+        <DateSelect
+          label="Birth date"
+          value={form.date}
+          onChange={(iso) => setForm((f) => ({ ...f, date: iso }))}
+        />
         <label className="text-xs uppercase tracking-widest text-muted-foreground">
           Birth time
           <input

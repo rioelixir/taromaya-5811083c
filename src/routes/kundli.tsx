@@ -34,6 +34,8 @@ import {
 } from "lucide-react";
 import { CalcSettingsPanel, type CalcSettings } from "@/components/calc-settings-panel";
 import { AccuracyPanel } from "@/components/accuracy-panel";
+import { CurrentTransit } from "@/components/current-transit";
+import { DateSelect } from "@/components/date-select";
 
 
 export const Route = createFileRoute("/kundli")({
@@ -61,9 +63,10 @@ const DEFAULTS: FormState = {
   elevation: "0", unknownTime: false,
 };
 
-type TabId = "overview" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
+type TabId = "overview" | "transit" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
+  { id: "transit", label: "Current Transit" },
   { id: "vargas", label: "Divisional" },
   { id: "dasha", label: "Dasha" },
   { id: "yogas", label: "Yogas" },
@@ -266,6 +269,15 @@ function KundliPage() {
 
           <div className="pt-6">
             {tab === "overview" && <OverviewTab chart={chart} />}
+            {tab === "transit" && (
+              <CurrentTransit
+                chart={chart}
+                latitude={Number(form.lat)}
+                longitude={Number(form.lon)}
+                tzOffsetHours={Number(form.tz)}
+                place={form.place}
+              />
+            )}
             {tab === "vargas" && <VargasTab chart={chart} />}
             {tab === "dasha" && <DashaTab chart={chart} birthDate={birthDate} />}
             {tab === "yogas" && <YogasTab chart={chart} />}
@@ -306,7 +318,7 @@ function BirthForm({
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your name" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Date"><input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className={inputCls} /></Field>
+          <DateSelect value={form.date} onChange={(iso) => setForm({ ...form, date: iso })} />
           <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} disabled={form.unknownTime} /></Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -433,19 +445,14 @@ function NorthIndianLagnaChart({ chart }: { chart: KundliChart }) {
             const startY = cy - (planetCount * 6);
             return (
               <g key={h}>
-                {/* House number badge */}
-                <text x={cx} y={startY - 4} textAnchor="middle" fontSize={13}
+                {/* Sign number only — no house numbers */}
+                <text x={cx} y={startY - 2} textAnchor="middle" fontSize={13}
                   fontWeight={700} fill="#7c3aed" fontFamily="ui-sans-serif, system-ui, sans-serif">
-                  H{h}{h === 1 ? " · Asc" : ""}
-                </text>
-                {/* Sign abbreviation */}
-                <text x={cx} y={startY + 10} textAnchor="middle" fontSize={11}
-                  fill="#6b7280" fontFamily="ui-serif, serif" fontStyle="italic">
-                  {RASHIS[sign].slice(0, 3)}
+                  {sign + 1}{h === 1 ? " · Asc" : ""}
                 </text>
                 {/* Full planet names, stacked */}
                 {planets.map((p, idx) => (
-                  <text key={p.name} x={cx} y={startY + 26 + idx * 14}
+                  <text key={p.name} x={cx} y={startY + 16 + idx * 14}
                     textAnchor="middle" fontSize={12} fontWeight={600}
                     fill="#111827" fontFamily="ui-sans-serif, system-ui, sans-serif">
                     {PLANET_FULL[p.name]}{p.retrograde ? " (R)" : ""}
@@ -487,7 +494,7 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
                 <div key={i} className="col-span-2 row-span-2 grid place-items-center text-center border border-gold/30 bg-gradient-to-br from-purple-50 to-amber-50">
                   <div>
                     <div className="text-[10px] uppercase tracking-widest font-bold text-purple-700">Lagna</div>
-                    <div className="font-display text-2xl text-gray-900 mt-1 font-bold">{RASHIS[chart.ascendant.rashi]}</div>
+                    <div className="font-display text-2xl text-gray-900 mt-1 font-bold">{chart.ascendant.rashi + 1}</div>
                     <div className="text-[11px] text-gray-600 mt-1">{formatDegree(chart.ascendant.degreeInRashi)}</div>
                   </div>
                 </div>
@@ -497,12 +504,11 @@ function SouthIndianChart({ chart }: { chart: KundliChart }) {
           }
           const isAsc = rashi === chart.ascendant.rashi;
           const planets = planetsByRashi.get(rashi) ?? [];
-          const houseNo = ((rashi - chart.ascendant.rashi + 12) % 12) + 1;
           return (
             <div key={i} className={`relative border border-gray-300 p-2 text-[10px] ${isAsc ? "bg-amber-50" : "bg-white"}`}>
               <div className="flex items-start justify-between gap-1">
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-700">{RASHIS[rashi].slice(0, 3)}</span>
-                <span className={`text-[10px] font-bold ${isAsc ? "text-purple-700" : "text-purple-600"}`}>H{houseNo}{isAsc ? "·As" : ""}</span>
+                <span className="text-[11px] font-bold text-gray-800">{rashi + 1}</span>
+                {isAsc && <span className="text-[10px] font-bold text-purple-700">Asc</span>}
               </div>
               <div className="mt-1.5 flex flex-col gap-0.5">
                 {planets.map((p) => (
@@ -626,7 +632,7 @@ function VargaMini({
               <div key={i} className="col-span-2 row-span-2 grid place-items-center border border-white/5 bg-cosmic/40">
                 <div className="text-center">
                   <div className="text-[9px] uppercase tracking-widest text-gold/60">{code}</div>
-                  <div className="font-display text-sm text-pearl">{RASHIS[ascSign].slice(0, 3)}</div>
+                  <div className="font-display text-sm text-pearl">{ascSign + 1}</div>
                 </div>
               </div>
             );
@@ -636,7 +642,7 @@ function VargaMini({
           const list = byRashi.get(rashi) ?? [];
           return (
             <div key={i} className={`relative border border-white/5 p-1 text-[9px] ${isAsc ? "bg-gold/[0.08]" : ""}`}>
-              <div className="text-[8px] uppercase text-muted-foreground/70">{RASHIS[rashi].slice(0, 3)}</div>
+              <div className="text-[8px] text-muted-foreground/70">{rashi + 1}</div>
               <div className="mt-1 flex flex-wrap gap-0.5">
                 {list.map((p) => (
                   <span key={p.name} className="inline-block rounded px-1 bg-white/5 text-pearl text-[9px]">
@@ -894,7 +900,6 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
       >
         <div className="mt-4 grid grid-cols-6 md:grid-cols-12 gap-2">
           {av.sarva.map((v, i) => {
-            const house = ((i - asc + 12) % 12) + 1;
             const intensity = v / maxSarva;
             return (
               <div key={i} className="rounded-xl border border-white/10 p-2 text-center relative overflow-hidden">
@@ -903,7 +908,7 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
                   style={{ opacity: intensity }}
                 />
                 <div className="relative">
-                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{RASHIS[i].slice(0,3)} · H{house}</div>
+                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">sign {i + 1}</div>
                   <div className="mt-1 font-display text-2xl text-pearl">{v}</div>
                 </div>
               </div>
@@ -930,7 +935,7 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
                   return (
                     <div key={i} className="flex flex-col items-center justify-end h-full" title={`${RASHIS[i]}: ${b}`}>
                       <div className={`w-full rounded-t bg-gradient-to-t ${tone}`} style={{ height: `${Math.max(6, h)}%` }} />
-                      <div className="mt-1 text-[8px] text-muted-foreground">{RASHIS[i].slice(0,2)}</div>
+                      <div className="mt-1 text-[8px] text-muted-foreground">{i + 1}</div>
                       <div className="text-[9px] font-mono text-pearl">{b}</div>
                     </div>
                   );

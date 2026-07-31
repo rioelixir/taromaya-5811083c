@@ -1,4 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
+import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -128,8 +129,7 @@ Structure: Core Signature, Life Path & Destiny, Inner Self (Soul Urge & Personal
           </label>
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
           </label>
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">System</span>
@@ -224,8 +224,7 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
           </label>
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
           </label>
         </div>
       </GlassCard>
@@ -320,11 +319,11 @@ function CompatibilityNumerology() {
       <div className="grid gap-4 md:grid-cols-2">
         <GlassCard title="Person A">
           <input value={a.name} onChange={(e) => setA({ ...a, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <input type="date" value={a.date} onChange={(e) => setA({ ...a, date: e.target.value })} className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl" />
+          <DateSelect label="" value={a.date} onChange={(v) => setA({ ...a, date: v })} />
         </GlassCard>
         <GlassCard title="Person B">
           <input value={b.name} onChange={(e) => setB({ ...b, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <input type="date" value={b.date} onChange={(e) => setB({ ...b, date: e.target.value })} className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl" />
+          <DateSelect label="" value={b.date} onChange={(v) => setB({ ...b, date: v })} />
         </GlassCard>
       </div>
 
@@ -522,8 +521,7 @@ function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate
       <GlassCard>
         <label className="block max-w-xs">
           <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
         </label>
       </GlassCard>
       {grid && (
@@ -636,8 +634,7 @@ function NineStarKiTab({ birthDate, setBirthDate }: { birthDate: string; setBirt
       <GlassCard>
         <label className="block max-w-xs">
           <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
-            className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
         </label>
       </GlassCard>
       {ki && (
