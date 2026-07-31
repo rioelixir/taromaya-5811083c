@@ -235,17 +235,48 @@ function RootComponent() {
           <Outlet />
         </main>
         {!chromeHidden && !pathname.startsWith("/tarot") && (
-          <footer className="relative mt-8 border-t border-gold/15 bg-background/40 pb-24 pt-6">
-            <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-1 px-6 text-center">
-              <p className="text-xs text-muted-foreground">
-                {branding.footerLine1 || "2026 • Taromaya."}
+          <footer className="relative mt-12 overflow-hidden border-t border-gold/25 bg-gradient-to-b from-background/60 to-background/95 pb-24 pt-10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+            />
+            <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 px-6 text-center">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold/50" />
+                <span className="font-serif text-lg tracking-[0.35em] text-gold">
+                  TAROMAYA
+                </span>
+                <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold/50" />
+              </div>
+
+              <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+                Stars, cards and numbers explained in simple words.
               </p>
-              <p className="text-xs text-muted-foreground">
-                {branding.footerLine2 || "App created by Riaa."}
+
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-xs text-muted-foreground">
+                  {branding.footerLine1 || "2026 • Taromaya."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {branding.footerLine2 || "App created by Riaa."}
+                </p>
+              </div>
+
+              <p className="text-[11px] text-muted-foreground/80">
+                Reference from{" "}
+                <a
+                  href="https://www.theplanetstoday.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold underline-offset-4 transition-colors hover:underline"
+                >
+                  Theplanetstoday.com
+                </a>
               </p>
             </div>
           </footer>
         )}
+
 
         
       </div>
