@@ -234,7 +234,7 @@ export function NakshatraPanel({
               Nakshatra right now
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
-            <div className="text-xs text-muted-foreground">{starLine}</div>
+            <div className="text-xs text-muted-foreground">{nakshatraLine}</div>
           </div>
 
           {result.card ? (
@@ -291,7 +291,7 @@ export function NakshatraPanel({
             </div>
           ) : (
             <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-muted-foreground">
-              This star's picture is not added yet.
+              This Nakshatra's picture is not added yet.
             </div>
           )}
 
@@ -324,7 +324,7 @@ export function NakshatraPanel({
             </button>
             {reading && (
               <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
-                <PlainAIText text={reading} label="Star reading" />
+                <PlainAIText text={reading} label="Nakshatra reading" />
               </div>
             )}
           </div>
