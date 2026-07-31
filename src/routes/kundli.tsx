@@ -900,7 +900,6 @@ function AshtakavargaTab({ chart }: { chart: KundliChart }) {
       >
         <div className="mt-4 grid grid-cols-6 md:grid-cols-12 gap-2">
           {av.sarva.map((v, i) => {
-            const house = ((i - asc + 12) % 12) + 1;
             const intensity = v / maxSarva;
             return (
               <div key={i} className="rounded-xl border border-white/10 p-2 text-center relative overflow-hidden">
