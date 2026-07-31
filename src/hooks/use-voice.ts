@@ -204,7 +204,13 @@ export function useVoice(onText: (text: string) => void) {
       const node = ctxAudio.createScriptProcessor(4096, 1, 1);
       const chunks: Float32Array[] = [];
       node.onaudioprocess = (e) => {
-        if (!pausedRef.current) chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+        if (pausedRef.current) return;
+        const frame = e.inputBuffer.getChannelData(0);
+        chunks.push(new Float32Array(frame));
+        let sum = 0;
+        for (let i = 0; i < frame.length; i += 8) sum += frame[i] * frame[i];
+        const loudness = Math.sqrt(sum / (frame.length / 8));
+        if (loudness > 0.012) waitForQuiet();
       };
       source.connect(node);
       node.connect(ctxAudio.destination);
@@ -215,18 +221,19 @@ export function useVoice(onText: (text: string) => void) {
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, []);
+  }, [waitForQuiet]);
 
   const teardown = useCallback(() => {
     activeRef.current = false;
     pausedRef.current = false;
+    clearSilence();
     const rec = recRef.current;
     recRef.current = null;
     if (rec) { try { rec.stop(); rec.abort(); } catch { /* already stopped */ } }
     const m = mediaRef.current;
     mediaRef.current = null;
     return m;
-  }, []);
+  }, [clearSilence]);
 
   /** Stop listening and hand over the words. */
   const stop = useCallback(async () => {
