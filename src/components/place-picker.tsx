@@ -95,7 +95,9 @@ export function PlacePicker({
     const off = offsetForLocalTime(h.timezone, y || 2000, mo || 1, d || 1, hh || 12, mi || 0);
     setZoneLabel(friendlyZoneName(h.timezone, h.country));
     onChange({
-      place: [h.city, h.state, h.country].filter(Boolean).join(", "),
+      place: worldwide
+        ? [h.city, h.country].filter(Boolean).join(", ")
+        : [h.city, h.state, h.country].filter(Boolean).join(", "),
       lat: h.latitude.toFixed(4),
       lon: h.longitude.toFixed(4),
       tz: String(off),
