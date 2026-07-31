@@ -104,7 +104,6 @@ function TarotPage() {
   const [starCtx, setStarCtx] = useState<StarContext>({});
   const handleStarContext = useCallback((ctx: StarContext) => {
     setStarCtx((prev) =>
-      prev.birthNakshatra === ctx.birthNakshatra &&
       prev.placeNakshatra === ctx.placeNakshatra &&
       prev.placeName === ctx.placeName &&
       prev.nakshatraCard === ctx.nakshatraCard
@@ -613,7 +612,6 @@ function TarotPage() {
             reversed: c.reversed,
             keywords: [],
           })),
-          birthNakshatra: starCtx.birthNakshatra,
           placeNakshatra: starCtx.placeNakshatra,
           placeName: starCtx.placeName,
           nakshatraCard: starCtx.nakshatraCard,
