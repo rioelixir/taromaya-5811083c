@@ -18,6 +18,7 @@ import { AutoTranslator } from "@/components/auto-translator";
 import { AuthorsNoteModal, consumeAuthorsNotePending } from "@/components/authors-note-modal";
 import { useBranding } from "@/hooks/use-branding";
 import { TourHighlighter } from "@/components/tour-highlighter";
+import { VoiceInputLayer } from "@/components/voice-input-layer";
 
 function NotFoundComponent() {
   return (
@@ -214,6 +215,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <VoiceInputLayer />
       <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
 
 
