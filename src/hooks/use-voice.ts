@@ -59,11 +59,11 @@ export function useVoice(onText: (text: string) => void) {
     if (silenceRef.current) clearTimeout(silenceRef.current);
     silenceRef.current = null;
   }, []);
-  const waitForQuiet = useCallback(() => {
+  const waitForQuiet = useCallback((ms = 2200) => {
     clearSilence();
     silenceRef.current = setTimeout(() => {
       if (activeRef.current && !pausedRef.current) stopRef.current();
-    }, 2200);
+    }, ms);
   }, [clearSilence]);
 
   useEffect(() => {
