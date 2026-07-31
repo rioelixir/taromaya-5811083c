@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home } from "lucide-react";
+import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages } from "lucide-react";
 import { HELP_GUIDES, helpGroups, type HelpGuide } from "@/lib/help-guides";
+import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/help")({
@@ -28,10 +29,15 @@ export const Route = createFileRoute("/help")({
 type PlayState = { id: string; status: "loading" | "playing" } | null;
 
 function HelpPage() {
+  const appLang = useLang();
   const [q, setQ] = useState("");
+  const [lang, setLang] = useState<Lang>("en");
   const [now, setNow] = useState<PlayState>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Start in whatever language the person already picked for the app.
+  useEffect(() => { setLang(appLang); }, [appLang]);
 
   useEffect(() => {
     return () => {
@@ -52,11 +58,12 @@ function HelpPage() {
   const speakWithPhone = (guide: HelpGuide) => {
     const synth = window.speechSynthesis;
     if (!synth) {
-      setProblem("Audio is not available on this device. You can read the words below instead.");
+      setProblem("Voice is not available on this device. Please try again later.");
       setNow(null);
       return;
     }
     const u = new SpeechSynthesisUtterance(`${guide.title}. ${guide.script}`);
+    u.lang = lang === "en" ? "en-IN" : lang;
     u.rate = 0.95;
     u.onend = () => setNow(null);
     u.onerror = () => setNow(null);
@@ -71,7 +78,9 @@ function HelpPage() {
     setProblem(null);
     setNow({ id: guide.id, status: "loading" });
     try {
-      const res = await fetch(`/api/public/help-audio?id=${encodeURIComponent(guide.id)}`);
+      const res = await fetch(
+        `/api/public/help-audio?id=${encodeURIComponent(guide.id)}&lang=${encodeURIComponent(lang)}`,
+      );
       if (!res.ok) throw new Error("no audio");
       const url = URL.createObjectURL(await res.blob());
       const audio = new Audio(url);
@@ -89,7 +98,7 @@ function HelpPage() {
     const needle = q.trim().toLowerCase();
     if (!needle) return HELP_GUIDES;
     return HELP_GUIDES.filter((g) =>
-      `${g.title} ${g.blurb} ${g.group} ${g.script}`.toLowerCase().includes(needle),
+      `${g.title} ${g.blurb} ${g.group}`.toLowerCase().includes(needle),
     );
   }, [q]);
 
@@ -109,19 +118,36 @@ function HelpPage() {
         <span className="gold-text">Listen and learn</span>
       </h1>
       <p className="mt-3 max-w-xl text-base text-muted-foreground">
-        Every part of the app has its own short audio guide. Press play and someone will explain it
-        to you in easy words. You can also read the same words on the card.
+        Every part of the app has its own short voice guide. Pick your language, press play, and
+        someone will explain it to you in easy words.
       </p>
 
-      <div className="mt-6 flex items-center gap-2 rounded-2xl glass gold-border px-4 py-3">
-        <Search className="h-4 w-4 text-gold shrink-0" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search help, for example tarot or numbers"
-          aria-label="Search help"
-          className="w-full bg-transparent text-sm text-pearl outline-none placeholder:text-muted-foreground"
-        />
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="flex items-center gap-2 rounded-2xl glass gold-border px-4 py-3">
+          <Search className="h-4 w-4 text-gold shrink-0" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search help, for example tarot or numbers"
+            aria-label="Search help"
+            className="w-full bg-transparent text-sm text-pearl outline-none placeholder:text-muted-foreground"
+          />
+        </div>
+        <div className="flex items-center gap-2 rounded-2xl glass gold-border px-4 py-3">
+          <Languages className="h-4 w-4 text-gold shrink-0" />
+          <select
+            value={lang}
+            onChange={(e) => { stop(); setLang(e.target.value as Lang); }}
+            aria-label="Choose the voice language"
+            className="w-full bg-transparent text-sm text-pearl outline-none"
+          >
+            {LANGUAGE_LIST.map((l) => (
+              <option key={l.code} value={l.code} className="text-foreground">
+                {l.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {problem && <p className="mt-3 text-sm text-muted-foreground">{problem}</p>}
@@ -166,8 +192,6 @@ function HelpPage() {
                         <div className="text-xs text-muted-foreground">{g.blurb}</div>
                       </div>
                     </div>
-
-                    <p className="mt-3 text-sm leading-relaxed text-foreground/80">{g.script}</p>
 
                     <Link
                       to={g.to}
