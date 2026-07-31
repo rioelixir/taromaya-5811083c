@@ -47,7 +47,7 @@ function PageView() {
   }, [page]);
 
   return (
-    <PageShell hideAI eyebrow="Taromaya" title={page?.title ?? (loading ? "Loading…" : "Page")}>
+    <PageShell hideAI hideVoice eyebrow="Taromaya" title={page?.title ?? (loading ? "Loading…" : "Page")}>
       {loading && <div className="flex items-center gap-2 text-sm text-white/60"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>}
       {err === "not_found" && <GlassCard><p className="text-pearl">This page doesn't exist yet.</p></GlassCard>}
       {err && err !== "not_found" && <GlassCard><p className="text-red-300">{err}</p></GlassCard>}

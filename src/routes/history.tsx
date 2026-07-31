@@ -83,6 +83,7 @@ function HistoryPage() {
     <PremiumGate featureName="History">
       <PageShell
         hideAI
+        hideVoice
         eyebrow="History"
         title="Your cosmic timeline"
         subtitle="Every kundli, report, and journal entry in one place."

@@ -29,7 +29,7 @@ function BlogIndex() {
   }, []);
 
   return (
-    <PageShell hideAI eyebrow="Journal" title="The Taromaya Blog" subtitle="Wisdom on tarot, astrology, and the cosmic within.">
+    <PageShell hideAI hideVoice eyebrow="Journal" title="The Taromaya Blog" subtitle="Wisdom on tarot, astrology, and the cosmic within.">
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-white/60"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
       ) : !rows.length ? (

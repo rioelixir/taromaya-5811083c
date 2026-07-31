@@ -40,7 +40,7 @@ function BlogPost() {
   }, [post]);
 
   return (
-    <PageShell hideAI eyebrow="Journal" title={post?.title ?? (loading ? "Loading…" : "Article")}>
+    <PageShell hideAI hideVoice eyebrow="Journal" title={post?.title ?? (loading ? "Loading…" : "Article")}>
       <Link to="/blog" className="mb-4 inline-flex items-center gap-1 text-xs text-white/60 hover:text-gold"><ArrowLeft className="h-3 w-3" /> All posts</Link>
       {loading && <div className="flex items-center gap-2 text-sm text-white/60"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>}
       {err === "not_found" && <GlassCard><p className="text-pearl">This article doesn't exist.</p></GlassCard>}
