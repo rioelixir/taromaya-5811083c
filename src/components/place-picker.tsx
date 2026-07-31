@@ -4,6 +4,7 @@ import { searchPlaces, type PlaceHit } from "@/lib/geo.functions";
 import { COUNTRIES } from "@/lib/countries";
 import { friendlyZoneName, offsetForLocalTime } from "@/lib/timezone";
 import { MapPin, Loader2, Check } from "lucide-react";
+import { VOICE_FILL_EVENT, isFirstOfKind, type SpokenDetails } from "@/lib/voice-parse";
 
 export type PlaceValue = {
   place: string;
@@ -82,6 +83,35 @@ export function PlacePicker({
     };
   }, [query, country, search]);
 
+  // Voice: a spoken city fills the first place box on the page all by itself.
+  useEffect(() => {
+    const onFill = (e: Event) => {
+      const d = (e as CustomEvent<SpokenDetails>).detail;
+      const spoken = d?.place?.trim();
+      if (!spoken) return;
+      if (!isFirstOfKind(boxRef.current, "[data-voice-place]")) return;
+      void (async () => {
+        setBusy(true);
+        try {
+          const res = await search({ data: { query: spoken, country } });
+          const best = res.places[0];
+          if (best) {
+            pickRef.current?.(best);
+          } else {
+            setQuery(spoken);
+            setOpen(false);
+          }
+        } catch {
+          setQuery(spoken);
+        } finally {
+          setBusy(false);
+        }
+      })();
+    };
+    window.addEventListener(VOICE_FILL_EVENT, onFill);
+    return () => window.removeEventListener(VOICE_FILL_EVENT, onFill);
+  }, [country, search]);
+
   const states = useMemo(() => {
     const seen = new Set<string>();
     return hits.map((h) => h.state).filter((s) => s && !seen.has(s) && seen.add(s));
@@ -107,8 +137,11 @@ export function PlacePicker({
     setOpen(false);
   };
 
+  const pickRef = useRef<((h: PlaceHit) => void) | null>(null);
+  pickRef.current = pick;
+
   return (
-    <div ref={boxRef} className={compact ? "relative" : "relative space-y-2"}>
+    <div ref={boxRef} data-voice-place className={compact ? "relative" : "relative space-y-2"}>
       {!compact && (
         <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       )}
