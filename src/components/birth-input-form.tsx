@@ -50,16 +50,6 @@ export function BirthInputForm({
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
-  const utcPreview = (() => {
-    try {
-      const local = new Date(Date.UTC(
-        form.year, form.month - 1, form.day,
-        form.hour, form.minute, form.seconds,
-      ));
-      const utc = new Date(local.getTime() - form.tzOffsetHours * 3600_000);
-      return utc.toISOString().replace("T", " ").replace(".000Z", " UTC");
-    } catch { return "—"; }
-  })();
 
   async function runCompute() {
     setLoading(true);
