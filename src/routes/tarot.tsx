@@ -960,14 +960,14 @@ function TarotPage() {
           return (
             <div
               onClick={closeZoom}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
+              className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300"
             >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   closeZoom();
                 }}
-                className="fixed top-4 right-4 z-10 rounded-full bg-white border border-white/80 p-2 shadow-lg hover:bg-gray-100"
+                className="fixed top-4 right-4 z-10 rounded-full bg-white border border-white/80 p-2 shadow-lg hover:bg-gray-100 cursor-default"
                 aria-label="Close"
               >
                 <X className="h-5 w-5 text-black" />
