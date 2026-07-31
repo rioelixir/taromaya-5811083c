@@ -15,11 +15,33 @@ export const PLAIN_ELI10_RULES = [
   "Same shape every time: begin with one short line that answers the question directly, then 2 to 4 emoji sections, then close with one gentle next step line.",
   "One steady voice: warm, kind, plain English. No jargon, no fancy words, no fortune-telling scare talk, no promises about money, health or death.",
   "Same question with the same data must always get the same answer. Never contradict yourself inside one reading.",
+  "Never write Roman numerals. Always use normal numbers like 1, 2, 3, 12, 21. Never write things like II, IV, IX, XII or XXI anywhere.",
 ].join("\n");
+
+const ROMAN_VALUES: Record<string, number> = { I: 1, V: 5, X: 10 };
+
+// Only the small numerals the app could ever show (2 to 39: houses, cards, chapters).
+// Keeping it to X, V and I means real words like MIX, DID or LIVID are never touched.
+const ROMAN_TOKEN = /\b(?=[XVI]{2,})X{0,3}(?:IX|IV|V?I{0,3})\b/g;
+
+function romanToArabic(roman: string): number {
+  let total = 0;
+  for (let i = 0; i < roman.length; i++) {
+    const cur = ROMAN_VALUES[roman[i]];
+    const next = ROMAN_VALUES[roman[i + 1]] ?? 0;
+    total += cur < next ? -cur : cur;
+  }
+  return total;
+}
+
+/** Replace any Roman numerals with plain numbers (1, 2, 3 …). */
+export function romanToArabicText(input: string): string {
+  return input.replace(ROMAN_TOKEN, (m) => (m ? String(romanToArabic(m)) : m));
+}
 
 /** Remove markdown/symbol noise from model output before display. */
 export function toPlainText(input: string): string {
-  return input
+  return romanToArabicText(input)
     .replace(/```[a-z]*\n?/gi, "")
     .replace(/^\s{0,3}#{1,6}\s*/gm, "")
     .replace(/^\s{0,3}>\s?/gm, "")
