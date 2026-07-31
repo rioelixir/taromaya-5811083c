@@ -70,6 +70,8 @@ export function reducedName(name: string, system: "Pythagorean" | "Chaldean" = "
 export type NumerologyInput = {
   fullName: string;    // used name / birth name
   birthDate: string;   // yyyy-mm-dd
+  /** Optional "today" override — makes personal year/month/day deterministic. */
+  now?: Date;
 };
 
 export type NumerologyReport = {
