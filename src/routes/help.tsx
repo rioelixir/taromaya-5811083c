@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home } from "lucide-react";
+import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages } from "lucide-react";
 import { HELP_GUIDES, helpGroups, type HelpGuide } from "@/lib/help-guides";
+import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/help")({
