@@ -666,18 +666,6 @@ function TarotPage() {
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <button
-                onClick={toggleFullScreen}
-                className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
-                aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
-              >
-                {isFullScreen ? (
-                  <Minimize className="h-4 w-4 shrink-0" />
-                ) : (
-                  <Maximize className="h-4 w-4 shrink-0" />
-                )}
-                <span className="hidden sm:inline">{isFullScreen ? "Exit" : "Full screen"}</span>
-              </button>
-              <button
                 onClick={() => setHeaderCollapsed(true)}
                 className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
                 aria-label="Collapse controls"
