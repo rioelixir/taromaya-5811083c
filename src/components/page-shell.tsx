@@ -6,6 +6,7 @@ import { AIInterpretation } from "@/components/ai-interpretation";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { VoicePanel } from "@/components/voice-panel";
+import { LevelGuide } from "@/components/level-guide";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
 
