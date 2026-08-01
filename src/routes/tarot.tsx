@@ -771,6 +771,17 @@ function TarotPage() {
         </button>
       )}
 
+      {/* Full-screen toggle - tiny, always reachable, no distraction */}
+      <button
+        onClick={toggleFullScreen}
+        className="absolute right-3 top-3 z-30 rounded-full border border-gold/40 bg-black/70 p-2 text-gold-soft hover:bg-black/90"
+        aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
+        title={isFullScreen ? "Exit full screen" : "Full screen"}
+      >
+        {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+      </button>
+
+
       {/* Board row: full-page canvas with collapsible Nakshatra drawer */}
       <div className="relative z-10 flex h-full w-full">
         {/* Nakshatra toggle - always visible on every screen */}
