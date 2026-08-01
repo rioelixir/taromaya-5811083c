@@ -130,7 +130,7 @@ export function PageShell({
             )}
           </header>
         )}
-        {!hideVoice && <VoicePanel />}
+        
         {children}
         {!hideAI && (
           <AIInterpretation
