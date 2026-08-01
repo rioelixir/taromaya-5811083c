@@ -84,8 +84,16 @@ export function setLang(next: Lang) {
 }
 
 export function useLang(): Lang {
-  return useSyncExternalStore(subscribe, readLang, () => "en");
+  const stored = useSyncExternalStore(subscribe, readLang, () => "en");
+  // Render English on the very first paint so the server and browser agree,
+  // then switch to the chosen language.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated ? stored : "en";
 }
+
 
 type Entry = { en: string; hi: string; hr: string };
 
