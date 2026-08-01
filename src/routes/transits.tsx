@@ -1,6 +1,6 @@
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { Explain } from "@/components/explain";
 import { ConfidenceNote } from "@/components/confidence-note";
@@ -90,26 +90,7 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
       subtitle="Watch the current heavens rotate over your natal wheel — with aspects, house activations, and an AI forecast."
     >
       <GlassCard title="Your natal birth data">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Name", "name", "text"], ["Date", "date", "date"], ["Time", "time", "time"],
-            ].map(([label, key, type]) => (
-            <label key={key} className="block">
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
-              <input type={type} value={(form as Record<string, string>)[key]}
-                onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-            </label>
-          ))}
-        </div>
-        <div className="mt-3">
-          <PlacePicker
-            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
-            onChange={(pl) => setForm((f) => ({ ...f, place: pl.place, lat: pl.lat, lon: pl.lon, tz: pl.tz }))}
-            forDate={form.date}
-            forTime={form.time}
-          />
-        </div>
+        <BirthVoiceBox value={form} onChange={(p) => setForm((prev) => ({ ...prev, ...p }))} />
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <div className="text-xs text-muted-foreground">Snapshot moment: <span className="text-pearl">{now.toLocaleString()}</span></div>
           <button onClick={() => setNow(new Date())}
