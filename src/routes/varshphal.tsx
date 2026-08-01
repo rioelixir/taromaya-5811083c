@@ -1,5 +1,5 @@
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -69,27 +69,9 @@ function VarshphalPage() {
     >
       <GlassCard>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Field label="Name">
-            <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Native" className={inputCls} />
-          </Field>
-          <Field label="Birth date">
-            <DateSelect label="" value={f.date} onChange={(v) => setF({ ...f, date: v })} />
-          </Field>
-          <Field label="Birth time">
-            <input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} className={inputCls} />
-          </Field>
-          <Field label="Timezone (h east of UTC)">
-            <input value={f.tz} onChange={(e) => setF({ ...f, tz: e.target.value })} className={inputCls} />
-          </Field>
-          <Field label="Latitude">
-            <input value={f.lat} onChange={(e) => setF({ ...f, lat: e.target.value })} className={inputCls} />
-          </Field>
-          <Field label="Longitude">
-            <input value={f.lon} onChange={(e) => setF({ ...f, lon: e.target.value })} className={inputCls} />
-          </Field>
-          <Field label="Place (label)">
-            <input value={f.place} onChange={(e) => setF({ ...f, place: e.target.value })} className={inputCls} />
-          </Field>
+          <div className="sm:col-span-2 lg:col-span-3">
+            <BirthVoiceBox value={f} onChange={(p) => setF((prev) => ({ ...prev, ...p }))} />
+          </div>
           <Field label="Target year">
             <input value={f.year} onChange={(e) => setF({ ...f, year: e.target.value })} className={inputCls} />
           </Field>
