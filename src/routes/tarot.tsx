@@ -4,7 +4,15 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { StarField } from "@/components/star-field";
 import { SPREADS, secureRandInt, type SpreadKey } from "@/lib/tarot-deck";
-import { DECK_LIST, BOARD_DECK_LIST, type DeckKey, type UploadedCard } from "@/lib/tarot-decks";
+import {
+  DECK_LIST,
+  BOARD_DECK_LIST,
+  CARD_GROUPS,
+  filterCardsByGroup,
+  type CardGroup,
+  type DeckKey,
+  type UploadedCard,
+} from "@/lib/tarot-decks";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
@@ -82,16 +90,18 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
-// Shuffle each admin-uploaded deck into a draw stack.
-function makeDeckStacks(source: DeckStacks): DeckStacks {
+// Shuffle each admin-uploaded deck into a draw stack, keeping only the chosen
+// group of cards (all / major only / minor only / court only).
+function makeDeckStacks(source: DeckStacks, group: CardGroup = "all"): DeckStacks {
   return Object.fromEntries(
-    DECK_LIST.map((m) => [m.key, shuffle(source[m.key] ?? [])]),
+    DECK_LIST.map((m) => [m.key, shuffle(filterCardsByGroup(source[m.key] ?? [], group))]),
   ) as unknown as DeckStacks;
 }
 
 function TarotPage() {
   const search = Route.useSearch();
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
+  const [cardGroup, setCardGroup] = useState<CardGroup>("all");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
   const { decks: uploaded, loading: loadingDecks, shortages: deckShortages } = useUploadedDecks();
@@ -200,14 +210,15 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(uploaded));
-  }, [uploaded]);
+    setDecks(makeDeckStacks(uploaded, cardGroup));
+  }, [uploaded, cardGroup]);
 
-  // Rebuild the draw stacks whenever the admin-uploaded decks load or change.
+  // Rebuild the draw stacks whenever the admin-uploaded decks load or change,
+  // or the user picks a different group of cards.
   useEffect(() => {
     setPlaced([]);
-    setDecks(makeDeckStacks(uploaded));
-  }, [uploaded]);
+    setDecks(makeDeckStacks(uploaded, cardGroup));
+  }, [uploaded, cardGroup]);
 
   useEffect(() => {
     setPlaced([]);
@@ -658,20 +669,22 @@ function TarotPage() {
     >
       <StarField />
 
-      {/* Top control bar - overlay, hidden by default so the board is full-page */}
+      {/* Top control bar - white sheet so every word is easy to read */}
       {!headerCollapsed && (
-        <div className="absolute left-0 right-0 top-0 z-30 border-b border-white/10 bg-black/95 backdrop-blur-md px-3 pb-3 pt-2 sm:px-4">
+        <div className="absolute left-0 right-0 top-0 z-30 max-h-[85dvh] overflow-y-auto border-b border-black/10 bg-white px-3 pb-3 pt-2 text-neutral-900 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] sm:px-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-baseline gap-3">
-              <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
-              <span className="hidden text-[10px] uppercase tracking-[0.35em] text-board-dim sm:inline">
+              <h1 className="font-display text-xl font-bold text-neutral-900 sm:text-2xl">
+                Tarot Board
+              </h1>
+              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-600 sm:inline">
                 Pick a deck · pull a card
               </span>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleFullScreen}
-                className="inline-flex items-center gap-1 rounded-lg border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-board-fg hover:bg-white/20"
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 hover:bg-neutral-200"
                 aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
               >
                 {isFullScreen ? (
@@ -683,7 +696,7 @@ function TarotPage() {
               </button>
               <button
                 onClick={() => setHeaderCollapsed(true)}
-                className="inline-flex items-center gap-1 rounded-lg border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-board-fg hover:bg-white/20"
+                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 hover:bg-neutral-200"
                 aria-label="Collapse controls"
               >
                 <ChevronUp className="h-3.5 w-3.5" />
@@ -699,20 +712,46 @@ function TarotPage() {
                 <button
                   key={k}
                   onClick={() => setSpreadKey(k)}
-                  className={`rounded-xl border px-3 py-2 text-xs font-medium transition-all sm:text-sm ${
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-all ${
                     active
-                      ? "border-gold/70 bg-gold/20 text-board-fg shadow-[0_0_20px_-8px_var(--gold)]"
-                      : "border-white/20 bg-white/[0.06] text-board-dim hover:border-white/40 hover:text-board-fg"
+                      ? "border-neutral-900 bg-neutral-900 text-white"
+                      : "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500"
                   }`}
                 >
                   {SPREADS[k].label}
                 </button>
               );
             })}
-            <div className="mx-1 h-6 w-px bg-white/10" aria-hidden />
-            <span className="text-[10px] uppercase tracking-widest text-gold-soft">
+            <div className="mx-1 hidden h-6 w-px bg-neutral-200 sm:block" aria-hidden />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-neutral-600">
               5 decks · any spread
             </span>
+          </div>
+
+          {/* Which kinds of cards to use — works for every deck, including
+              Lost & Found and Health */}
+          <div className="mt-2">
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-600">
+              Which cards to use
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {CARD_GROUPS.map((g) => {
+                const active = g.key === cardGroup;
+                return (
+                  <button
+                    key={g.key}
+                    onClick={() => setCardGroup(g.key)}
+                    className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-all ${
+                      active
+                        ? "border-amber-600 bg-amber-100 text-amber-900"
+                        : "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500"
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -721,25 +760,25 @@ function TarotPage() {
               onChange={(e) => setQuestion(e.target.value)}
               maxLength={200}
               placeholder="What's on your mind? (optional)"
-              className="min-w-[220px] flex-1 rounded-xl border border-white/20 bg-white/[0.06] px-3 py-2 text-sm text-board-fg placeholder:text-board-dim/70 focus:border-gold/60 focus:outline-none"
+              className="min-w-[220px] flex-1 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-base text-neutral-900 placeholder:text-neutral-500 focus:border-neutral-900 focus:outline-none"
             />
             <button
               onClick={shuffleAll}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-3 py-2 text-sm font-medium text-board-fg hover:bg-white/[0.12]"
+              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-100"
               title="Shuffle every deck"
             >
               <Shuffle className="h-4 w-4" /> Shuffle
             </button>
             <button
               onClick={resetSpread}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm hover:bg-white/[0.05]"
+              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-100"
             >
               <RotateCcw className="h-4 w-4" /> Start over
             </button>
             <button
               onClick={requestReading}
               disabled={!readyToInterpret || loadingReading}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-medium text-cosmic transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loadingReading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -751,6 +790,7 @@ function TarotPage() {
           </div>
         </div>
       )}
+
 
       {/* Show controls button - vertical pill on the right edge */}
       {headerCollapsed && (
@@ -945,7 +985,9 @@ function TarotPage() {
                         {meta.shortName}
                       </div>
                       <div className="text-[11px] font-semibold text-board-fg/90 leading-tight">
-                        {subDeck.length}/{meta.expected}
+                        {cardGroup === "all"
+                          ? `${subDeck.length}/${meta.expected}`
+                          : `${subDeck.length} cards`}
                       </div>
                     </div>
                   );
@@ -953,7 +995,9 @@ function TarotPage() {
               </div>
               <div className="text-sm text-board-fg/85 pointer-events-auto text-center pt-1">
                 {!loadingDecks && totalCards === 0
-                  ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                  ? cardGroup === "all"
+                    ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                    : "No cards of this kind yet. Pick All cards to use the full decks."
                   : "Tap a deck, or hold and drag a card onto the board"}
               </div>
             </div>
