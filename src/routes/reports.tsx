@@ -88,7 +88,7 @@ function ReportsPage() {
       <GlassCard title="Your details">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Name" value={birth.name} onChange={(v) => setBirth({...birth, name: v})} />
-          <Field label="Date" type="date" value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
+          <DateSelect value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
           <Field label="Time" type="time" value={birth.time} onChange={(v) => setBirth({...birth, time: v})} />
         </div>
         <div className="mt-3">
