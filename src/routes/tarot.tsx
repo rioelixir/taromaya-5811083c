@@ -28,8 +28,6 @@ import {
   ChevronUp,
   ChevronDown,
   Star,
-  Maximize,
-  Minimize,
 } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
