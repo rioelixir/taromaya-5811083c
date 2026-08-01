@@ -11,6 +11,9 @@ import { computeMonthAlmanac, chaughadiyaSummary, type AlmanacDay } from "@/lib/
 import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
 import { scanFestivals } from "@/lib/festivals";
 import { Sun, Moon, Clock, MapPin, Sparkles, CalendarDays, ShieldAlert, Flame } from "lucide-react";
+import { Explain } from "@/components/explain";
+import { ConfidenceNote } from "@/components/confidence-note";
+import { CrossCheckPanel } from "@/components/cross-check-panel";
 
 
 export const Route = createFileRoute("/panchang")({
@@ -112,19 +115,19 @@ function PanchangPage() {
           <div className="mt-2 font-display text-2xl gold-text">{p.tithi.paksha} Paksha · {p.tithi.name}</div>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
 
-            <Row k="Tithi" v={`${p.tithi.name} (${p.tithi.number})`} />
-            <Row k="Paksha" v={p.tithi.paksha} />
-            <Row k="Nakshatra" v={`${p.nakshatra.name} — Pada ${p.nakshatra.pada}`} />
-            <Row k="Nak. lord" v={p.nakshatra.lord} />
-            <Row k="Yoga" v={p.yoga.name} />
-            <Row k="Karana" v={p.karana.name} />
-            <Row k="Moon age" v={`${p.moonAge.toFixed(1)}d`} />
+            <Row term="tithi" k="Tithi" v={`${p.tithi.name} (${p.tithi.number})`} />
+            <Row term="paksha" k="Paksha" v={p.tithi.paksha} />
+            <Row term="nakshatra" k="Nakshatra" v={`${p.nakshatra.name} — Pada ${p.nakshatra.pada}`} />
+            <Row term="nakshatra" k="Nak. lord" v={p.nakshatra.lord} />
+            <Row term="yoga" k="Yoga" v={p.yoga.name} />
+            <Row term="karana" k="Karana" v={p.karana.name} />
+            <Row term="moon-age" k="Moon age" v={`${p.moonAge.toFixed(1)}d`} />
           </div>
         </GlassCard>
 
         <GlassCard title="Sun & Moon">
           <div className="space-y-3 text-sm">
-            <TimeRow icon={<Sun className="w-4 h-4 text-gold" />} label="Sunrise" value={fmtTime(p.sunrise)} />
+            <TimeRow icon={<Sun className="w-4 h-4 text-gold" />} label="Sunrise" term="sunrise" value={fmtTime(p.sunrise)} />
             <TimeRow icon={<Sun className="w-4 h-4 text-gold/60" />} label="Solar noon" value={fmtTime(p.solarNoon)} />
             <TimeRow icon={<Sun className="w-4 h-4 text-orange-300" />} label="Sunset" value={fmtTime(p.sunset)} />
             <TimeRow icon={<Moon className="w-4 h-4 text-pearl" />} label="Moonrise" value={fmtTime(p.moonrise)} />
@@ -137,19 +140,22 @@ function PanchangPage() {
 
         <GlassCard title="Auspicious Muhurats" desc="Good windows are listed first, then the windows most people avoid for new starts.">
           <div className="space-y-2 text-sm">
-            <MuhurtaRow label="Abhijit" range={p.abhijitMuhurat} good />
+            <MuhurtaRow term="abhijit" label="Abhijit" range={p.abhijitMuhurat} good />
             <MuhurtaRow label="Brahma" range={p.brahmaMuhurat} good />
             <MuhurtaRow label="Godhuli" range={p.godhuliMuhurat} good />
             <div className="pt-2 border-t border-white/5" />
-            <MuhurtaRow label="Rahu Kaal" range={p.rahuKaal} />
+            <MuhurtaRow term="rahu-kaal" label="Rahu Kaal" range={p.rahuKaal} />
             <MuhurtaRow label="Yamaganda" range={p.yamaganda} />
             <MuhurtaRow label="Gulika" range={p.gulika} />
           </div>
         </GlassCard>
       </div>
 
+      <ConfidenceNote noteKey="panchang-core" />
+
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <GlassCard title="Chaughadiya — Day" desc="The daytime is split into small windows. Green ones are fine for starting things, marked ones are better skipped.">
+          <div className="mb-2 text-xs"><Explain term="chaughadiya">What is a Chaughadiya?</Explain></div>
           <ChaughadiyaTable rows={p.chaughadiyaDay} />
         </GlassCard>
         <GlassCard title="Chaughadiya — Night" desc="The same idea for the night, from sunset to next sunrise.">
@@ -185,6 +191,7 @@ function PanchangPage() {
       {/* Hora — Planetary Hours */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <GlassCard title="Hora — Day (Sunrise → Sunset)" desc="Each hour of the day is looked after by one planet. Pick the hour that matches your task.">
+          <div className="mb-2 text-xs"><Explain term="hora">What is a Hora?</Explain></div>
           <HoraTable rows={horas.filter(h => h.isDay)} nowIdx={nowHora?.index ?? -1} />
         </GlassCard>
         <GlassCard title="Hora — Night (Sunset → Sunrise)" desc="The same planetary hours, carried on through the night.">
@@ -202,6 +209,8 @@ function PanchangPage() {
           </div>
         </div>
       )}
+
+      <ConfidenceNote noteKey="panchang-timings" />
 
       {/* Deep attributes: Panchaka, Bhadra, Tithi quality, Yoga quality, Nakshatra character */}
       <DeepAttributes p={p} weekdayNum={new Date(date).getDay()} />
@@ -239,6 +248,16 @@ function PanchangPage() {
           )}
         </GlassCard>
       </div>
+      <CrossCheckPanel
+        className="mt-6"
+        input={{
+          year: Number(date.split("-")[0]),
+          month: Number(date.split("-")[1]),
+          day: Number(date.split("-")[2]),
+          hour: 12, minute: 0, tzOffsetHours: 0,
+          latitude: Number(lat), longitude: Number(lon),
+        }}
+      />
     </PageShell>
   );
 }
@@ -268,26 +287,30 @@ function HoraTable({ rows, nowIdx }: { rows: HoraSlot[]; nowIdx: number }) {
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function Row({ k, v, term }: { k: string; v: string; term?: string }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{k}</div>
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+        {term ? <Explain term={term}>{k}</Explain> : k}
+      </div>
       <div className="mt-0.5 text-pearl">{v}</div>
     </div>
   );
 }
-function TimeRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function TimeRow({ icon, label, value, term }: { icon: React.ReactNode; label: string; value: string; term?: string }) {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2 text-muted-foreground">{icon}{label}</div>
+      <div className="flex items-center gap-2 text-muted-foreground">
+        {icon}{term ? <Explain term={term}>{label}</Explain> : label}
+      </div>
       <div className="text-pearl font-mono">{value}</div>
     </div>
   );
 }
-function MuhurtaRow({ label, range, good }: { label: string; range: [Date, Date] | null; good?: boolean }) {
+function MuhurtaRow({ label, range, good, term }: { label: string; range: [Date, Date] | null; good?: boolean; term?: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-pearl">{label}</span>
+      <span className="text-pearl">{term ? <Explain term={term}>{label}</Explain> : label}</span>
       <span className={`font-mono text-xs ${good ? "text-emerald-300" : "text-red-300"}`}>{fmtRange(range)}</span>
     </div>
   );
@@ -323,7 +346,7 @@ function DeepAttributes({ p, weekdayNum }: { p: ReturnType<typeof computePanchan
         <div className={`rounded-xl p-3 mb-3 ${panchaka.active ? "bg-red-500/10 border border-red-400/30" : "bg-emerald-500/10 border border-emerald-400/20"}`}>
           <div className="flex items-center gap-2 text-xs">
             <ShieldAlert className={`w-4 h-4 ${panchaka.active ? "text-red-300" : "text-emerald-300"}`} />
-            <span className="uppercase tracking-widest text-muted-foreground">Panchaka</span>
+            <Explain term="panchaka" className="uppercase tracking-widest text-muted-foreground">Panchaka</Explain>
             {panchaka.type && <span className="gold-text">{panchaka.type}</span>}
           </div>
           <div className="mt-1 text-sm text-pearl">{panchaka.note}</div>
@@ -331,7 +354,7 @@ function DeepAttributes({ p, weekdayNum }: { p: ReturnType<typeof computePanchan
         <div className={`rounded-xl p-3 ${bhadra.active ? "bg-red-500/10 border border-red-400/30" : "bg-white/5"}`}>
           <div className="flex items-center gap-2 text-xs">
             <Flame className={`w-4 h-4 ${bhadra.active ? "text-red-300" : "text-muted-foreground"}`} />
-            <span className="uppercase tracking-widest text-muted-foreground">Bhadra (Vishti)</span>
+            <Explain term="bhadra" className="uppercase tracking-widest text-muted-foreground">Bhadra (Vishti)</Explain>
           </div>
           <div className="mt-1 text-sm text-pearl">{bhadra.note}</div>
         </div>

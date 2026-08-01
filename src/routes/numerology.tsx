@@ -2,6 +2,8 @@ import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Explain } from "@/components/explain";
+import { ConfidenceNote } from "@/components/confidence-note";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import {
@@ -89,6 +91,8 @@ function NumerologyPage() {
       {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
       {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "compat" && <CompatibilityNumerology />}
+
+      <ConfidenceNote noteKey="numerology" className="mt-6" />
     </PageShell>
   );
 }
@@ -400,10 +404,22 @@ function CompatibilityNumerology() {
   );
 }
 
+const NUM_TERMS: Record<string, string> = {
+  "Life Path": "life-path",
+  Destiny: "destiny",
+  "Soul Urge": "soul-urge",
+  "Mulank (driver)": "mulank",
+  "Bhagyank (destiny)": "bhagyank",
+  "Driver (Mulank)": "mulank",
+  "Conductor (Bhagyank)": "bhagyank",
+};
 function BigNum({ label, n }: { label: string; n: number }) {
+  const term = NUM_TERMS[label];
   return (
     <div className="glass rounded-2xl p-5">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+        {term ? <Explain term={term}>{label}</Explain> : label}
+      </div>
       <div className="mt-2 font-display text-4xl gold-text">{n}</div>
       <div className="mt-1 text-xs text-muted-foreground line-clamp-2">{NUMBER_MEANINGS[n] ?? ""}</div>
     </div>
@@ -774,7 +790,8 @@ function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <GlassCard title="Lo Shu magic square">
+            <GlassCard title="Lo Shu magic square" desc="Tap the title terms to see how the grid is built.">
+              <div className="mb-2 text-xs"><Explain term="loshu">How is this grid made?</Explain></div>
               <div className="mx-auto grid max-w-sm grid-cols-3 gap-2">
                 {layout.flat().map((n) => {
                   const c = grid.counts[n] ?? 0;

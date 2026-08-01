@@ -77,6 +77,8 @@ export type Panchang = {
   dishaShool: string;
   ayanamsa: number;
   julianDay: number;
+  /** The exact moment the five limbs were read (local sunrise of the Vedic day). */
+  refMoment: Date;
   moonIllumination: number;
   moonAge: number;
 };
@@ -252,6 +254,7 @@ export function computePanchang(input: PanchangInput): Panchang {
     chaughadiyaNight,
     chandrashtama,
     dishaShool: DISHA_SHOOL[wd],
+    refMoment: refDate,
     ayanamsa: lahiriAyanamsa(refDate),
     julianDay: jdFromDate(refDate),
     moonIllumination: illum.phase_fraction,

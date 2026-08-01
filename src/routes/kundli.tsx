@@ -3,6 +3,9 @@ import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, type ReactNode } from "react";
+import { Explain } from "@/components/explain";
+import { ConfidenceNote } from "@/components/confidence-note";
+import { CrossCheckPanel } from "@/components/cross-check-panel";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { ChartZoom } from "@/components/chart-zoom";
 import {
@@ -288,6 +291,29 @@ function KundliPage() {
             {tab === "lalkitab" && <LalKitabTab chart={chart} />}
             {tab === "gems" && <GemstonesTab chart={chart} />}
             {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
+
+            <ConfidenceNote
+              noteKey={
+                tab === "dasha" ? "kundli-dasha"
+                : tab === "shadbala" ? "strength"
+                : tab === "transit" ? "transits"
+                : "kundli-chart"
+              }
+            />
+
+            <CrossCheckPanel
+              className="mt-4"
+              input={{
+                year: Number(form.date.split("-")[0]),
+                month: Number(form.date.split("-")[1]),
+                day: Number(form.date.split("-")[2]),
+                hour: form.unknownTime ? 12 : Number(form.time.split(":")[0]),
+                minute: form.unknownTime ? 0 : Number(form.time.split(":")[1]),
+                tzOffsetHours: Number(form.tz),
+                latitude: Number(form.lat),
+                longitude: Number(form.lon),
+              }}
+            />
           </div>
         </div>
       )}
@@ -493,16 +519,18 @@ function ChartSummary({ chart }: { chart: KundliChart }) {
   const nak = NAKSHATRAS[chart.moonNakshatra.index];
   return (
     <div className="grid grid-cols-3 gap-3">
-      <Stat label="Lagna" value={lagna} sub={formatDegree(chart.ascendant.degreeInRashi)} />
-      <Stat label="Lagna lord" value={lord} sub="Guiding planet" />
-      <Stat label="Janma Nakshatra" value={nak} sub={`Pada ${chart.moonNakshatra.pada} · ${chart.moonNakshatra.lord}`} />
+      <Stat term="ascendant" label="Lagna" value={lagna} sub={formatDegree(chart.ascendant.degreeInRashi)} />
+      <Stat term="house" label="Lagna lord" value={lord} sub="Guiding planet" />
+      <Stat term="nakshatra" label="Janma Nakshatra" value={nak} sub={`Pada ${chart.moonNakshatra.pada} · ${chart.moonNakshatra.lord}`} />
     </div>
   );
 }
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stat({ label, value, sub, term }: { label: string; value: string; sub?: string; term?: string }) {
   return (
     <div className="glass rounded-2xl p-4">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+        {term ? <Explain term={term}>{label}</Explain> : label}
+      </div>
       <div className="mt-1 font-display text-lg text-pearl">{value}</div>
       {sub && <div className="mt-1 text-[11px] text-muted-foreground">{sub}</div>}
     </div>
@@ -788,7 +816,7 @@ function DoshasTab({ chart }: { chart: KundliChart }) {
 
 function PlanetTable({ chart }: { chart: KundliChart }) {
   return (
-    <GlassCard title="Planetary positions" desc="Sidereal longitudes, whole-sign house, nakshatra, and motion.">
+    <GlassCard title="Planetary positions" desc="Tap any value to see what it means, from simple to advanced, with the exact formula.">
       <div className="grid gap-2 sm:grid-cols-2">
         {chart.planets.map((p) => {
           const house = ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1;
@@ -800,17 +828,19 @@ function PlanetTable({ chart }: { chart: KundliChart }) {
                   <span className="font-display text-base text-pearl">{p.name}</span>
                   {p.retrograde && <span className="text-[10px] uppercase tracking-widest text-aurora">℞</span>}
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-gold/80">H{house}</span>
+                <Explain term="house" className="text-[10px] uppercase tracking-widest text-gold/80" showIcon={false}>H{house}</Explain>
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                {RASHIS[p.rashi]} · {NAKSHATRAS[p.nakshatra]} · pada {p.pada}
+              <div className="mt-1 flex flex-wrap gap-x-2 text-xs text-muted-foreground">
+                <span>{RASHIS[p.rashi]}</span>
+                <span>·</span>
+                <Explain term="nakshatra" showIcon={false}>{NAKSHATRAS[p.nakshatra]} · pada {p.pada}</Explain>
               </div>
               <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${pct}%` }} />
               </div>
               <div className="mt-1 flex justify-between font-mono text-[10px] text-muted-foreground">
                 <span>{formatDegree(p.degreeInRashi)}</span>
-                <span>{p.retrograde ? "Retrograde" : "Direct"}</span>
+                <Explain term="retrograde" showIcon={false}>{p.retrograde ? "Retrograde" : "Direct"}</Explain>
               </div>
             </div>
           );

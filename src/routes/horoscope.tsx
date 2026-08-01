@@ -1,6 +1,8 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Explain } from "@/components/explain";
+import { ConfidenceNote } from "@/components/confidence-note";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
@@ -193,6 +195,8 @@ About 380 words.`,
           </GlassCard>
         </div>
       )}
+
+      <ConfidenceNote noteKey="horoscope" className="mt-6" />
     </PageShell>
   );
 }
@@ -315,7 +319,7 @@ function NakshatraTab({ today }: { today: Date }) {
       <GlassCard>
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Nakshatra of the day</div>
+            <Explain term="nakshatra" className="text-[10px] uppercase tracking-widest text-muted-foreground">Nakshatra of the day</Explain>
             <div className="font-display text-3xl gold-text mt-1">{nak.name}</div>
             <div className="text-xs text-muted-foreground">Pada {nak.pada} · Ruled by {nak.lord} · Deity {nak.deity}</div>
           </div>
