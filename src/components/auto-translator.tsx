@@ -190,12 +190,15 @@ export function AutoTranslator() {
       });
     };
 
-    // Initial + on route change
-    schedule();
+    // Wait for React to finish hydrating before touching the text,
+    // then run again shortly after so late panels are covered too.
+    const t1 = setTimeout(schedule, 400);
+    const t2 = setTimeout(schedule, 1400);
     const unsub = router.subscribe("onResolved", () => {
       // Wait for DOM to paint
-      setTimeout(schedule, 60);
+      setTimeout(schedule, 200);
     });
+
 
     // Watch DOM mutations for dynamic content
     const observer = new MutationObserver(() => {
