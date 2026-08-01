@@ -72,6 +72,12 @@ function humanise(line: string): string {
     .replace(/\bp(\d)\b/g, "part $1")
     .replace(/\(R\)/g, "moving backwards")
     .replace(/\b(\d{1,2})\s+\d{1,2}(\s+\d{1,2})?\b(?=\s*(·|$))/g, "") // bare degree numbers
+    // a lone degree number right after a sign name, e.g. "Aquarius 10"
+    .replace(
+      /\b(Aries|Taurus|Gemini|Cancer|Leo|Virgo|Libra|Scorpio|Sagittarius|Capricorn|Aquarius|Pisces)\s+\d{1,2}\b/gi,
+      "$1",
+    )
+
     .replace(/\s*·\s*/g, " · ")
     .replace(/\(\s*\)/g, "")
     .replace(/\s{2,}/g, " ")
