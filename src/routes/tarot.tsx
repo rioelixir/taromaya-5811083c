@@ -735,23 +735,12 @@ function TarotPage() {
         )}
       </div>
 
-      {/* Board row: Nakshatra panel on the left, canvas on the right */}
-      <div className="relative z-10 flex w-full flex-1 min-h-0">
-        {/* Desktop panel */}
-        <aside className="hidden lg:block w-[330px] shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-sm">
-          <NakshatraPanel
-            cards={uploaded.nakshatra ?? []}
-            question={question}
-            onPlaceCard={placeExactCard}
-            onDragCardStart={beginDragExactCard}
-            onContext={handleStarContext}
-          />
-        </aside>
-
-        {/* Phone drawer */}
+      {/* Board row: full-page canvas with collapsible Nakshatra drawer */}
+      <div className="relative z-10 flex h-full w-full">
+        {/* Nakshatra toggle - always visible on every screen */}
         <button
           onClick={() => setNakshatraPanelOpen(true)}
-          className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Open Nakshatra panel"
         >
           <div className="flex flex-col items-center gap-2">
@@ -764,9 +753,11 @@ function TarotPage() {
             </span>
           </div>
         </button>
+
+        {/* Nakshatra drawer - slides over the full-page board */}
         {nakshatraPanelOpen && (
-          <div className="lg:hidden fixed inset-0 z-40 flex">
-            <div className="w-[86vw] max-w-[340px] border-r border-gold/25 bg-cosmic/95 backdrop-blur-md animate-in slide-in-from-left duration-300">
+          <div className="fixed inset-0 z-40 flex">
+            <div className="w-[86vw] max-w-[340px] animate-in slide-in-from-left border-r border-gold/25 bg-cosmic/95 backdrop-blur-md duration-300">
               <div className="flex items-center justify-between px-3 pt-3">
                 <span className="text-xs uppercase tracking-[0.3em] text-gold/80">Nakshatra</span>
                 <button
