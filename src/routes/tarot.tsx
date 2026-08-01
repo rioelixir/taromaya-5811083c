@@ -743,11 +743,18 @@ function TarotPage() {
         {/* Phone drawer */}
         <button
           onClick={() => setNakshatraPanelOpen(true)}
-          className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-xl border border-l-0 border-gold/40 bg-black/70 px-3 py-2 text-[10px] uppercase tracking-widest text-gold"
+          className="lg:hidden absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Open Nakshatra panel"
         >
-          <Star className="h-4 w-4 shrink-0" />
-          <span className="ml-1.5">Nakshatra</span>
+          <div className="flex flex-col items-center gap-2">
+            <Star className="h-4 w-4 fill-gold/20" />
+            <span
+              className="text-[11px] font-semibold uppercase tracking-[0.25em]"
+              style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+            >
+              Nakshatra
+            </span>
+          </div>
         </button>
         {nakshatraPanelOpen && (
           <div className="lg:hidden fixed inset-0 z-40 flex">
