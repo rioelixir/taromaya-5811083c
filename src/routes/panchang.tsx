@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computePanchang, fmtTime, fmtRange, todaysFestivals, WEEKDAY } from "@/lib/panchang";
 import { classifyPanchaka, bhadraInfo, tithiQuality, nakshatraCharacter, yogaQuality } from "@/lib/panchang-deep";
+import { dayVerdict, tithiPlain, nakshatraPlain, yogaPlain, karanaPlain, weekdayPlain } from "@/lib/panchang-plain";
 import { computeMonthAlmanac, chaughadiyaSummary, type AlmanacDay } from "@/lib/panchang-month";
 import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
 import { scanFestivals } from "@/lib/festivals";
@@ -58,6 +59,8 @@ function PanchangPage() {
   }, [p, date, lat, lon]);
 
   const nowHora = useMemo(() => currentHora(horas), [horas]);
+
+  const verdict = useMemo(() => dayVerdict(p), [p]);
 
   const festivalCalendar = useMemo(() => {
     const [y, m, d] = date.split("-").map(Number);
