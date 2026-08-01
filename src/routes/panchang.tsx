@@ -87,6 +87,20 @@ function PanchangPage() {
         </div>
       </GlassCard>
 
+      <GlassCard className="mt-6">
+        <div className="text-[10px] uppercase tracking-widest text-gold">In plain words</div>
+        <div className="mt-2 font-display text-2xl gold-text">{verdict.label} day</div>
+        <p className="mt-2 text-sm text-muted-foreground">{verdict.summary}</p>
+        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+          {[weekdayPlain(p), tithiPlain(p), nakshatraPlain(p), yogaPlain(p), karanaPlain(p)].map((line) => (
+            <li key={line} className="flex gap-2.5">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/70" />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <GlassCard>
           <div className="text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-2">
@@ -94,6 +108,7 @@ function PanchangPage() {
           </div>
           <div className="mt-2 font-display text-2xl gold-text">{p.tithi.paksha} Paksha · {p.tithi.name}</div>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+
             <Row k="Tithi" v={`${p.tithi.name} (${p.tithi.number})`} />
             <Row k="Paksha" v={p.tithi.paksha} />
             <Row k="Nakshatra" v={`${p.nakshatra.name} — Pada ${p.nakshatra.pada}`} />
