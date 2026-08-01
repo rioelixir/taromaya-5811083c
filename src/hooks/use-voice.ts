@@ -52,19 +52,18 @@ export function useVoice(onText: (text: string) => void) {
   } | null>(null);
   const onTextRef = useRef(onText);
   onTextRef.current = onText;
-  /** Stops listening on its own once the person goes quiet, so nobody has to tap twice. */
+  /** No clocks: listening starts on a tap and only ends on the next tap. */
   const stopRef = useRef<() => void>(() => {});
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clearSilence = useCallback(() => {
     if (silenceRef.current) clearTimeout(silenceRef.current);
     silenceRef.current = null;
   }, []);
-  const waitForQuiet = useCallback((ms = 2200) => {
+  /** Kept as a no-op so the mic never turns itself off mid-sentence. */
+  const waitForQuiet = useCallback((_ms?: number) => {
     clearSilence();
-    silenceRef.current = setTimeout(() => {
-      if (activeRef.current && !pausedRef.current) stopRef.current();
-    }, ms);
   }, [clearSilence]);
+
 
   useEffect(() => {
     setAvailable(!!ctor() || !!navigator.mediaDevices?.getUserMedia);
