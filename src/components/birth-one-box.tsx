@@ -130,8 +130,7 @@ export function BirthOneBox({
           Your birth details — one box
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Say it or type it all in one line. Example:{" "}
-          <span className="text-gold">“{EXAMPLE}”</span>
+          Tap the mic and say one word at a time.
         </p>
       </div>
 
@@ -152,7 +151,7 @@ export function BirthOneBox({
             }
           }}
           aria-label="Birth details in one box"
-          placeholder={listening ? "Listening… keep talking" : "Name, birth date, birth time and place"}
+          placeholder={listening ? "Say one word…" : "Tap the mic and say one word at a time"}
           className="min-h-[4.5rem] w-full resize-none bg-transparent px-2 py-1 text-base leading-relaxed text-pearl outline-none placeholder:text-muted-foreground"
         />
         {voice.available && (
@@ -181,7 +180,7 @@ export function BirthOneBox({
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening
           </div>
           <p className="mt-1 text-base leading-relaxed text-pearl">
-            {voice.heard || "Start talking — your words show up here."}
+            {voice.heard || "Say one word…"}
           </p>
         </div>
       )}
