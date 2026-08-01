@@ -6,7 +6,7 @@ const CACHE_KEY = (lang: Lang) => `taromaya.translations.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
 const ATTR_ORIG = "data-i18n-orig";
 const MAX_LEN = 900;
-const ATTRS = ["placeholder", "aria-label", "title", "alt"] as const;
+const ATTRS = ["placeholder", "aria-label", "title", "alt", "label", "value"] as const;
 
 /** What we last wrote into a text node, so re-renders get re-translated. */
 const doneText = new WeakMap<Text, { src: string; out: string }>();
