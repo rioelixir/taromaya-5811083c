@@ -734,15 +734,14 @@ function TarotPage() {
               <button
                 onClick={shuffleAll}
                 className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
-                title="Shuffle every deck"
               >
-                <Shuffle className="h-5 w-5 shrink-0" /> Shuffle
+                <Shuffle className="h-5 w-5 shrink-0" /> Mix the cards
               </button>
               <button
                 onClick={resetSpread}
                 className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
               >
-                <RotateCcw className="h-5 w-5 shrink-0" /> Start over
+                <RotateCcw className="h-5 w-5 shrink-0" /> Clear the board
               </button>
               <button
                 onClick={requestReading}
@@ -754,8 +753,9 @@ function TarotPage() {
                 ) : (
                   <Sparkles className="h-5 w-5 shrink-0" />
                 )}
-                Ask AI
+                Read my cards
               </button>
+
             </div>
           </div>
 
