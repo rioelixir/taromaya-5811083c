@@ -10,6 +10,7 @@ import {
 import {
   loShuGrid, nineStarKi, kabbalah, essenceTimeline, lifeCycles, analyseName,
 } from "@/lib/numerology-deep";
+import { vedicNumerology, loShuAdvanced, relationSets } from "@/lib/vedic-numerology";
 import {
   spellingCheck, nameDeepMeaning, missingAlphabets, spellingVariants,
   mobileDobMatch,
@@ -27,9 +28,10 @@ export const Route = createFileRoute("/numerology")({
   }),
 });
 
-type Tab = "personal" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
+type Tab = "personal" | "vedic" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   personal: "Personal",
+  vedic: "Vedic",
   timeline: "Timeline",
   loshu: "Lo Shu",
   chinese: "Nine Star Ki",
@@ -69,6 +71,12 @@ function NumerologyPage() {
           fullName={fullName} setFullName={setFullName}
           birthDate={birthDate} setBirthDate={setBirthDate}
           system={system} setSystem={setSystem}
+        />
+      )}
+      {tab === "vedic" && (
+        <VedicTab
+          fullName={fullName} setFullName={setFullName}
+          birthDate={birthDate} setBirthDate={setBirthDate}
         />
       )}
       {tab === "timeline" && (
@@ -505,6 +513,158 @@ function TimelineNumerology({
   );
 }
 
+
+// ═══════════════════════════════════════════════════════════════════
+// VEDIC NUMEROLOGY (Mulank / Bhagyank / Namank) + advanced Lo Shu
+// ═══════════════════════════════════════════════════════════════════
+function VedicTab({
+  fullName, setFullName, birthDate, setBirthDate,
+}: {
+  fullName: string; setFullName: (s: string) => void;
+  birthDate: string; setBirthDate: (s: string) => void;
+}) {
+  const v = useMemo(() => {
+    if (!birthDate) return null;
+    try { return vedicNumerology(birthDate, fullName); } catch { return null; }
+  }, [birthDate, fullName]);
+  const adv = useMemo(() => {
+    if (!birthDate) return null;
+    try { return loShuAdvanced(birthDate); } catch { return null; }
+  }, [birthDate]);
+
+  const relWord = (r: string | null) =>
+    r === "friend" ? "get along well" : r === "enemy" ? "pull apart" : "are neutral";
+
+  return (
+    <>
+      <GlassCard>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Full name</span>
+            <input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Your name as you use it"
+              className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl focus:outline-none focus:border-gold/50"
+            />
+          </label>
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+            <DateSelect label="" value={birthDate} onChange={(val) => setBirthDate(val)} />
+          </label>
+        </div>
+      </GlassCard>
+
+      {v && (
+        <>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <BigNum label="Mulank (driver)" n={v.mulank} />
+            <BigNum label="Bhagyank (destiny)" n={v.bhagyank} />
+            {v.namank != null && <BigNum label="Namank (name)" n={v.namank} />}
+            <BigNum label="This year" n={v.personalYear} />
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <GlassCard title="Who you are">
+              <KV k={`Mulank ${v.mulank}`} v={`${v.mulankProfile.planet} — ${v.mulankProfile.nature}`} />
+              <KV k={`Bhagyank ${v.bhagyank}`} v={`${v.bhagyankProfile.planet} — ${v.bhagyankProfile.nature}`} />
+              {v.namankProfile && v.namank != null && (
+                <KV k={`Namank ${v.namank}`} v={`${v.namankProfile.planet} — ${v.namankProfile.nature}`} />
+              )}
+              <KV k="Good work for you" v={v.mulankProfile.career} />
+              <KV k="Watch out for" v={v.mulankProfile.caution} />
+              <KV k="This year" v={v.yearNote} />
+            </GlassCard>
+
+            <GlassCard title="Do your numbers agree?">
+              <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="h-full bg-gold/70" style={{ width: `${v.harmony.score}%` }} />
+              </div>
+              <KV k="Driver and destiny" v={`They ${relWord(v.harmony.mulankBhagyank)}.`} />
+              {v.harmony.mulankNamank && (
+                <KV k="Driver and name" v={`They ${relWord(v.harmony.mulankNamank)}.`} />
+              )}
+              {v.harmony.bhagyankNamank && (
+                <KV k="Destiny and name" v={`They ${relWord(v.harmony.bhagyankNamank)}.`} />
+              )}
+              <p className="mt-2 text-sm text-pearl/90">{v.harmony.note}</p>
+            </GlassCard>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <GlassCard title="Lucky for you">
+              <KV k="Days" v={v.luckyDays.join(", ")} />
+              <KV k="Colours" v={v.luckyColors.join(", ")} />
+              <KV k="Numbers" v={v.luckyNumbers.join(", ")} />
+              <KV k="Numbers to go slow with" v={v.avoidNumbers.join(", ") || "None"} />
+              <KV k="Stones" v={v.gems.join(", ")} />
+              <KV k="Simple chant" v={v.mantras.join(" · ")} />
+              <KV k="Helpful direction" v={`${v.mulankProfile.direction} (driver), ${v.bhagyankProfile.direction} (destiny)`} />
+            </GlassCard>
+            <GlassCard title="Friend, neutral and difficult numbers">
+              {[v.mulank, v.bhagyank].map((n, i) => {
+                const sets = relationSets(n);
+                return (
+                  <div key={`${n}-${i}`} className="mb-3 rounded-xl bg-white/5 p-3 text-xs">
+                    <div className="font-display text-base gold-text">{i === 0 ? "Mulank" : "Bhagyank"} {n}</div>
+                    <div className="mt-1 text-emerald-300">Friends: {sets.friends.join(", ")}</div>
+                    <div className="text-muted-foreground">Neutral: {sets.neutral.join(", ") || "None"}</div>
+                    <div className="text-red-300">Difficult: {sets.enemies.join(", ") || "None"}</div>
+                  </div>
+                );
+              })}
+            </GlassCard>
+          </div>
+        </>
+      )}
+
+      {adv && (
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <GlassCard title="What your grid says">
+            <p className="text-sm text-pearl/90">{adv.summary}</p>
+            {adv.arrowNotes.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {adv.arrowNotes.map((a) => (
+                  <div key={`${a.key}-${a.kind}`} className="rounded-lg bg-white/5 px-3 py-2 text-xs">
+                    <span className={a.kind === "strength" ? "gold-text" : "text-red-300"}>
+                      {a.kind === "strength" ? "Strong" : "Weak"}
+                    </span>{" "}
+                    <span className="capitalize text-pearl">{a.key}</span>
+                    <div className="mt-1 text-muted-foreground">{a.note}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {adv.excess.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {adv.excess.map((e) => (
+                  <div key={e.number} className="rounded-lg bg-white/5 px-3 py-2 text-xs">
+                    <span className="gold-text">{e.number} × {e.count}</span>
+                    <div className="mt-1 text-muted-foreground">{e.note}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </GlassCard>
+          <GlassCard title="Easy things that help">
+            {adv.remedies.length === 0 ? (
+              <p className="text-sm text-emerald-300">Nothing is missing in your grid.</p>
+            ) : (
+              <div className="space-y-2">
+                {adv.remedies.map((r) => (
+                  <div key={r.number} className="rounded-lg bg-white/5 px-3 py-2 text-xs">
+                    <div className="gold-text">{r.number} — {r.planet}</div>
+                    <div className="mt-1 text-pearl/90">{r.remedy}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </GlassCard>
+        </div>
+      )}
+    </>
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // LO SHU GRID
