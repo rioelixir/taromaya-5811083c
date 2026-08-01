@@ -71,8 +71,9 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 86;
 const CARD_H = 132;
-const MINI_W = 58;
-const MINI_H = 88;
+// Deck stacks are shown big by default so users can tap/drag them easily.
+const MINI_W = 110;
+const MINI_H = 170;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
@@ -919,7 +920,7 @@ function TarotPage() {
                   . Ask the admin to add the rest.
                 </div>
               )}
-              <div className="pointer-events-auto flex items-end gap-1.5 sm:gap-2.5 overflow-x-auto max-w-full pb-1">
+              <div className="pointer-events-auto flex items-end gap-2 sm:gap-4 overflow-x-auto max-w-full pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {BOARD_DECK_LIST.map((meta, di) => {
                   const subDeck = decks[meta.key] ?? [];
                   const empty = subDeck.length === 0;
@@ -927,10 +928,12 @@ function TarotPage() {
                     <div
                       key={meta.key}
                       className="relative flex flex-col items-center flex-shrink-0"
-                      style={{ width: 78 }}
+                      style={{ width: MINI_W + 8 }}
                       title={`${meta.name} — ${meta.tagline}`}
                     >
-                      <div className="relative" style={{ width: MINI_W, height: MINI_H }}>
+                      <div
+                        className="relative w-[110px] h-[170px] sm:w-[130px] sm:h-[200px] md:w-[150px] md:h-[230px]"
+                      >
                         {[0, 1, 2].map((i) => {
                           const isTop = i === 0 && !empty;
                           const rot = (i - 1) * 1.2 + (di - 2) * 0.6;
@@ -940,28 +943,28 @@ function TarotPage() {
                               onPointerDown={
                                 isTop ? (e) => beginDragFromDeck(e, meta.key) : undefined
                               }
-                              className={`absolute inset-0 rounded-xl border ${
+                              className={`absolute inset-0 rounded-2xl border ${
                                 empty
                                   ? "border-white/10 bg-black/30"
                                   : "bg-gradient-to-br from-midnight to-cosmic"
                               } ${isTop ? "cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-transform" : ""}`}
                               style={{
-                                transform: `translate(${i * 1.5}px, ${i * -2}px) rotate(${rot}deg)`,
+                                transform: `translate(${i * 2}px, ${i * -3}px) rotate(${rot}deg)`,
                                 zIndex: 10 - i,
                                 borderColor: empty ? undefined : `${meta.accent}66`,
                                 boxShadow:
                                   empty || !isTop
                                     ? undefined
-                                    : `0 8px 32px -12px ${meta.accent}80, inset 0 0 24px -12px ${meta.accent}`,
+                                    : `0 10px 40px -14px ${meta.accent}80, inset 0 0 28px -14px ${meta.accent}`,
                               }}
                             >
                               {!empty && (
                                 <div
-                                  className="absolute inset-1.5 rounded-lg border flex items-center justify-center"
+                                  className="absolute inset-2 rounded-xl border flex items-center justify-center"
                                   style={{ borderColor: `${meta.accent}40` }}
                                 >
                                   <div
-                                    className="font-display text-lg"
+                                    className="font-display text-2xl sm:text-3xl"
                                     style={{ color: `${meta.accent}` }}
                                   >
                                     {meta.glyph}
@@ -973,12 +976,12 @@ function TarotPage() {
                         })}
                       </div>
                       <div
-                        className="mt-2 w-[76px] rounded-md bg-black/60 px-1 py-0.5 text-[13px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                        className="mt-2 w-full rounded-md bg-black/60 px-1 py-0.5 text-sm sm:text-base font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                         style={{ color: meta.accent }}
                       >
                         {meta.shortName}
                       </div>
-                      <div className="text-[11px] font-semibold text-board-fg/90 leading-tight">
+                      <div className="text-xs sm:text-sm font-semibold text-board-fg/90 leading-tight">
                         {cardGroup === "all"
                           ? `${subDeck.length}/${meta.expected}`
                           : `${subDeck.length} cards`}
@@ -986,13 +989,6 @@ function TarotPage() {
                     </div>
                   );
                 })}
-              </div>
-              <div className="text-sm text-board-fg/85 pointer-events-auto text-center pt-1">
-                {!loadingDecks && totalCards === 0
-                  ? cardGroup === "all"
-                    ? "No card pictures yet. An admin can add them in Admin, then Assets."
-                    : "No cards of this kind yet. Pick All cards to use the full decks."
-                  : "Tap a deck, or hold and drag a card onto the board"}
               </div>
             </div>
           </div>
