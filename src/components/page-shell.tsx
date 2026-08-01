@@ -6,6 +6,7 @@ import { AIInterpretation } from "@/components/ai-interpretation";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { VoicePanel } from "@/components/voice-panel";
+import { LevelGuide } from "@/components/level-guide";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -86,6 +87,7 @@ export function PageShell({
   aiIntent,
   hideAI,
   hideVoice,
+  hideLearn,
 }: {
   eyebrow?: string;
   title: string;
@@ -101,6 +103,8 @@ export function PageShell({
   hideAI?: boolean;
   /** Set to true to hide the speak-first panel (auth, terms, admin). */
   hideVoice?: boolean;
+  /** Set to true to hide the beginner-to-advanced learning card. */
+  hideLearn?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   return (
@@ -129,6 +133,7 @@ export function PageShell({
           </header>
         )}
         {!hideVoice && <VoicePanel />}
+        {!hideLearn && !hideVoice && <LevelGuide title={title} />}
         {children}
         {!hideAI && (
           <AIInterpretation
