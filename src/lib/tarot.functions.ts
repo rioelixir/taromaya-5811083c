@@ -5,6 +5,8 @@ import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
 import { MODEL_DEEP } from "@/lib/ai-models";
+import { offlineTarotReading } from "./offline-tarot";
+import { AI_OFFLINE } from "./offline-mode";
 
 const DrawSchema = z.object({
   spreadLabel: z.string(),
@@ -34,6 +36,8 @@ export const interpretTarot = createServerFn({ method: "POST" })
   .middleware([requirePremium])
   .inputValidator((data: unknown) => DrawSchema.parse(data))
   .handler(async ({ data }) => {
+    if (AI_OFFLINE) return { text: offlineTarotReading(data) };
+
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);

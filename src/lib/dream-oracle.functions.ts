@@ -6,6 +6,8 @@ import { liveSkySnapshot, signName } from "./live-sky";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
+import { offlineDreamReading } from "./offline-dream";
+import { AI_OFFLINE } from "./offline-mode";
 
 const Input = z.object({
   dream: z.string().min(4).max(4000),
@@ -25,10 +27,6 @@ export const interpretDream = createServerFn({ method: "POST" })
   .middleware([requirePremium])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
-    const gateway = createLovableAiGatewayProvider(key);
-
     // Live cosmic context for grounding
     const snap = liveSkySnapshot();
     const moon = snap.sky.tropicalPlanets.find(p => p.name === "Moon")!;
@@ -61,11 +59,17 @@ export const interpretDream = createServerFn({ method: "POST" })
       `\nInterpret with elegance. Keep it under 550 words.`,
     ].join("\n");
 
-    const { text } = await generateText({
-      model: gateway(MODEL_EVERYDAY),
-      system: withSupremeSystem(system),
-      prompt,
-    });
+    const context = { moonSign, sunSign, moonPhase: snap.moon.name, illumination: snap.moon.illumination, retros };
+
+    let text: string;
+    if (AI_OFFLINE) {
+      text = offlineDreamReading({ dream: data.dream, mood: data.mood, focus: data.focus, context });
+    } else {
+      const key = process.env.LOVABLE_API_KEY;
+      if (!key) throw new Error("Missing LOVABLE_API_KEY");
+      const gateway = createLovableAiGatewayProvider(key);
+      text = (await generateText({ model: gateway(MODEL_EVERYDAY), system: withSupremeSystem(system), prompt })).text;
+    }
 
     return {
       text,

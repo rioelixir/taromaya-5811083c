@@ -1,4 +1,6 @@
 import { aiReading as aiReadingServer } from "./ai-reading.functions";
+import { offlineReading } from "./offline-reading";
+import { AI_OFFLINE } from "./offline-mode";
 
 /**
  * Cached front door for AI readings.
@@ -80,6 +82,10 @@ function write(key: string, text: string) {
  * Same signature as the underlying server function, so call sites don't change.
  */
 export async function aiReading(args: { data: { system: string; prompt: string } }) {
+  // Offline mode: Taromaya writes the reading itself from the numbers it just
+  // calculated, so nothing is sent to a paid AI model.
+  if (AI_OFFLINE) return { text: offlineReading(args.data), cached: false as const };
+
   const key = hash(`${args.data.system}\u0000${args.data.prompt}`);
   const hit = read(key);
   if (hit) return { text: hit, cached: true as const };
