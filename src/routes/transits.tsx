@@ -2,6 +2,9 @@ import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
+import { Explain } from "@/components/explain";
+import { ConfidenceNote } from "@/components/confidence-note";
+import { CrossCheckPanel } from "@/components/cross-check-panel";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { BiWheelChart } from "@/components/bi-wheel-chart";
@@ -142,11 +145,11 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
                     <div className="flex items-center gap-2">
                       <span className="gold-text font-serif text-lg">{PLANET_GLYPHS[h.transit]}</span>
                       <span className="text-pearl">{h.transit}</span>
-                      <span className={`text-xs uppercase tracking-widest ${ASPECT_COLORS[h.type]}`}>{h.type}</span>
+                      <Explain term="aspect" className={`text-xs uppercase tracking-widest ${ASPECT_COLORS[h.type]}`} showIcon={false}>{h.type}</Explain>
                       <span className="text-cyan-300 font-serif text-lg">{PLANET_GLYPHS[h.natal]}</span>
                       <span className="text-cyan-300">{h.natal}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground font-mono">{h.orb.toFixed(2)}°</span>
+                    <Explain term="orb" className="text-xs text-muted-foreground font-mono" showIcon={false}>{h.orb.toFixed(2)}°</Explain>
                   </div>
                 ))}
               </div>
@@ -164,7 +167,9 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
                       {h.retrograde && <span className="text-cyan-300 text-[10px]">℞</span>}
                     </div>
                     <div className="text-pearl">{SIGN_GLYPHS[s]} {SIGN_NAMES[s]}</div>
-                    <div className="text-muted-foreground">House {h.house} · {formatDegree(h.longitude - s * 30)}</div>
+                    <div className="text-muted-foreground">
+                      <Explain term="house" showIcon={false}>House {h.house}</Explain> · {formatDegree(h.longitude - s * 30)}
+                    </div>
                   </div>
                 );
               })}
@@ -174,7 +179,7 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
       </div>
 
       <div className="mt-6">
-        <GlassCard title="All active aspects (tight orbs)">
+        <GlassCard title="All active aspects (tight orbs)" desc="Tap an aspect name or an orb to see what it means, from simple to advanced, with the exact formula.">
           <div className="max-h-80 overflow-y-auto text-xs">
             {hits.length === 0 ? <div className="text-muted-foreground">Sky is quiet.</div> : (
               <table className="w-full">
@@ -182,9 +187,9 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
                   {hits.map((h, i) => (
                     <tr key={i} className="border-t border-white/5">
                       <td className="py-1.5">{PLANET_GLYPHS[h.transit]} {h.transit}</td>
-                      <td className={ASPECT_COLORS[h.type]}>{h.type}</td>
+                      <td className={ASPECT_COLORS[h.type]}><Explain term="aspect" showIcon={false}>{h.type}</Explain></td>
                       <td>{PLANET_GLYPHS[h.natal]} natal {h.natal}</td>
-                      <td className="text-right text-muted-foreground font-mono">{h.orb.toFixed(2)}°</td>
+                      <td className="text-right text-muted-foreground font-mono"><Explain term="orb" showIcon={false}>{h.orb.toFixed(2)}°</Explain></td>
                     </tr>
                   ))}
                 </tbody>
@@ -207,6 +212,23 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
           {aiText && <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{aiText}</div>}
         </GlassCard>
       </div>
+
+      <ConfidenceNote noteKey="transits" className="mt-6" />
+
+      <CrossCheckPanel
+        className="mt-4"
+        input={{
+          year: Number(form.date.split("-")[0]),
+          month: Number(form.date.split("-")[1]),
+          day: Number(form.date.split("-")[2]),
+          hour: Number(form.time.split(":")[0]),
+          minute: Number(form.time.split(":")[1]),
+          tzOffsetHours: Number(form.tz),
+          latitude: Number(form.lat),
+          longitude: Number(form.lon),
+          now,
+        }}
+      />
 
       <TransitTimeline
         natalPlanets={natal.tropicalPlanets.map((p) => ({ name: p.name, longitude: p.tropicalLongitude }))}
