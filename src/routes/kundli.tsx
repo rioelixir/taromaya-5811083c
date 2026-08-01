@@ -334,25 +334,9 @@ function BirthForm({
   return (
     <GlassCard title="Birth details">
       <div className="grid gap-3">
-        <Field label="Name (optional)">
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your name" />
-        </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <DateSelect value={form.date} onChange={(iso) => setForm({ ...form, date: iso })} />
-          <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} disabled={form.unknownTime} /></Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Seconds"><input value={form.seconds} onChange={(e) => setForm({ ...form, seconds: e.target.value })} className={inputCls} inputMode="numeric" disabled={form.unknownTime} placeholder="0" /></Field>
-        </div>
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" checked={form.unknownTime} onChange={(e) => setForm({ ...form, unknownTime: e.target.checked })} className="accent-gold" />
-          Time unknown (use noon chart)
-        </label>
-        <PlacePicker
-          value={{ place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-          onChange={(p) => setForm({ ...form, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
-          forDate={form.date}
-          forTime={form.time}
+        <BirthOneBox
+          value={{ name: form.name, date: form.date, time: form.time, place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
+          onChange={(patch) => setForm({ ...form, ...patch, unknownTime: false } as FormState)}
         />
         <button
           disabled={!canSubmit} onClick={onCompute}
@@ -365,6 +349,7 @@ function BirthForm({
     </GlassCard>
   );
 }
+
 
 const inputCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
