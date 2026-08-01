@@ -240,9 +240,9 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
               <Link
                 to="/admin"
                 onClick={onClose}
-                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+                className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-base text-foreground hover:bg-primary/8"
               >
-                <Shield className="h-4 w-4 text-gold shrink-0" />
+                <Shield className="h-5 w-5 text-gold shrink-0" />
                 <span>{t("Control Room")}</span>
               </Link>
             </div>
@@ -253,11 +253,12 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
               window.dispatchEvent(new Event("taromaya:open-authors-note"));
               onClose();
             }}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+            className="w-full flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-base text-foreground hover:bg-primary/8"
           >
-            <Feather className="h-4 w-4 text-primary shrink-0" />
+            <Feather className="h-5 w-5 text-primary shrink-0" />
             <span>{t("Author's Note")}</span>
           </button>
+
         </nav>
 
         <div className="px-4 pb-3 pt-2 border-t border-border/40">
