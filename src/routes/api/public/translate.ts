@@ -127,15 +127,19 @@ export const Route = createFileRoute("/api/public/translate")({
         }
 
         // Hinglish goes through Hindi, everything else translates directly.
-        const target = lang === "hr" ? "hi" : lang;
+        const hinglish = lang === "hr";
+        const target = hinglish ? "hi" : lang;
 
         const results = await Promise.all(
           strings.map(async (s) => {
-            const hit = await gtx(target, s);
+            const hit = await gtx(target, s, hinglish);
             if (!hit) return s;
-            return lang === "hr" ? toLatin(hit) : hit;
+            if (!hinglish) return hit.text;
+            // Prefer Google's own romanization; fall back to transliteration.
+            return hit.roman ?? toLatin(hit.text);
           }),
         );
+
 
         return new Response(JSON.stringify({ translations: results }), { headers: json() });
       },
