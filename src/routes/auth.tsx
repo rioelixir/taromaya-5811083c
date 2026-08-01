@@ -6,6 +6,8 @@ import { StarField } from "@/components/star-field";
 import { Sparkles, Loader2, Mail } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
 import { queueAuthorsNote } from "@/components/authors-note-modal";
+import { termsStatus } from "@/lib/terms.functions";
+
 
 function AuthLogo() {
   const logo = useAppLogo();
