@@ -46,6 +46,34 @@ const TAB_LABEL: Record<Tab, string> = {
 };
 
 
+function FullReportTab({
+  fullName, setFullName, birthDate, setBirthDate,
+}: {
+  fullName: string; setFullName: (s: string) => void;
+  birthDate: string; setBirthDate: (s: string) => void;
+}) {
+  return (
+    <>
+      <GlassCard>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Your full name (as you use it)</span>
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Aryan Sharma"
+              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
+          </label>
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
+          </label>
+        </div>
+      </GlassCard>
+      <div className="mt-6">
+        <NumerologyFullReport fullName={fullName} birthDate={birthDate} />
+      </div>
+    </>
+  );
+}
+
 function NumerologyPage() {
   const [tab, setTab] = useState<Tab>("report");
   const [fullName, setFullName] = useState("");
