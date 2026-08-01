@@ -71,9 +71,10 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 86;
 const CARD_H = 132;
-// Deck stacks are shown big by default so users can tap/drag them easily.
-const MINI_W = 110;
-const MINI_H = 170;
+// Deck stacks are shown at a medium size so they are easy to tap but do not
+// dominate the board. Placed cards keep their own size above.
+const MINI_W = 90;
+const MINI_H = 138;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
