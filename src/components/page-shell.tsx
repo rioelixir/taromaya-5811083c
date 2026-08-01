@@ -102,6 +102,8 @@ export function PageShell({
   hideAI?: boolean;
   /** Set to true to hide the speak-first panel (auth, terms, admin). */
   hideVoice?: boolean;
+  /** Set to true to hide the beginner-to-advanced learning card. */
+  hideLearn?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   return (
