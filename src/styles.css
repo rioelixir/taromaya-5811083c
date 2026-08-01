@@ -175,7 +175,7 @@
     color: oklch(0.12 0.02 295) !important;
   }
   .text-muted-foreground {
-    color: oklch(0.30 0.03 290) !important;
+    color: oklch(0.26 0.03 290) !important;
     font-weight: 500;
   }
 
@@ -336,10 +336,10 @@
 }
 
 @utility gold-text {
-  background: linear-gradient(135deg, oklch(0.42 0.14 78), oklch(0.55 0.14 82));
+  background: linear-gradient(135deg, oklch(0.34 0.12 70), oklch(0.44 0.13 82));
   -webkit-background-clip: text;
   background-clip: text;
-  color: oklch(0.35 0.12 78);
+  color: oklch(0.30 0.11 74);
   -webkit-text-fill-color: transparent;
   font-weight: 700;
 }
