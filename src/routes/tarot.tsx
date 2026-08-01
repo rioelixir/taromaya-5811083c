@@ -796,7 +796,7 @@ function TarotPage() {
       {headerCollapsed && (
         <button
           onClick={() => setHeaderCollapsed(false)}
-          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl border border-r-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[-4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl border border-r-0 border-gold/50 bg-black/80 min-w-11 px-3 py-6 text-gold shadow-[-4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Show controls"
         >
           <div className="flex flex-col items-center gap-2">
@@ -827,7 +827,7 @@ function TarotPage() {
         {/* Nakshatra toggle - always visible on every screen */}
         <button
           onClick={() => setNakshatraPanelOpen(true)}
-          className="absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 min-w-11 px-3 py-6 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Open Nakshatra panel"
         >
           <div className="flex flex-col items-center gap-2">
