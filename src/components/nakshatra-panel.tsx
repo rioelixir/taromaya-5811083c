@@ -276,7 +276,7 @@ export function NakshatraPanel({
         <div className="space-y-3">
           <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">
-              Nakshatra right now
+              Nakshatra for {prettyDate(date)}, {time}
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
             <div className="text-xs text-muted-foreground">{nakshatraLine}</div>
