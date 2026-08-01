@@ -1,8 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages, Sparkles } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Loader2,
+  Search,
+  ArrowRight,
+  HelpCircle,
+  Home,
+  Languages,
+  Sparkles,
+  Square,
+} from "lucide-react";
 import { HELP_GUIDES, helpGroups, searchGuides, type HelpGuide } from "@/lib/help-guides";
 import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
+import { loadVoices, pickVoice, speakText, type Speaker } from "@/lib/help-speech";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/help")({
@@ -26,7 +38,7 @@ export const Route = createFileRoute("/help")({
   }),
 });
 
-type PlayState = { id: string; status: "loading" | "playing" } | null;
+type PlayState = { id: string; status: "loading" | "playing" | "paused" } | null;
 
 function HelpPage() {
   const appLang = useLang();
@@ -38,43 +50,60 @@ function HelpPage() {
   // The phone's own voice is free and instant, so it is the normal way to listen.
   // The studio voice sounds nicer and is there when someone wants it.
   const [studio, setStudio] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const scriptCache = useRef<Map<string, string>>(new Map());
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speakerRef = useRef<Speaker | null>(null);
 
   // Start in whatever language the person already picked for the app.
-  useEffect(() => { setLang(appLang); }, [appLang]);
+  useEffect(() => {
+    setLang(appLang);
+  }, [appLang]);
+
+  // Ask the device which voices it has, so we know what it can really read.
+  useEffect(() => {
+    void loadVoices().then(setVoices);
+  }, []);
 
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;
-      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+      speakerRef.current?.cancel();
+      speakerRef.current = null;
     };
   }, []);
 
   const stop = () => {
     audioRef.current?.pause();
     audioRef.current = null;
-    window.speechSynthesis?.cancel();
+    speakerRef.current?.cancel();
+    speakerRef.current = null;
+    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     setNow(null);
   };
 
-  /** If the voice service is busy, the phone reads it out instead, so help always works. */
+  const choice = useMemo(() => pickVoice(voices, lang), [voices, lang]);
+  /** No voice on the device for this language, so the studio voice is the only way. */
+  const needsStudio = voices.length > 0 && !choice.exact && lang !== "en";
+
+  /** The device reads the guide out loud, piece by piece. */
   const speakWithPhone = (guide: HelpGuide, words?: string) => {
-    const synth = window.speechSynthesis;
-    if (!synth) {
-      setProblem("Voice is not available on this device. Please try again later.");
-      setNow(null);
-      return;
-    }
-    const u = new SpeechSynthesisUtterance(words ?? `${guide.title}. ${guide.script}`);
-    u.lang = lang === "en" ? "en-IN" : lang;
-    u.rate = 0.95;
-    u.onend = () => setNow(null);
-    u.onerror = () => setNow(null);
-    synth.cancel();
-    synth.speak(u);
-    setNow({ id: guide.id, status: "playing" });
+    speakerRef.current?.cancel();
+    speakerRef.current = speakText(words ?? `${guide.title}. ${guide.script}`, {
+      lang: choice.tag,
+      voice: choice.voice,
+      onStart: () => setNow({ id: guide.id, status: "playing" }),
+      onDone: () => {
+        speakerRef.current = null;
+        setNow(null);
+      },
+      onFail: (why) => {
+        speakerRef.current = null;
+        setNow(null);
+        setProblem(why);
+      },
+    });
   };
 
   /** Gets the guide words in the chosen language, and remembers them. */
@@ -94,18 +123,38 @@ function HelpPage() {
     return text;
   };
 
+  /** Play, pause and carry on again from the same button. */
   const play = async (guide: HelpGuide) => {
-    if (now?.id === guide.id) { stop(); return; }
+    if (now?.id === guide.id) {
+      if (now.status === "playing") {
+        audioRef.current?.pause();
+        speakerRef.current?.pause();
+        setNow({ id: guide.id, status: "paused" });
+        return;
+      }
+      if (now.status === "paused") {
+        void audioRef.current?.play();
+        speakerRef.current?.resume();
+        setNow({ id: guide.id, status: "playing" });
+        return;
+      }
+      stop();
+      return;
+    }
     stop();
     setProblem(null);
     setNow({ id: guide.id, status: "loading" });
 
-    if (!studio) {
+    const useStudio = studio || needsStudio;
+
+    if (!useStudio) {
+      let words: string | undefined;
       try {
-        speakWithPhone(guide, await wordsFor(guide));
+        words = await wordsFor(guide);
       } catch {
-        speakWithPhone(guide);
+        words = undefined;
       }
+      speakWithPhone(guide, words);
       return;
     }
 
@@ -114,15 +163,32 @@ function HelpPage() {
         `/api/public/help-audio?id=${encodeURIComponent(guide.id)}&lang=${encodeURIComponent(lang)}`,
       );
       if (!res.ok) throw new Error("no audio");
-      const url = URL.createObjectURL(await res.blob());
+      const blob = await res.blob();
+      if (blob.size < 1024) throw new Error("empty audio");
+      const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => { URL.revokeObjectURL(url); setNow(null); };
-      audio.onerror = () => { URL.revokeObjectURL(url); speakWithPhone(guide); };
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+        setNow(null);
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+        speakWithPhone(guide);
+      };
       audioRef.current = audio;
       await audio.play();
       setNow({ id: guide.id, status: "playing" });
     } catch {
-      speakWithPhone(guide);
+      // The nicer voice is not available right now, so the device reads it.
+      let words: string | undefined;
+      try {
+        words = await wordsFor(guide);
+      } catch {
+        words = undefined;
+      }
+      speakWithPhone(guide, words);
     }
   };
 
@@ -166,7 +232,10 @@ function HelpPage() {
           <Languages className="h-4 w-4 text-gold shrink-0" />
           <select
             value={lang}
-            onChange={(e) => { stop(); setLang(e.target.value as Lang); }}
+            onChange={(e) => {
+              stop();
+              setLang(e.target.value as Lang);
+            }}
             aria-label="Choose the voice language"
             className="w-full bg-transparent text-sm text-pearl outline-none"
           >
@@ -184,7 +253,10 @@ function HelpPage() {
           <button
             key={name}
             type="button"
-            onClick={() => { stop(); setGroup(name); }}
+            onClick={() => {
+              stop();
+              setGroup(name);
+            }}
             aria-pressed={group === name}
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs transition",
@@ -198,20 +270,40 @@ function HelpPage() {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => { stop(); setStudio((v) => !v); }}
-        aria-pressed={studio}
-        className={cn(
-          "mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
-          studio
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            stop();
+            setStudio((v) => !v);
+          }}
+          aria-pressed={studio}
+          className={cn(
+            "inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
+            studio
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+          )}
+        >
+          <Sparkles className="h-4 w-4" />
+          {studio ? "Nicer voice is on" : "Use a nicer voice"}
+        </button>
+        {now && (
+          <button
+            type="button"
+            onClick={stop}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border/50 bg-white/60 px-3 py-2 text-xs text-muted-foreground transition hover:bg-white"
+          >
+            <Square className="h-4 w-4" /> Stop
+          </button>
         )}
-      >
-        <Sparkles className="h-4 w-4" />
-        {studio ? "Nicer voice is on" : "Use a nicer voice"}
-      </button>
+      </div>
+
+      {needsStudio && !studio && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          This device has no voice for this language, so the nicer voice will read it for you.
+        </p>
+      )}
 
       {problem && <p className="mt-3 text-sm text-muted-foreground">{problem}</p>}
 
@@ -225,6 +317,7 @@ function HelpPage() {
               {items.map((g) => {
                 const active = now?.id === g.id;
                 const loading = active && now?.status === "loading";
+                const playing = active && now?.status === "playing";
                 return (
                   <div
                     key={g.id}
@@ -234,7 +327,13 @@ function HelpPage() {
                       <button
                         type="button"
                         onClick={() => void play(g)}
-                        aria-label={active ? `Stop the guide for ${g.title}` : `Listen to the guide for ${g.title}`}
+                        aria-label={
+                          playing
+                            ? `Pause the guide for ${g.title}`
+                            : active && now?.status === "paused"
+                              ? `Carry on the guide for ${g.title}`
+                              : `Listen to the guide for ${g.title}`
+                        }
                         className={cn(
                           "grid h-12 w-12 shrink-0 place-items-center rounded-full transition active:scale-95",
                           active
@@ -244,12 +343,13 @@ function HelpPage() {
                       >
                         {loading ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : active ? (
+                        ) : playing ? (
                           <Pause className="h-5 w-5" />
                         ) : (
                           <Play className="h-5 w-5" />
                         )}
                       </button>
+
                       <div className="min-w-0">
                         <div className="font-medium text-foreground">{g.title}</div>
                         <div className="text-xs text-muted-foreground">{g.blurb}</div>
