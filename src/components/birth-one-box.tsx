@@ -214,19 +214,20 @@ export function BirthOneBox({
         <button
           type="button"
           onClick={() => apply(text)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-gold/15 px-5 text-sm text-gold gold-border hover:bg-gold/25"
+          className="inline-flex min-h-12 items-center gap-2 rounded-full bg-gold/15 px-5 text-base text-gold gold-border hover:bg-gold/25"
         >
-          <CornerDownLeft className="h-4 w-4" /> Use these details
+          <CornerDownLeft className="h-5 w-5" /> Use this
         </button>
         {text && (
           <button
             type="button"
             onClick={() => { setText(""); setNote(null); voice.clear(); }}
-            className="inline-flex min-h-11 items-center rounded-full bg-white/5 px-5 text-sm text-pearl/90 hover:bg-white/10"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-white/5 px-5 text-base text-pearl/90 hover:bg-white/10"
           >
-            Clear
+            Start again
           </button>
         )}
+
         {busy && (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" /> Finding the place…
