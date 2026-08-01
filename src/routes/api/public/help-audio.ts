@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { guideById } from "@/lib/help-guides";
 import { LANGUAGE_LIST } from "@/lib/i18n";
+import { MODEL_EVERYDAY } from "@/lib/ai-models";
 
 /**
  * Reads one help guide out loud, in any language the app supports.
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/api/public/help-audio")({
             method: "POST",
             headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-3.6-flash",
+              model: MODEL_EVERYDAY,
               messages: [
                 {
                   role: "system",
@@ -48,6 +49,17 @@ export const Route = createFileRoute("/api/public/help-audio")({
           } else {
             console.error(`Help translate failed [${t.status}]: ${await t.text().catch(() => "")}`);
           }
+        }
+
+        // The phone can read the words out itself for free. When the page asks
+        // for text only we stop here, which is the normal path.
+        if (url.searchParams.get("text") === "1") {
+          return new Response(JSON.stringify({ text: spoken }), {
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "public, max-age=2592000, immutable",
+            },
+          });
         }
 
         const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
@@ -74,7 +86,7 @@ export const Route = createFileRoute("/api/public/help-audio")({
         return new Response(res.body, {
           headers: {
             "Content-Type": "audio/mpeg",
-            "Cache-Control": "public, max-age=86400",
+            "Cache-Control": "public, max-age=2592000, immutable",
           },
         });
       },
