@@ -852,19 +852,20 @@ function TarotPage() {
               />
             ))}
 
-            {/* Always-there Ask AI button, so it works even with the top bar hidden */}
+            {/* Always-there reading button, so it works even with the top bar hidden */}
             <button
               onClick={requestReading}
               disabled={!readyToInterpret || loadingReading}
-              className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+              className="absolute top-3 left-3 z-30 inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-base font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
             >
               {loadingReading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-5 w-5" />
               )}
-              Ask AI
+              Read my cards
             </button>
+
 
             {/* Tarot deck stacks — bottom right */}
             <div
