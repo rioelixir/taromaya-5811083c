@@ -182,31 +182,33 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
             <div className="min-w-0">
               <div className="font-display text-xl leading-none gold-text">TAROMAYA</div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1 truncate">
-                All Modules
+                Everything in the app
               </div>
             </div>
           </Link>
           <button
             onClick={onClose}
-            className="ml-auto h-9 w-9 grid place-items-center rounded-full hover:bg-black/5"
+            className="ml-auto h-11 w-11 grid place-items-center rounded-full hover:bg-black/5"
             aria-label="Close menu"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="px-5 pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search modules…"
-              className="w-full rounded-xl border border-border/40 bg-white/60 pl-9 pr-3 py-2.5 text-sm"
+              placeholder="Type what you are looking for…"
+              className="min-h-12 w-full rounded-xl border border-border/40 bg-white/60 pl-10 pr-3 py-2.5 text-base"
             />
           </div>
         </div>
+
+
 
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-4">
           {filtered.map((group) => (
