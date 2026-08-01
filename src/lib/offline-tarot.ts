@@ -57,6 +57,18 @@ function speak(text: string): string {
     .trim();
 }
 
+/** Little joining words so the pulls read as one story, not a list. */
+const LINKS = [
+  "",
+  "Then the story moves on.",
+  "Next to that,",
+  "Underneath it all,",
+  "Alongside that,",
+  "And there is more.",
+  "Close to the end,",
+  "Last of all,",
+];
+
 export function offlineTarotReading(draw: OfflineDraw): string {
   const n = seed(draw.cards.map((c) => `${c.name}${c.reversed}`).join("|") + (draw.question ?? ""));
   const lines: string[] = [];
@@ -66,8 +78,11 @@ export function offlineTarotReading(draw: OfflineDraw): string {
   const question = (draw.question ?? "").trim();
   const wantsYesNo = !!question && YES_WORDS.test(question);
   const votes: number[] = [];
+  const said = new Set<string>();
 
-  const chosen = draw.cards.slice(0, 8);
+  const chosen = draw.cards.slice(0, 10);
+  const reversedCount = chosen.filter((c) => c.reversed).length;
+
   chosen.forEach((card, i) => {
     const keywordList = (card.keywords ?? []).filter(Boolean).slice(0, 3);
     const keywords = keywordList.join(", ");
@@ -75,16 +90,30 @@ export function offlineTarotReading(draw: OfflineDraw): string {
     let body = "";
     if (d) {
       const core = card.reversed ? d.reversed : d.upright;
-      const flavour = /love|relationship|marriage|partner|him|her|crush/i.test(question)
+      const flavour = /love|relationship|marriage|partner|him|her|crush|husband|wife/i.test(question)
         ? d.love
-        : /job|work|money|career|business|study/i.test(question)
+        : /job|work|money|career|business|study|exam|salary/i.test(question)
           ? d.career
-          : i === chosen.length - 1
+          : /health|body|sleep|tired|illness/i.test(question)
             ? d.spiritual
-            : "";
+            : i === chosen.length - 1
+              ? d.spiritual
+              : "";
       body = [speak(core), flavour ? speak(flavour) : ""].filter(Boolean).join(" ");
       const yn = d.yesNo?.toLowerCase() ?? "";
-      votes.push(card.reversed ? (yn.startsWith("yes") ? -1 : yn.startsWith("no") ? 1 : 0) : yn.startsWith("yes") ? 1 : yn.startsWith("no") ? -1 : 0);
+      votes.push(
+        card.reversed
+          ? yn.startsWith("yes")
+            ? -1
+            : yn.startsWith("no")
+              ? 1
+              : 0
+          : yn.startsWith("yes")
+            ? 1
+            : yn.startsWith("no")
+              ? -1
+              : 0,
+      );
     } else if (keywords) {
       body = `The words on this one point to ${keywords}${card.reversed ? ", and it comes softened or delayed" : ""}.`;
     } else {
@@ -92,11 +121,32 @@ export function offlineTarotReading(draw: OfflineDraw): string {
         ? "This one asks you to slow down before you push."
         : "This one says the way ahead is open if you take it.";
     }
-    lines.push(body);
+
+    // Never repeat the same sentence twice in one reading.
+    const key = body.slice(0, 60).toLowerCase();
+    if (said.has(key)) return;
+    said.add(key);
+
+    const link = i === 0 ? "" : LINKS[i % LINKS.length];
+    lines.push(link ? `${link} ${body}`.replace(/\s+/g, " ").trim() : body);
   });
 
+  // The overall weather of the pull, from how much came out reversed.
+  if (chosen.length > 2) {
+    const share = reversedCount / chosen.length;
+    lines.push(
+      share === 0
+        ? "Taken together, the road here is fairly open, so the main risk is waiting too long."
+        : share < 0.4
+          ? "Taken together, most of this flows, with one or two places that need patience."
+          : share < 0.7
+            ? "Taken together, this is a mixed patch: real progress, but it comes slower than you would like."
+            : "Taken together, a lot of this is held back for now, so pushing harder will only tire you out.",
+    );
+  }
+
   const stars = [
-    draw.birthNakshatra ? `Your birth star adds a steady thread through all of this` : "",
+    draw.birthNakshatra ? "Your birth star adds a steady thread through all of this" : "",
     draw.placeNakshatra
       ? `and where you are sitting right now colours today's mood${draw.placeName ? ` in ${draw.placeName}` : ""}`
       : "",
@@ -106,8 +156,18 @@ export function offlineTarotReading(draw: OfflineDraw): string {
   if (wantsYesNo) {
     const score = votes.reduce((a, b) => a + b, 0);
     const answer =
-      score >= 2 ? "Yes." : score === 1 ? "Leaning yes." : score === 0 ? "It is not settled yet, so wait a little." : score === -1 ? "Leaning no." : "No.";
+      score >= 2
+        ? "Yes."
+        : score === 1
+          ? "Leaning yes."
+          : score === 0
+            ? "It is not settled yet, so wait a little."
+            : score === -1
+              ? "Leaning no."
+              : "No.";
     lines.push(`On your question, the answer here is ${answer}`);
+  } else if (question) {
+    lines.push("On what you asked, the honest answer is that this is still being shaped by what you do next.");
   }
 
   lines.push(
@@ -115,8 +175,10 @@ export function offlineTarotReading(draw: OfflineDraw): string {
       "One simple next step: write down the first thought you had while looking at these, and act on it today.",
       "One simple next step: pick the easiest kind thing you can do about this before tonight.",
       "One simple next step: say the true thing out loud to the one person who needs to hear it.",
-    ][n % 3],
+      "One simple next step: choose the smallest job you have been avoiding and finish it today.",
+    ][n % 4],
   );
 
   return lines.join("\n");
 }
+
