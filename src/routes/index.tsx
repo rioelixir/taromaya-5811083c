@@ -57,18 +57,18 @@ function Home() {
       <div className="mt-8 flex flex-wrap gap-3" data-tour="hero-start">
         <Link
           to="/tarot"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-md hover:shadow-lg transition-all"
+          className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-medium text-primary-foreground shadow-md hover:shadow-lg transition-all"
         >
-          <Sparkles className="h-4 w-4" />
-          Start a reading
-          <ArrowRight className="h-4 w-4" />
+          <Sparkles className="h-5 w-5" />
+          Draw a card
+          <ArrowRight className="h-5 w-5" />
         </Link>
         <Link
           to="/ai"
-          className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-white/60 px-6 py-3 text-sm text-foreground hover:bg-white/90 transition"
+          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border/50 bg-white/60 px-6 py-3 text-base text-foreground hover:bg-white/90 transition"
         >
-          <Bot className="h-4 w-4 text-primary" />
-          Ask the oracle
+          <Bot className="h-5 w-5 text-primary" />
+          Ask a question
         </Link>
       </div>
 
@@ -76,61 +76,53 @@ function Home() {
       {/* Quick actions — 4 large tiles */}
       <section className="mt-12" data-tour="quick-actions">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl">Quick actions</h2>
+          <h2 className="font-display text-xl">Start here</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <QuickTile to="/tarot" label="Tarot" hint="Draw a card" icon={Sparkles} />
-          <QuickTile to="/kundli" label="Kundli" hint="Your birth chart" icon={Star} />
-          <QuickTile to="/panchang" label="Panchang" hint="Today's almanac" icon={CalendarDays} />
-          <QuickTile to="/ai" label="AI Guide" hint="Ask anything" icon={Bot} />
+          <QuickTile to="/tarot" label="Tarot cards" icon={Sparkles} />
+          <QuickTile to="/kundli" label="Birth chart" icon={Star} />
+          <QuickTile to="/panchang" label="Today's sky" icon={CalendarDays} />
+          <QuickTile to="/ai" label="Ask the guide" icon={Bot} />
         </div>
       </section>
 
       {/* Matching & numbers */}
       <section className="mt-10">
-        <h2 className="mb-4 font-display text-xl">Matching &amp; numbers</h2>
+        <h2 className="mb-4 font-display text-xl">Matching and numbers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <Link
             to="/numerology"
             search={{ tab: "compat" }}
-            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
           >
-            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Heart className="h-5 w-5" />
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Heart className="h-6 w-6" />
             </div>
-            <div className="min-w-0">
-              <div className="font-medium text-foreground">Kundli Matching</div>
-              <div className="text-xs text-muted-foreground">See how two people fit together</div>
-            </div>
+            <div className="min-w-0 text-base font-medium text-foreground">Kundli matching</div>
           </Link>
           <Link
             to="/numerology"
             search={{ tab: "report" }}
-            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
           >
-            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Hash className="h-5 w-5" />
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Hash className="h-6 w-6" />
             </div>
-            <div className="min-w-0">
-              <div className="font-medium text-foreground">Numerology</div>
-              <div className="text-xs text-muted-foreground">Your numbers, explained simply</div>
-            </div>
+            <div className="min-w-0 text-base font-medium text-foreground">My numbers</div>
           </Link>
           <Link
             to="/numerology"
             search={{ tab: "vedic" }}
-            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
           >
-            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Sigma className="h-5 w-5" />
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Sigma className="h-6 w-6" />
             </div>
-            <div className="min-w-0">
-              <div className="font-medium text-foreground">Vedic Numerology</div>
-              <div className="text-xs text-muted-foreground">Birth number the Vedic way</div>
-            </div>
+            <div className="min-w-0 text-base font-medium text-foreground">Vedic numbers</div>
           </Link>
         </div>
       </section>
+
 
       {/* Today */}
       <section className="mt-10">
