@@ -81,6 +81,7 @@ import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicTranslateRouteImport } from './routes/api/public/translate'
 import { Route as ApiPublicHelpAudioRouteImport } from './routes/api/public/help-audio'
 import { Route as ApiPublicBootstrapAdminsRouteImport } from './routes/api/public/bootstrap-admins'
 import { Route as AuthenticatedKundliNewRouteImport } from './routes/_authenticated/kundli.new'
@@ -448,6 +449,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicTranslateRoute = ApiPublicTranslateRouteImport.update({
+  id: '/api/public/translate',
+  path: '/api/public/translate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHelpAudioRoute = ApiPublicHelpAudioRouteImport.update({
   id: '/api/public/help-audio',
   path: '/api/public/help-audio',
@@ -545,6 +551,7 @@ export interface FileRoutesByFullPath {
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
+  '/api/public/translate': typeof ApiPublicTranslateRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -622,6 +629,7 @@ export interface FileRoutesByTo {
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
+  '/api/public/translate': typeof ApiPublicTranslateRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -701,6 +709,7 @@ export interface FileRoutesById {
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
+  '/api/public/translate': typeof ApiPublicTranslateRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -780,6 +789,7 @@ export interface FileRouteTypes {
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
+    | '/api/public/translate'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -857,6 +867,7 @@ export interface FileRouteTypes {
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
+    | '/api/public/translate'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -935,6 +946,7 @@ export interface FileRouteTypes {
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
+    | '/api/public/translate'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -1004,6 +1016,7 @@ export interface RootRouteChildren {
   ShareTokenRoute: typeof ShareTokenRoute
   ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
   ApiPublicHelpAudioRoute: typeof ApiPublicHelpAudioRoute
+  ApiPublicTranslateRoute: typeof ApiPublicTranslateRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1513,6 +1526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/translate': {
+      id: '/api/public/translate'
+      path: '/api/public/translate'
+      fullPath: '/api/public/translate'
+      preLoaderRoute: typeof ApiPublicTranslateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/help-audio': {
       id: '/api/public/help-audio'
       path: '/api/public/help-audio'
@@ -1647,6 +1667,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTokenRoute: ShareTokenRoute,
   ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
   ApiPublicHelpAudioRoute: ApiPublicHelpAudioRoute,
+  ApiPublicTranslateRoute: ApiPublicTranslateRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport

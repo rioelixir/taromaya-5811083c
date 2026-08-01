@@ -82,17 +82,13 @@ async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<
   if (strings.length === 0) return {};
   const map: Record<string, string> = {};
   // chunk to keep requests small
-  const CHUNK = 40;
+  const CHUNK = 30;
   for (let i = 0; i < strings.length; i += CHUNK) {
     const batch = strings.slice(i, i + CHUNK);
     try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data: sess } = await supabase.auth.getSession();
-      const token = sess.session?.access_token;
-      if (!token) return {};
-      const res = await fetch("/api/translate", {
+      const res = await fetch("/api/public/translate", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ lang, strings: batch }),
       });
       if (!res.ok) continue;
@@ -108,6 +104,7 @@ async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<
   }
   return map;
 }
+
 
 let running = false;
 async function translatePage(lang: Lang) {
