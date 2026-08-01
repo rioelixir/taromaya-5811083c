@@ -18,7 +18,9 @@ import {
   mobileDobMatch,
 } from "@/lib/name-spelling";
 import { aiReading } from "@/lib/ai-reading.functions";
+import { NumerologyFullReport } from "@/components/numerology-report";
 import { Loader2, Sparkles } from "lucide-react";
+
 
 export const Route = createFileRoute("/numerology")({
   component: () => (<PremiumGate featureName="Numerology"><NumerologyPage /></PremiumGate>),
