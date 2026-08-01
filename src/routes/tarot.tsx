@@ -921,11 +921,11 @@ function TarotPage() {
                             >
                               {!empty && (
                                 <div
-                                  className="absolute inset-2 rounded-xl border flex items-center justify-center"
+                                  className="absolute inset-1 rounded-xl border flex items-center justify-center"
                                   style={{ borderColor: `${meta.accent}40` }}
                                 >
                                   <div
-                                    className="font-display text-2xl sm:text-3xl"
+                                    className="font-display text-lg"
                                     style={{ color: `${meta.accent}` }}
                                   >
                                     {meta.glyph}
@@ -937,12 +937,12 @@ function TarotPage() {
                         })}
                       </div>
                       <div
-                        className="mt-2 w-full rounded-md bg-black/60 px-1 py-0.5 text-sm sm:text-base font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                        className="mt-1.5 w-full rounded-md bg-black/60 px-1 py-0.5 text-[10px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                         style={{ color: meta.accent }}
                       >
                         {meta.shortName}
                       </div>
-                      <div className="text-xs sm:text-sm font-semibold text-board-fg/90 leading-tight">
+                      <div className="text-[10px] font-semibold text-board-fg/90 leading-tight">
                         {cardGroup === "all"
                           ? `${subDeck.length}/${meta.expected}`
                           : `${subDeck.length} cards`}
