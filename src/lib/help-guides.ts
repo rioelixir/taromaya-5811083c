@@ -344,41 +344,6 @@ export const HELP_GUIDES: HelpGuide[] = [
       "You can see which sign each planet is sitting in and whether it is moving forward or looking like it is going backwards. " +
       "It updates by itself, so you can just watch.",
   },
-  {
-    id: "observatory",
-    title: "Observatory",
-    to: "/observatory",
-    group: "Sky watching",
-    blurb: "Look closer at the sky.",
-    tags: ["telescope", "planets", "watch"],
-    script:
-      "The observatory is for looking, not for predicting. " +
-      "It shows the planets and their positions in a bigger, clearer view, so you can learn what is up there tonight.",
-  },
-  {
-    id: "weather",
-    title: "Cosmic weather",
-    to: "/weather",
-    group: "Sky watching",
-    blurb: "The mood of the sky today.",
-    tags: ["mood", "today", "energy"],
-    script:
-      "Think of this as a weather report for the sky's mood. " +
-      "Pick your city and read the short forecast: calm, busy, or a bit bumpy, and one simple tip for the day.",
-  },
-  {
-    id: "astrocartography",
-    title: "Places on the map",
-    to: "/astrocartography",
-    group: "Sky watching",
-    blurb: "Where in the world suits you.",
-    tags: ["travel", "move", "map", "city"],
-    script:
-      "Your chart feels different in different places. " +
-      NEEDS_BIRTH +
-      "The map shows lines across the world and tells you, in plain words, what kind of place each line brings: good for work, good for love, good for rest. " +
-      "Use it when you are thinking about travelling or moving.",
-  },
 
   // ------------------------------------------------------------- Life areas
   {
