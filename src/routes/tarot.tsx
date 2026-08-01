@@ -775,15 +775,6 @@ function TarotPage() {
         </button>
       )}
 
-      {/* Full-screen toggle - sits just below the Show button on the right */}
-      <button
-        onClick={toggleFullScreen}
-        className="absolute right-3 top-14 z-30 rounded-full border border-gold/40 bg-black/70 p-2 text-gold-soft hover:bg-black/90"
-        aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
-        title={isFullScreen ? "Exit full screen" : "Full screen"}
-      >
-        {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-      </button>
 
 
 
