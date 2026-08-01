@@ -53,3 +53,56 @@ export function prettyCardName(raw: string): string {
     .trim()
     .replace(/\b\w/g, (m) => m.toUpperCase()) || "Card";
 }
+
+// ---------- Card groups (works for every deck: Rider Waite, Soulmates,
+// Lost & Found, Health) ----------
+// Users can choose to pull only big-picture cards (major), only everyday
+// cards (minor) or only the people cards (court). Grouping is read from the
+// file name the admin uploaded, so it needs no extra metadata.
+
+export type CardGroup = "all" | "major" | "minor" | "court";
+
+export const CARD_GROUPS: { key: CardGroup; label: string }[] = [
+  { key: "all", label: "All cards" },
+  { key: "major", label: "Major only" },
+  { key: "minor", label: "Minor only" },
+  { key: "court", label: "Court only" },
+];
+
+const COURT_WORDS = /\b(page|knight|queen|king|prince|princess|jack|knave)\b/;
+const SUIT_WORDS = /\b(wand|wands|cup|cups|sword|swords|pentacle|pentacles|coin|coins|disk|disks|rod|rods)\b/;
+const RANK_WORDS =
+  /\b(ace|one|two|three|four|five|six|seven|eight|nine|ten|1|2|3|4|5|6|7|8|9|10)\b/;
+
+const MAJOR_NAMES = [
+  "fool", "magician", "high priestess", "priestess", "empress", "emperor",
+  "hierophant", "lovers", "chariot", "strength", "hermit", "wheel of fortune",
+  "wheel", "justice", "hanged man", "death", "temperance", "devil", "tower",
+  "star", "moon", "sun", "judgement", "judgment", "world",
+];
+
+export function cardGroupOf(name: string): Exclude<CardGroup, "all"> {
+  const n = name.toLowerCase();
+  if (/\bmajor\b/.test(n)) return "major";
+  if (COURT_WORDS.test(n)) return "court";
+  if (/\bcourt\b/.test(n)) return "court";
+  if (/\bminor\b/.test(n)) return "minor";
+  if (MAJOR_NAMES.some((m) => n.includes(m))) return "major";
+  if (SUIT_WORDS.test(n) && RANK_WORDS.test(n)) return "minor";
+  if (SUIT_WORDS.test(n)) return "minor";
+  // Numbered-only files (0-21) are usually the big-picture cards.
+  const num = n.match(/\b(\d{1,2})\b/);
+  if (num && Number(num[1]) <= 21) return "major";
+  return "minor";
+}
+
+export function filterCardsByGroup<T extends { name: string }>(
+  cards: T[],
+  group: CardGroup,
+): T[] {
+  if (group === "all") return cards;
+  const picked = cards.filter((c) => cardGroupOf(c.name) === group);
+  // Never hand back an empty stack when the deck simply isn't labelled that
+  // way — fall back to the full deck so the board always works.
+  return picked.length > 0 ? picked : [];
+}
