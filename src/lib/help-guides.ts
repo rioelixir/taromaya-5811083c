@@ -219,19 +219,7 @@ export const HELP_GUIDES: HelpGuide[] = [
       "Start with the strongest and lean on it.",
   },
   {
-    id: "rectification",
-    title: "Birth time check",
-    to: "/rectification",
-    group: "Your chart",
-    blurb: "Not sure of your birth time? Narrow it down.",
-    tags: ["time", "unknown", "correct"],
-    script:
-      "If nobody remembers your exact birth time, this helps you get closer. " +
-      "Put in your best guess and a few big events from your life, like a marriage or a move. " +
-      "The app tests nearby times and shows which one matches your life best. " +
-      "It is a good guess, not a certainty, so keep it as a helpful hint.",
-  },
-  {
+
     id: "deep-jyotish",
     title: "Deep study",
     to: "/deep-jyotish",
