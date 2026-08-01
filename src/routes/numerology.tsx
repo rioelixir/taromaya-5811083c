@@ -30,8 +30,9 @@ export const Route = createFileRoute("/numerology")({
   }),
 });
 
-type Tab = "personal" | "vedic" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
+type Tab = "report" | "personal" | "vedic" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
+  report: "Full Report",
   personal: "Personal",
   vedic: "Vedic",
   timeline: "Timeline",
@@ -43,6 +44,7 @@ const TAB_LABEL: Record<Tab, string> = {
   mobile: "Mobile",
   compat: "Kundli Matching",
 };
+
 
 function NumerologyPage() {
   const [tab, setTab] = useState<Tab>("personal");
