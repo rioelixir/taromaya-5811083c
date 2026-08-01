@@ -90,7 +90,7 @@ function NumerologyPage() {
       {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
       {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
       {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
-      {tab === "compat" && <CompatibilityNumerology />}
+      {tab === "compat" && <KundliMatchingNumerology />}
 
       <ConfidenceNote noteKey="numerology" className="mt-6" />
     </PageShell>
@@ -367,7 +367,7 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
 }
 
 
-function CompatibilityNumerology() {
+function KundliMatchingNumerology() {
   const [a, setA] = useState({ name: "", date: "1995-06-15" });
   const [b, setB] = useState({ name: "", date: "1994-11-22" });
   const rA = useMemo(() => (a.date ? computeNumerology({ fullName: a.name || "A", birthDate: a.date }) : null), [a]);
