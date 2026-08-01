@@ -6,6 +6,8 @@ import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
 import { MODEL_DEEP } from "@/lib/ai-models";
 import { usingOwnAi } from "@/lib/ai-provider.server";
+import { offlineReading } from "./offline-reading";
+import { AI_OFFLINE } from "./offline-mode";
 
 const PlanetSchema = z.object({
   name: z.string(),
@@ -27,6 +29,13 @@ export const interpretKundli = createServerFn({ method: "POST" })
   .middleware([requirePremium])
   .inputValidator((data: unknown) => KundliInterpretSchema.parse(data))
   .handler(async ({ data }) => {
+    if (AI_OFFLINE) {
+      const facts = data.planets
+        .map((p) => `${p.name} in sign ${p.rashi} at ${p.degree}, house ${p.house}, nakshatra ${p.nakshatra}${p.retrograde ? ", moving backwards" : ""}`)
+        .join(". ");
+      return { text: offlineReading({ system: "Vedic birth chart reading", prompt: facts }) };
+    }
+
     const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
     if (!key) throw new Error("AI is not set up");
     const gateway = createLovableAiGatewayProvider(key);

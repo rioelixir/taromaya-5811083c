@@ -4,6 +4,7 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
 import { LANGUAGE_LIST } from "@/lib/i18n";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
+import { AI_OFFLINE } from "@/lib/offline-mode";
 
 type Body = { lang?: string; strings?: string[] };
 
@@ -21,6 +22,14 @@ export const Route = createFileRoute("/api/translate")({
             headers: { "Content-Type": "application/json" },
           });
         }
+        // Offline mode: no paid translation model is called, so the original
+        // words are shown as they are.
+        if (AI_OFFLINE) {
+          return new Response(JSON.stringify({ translations: strings }), {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 

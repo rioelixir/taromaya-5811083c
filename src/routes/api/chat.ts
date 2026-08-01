@@ -1,9 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import {
+  convertToModelMessages,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
+  streamText,
+  type UIMessage,
+} from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { withSupremeSystem } from "@/lib/ai-system";
 import { createClient } from "@supabase/supabase-js";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
+import { offlineReading } from "@/lib/offline-reading";
+import { AI_OFFLINE } from "@/lib/offline-mode";
 
 type Body = {
   messages?: UIMessage[];
@@ -43,6 +51,27 @@ export const Route = createFileRoute("/api/chat")({
         const body = (await request.json()) as Body;
         const messages = body.messages;
         if (!Array.isArray(messages)) return new Response("messages required", { status: 400 });
+
+        if (AI_OFFLINE) {
+          const last = [...messages].reverse().find((m) => m.role === "user");
+          const question = (last?.parts ?? [])
+            .map((p: any) => (p?.type === "text" ? p.text : ""))
+            .join(" ")
+            .trim();
+          const answer = offlineReading({
+            system: body.context ?? "",
+            prompt: question || "Give me a short reading for today.",
+          });
+          const stream = createUIMessageStream({
+            execute: ({ writer }) => {
+              const id = "offline-1";
+              writer.write({ type: "text-start", id });
+              writer.write({ type: "text-delta", id, delta: answer });
+              writer.write({ type: "text-end", id });
+            },
+          });
+          return createUIMessageStreamResponse({ stream });
+        }
 
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
