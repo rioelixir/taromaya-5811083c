@@ -3,7 +3,6 @@ import { ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { buildNumerologyReport, TRAITS, root, type FullNumerologyReport } from "@/lib/numerology-report";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { aiReading } from "@/lib/ai-cache";
-import { useServerFn } from "@tanstack/react-start";
 
 const LazyGrid = lazy(() => import("@/components/numerology-report-grid"));
 
