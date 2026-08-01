@@ -1,4 +1,3 @@
-import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -37,7 +36,7 @@ import {
   CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
 import { CurrentTransit } from "@/components/current-transit";
-import { DateSelect } from "@/components/date-select";
+import { BirthOneBox } from "@/components/birth-one-box";
 
 
 export const Route = createFileRoute("/kundli")({
@@ -336,7 +335,7 @@ function BirthForm({
       <div className="grid gap-3">
         <BirthOneBox
           value={{ name: form.name, date: form.date, time: form.time, place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-          onChange={(patch) => setForm({ ...form, ...patch, unknownTime: false } as FormState)}
+          onChange={(patch: Record<string, string>) => setForm({ ...form, ...patch, unknownTime: false } as FormState)}
         />
         <button
           disabled={!canSubmit} onClick={onCompute}
@@ -353,15 +352,6 @@ function BirthForm({
 
 const inputCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
-      {children}
-    </label>
-  );
-}
 
 // ── South Indian chart
 const CELL_TO_RASHI: Record<string, number> = {
