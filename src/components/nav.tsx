@@ -306,9 +306,9 @@ function AuthFooter({ onClose }: { onClose: () => void }) {
         <Link
           to="/auth"
           onClick={onClose}
-          className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-white font-medium py-2.5 text-sm"
+          className="inline-flex min-h-12 items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-white font-medium py-2.5 text-base"
         >
-          <LogIn className="h-4 w-4" /> Sign in
+          <LogIn className="h-5 w-5" /> Sign in
         </Link>
       )}
     </div>
@@ -320,9 +320,9 @@ function AuthFooter({ onClose }: { onClose: () => void }) {
  */
 const bottomNav = [
   { to: "/", label: "Home", icon: HomeIcon },
-  { to: "/tarot", label: "Tarot", icon: Sparkles },
-  { to: "/history", label: "History", icon: History },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/tarot", label: "Cards", icon: Sparkles },
+  { to: "/history", label: "Past", icon: History },
+  { to: "/profile", label: "Me", icon: User },
 ] as const;
 
 export function BottomNav() {
@@ -340,16 +340,16 @@ export function BottomNav() {
             <li key={to}>
               <Link
                 to={to}
-                className="flex flex-col items-center gap-1 py-2.5 text-[11px]"
+                className="flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-xs"
                 aria-current={active ? "page" : undefined}
               >
                 <span
                   className={[
-                    "grid place-items-center h-9 w-9 rounded-full transition-all",
+                    "grid place-items-center h-11 w-11 rounded-full transition-all",
                     active ? "bg-primary/12 text-primary" : "text-muted-foreground",
                   ].join(" ")}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-6 w-6" />
                 </span>
                 <span className={active ? "text-primary font-medium" : "text-muted-foreground"}>
                   {t(label)}
@@ -358,6 +358,7 @@ export function BottomNav() {
             </li>
           );
         })}
+
       </ul>
     </nav>
   );
