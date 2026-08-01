@@ -799,7 +799,7 @@ function TarotPage() {
                 <button
                   onClick={() => setNakshatraPanelOpen(false)}
                   aria-label="Close Nakshatra panel"
-                  className="text-muted-foreground hover:text-pearl"
+                  className="text-board-dim hover:text-board-fg"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -933,14 +933,14 @@ function TarotPage() {
                       >
                         {meta.shortName}
                       </div>
-                      <div className="text-[11px] font-medium text-pearl/80 leading-tight">
+                      <div className="text-[11px] font-semibold text-board-fg/90 leading-tight">
                         {subDeck.length}/{meta.expected}
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="text-xs text-pearl/70 pointer-events-auto text-center pt-1">
+              <div className="text-sm text-board-fg/85 pointer-events-auto text-center pt-1">
                 {!loadingDecks && totalCards === 0
                   ? "No card pictures yet. An admin can add them in Admin, then Assets."
                   : "Tap a deck, or hold and drag a card onto the board"}
@@ -961,14 +961,14 @@ function TarotPage() {
                       setReading(null);
                       setError(null);
                     }}
-                    className="text-muted-foreground hover:text-pearl"
+                    className="text-board-dim hover:text-board-fg"
                     aria-label="Close reading"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
                 {loadingReading && !reading && (
-                  <div className="mt-3 flex items-center gap-3 text-muted-foreground text-sm">
+                  <div className="mt-3 flex items-center gap-3 text-board-dim text-sm">
                     <Loader2 className="h-4 w-4 animate-spin" /> Your reading is coming…
                   </div>
                 )}
