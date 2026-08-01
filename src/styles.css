@@ -434,3 +434,8 @@
   scroll-margin-top: 96px;
   z-index: 30;
 }
+
+/* Pages with their own inline Back button hide the global floating one. */
+html.has-pageshell-back [data-global-back] {
+  display: none;
+}

@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from "react";
-import { Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
+import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
+
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { VoicePanel } from "@/components/voice-panel";
@@ -42,16 +44,10 @@ function PageNav({
   collapsed: boolean;
   onToggle: () => void;
 }) {
-  const router = useRouter();
   return (
     <div className="mb-4 flex items-center justify-between gap-2">
-      <button
-        onClick={() => router.history.back()}
-        className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
-        aria-label="Go back"
-      >
-        <ArrowLeft className="h-4 w-4 text-gold" /> Back
-      </button>
+      <BackButton />
+
       <div className="flex items-center gap-2 flex-wrap justify-end" data-no-translate>
         <BirthStatusChip />
         <LanguageSwitcher compact />
@@ -103,6 +99,12 @@ export function PageShell({
   hideVoice?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  // This page already shows its own Back button, so hide the global floating one.
+  useEffect(() => {
+    document.documentElement.classList.add("has-pageshell-back");
+    return () => document.documentElement.classList.remove("has-pageshell-back");
+  }, []);
+
   return (
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
