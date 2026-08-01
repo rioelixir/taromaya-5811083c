@@ -101,6 +101,7 @@ function makeDeckStacks(source: DeckStacks, group: CardGroup = "all"): DeckStack
 function TarotPage() {
   const search = Route.useSearch();
   const [spreadKey, setSpreadKey] = useState<SpreadKey>("ppf");
+  const [cardGroup, setCardGroup] = useState<CardGroup>("all");
   const [question, setQuestion] = useState("");
   const [placed, setPlaced] = useState<PlacedCard[]>([]);
   const { decks: uploaded, loading: loadingDecks, shortages: deckShortages } = useUploadedDecks();
