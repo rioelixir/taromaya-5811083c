@@ -61,16 +61,17 @@ export const Route = createFileRoute("/api/ai-reading")({
             { status: 400 },
           );
         }
-        const { system, prompt, promptKey } = parsed.data;
+        const { system, prompt, promptKey, areas } = parsed.data;
 
         // Any active provider will do: the owner's own key, or the gateway.
         // Offline mode: Taromaya writes the reading itself, no paid model.
+        // Plain text, because the client streams the body straight to the page.
         if (AI_OFFLINE) {
-          return new Response(
-            JSON.stringify({ text: offlineReading({ system: system ?? "", prompt }) }),
-            { headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(offlineReading({ system: system ?? "", prompt, areas }), {
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          });
         }
+
 
         const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
         if (!key) {
