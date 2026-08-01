@@ -139,18 +139,15 @@ function Home() {
         <h2 className="mb-4 font-display text-xl">Need help? Just listen</h2>
         <Link
           to="/help"
-          className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
         >
-          <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
-            <Headphones className="h-5 w-5" />
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
+            <Headphones className="h-6 w-6" />
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-medium text-foreground">Help — listen and learn</div>
-            <div className="text-xs text-muted-foreground">
-              A short audio guide for every module. Press play and we explain it in easy words.
-            </div>
+          <div className="min-w-0 flex-1 text-base font-medium text-foreground">
+            Listen and learn
           </div>
-          <ArrowRight className="h-4 w-4 text-primary shrink-0" />
+          <ArrowRight className="h-5 w-5 text-primary shrink-0" />
         </Link>
       </section>
 
@@ -162,15 +159,12 @@ function Home() {
             type="button"
             data-tour="guides"
             onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
-            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
+            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
           >
-            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
-              <Feather className="h-5 w-5" />
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
+              <Feather className="h-6 w-6" />
             </div>
-            <div className="min-w-0">
-              <div className="font-medium text-foreground">Author's Note</div>
-              <div className="text-xs text-muted-foreground">A message from Giaa Sharma</div>
-            </div>
+            <div className="min-w-0 text-base font-medium text-foreground">Author's note</div>
           </button>
 
         </div>
@@ -182,20 +176,16 @@ function Home() {
         <button
           type="button"
           data-tour="explore-all"
-          onClick={() => document.querySelector<HTMLButtonElement>('[aria-label="Open menu"]')?.click()}
-          className="w-full flex items-center justify-between rounded-2xl border border-border/40 bg-white/60 px-5 py-4 text-left hover:bg-white/90 transition"
+          onClick={() => window.dispatchEvent(new Event("taromaya:open-menu"))}
+          className="w-full flex min-h-16 items-center justify-between gap-4 rounded-2xl border border-border/40 bg-white/60 px-5 py-4 text-left hover:bg-white/90 transition"
         >
-          <div>
-            <div className="font-display text-lg">Explore all modules</div>
-            <div className="text-sm text-muted-foreground">
-              Kundli, panchang, numerology, doshas, remedies, transits and more.
-            </div>
-          </div>
-          <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary">
-            <LayoutGrid className="h-5 w-5" />
+          <div className="font-display text-lg">See everything</div>
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+            <LayoutGrid className="h-6 w-6" />
           </div>
         </button>
       </section>
+
     </div>
   );
 }
