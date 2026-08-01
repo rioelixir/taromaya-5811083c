@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useBirthProfile, useSaveBirthProfile } from "@/hooks/use-birth-profile";
