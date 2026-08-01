@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -249,18 +248,7 @@ function PersonInputs({ value, onChange }: { value: Person; onChange: (p: Person
   const set = (k: keyof Person, v: string) => onChange({ ...value, [k]: v });
   return (
     <div className="space-y-3">
-      <input value={value.name} onChange={(e) => set("name", e.target.value)} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl" />
-      <div className="grid grid-cols-2 gap-3">
-        <DateSelect label="" value={value.date} onChange={(v) => set("date", v)} />
-        <input type="time" value={value.time} onChange={(e) => set("time", e.target.value)} className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-pearl" />
-      </div>
-      <PlacePicker
-        label="Where were they born?"
-        value={{ place: value.place ?? "", lat: value.lat, lon: value.lon, tz: value.tz }}
-        onChange={(p) => onChange({ ...value, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
-        forDate={value.date}
-        forTime={value.time}
-      />
+      <BirthVoiceBox value={value} onChange={(p) => onChange({ ...value, ...p })} />
     </div>
   );
 }

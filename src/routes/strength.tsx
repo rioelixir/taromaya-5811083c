@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -62,14 +61,7 @@ function StrengthPage() {
         <GlassCard>
           <h3 className="mb-3 font-serif text-lg">Birth Details</h3>
           <div className="space-y-3 text-xs">
-            <Field label="Date"><DateSelect label="" value={form.date} onChange={(v) => setForm((f) => ({ ...f, date: v }))} /></Field>
-            <Field label="Time"><input type="time" value={form.time} onChange={set("time")} className={inputCls} /></Field>
-            <PlacePicker
-              value={{ place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-              onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
-              forDate={form.date}
-              forTime={form.time}
-            />
+            <BirthVoiceBox value={form} onChange={(p) => setForm((prev) => ({ ...prev, ...p }))} />
           </div>
         </GlassCard>
 

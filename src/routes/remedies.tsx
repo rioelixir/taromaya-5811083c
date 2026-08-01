@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -52,21 +51,7 @@ function RemediesPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <GlassCard title="Your birth data" desc="Optional — used to prioritise which planets need remedies most.">
           <div className="grid gap-3">
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">
-              Date
-              <DateSelect label="" value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
-            </label>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">
-              Time
-              <input type="time" value={birth.time} onChange={(e) => setBirth({...birth, time: e.target.value})}
-                className="mt-1 block w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-pearl" />
-            </label>
-            <PlacePicker
-              value={{ place: (birth as Record<string, string>).place ?? "", lat: birth.lat, lon: birth.lon, tz: birth.tz }}
-              onChange={(p) => setBirth({ ...birth, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
-              forDate={birth.date}
-              forTime={birth.time}
-            />
+            <BirthVoiceBox value={birth} onChange={(p) => setBirth((prev) => ({ ...prev, ...p }))} />
             <button
               onClick={() => setShowChart(true)}
               className="mt-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-2.5 hover:brightness-110"

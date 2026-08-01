@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { DateSelect } from "@/components/date-select";
 import { PremiumGate } from "@/components/premium-gate";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { useBirthProfile, useSaveBirthProfile } from "@/hooks/use-birth-profile";
@@ -119,27 +118,10 @@ function BirthDetailsPage() {
                 </select>
               </Field>
 
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Birth date" required error={errors.birth_date}>
-                  <DateSelect
-                    label=""
-                    maxYear={new Date().getFullYear()}
-                    value={form.birth_date}
-                    onChange={(v) => setForm((f) => ({ ...f, birth_date: v }))}
-                  />
-                </Field>
-                <Field label="Birth time (24h, local)" required error={errors.birth_time}>
-                  <input
-                    type="time" className="input"
-                    value={form.birth_time}
-                    onChange={(e) => setForm((f) => ({ ...f, birth_time: e.target.value }))}
-                    required
-                  />
-                </Field>
-              </div>
-
-              <PlacePicker
+              <BirthVoiceBox
                 value={{
+                  date: form.birth_date,
+                  time: form.birth_time,
                   place: form.place,
                   lat: String(form.latitude),
                   lon: String(form.longitude),
@@ -148,15 +130,21 @@ function BirthDetailsPage() {
                 onChange={(p) =>
                   setForm((f) => ({
                     ...f,
-                    place: p.place,
-                    latitude: parseFloat(p.lat) || 0,
-                    longitude: parseFloat(p.lon) || 0,
-                    tz_offset_hours: parseFloat(p.tz) || 0,
+                    birth_date: p.date ?? f.birth_date,
+                    birth_time: p.time ?? f.birth_time,
+                    place: p.place ?? f.place,
+                    latitude: p.lat !== undefined ? parseFloat(p.lat) || 0 : f.latitude,
+                    longitude: p.lon !== undefined ? parseFloat(p.lon) || 0 : f.longitude,
+                    tz_offset_hours: p.tz !== undefined ? parseFloat(p.tz) || 0 : f.tz_offset_hours,
                   }))
                 }
-                forDate={form.birth_date}
-                forTime={form.birth_time}
               />
+              {(errors.birth_date || errors.birth_time) && (
+                <p className="text-sm text-destructive">
+                  {errors.birth_date ?? errors.birth_time}
+                </p>
+              )}
+
 
 
               <div className="flex items-center justify-between gap-3 pt-2">

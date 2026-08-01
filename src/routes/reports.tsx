@@ -1,4 +1,4 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
 import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
@@ -86,19 +86,7 @@ function ReportsPage() {
       subtitle="Luxury dossiers with vector rashi charts, dashas, transits, and remedies — computed live from your birth data."
     >
       <GlassCard title="Your details">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Field label="Name" value={birth.name} onChange={(v) => setBirth({...birth, name: v})} />
-          <DateSelect value={birth.date} onChange={(v) => setBirth({...birth, date: v})} />
-          <Field label="Time" type="time" value={birth.time} onChange={(v) => setBirth({...birth, time: v})} />
-        </div>
-        <div className="mt-3">
-          <PlacePicker
-            value={{ place: birth.place, lat: birth.lat, lon: birth.lon, tz: birth.tz }}
-            onChange={(p) => setBirth({ ...birth, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
-            forDate={birth.date}
-            forTime={birth.time}
-          />
-        </div>
+        <BirthVoiceBox value={birth} onChange={(p) => setBirth((prev) => ({ ...prev, ...p }))} />
       </GlassCard>
 
       <div className="mt-6">
