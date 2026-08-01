@@ -77,8 +77,12 @@ export function pickVoice(voices: SpeechSynthesisVoice[], lang: string): VoiceCh
   for (const tag of tags) {
     const hit =
       voices.find((v) => v.lang.replace("_", "-").toLowerCase() === tag.toLowerCase()) ??
-      voices.find((v) => v.lang.replace("_", "-").toLowerCase().startsWith(`${tag.toLowerCase()}-`)) ??
-      voices.find((v) => v.lang.replace("_", "-").toLowerCase().startsWith(tag.split("-")[0].toLowerCase()));
+      voices.find((v) =>
+        v.lang.replace("_", "-").toLowerCase().startsWith(`${tag.toLowerCase()}-`),
+      ) ??
+      voices.find((v) =>
+        v.lang.replace("_", "-").toLowerCase().startsWith(tag.split("-")[0].toLowerCase()),
+      );
     if (hit) {
       const wanted = tags[0].split("-")[0].toLowerCase();
       return { voice: hit, tag, exact: hit.lang.toLowerCase().startsWith(wanted) };
@@ -96,17 +100,25 @@ export function speakableChunks(text: string, maxChars = 180): string[] {
   let piece = "";
   for (const s of sentences) {
     if (s.length > maxChars) {
-      if (piece.trim()) { out.push(piece.trim()); piece = ""; }
+      if (piece.trim()) {
+        out.push(piece.trim());
+        piece = "";
+      }
       const words = s.split(" ");
       let line = "";
       for (const w of words) {
-        if ((line + " " + w).trim().length > maxChars) { out.push(line.trim()); line = w; }
-        else line = `${line} ${w}`;
+        if ((line + " " + w).trim().length > maxChars) {
+          out.push(line.trim());
+          line = w;
+        } else line = `${line} ${w}`;
       }
       if (line.trim()) out.push(line.trim());
       continue;
     }
-    if (piece && (piece + s).length > maxChars) { out.push(piece.trim()); piece = ""; }
+    if (piece && (piece + s).length > maxChars) {
+      out.push(piece.trim());
+      piece = "";
+    }
     piece += s;
   }
   if (piece.trim()) out.push(piece.trim());
@@ -139,7 +151,12 @@ export function speakText(
   },
 ): Speaker {
   const synth = typeof window === "undefined" ? undefined : window.speechSynthesis;
-  const dead: Speaker = { cancel: () => {}, pause: () => {}, resume: () => {}, started: () => false };
+  const dead: Speaker = {
+    cancel: () => {},
+    pause: () => {},
+    resume: () => {},
+    started: () => false,
+  };
   if (!synth) {
     opts.onFail?.("This device cannot read out loud.");
     return dead;
@@ -157,7 +174,10 @@ export function speakText(
 
   const next = () => {
     if (stopped) return;
-    if (index >= pieces.length) { opts.onDone?.(); return; }
+    if (index >= pieces.length) {
+      opts.onDone?.();
+      return;
+    }
     const u = new SpeechSynthesisUtterance(pieces[index]);
     if (opts.voice) u.voice = opts.voice;
     u.lang = opts.voice?.lang || opts.lang;
@@ -168,7 +188,10 @@ export function speakText(
       begun = true;
       opts.onStart?.();
     };
-    u.onend = () => { index += 1; next(); };
+    u.onend = () => {
+      index += 1;
+      next();
+    };
     u.onerror = (e) => {
       const why = String((e as SpeechSynthesisErrorEvent).error || "");
       if (stopped || why === "interrupted" || why === "canceled") return;
@@ -193,9 +216,25 @@ export function speakText(
   }, 2500);
 
   return {
-    cancel: () => { stopped = true; clearTimeout(guard); synth.cancel(); },
-    pause: () => { try { synth.pause(); } catch { /* not supported */ } },
-    resume: () => { try { synth.resume(); } catch { /* not supported */ } },
+    cancel: () => {
+      stopped = true;
+      clearTimeout(guard);
+      synth.cancel();
+    },
+    pause: () => {
+      try {
+        synth.pause();
+      } catch {
+        /* not supported */
+      }
+    },
+    resume: () => {
+      try {
+        synth.resume();
+      } catch {
+        /* not supported */
+      }
+    },
     started: () => begun,
   };
 }

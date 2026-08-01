@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages, Sparkles, Square } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Loader2,
+  Search,
+  ArrowRight,
+  HelpCircle,
+  Home,
+  Languages,
+  Sparkles,
+  Square,
+} from "lucide-react";
 import { HELP_GUIDES, helpGroups, searchGuides, type HelpGuide } from "@/lib/help-guides";
 import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
 import { loadVoices, pickVoice, speakText, type Speaker } from "@/lib/help-speech";
 import { cn } from "@/lib/utils";
-
 
 export const Route = createFileRoute("/help")({
   component: HelpPage,
@@ -46,10 +56,14 @@ function HelpPage() {
   const speakerRef = useRef<Speaker | null>(null);
 
   // Start in whatever language the person already picked for the app.
-  useEffect(() => { setLang(appLang); }, [appLang]);
+  useEffect(() => {
+    setLang(appLang);
+  }, [appLang]);
 
   // Ask the device which voices it has, so we know what it can really read.
-  useEffect(() => { void loadVoices().then(setVoices); }, []);
+  useEffect(() => {
+    void loadVoices().then(setVoices);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -80,7 +94,10 @@ function HelpPage() {
       lang: choice.tag,
       voice: choice.voice,
       onStart: () => setNow({ id: guide.id, status: "playing" }),
-      onDone: () => { speakerRef.current = null; setNow(null); },
+      onDone: () => {
+        speakerRef.current = null;
+        setNow(null);
+      },
       onFail: (why) => {
         speakerRef.current = null;
         setNow(null);
@@ -132,7 +149,11 @@ function HelpPage() {
 
     if (!useStudio) {
       let words: string | undefined;
-      try { words = await wordsFor(guide); } catch { words = undefined; }
+      try {
+        words = await wordsFor(guide);
+      } catch {
+        words = undefined;
+      }
       speakWithPhone(guide, words);
       return;
     }
@@ -146,19 +167,30 @@ function HelpPage() {
       if (blob.size < 1024) throw new Error("empty audio");
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => { URL.revokeObjectURL(url); audioRef.current = null; setNow(null); };
-      audio.onerror = () => { URL.revokeObjectURL(url); audioRef.current = null; speakWithPhone(guide); };
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+        setNow(null);
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        audioRef.current = null;
+        speakWithPhone(guide);
+      };
       audioRef.current = audio;
       await audio.play();
       setNow({ id: guide.id, status: "playing" });
     } catch {
       // The nicer voice is not available right now, so the device reads it.
       let words: string | undefined;
-      try { words = await wordsFor(guide); } catch { words = undefined; }
+      try {
+        words = await wordsFor(guide);
+      } catch {
+        words = undefined;
+      }
       speakWithPhone(guide, words);
     }
   };
-
 
   const filtered = useMemo(() => {
     const found = searchGuides(q);
@@ -200,7 +232,10 @@ function HelpPage() {
           <Languages className="h-4 w-4 text-gold shrink-0" />
           <select
             value={lang}
-            onChange={(e) => { stop(); setLang(e.target.value as Lang); }}
+            onChange={(e) => {
+              stop();
+              setLang(e.target.value as Lang);
+            }}
             aria-label="Choose the voice language"
             className="w-full bg-transparent text-sm text-pearl outline-none"
           >
@@ -218,7 +253,10 @@ function HelpPage() {
           <button
             key={name}
             type="button"
-            onClick={() => { stop(); setGroup(name); }}
+            onClick={() => {
+              stop();
+              setGroup(name);
+            }}
             aria-pressed={group === name}
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs transition",
@@ -235,7 +273,10 @@ function HelpPage() {
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => { stop(); setStudio((v) => !v); }}
+          onClick={() => {
+            stop();
+            setStudio((v) => !v);
+          }}
           aria-pressed={studio}
           className={cn(
             "inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
@@ -265,7 +306,6 @@ function HelpPage() {
       )}
 
       {problem && <p className="mt-3 text-sm text-muted-foreground">{problem}</p>}
-
 
       {helpGroups().map((group) => {
         const items = filtered.filter((g) => g.group === group);
