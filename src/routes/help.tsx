@@ -28,7 +28,7 @@ export const Route = createFileRoute("/help")({
   }),
 });
 
-type PlayState = { id: string; status: "loading" | "playing" } | null;
+type PlayState = { id: string; status: "loading" | "playing" | "paused" } | null;
 
 function HelpPage() {
   const appLang = useLang();
@@ -40,43 +40,53 @@ function HelpPage() {
   // The phone's own voice is free and instant, so it is the normal way to listen.
   // The studio voice sounds nicer and is there when someone wants it.
   const [studio, setStudio] = useState(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const scriptCache = useRef<Map<string, string>>(new Map());
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speakerRef = useRef<Speaker | null>(null);
 
   // Start in whatever language the person already picked for the app.
   useEffect(() => { setLang(appLang); }, [appLang]);
+
+  // Ask the device which voices it has, so we know what it can really read.
+  useEffect(() => { void loadVoices().then(setVoices); }, []);
 
   useEffect(() => {
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;
-      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+      speakerRef.current?.cancel();
+      speakerRef.current = null;
     };
   }, []);
 
   const stop = () => {
     audioRef.current?.pause();
     audioRef.current = null;
-    window.speechSynthesis?.cancel();
+    speakerRef.current?.cancel();
+    speakerRef.current = null;
+    if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     setNow(null);
   };
 
-  /** If the voice service is busy, the phone reads it out instead, so help always works. */
+  const choice = useMemo(() => pickVoice(voices, lang), [voices, lang]);
+  /** No voice on the device for this language, so the studio voice is the only way. */
+  const needsStudio = voices.length > 0 && !choice.exact && lang !== "en";
+
+  /** The device reads the guide out loud, piece by piece. */
   const speakWithPhone = (guide: HelpGuide, words?: string) => {
-    const synth = window.speechSynthesis;
-    if (!synth) {
-      setProblem("Voice is not available on this device. Please try again later.");
-      setNow(null);
-      return;
-    }
-    const u = new SpeechSynthesisUtterance(words ?? `${guide.title}. ${guide.script}`);
-    u.lang = lang === "en" ? "en-IN" : lang;
-    u.rate = 0.95;
-    u.onend = () => setNow(null);
-    u.onerror = () => setNow(null);
-    synth.cancel();
-    synth.speak(u);
-    setNow({ id: guide.id, status: "playing" });
+    speakerRef.current?.cancel();
+    speakerRef.current = speakText(words ?? `${guide.title}. ${guide.script}`, {
+      lang: choice.tag,
+      voice: choice.voice,
+      onStart: () => setNow({ id: guide.id, status: "playing" }),
+      onDone: () => { speakerRef.current = null; setNow(null); },
+      onFail: (why) => {
+        speakerRef.current = null;
+        setNow(null);
+        setProblem(why);
+      },
+    });
   };
 
   /** Gets the guide words in the chosen language, and remembers them. */
@@ -96,18 +106,34 @@ function HelpPage() {
     return text;
   };
 
+  /** Play, pause and carry on again from the same button. */
   const play = async (guide: HelpGuide) => {
-    if (now?.id === guide.id) { stop(); return; }
+    if (now?.id === guide.id) {
+      if (now.status === "playing") {
+        audioRef.current?.pause();
+        speakerRef.current?.pause();
+        setNow({ id: guide.id, status: "paused" });
+        return;
+      }
+      if (now.status === "paused") {
+        void audioRef.current?.play();
+        speakerRef.current?.resume();
+        setNow({ id: guide.id, status: "playing" });
+        return;
+      }
+      stop();
+      return;
+    }
     stop();
     setProblem(null);
     setNow({ id: guide.id, status: "loading" });
 
-    if (!studio) {
-      try {
-        speakWithPhone(guide, await wordsFor(guide));
-      } catch {
-        speakWithPhone(guide);
-      }
+    const useStudio = studio || needsStudio;
+
+    if (!useStudio) {
+      let words: string | undefined;
+      try { words = await wordsFor(guide); } catch { words = undefined; }
+      speakWithPhone(guide, words);
       return;
     }
 
@@ -116,17 +142,23 @@ function HelpPage() {
         `/api/public/help-audio?id=${encodeURIComponent(guide.id)}&lang=${encodeURIComponent(lang)}`,
       );
       if (!res.ok) throw new Error("no audio");
-      const url = URL.createObjectURL(await res.blob());
+      const blob = await res.blob();
+      if (blob.size < 1024) throw new Error("empty audio");
+      const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.onended = () => { URL.revokeObjectURL(url); setNow(null); };
-      audio.onerror = () => { URL.revokeObjectURL(url); speakWithPhone(guide); };
+      audio.onended = () => { URL.revokeObjectURL(url); audioRef.current = null; setNow(null); };
+      audio.onerror = () => { URL.revokeObjectURL(url); audioRef.current = null; speakWithPhone(guide); };
       audioRef.current = audio;
       await audio.play();
       setNow({ id: guide.id, status: "playing" });
     } catch {
-      speakWithPhone(guide);
+      // The nicer voice is not available right now, so the device reads it.
+      let words: string | undefined;
+      try { words = await wordsFor(guide); } catch { words = undefined; }
+      speakWithPhone(guide, words);
     }
   };
+
 
   const filtered = useMemo(() => {
     const found = searchGuides(q);
