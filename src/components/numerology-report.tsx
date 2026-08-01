@@ -1,7 +1,7 @@
 import { useMemo, useState, lazy, Suspense } from "react";
 import { ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { buildNumerologyReport, TRAITS, root, type FullNumerologyReport } from "@/lib/numerology-report";
-import { PlainAiText } from "@/components/plain-ai-text";
+import { PlainAIText } from "@/components/plain-ai-text";
 import { aiReading } from "@/lib/ai-reading.functions";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -157,7 +157,7 @@ export function NumerologyFullReport({ fullName, birthDate }: { fullName: string
       </button>
       {aiText && (
         <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-          <PlainAiText text={aiText} />
+          <PlainAIText text={aiText} />
         </div>
       )}
 
