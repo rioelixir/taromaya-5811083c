@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages, Sparkles } from "lucide-react";
+import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages, Sparkles, Square } from "lucide-react";
 import { HELP_GUIDES, helpGroups, searchGuides, type HelpGuide } from "@/lib/help-guides";
 import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
+import { loadVoices, pickVoice, speakText, type Speaker } from "@/lib/help-speech";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/help")({
   component: HelpPage,
