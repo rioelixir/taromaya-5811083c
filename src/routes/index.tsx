@@ -86,6 +86,52 @@ function Home() {
         </div>
       </section>
 
+      {/* Matching & numbers */}
+      <section className="mt-10">
+        <h2 className="mb-4 font-display text-xl">Matching &amp; numbers</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <Link
+            to="/numerology"
+            search={{ tab: "compat" }}
+            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Heart className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-medium text-foreground">Kundli Matching</div>
+              <div className="text-xs text-muted-foreground">See how two people fit together</div>
+            </div>
+          </Link>
+          <Link
+            to="/numerology"
+            search={{ tab: "report" }}
+            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Hash className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-medium text-foreground">Numerology</div>
+              <div className="text-xs text-muted-foreground">Your numbers, explained simply</div>
+            </div>
+          </Link>
+          <Link
+            to="/numerology"
+            search={{ tab: "vedic" }}
+            className="group flex items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Sigma className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-medium text-foreground">Vedic Numerology</div>
+              <div className="text-xs text-muted-foreground">Birth number the Vedic way</div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* Today */}
       <section className="mt-10">
         <h2 className="mb-4 font-display text-xl">Today</h2>
