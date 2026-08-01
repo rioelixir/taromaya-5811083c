@@ -36,7 +36,14 @@ export function AIInterpretation({
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Parts of life the reader wants this reading to speak to. */
+  const [areas, setAreas] = useState<LifeAreaId[]>([]);
   const abortRef = useRef<AbortController | null>(null);
+
+  function toggleArea(id: LifeAreaId) {
+    setAreas((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]));
+  }
+
 
   // Cancel any in-flight stream if the component unmounts.
   useEffect(() => () => abortRef.current?.abort(), []);
