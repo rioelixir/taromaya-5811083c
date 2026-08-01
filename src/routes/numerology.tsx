@@ -152,52 +152,100 @@ Structure: Core Signature, Life Path & Destiny, Inner Self (Soul Urge & Personal
 
       {report && (
         <>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <BigNum label="Life Path" n={report.lifePath} />
-            <BigNum label="Destiny" n={report.destiny} />
-            <BigNum label="Soul Urge" n={report.soulUrge} />
-            <BigNum label="Personality" n={report.personality} />
-            <BigNum label="Birthday" n={report.birthday} />
-            <BigNum label="Maturity" n={report.maturity} />
-            <BigNum label="Personal Year" n={report.personalYear} />
-            <BigNum label="Personal Day" n={report.personalDay} />
-          </div>
-
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <GlassCard title="Pinnacles & Challenges">
-              <div className="grid grid-cols-4 gap-3 text-center">
-                {report.pinnacles.map((n, i) => (
-                  <div key={i} className="rounded-xl bg-white/5 p-3">
-                    <div className="text-[10px] text-muted-foreground">P{i + 1}</div>
-                    <div className="font-display text-2xl gold-text">{n}</div>
-                  </div>
-                ))}
-                {report.challenges.map((n, i) => (
-                  <div key={"c" + i} className="rounded-xl bg-white/5 p-3">
-                    <div className="text-[10px] text-muted-foreground">C{i + 1}</div>
-                    <div className="font-display text-2xl text-red-300">{n}</div>
-                  </div>
-                ))}
+          {/* Layer 1 — plain-language headline, no jargon. */}
+          <div className="mt-6">
+            <GlassCard>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Your simple result</div>
+              <div className="mt-2 flex flex-wrap items-baseline gap-3">
+                <span className="font-display text-5xl gold-text">{report.lifePath}</span>
+                <span className="text-lg text-pearl">is your life path number</span>
               </div>
-            </GlassCard>
-            <GlassCard title="Luck signature">
-              <div className="space-y-2 text-sm">
-                <KV k="Planet" v={report.planetRuler} />
-                <KV k="Lucky numbers" v={report.luckyNumbers.join(" · ")} />
-                <KV k="Lucky colours" v={report.luckyColors.join(" · ")} />
-                <KV k="Lucky days" v={report.luckyDays.join(" · ")} />
-                <KV k="Compatible numbers" v={report.compatibleNumbers.join(" · ")} />
-                {report.karmicDebts.length > 0 && <KV k="Karmic debts" v={report.karmicDebts.join(", ")} />}
-                {report.masterNumbers.length > 0 && <KV k="Master numbers" v={report.masterNumbers.join(", ")} />}
-              </div>
+              <p className="mt-2 text-sm text-pearl/90">
+                This is the main number in numerology, worked out from your date of birth. In plain words: {NUMBER_MEANINGS[report.lifePath]?.toLowerCase()}
+              </p>
             </GlassCard>
           </div>
 
-          <div className="mt-4">
-            <GlassCard title="Life Path meaning">
-              <div className="font-display text-lg gold-text">{report.lifePath}</div>
-              <div className="mt-1 text-sm text-pearl">{NUMBER_MEANINGS[report.lifePath]}</div>
-            </GlassCard>
+          {/* Layer 2 — core numbers, one plain sentence each. */}
+          <div className="mt-6">
+            <div className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Your core numbers</div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <BigNum label="Life Path" n={report.lifePath} />
+              <BigNum label="Destiny" n={report.destiny} />
+              <BigNum label="Soul Urge" n={report.soulUrge} />
+              <BigNum label="Personality" n={report.personality} />
+              <BigNum label="Birthday" n={report.birthday} />
+              <BigNum label="Maturity" n={report.maturity} />
+              <BigNum label="Personal Year" n={report.personalYear} />
+              <BigNum label="Personal Day" n={report.personalDay} />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Life path: the path you are walking overall. Destiny: what you are here to do. Soul urge: what your heart quietly wants.
+              Personality: how others see you first. Birthday: a small extra gift you were born with. Maturity: who you grow into later in life.
+              Personal year and day: the mood of right now.
+            </p>
+          </div>
+
+          {/* Layer 3 — advanced material, explained simply, further down the page. */}
+          <div className="mt-10">
+            <div className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Going deeper — cycles, luck and karma</div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <GlassCard title="Pinnacles & Challenges — the four chapters of your life">
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Pinnacles are four big chapters your life moves through, each with its own lesson. Challenges are the harder habit each
+                  chapter asks you to work on.
+                </p>
+                <div className="grid grid-cols-4 gap-3 text-center">
+                  {report.pinnacles.map((n, i) => (
+                    <div key={i} className="rounded-xl bg-white/5 p-3">
+                      <div className="text-[10px] text-muted-foreground">Chapter {i + 1}</div>
+                      <div className="font-display text-2xl gold-text">{n}</div>
+                    </div>
+                  ))}
+                  {report.challenges.map((n, i) => (
+                    <div key={"c" + i} className="rounded-xl bg-white/5 p-3">
+                      <div className="text-[10px] text-muted-foreground">Lesson {i + 1}</div>
+                      <div className="font-display text-2xl text-red-300">{n}</div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+              <GlassCard title="Luck signature">
+                <p className="mb-3 text-xs text-muted-foreground">Small everyday helpers linked to your life path number.</p>
+                <div className="space-y-2 text-sm">
+                  <KV k="Planet" v={report.planetRuler} />
+                  <KV k="Lucky numbers" v={report.luckyNumbers.join(" · ")} />
+                  <KV k="Lucky colours" v={report.luckyColors.join(" · ")} />
+                  <KV k="Lucky days" v={report.luckyDays.join(" · ")} />
+                  <KV k="Compatible numbers" v={report.compatibleNumbers.join(" · ")} />
+                </div>
+              </GlassCard>
+            </div>
+
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <GlassCard title="Karmic debt numbers">
+                <p className="mb-2 text-xs text-muted-foreground">
+                  A karmic debt number (13, 14, 16 or 19) shows up when one of your core totals hits that number before it gets reduced.
+                  It is not bad luck — it just points to a lesson carried over that this life is asking you to finish.
+                </p>
+                {report.karmicDebts.length > 0 ? (
+                  <div className="text-sm text-pearl">{report.karmicDebts.join(", ")}</div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">None found in your chart.</div>
+                )}
+              </GlassCard>
+              <GlassCard title="Master numbers">
+                <p className="mb-2 text-xs text-muted-foreground">
+                  A master number (11, 22 or 33) is a double number that numerology keeps whole instead of reducing further. It means
+                  extra intensity in that part of your chart — more potential, and more responsibility to use it well.
+                </p>
+                {report.masterNumbers.length > 0 ? (
+                  <div className="text-sm text-pearl">{report.masterNumbers.join(", ")}</div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">None found in your chart.</div>
+                )}
+              </GlassCard>
+            </div>
           </div>
 
           <div className="mt-6">
@@ -557,6 +605,20 @@ function VedicTab({
 
       {v && (
         <>
+          <div className="mt-6">
+            <GlassCard>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Your simple result</div>
+              <div className="mt-2 flex flex-wrap items-baseline gap-3">
+                <span className="font-display text-5xl gold-text">{v.mulank}</span>
+                <span className="text-lg text-pearl">is your driver number (Mulank)</span>
+              </div>
+              <p className="mt-2 text-sm text-pearl/90">
+                This comes straight from the day you were born, and it is the number Vedic numerology uses most for everyday personality.
+                In plain words: {v.mulankProfile.nature}
+              </p>
+            </GlassCard>
+          </div>
+
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <BigNum label="Mulank (driver)" n={v.mulank} />
             <BigNum label="Bhagyank (destiny)" n={v.bhagyank} />

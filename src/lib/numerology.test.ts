@@ -184,3 +184,24 @@ describe("reducedName() honours the Y rule", () => {
     expect(reducedName("Lynn", "Chaldean")).toBeGreaterThan(0);
   });
 });
+
+describe("Chaldean name value — reference cases", () => {
+  it("matches the classic Chaldean chart for a known name", () => {
+    // Chaldean: J1 O7 H5 N5 = 18 -> 9
+    expect(reducedName("John", "Chaldean")).toBe(9);
+  });
+  it("differs from Pythagorean for the same name (systems are not interchangeable)", () => {
+    expect(reducedName("John", "Pythagorean")).not.toBe(reducedName("John", "Chaldean"));
+  });
+});
+
+describe("Pinnacles and challenges — known reference chart", () => {
+  it("computes the four pinnacles and four challenges for Feb 18 1985", () => {
+    const r = computeNumerology({ fullName: "John Doe", birthDate: "1985-02-18" });
+    // M=2, D=18->9, Y=1985->23->5
+    // P1 = reduce(2+9)=11(master); P2 = reduce(9+5)=5; P3 = reduce(reduce(11,false)+5)= reduce(2+5)=7; P4 = reduce(2+5)=7
+    expect(r.pinnacles).toEqual([11, 5, 7, 7]);
+    // C1 = |2-9|=7; C2=|9-5|=4; C3=|7-4|=3; C4=|2-5|=3
+    expect(r.challenges).toEqual([7, 4, 3, 3]);
+  });
+});

@@ -514,8 +514,25 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 function OverviewTab({ chart }: { chart: KundliChart }) {
   const yogas = detectYogas(chart).filter((y) => y.present);
   const doshas = detectDoshas(chart).filter((d) => d.present);
+  const asc = RASHIS[chart.ascendant.rashi];
+  const moonRashi = RASHIS[chart.planets.find((p) => p.name === "Moon")!.rashi];
   return (
     <div className="grid gap-4 md:grid-cols-2">
+      <GlassCard title="In plain English" className="md:col-span-2">
+        <p className="text-sm text-muted-foreground">
+          Your birth chart, or Kundli, is a map of the sky at the moment you were born. Your rising sign
+          (Lagna) is <span className="text-primary">{asc}</span> — this is the "front door" of your
+          personality — and your Moon is in <span className="text-primary">{moonRashi}</span>, which shapes
+          your emotional nature and is used to calculate your Vimshottari dasha (life-period timeline)
+          further down.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Use the tabs above to go deeper: Planets shows every planet's exact position with a one-line
+          meaning, Dasha shows which life chapter you are in right now down to the month, and the remaining
+          tabs (Divisional charts, Yogas, Doshas, Ashtakavarga, Shadbala, KP Sub-Lords, Lal Kitab) are
+          advanced tables for a fuller classical reading.
+        </p>
+      </GlassCard>
       <GlassCard title="Auspicious yogas active" desc={`${yogas.length} detected`}>
         <ul className="space-y-2 mt-2">
           {yogas.length === 0 && <li className="text-xs text-muted-foreground">None among the detected set.</li>}

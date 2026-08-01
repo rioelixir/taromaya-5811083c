@@ -116,6 +116,16 @@ Structure: ### The current sky, ### What's activating, ### Where the energy land
         </div>
       </GlassCard>
 
+      <GlassCard title="In plain English" className="mt-6">
+        <p className="text-sm text-muted-foreground">
+          Transits show how today's planets interact with the fixed planets from your birth chart. When a
+          moving planet lines up closely with one of your birth planets, it "activates" that part of your
+          life for a while. Below, the wheel shows the two charts overlaid, a plain list of the strongest
+          current transits, and — further down — full technical tables of every aspect, station, sign
+          change and eclipse over the coming months.
+        </p>
+      </GlassCard>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,560px)_1fr]">
         <GlassCard>
           <BiWheelChart chart={natal} outerPlanets={outerPlanets} outerLabel="Transiting" />

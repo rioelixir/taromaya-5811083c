@@ -92,6 +92,19 @@ function VedicTransitsPage() {
         </div>
       </GlassCard>
 
+      <GlassCard title="In plain English" className="mt-6">
+        <p className="text-sm text-muted-foreground">
+          This page tracks how today's planets are sitting compared to where your Moon was at birth — this
+          is called Gochara (transit). Saturn's transit is watched most closely because it moves slowly and
+          its passage near your Moon (called Sade Sati) marks a multi-year phase of hard work and growth.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Further down you'll find the detailed tables: Sade Sati and Kantaka Shani (Saturn's current
+          effect), planet-by-planet Gochara positions, and which of your current Dasha (planetary period)
+          lords are being activated by today's sky.
+        </p>
+      </GlassCard>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <GlassCard title="Sade Sati">
           {!report.sadeSati.active ? (

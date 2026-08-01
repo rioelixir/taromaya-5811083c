@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computePanchang, fmtTime, fmtRange, todaysFestivals, WEEKDAY } from "@/lib/panchang";
 import { classifyPanchaka, bhadraInfo, tithiQuality, nakshatraCharacter, yogaQuality } from "@/lib/panchang-deep";
+import { dayVerdict, tithiPlain, nakshatraPlain, yogaPlain, karanaPlain, weekdayPlain } from "@/lib/panchang-plain";
 import { computeMonthAlmanac, chaughadiyaSummary, type AlmanacDay } from "@/lib/panchang-month";
 import { computeHoras, currentHora, HORA_NATURE, type HoraSlot } from "@/lib/hora";
 import { scanFestivals } from "@/lib/festivals";
@@ -59,6 +60,8 @@ function PanchangPage() {
 
   const nowHora = useMemo(() => currentHora(horas), [horas]);
 
+  const verdict = useMemo(() => dayVerdict(p), [p]);
+
   const festivalCalendar = useMemo(() => {
     const [y, m, d] = date.split("-").map(Number);
     const start = new Date(y, m - 1, d);
@@ -87,6 +90,20 @@ function PanchangPage() {
         </div>
       </GlassCard>
 
+      <GlassCard className="mt-6">
+        <div className="text-[10px] uppercase tracking-widest text-gold">In plain words</div>
+        <div className="mt-2 font-display text-2xl gold-text">{verdict.label} day</div>
+        <p className="mt-2 text-sm text-muted-foreground">{verdict.summary}</p>
+        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+          {[weekdayPlain(p), tithiPlain(p), nakshatraPlain(p), yogaPlain(p), karanaPlain(p)].map((line) => (
+            <li key={line} className="flex gap-2.5">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold/70" />
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </GlassCard>
+
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <GlassCard>
           <div className="text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-2">
@@ -94,6 +111,7 @@ function PanchangPage() {
           </div>
           <div className="mt-2 font-display text-2xl gold-text">{p.tithi.paksha} Paksha · {p.tithi.name}</div>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+
             <Row k="Tithi" v={`${p.tithi.name} (${p.tithi.number})`} />
             <Row k="Paksha" v={p.tithi.paksha} />
             <Row k="Nakshatra" v={`${p.nakshatra.name} — Pada ${p.nakshatra.pada}`} />
@@ -117,7 +135,7 @@ function PanchangPage() {
           </div>
         </GlassCard>
 
-        <GlassCard title="Auspicious Muhurats">
+        <GlassCard title="Auspicious Muhurats" desc="Good windows are listed first, then the windows most people avoid for new starts.">
           <div className="space-y-2 text-sm">
             <MuhurtaRow label="Abhijit" range={p.abhijitMuhurat} good />
             <MuhurtaRow label="Brahma" range={p.brahmaMuhurat} good />
@@ -131,16 +149,16 @@ function PanchangPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Chaughadiya — Day">
+        <GlassCard title="Chaughadiya — Day" desc="The daytime is split into small windows. Green ones are fine for starting things, marked ones are better skipped.">
           <ChaughadiyaTable rows={p.chaughadiyaDay} />
         </GlassCard>
-        <GlassCard title="Chaughadiya — Night">
+        <GlassCard title="Chaughadiya — Night" desc="The same idea for the night, from sunset to next sunrise.">
           <ChaughadiyaTable rows={p.chaughadiyaNight} />
         </GlassCard>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Special notes">
+        <GlassCard title="Special notes" desc="Extra traditional warnings that apply to this date.">
           <div className="space-y-3 text-sm">
             <div>
               <div className="text-xs text-muted-foreground">Disha Shool (avoid direction)</div>
@@ -158,7 +176,7 @@ function PanchangPage() {
             )}
           </div>
         </GlassCard>
-        <GlassCard title="Astronomical">
+        <GlassCard title="Astronomical" desc="The raw sky numbers behind everything above, if you want to check them.">
           <div className="text-xs text-muted-foreground">Julian Day: <span className="text-pearl">{p.julianDay.toFixed(4)}</span></div>
           <div className="text-xs text-muted-foreground mt-1">Sun–Moon elongation: <span className="text-pearl">{(p.tithi.number - 1) * 12 + "°"}</span></div>
         </GlassCard>
@@ -166,10 +184,10 @@ function PanchangPage() {
 
       {/* Hora — Planetary Hours */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Hora — Day (Sunrise → Sunset)">
+        <GlassCard title="Hora — Day (Sunrise → Sunset)" desc="Each hour of the day is looked after by one planet. Pick the hour that matches your task.">
           <HoraTable rows={horas.filter(h => h.isDay)} nowIdx={nowHora?.index ?? -1} />
         </GlassCard>
-        <GlassCard title="Hora — Night (Sunset → Sunrise)">
+        <GlassCard title="Hora — Night (Sunset → Sunrise)" desc="The same planetary hours, carried on through the night.">
           <HoraTable rows={horas.filter(h => !h.isDay)} nowIdx={nowHora?.index ?? -1} />
         </GlassCard>
       </div>

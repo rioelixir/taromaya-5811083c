@@ -197,10 +197,12 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     const dig = (1 - digArc / 6) * 0.6;
 
     // Kala bala — a light proxy: benefics stronger at night, malefics by day.
-    // Without exact sunrise we approximate from Sun's house (12..6 = day arc).
+    // Without exact sunrise we approximate from the Sun's house: houses 7-12
+    // from the ascendant are above the horizon (Sun visible = day birth),
+    // houses 1-6 are below the horizon (night birth).
     const sun = chart.planets[0];
-    const dayArc = norm12(sun.rashi - ascRashi) + 1;
-    const isDayChart = dayArc <= 6;
+    const sunHouse = norm12(sun.rashi - ascRashi) + 1;
+    const isDayChart = sunHouse >= 7;
     const isBenefic = name === "Jupiter" || name === "Venus" || name === "Moon" || name === "Mercury";
     const kala = (isDayChart === isBenefic ? 0.3 : 0.5);
 
@@ -210,14 +212,19 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     // Naisargika — classical.
     const naisargika = NAISARGIKA[name];
 
-    // Drig bala — placeholder from aspecting benefic/malefic count around planet.
+    // Drig bala — from aspecting benefic/malefic count around planet.
+    // Every planet casts a 7th-house (opposition) aspect; Mars also casts
+    // special aspects to houses 4 and 8, Jupiter to 5 and 9, Saturn to 3 and 10
+    // (the classical Parashari special-aspect rule).
     let drig = 0.2;
     chart.planets.forEach((q) => {
       if (q.name === name) return;
       const diff = norm12(q.rashi - p.rashi) + 1;
       const isMalefic = q.name === "Sun" || q.name === "Mars" || q.name === "Saturn" || q.name === "Rahu" || q.name === "Ketu";
       if ([7].includes(diff)) drig += isMalefic ? -0.15 : 0.15;
-      if ([5, 9].includes(diff) && (q.name === "Jupiter")) drig += 0.2;
+      if ([5, 9].includes(diff) && q.name === "Jupiter") drig += 0.2;
+      if ([4, 8].includes(diff) && q.name === "Mars") drig -= 0.15;
+      if ([3, 10].includes(diff) && q.name === "Saturn") drig -= 0.15;
     });
     drig = Math.max(0, drig);
 
