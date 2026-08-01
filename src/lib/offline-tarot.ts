@@ -1,4 +1,21 @@
-import { TAROT_DETAILS } from "./tarot-details";
+import { getCardDetails, type CardDetails } from "./tarot-details";
+import { TAROT_DECK, type TarotCard } from "./tarot-deck";
+
+/** Finds the card book entry for a card name, whichever deck it came from. */
+function detailsFor(name: string, keywords: string[], reversed: boolean): CardDetails | null {
+  const known = TAROT_DECK.find((c) => c.name.toLowerCase() === name.toLowerCase());
+  if (known) return getCardDetails(known);
+  if (!keywords.length) return null;
+  const custom: TarotCard = {
+    id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    name,
+    arcana: "minor",
+    keywords,
+    keywordsReversed: keywords,
+  };
+  void reversed;
+  return getCardDetails(custom);
+}
 
 /**
  * Writes a tarot reading from the app's own card book, with no AI model.
@@ -52,8 +69,9 @@ export function offlineTarotReading(draw: OfflineDraw): string {
 
   const chosen = draw.cards.slice(0, 8);
   chosen.forEach((card, i) => {
-    const d = TAROT_DETAILS[card.name];
-    const keywords = (card.keywords ?? []).filter(Boolean).slice(0, 3).join(", ");
+    const keywordList = (card.keywords ?? []).filter(Boolean).slice(0, 3);
+    const keywords = keywordList.join(", ");
+    const d = detailsFor(card.name, keywordList, card.reversed);
     let body = "";
     if (d) {
       const core = card.reversed ? d.reversed : d.upright;
