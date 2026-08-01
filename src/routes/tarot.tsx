@@ -113,23 +113,6 @@ function TarotPage() {
   // Hidden by default: the board itself is the whole screen until the user
   // taps "Show" to reveal the deck/spread controls.
   const [headerCollapsed, setHeaderCollapsed] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  useEffect(() => {
-    const onChange = () => setIsFullScreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onChange);
-    onChange();
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
-  const toggleFullScreen = async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen();
-    } catch {
-      /* some browsers block full screen; the board is already full-page */
-    }
-  };
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
   const [starCtx, setStarCtx] = useState<StarContext>({});
