@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Star,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
 
