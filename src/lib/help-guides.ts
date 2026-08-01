@@ -219,19 +219,7 @@ export const HELP_GUIDES: HelpGuide[] = [
       "Start with the strongest and lean on it.",
   },
   {
-    id: "rectification",
-    title: "Birth time check",
-    to: "/rectification",
-    group: "Your chart",
-    blurb: "Not sure of your birth time? Narrow it down.",
-    tags: ["time", "unknown", "correct"],
-    script:
-      "If nobody remembers your exact birth time, this helps you get closer. " +
-      "Put in your best guess and a few big events from your life, like a marriage or a move. " +
-      "The app tests nearby times and shows which one matches your life best. " +
-      "It is a good guess, not a certainty, so keep it as a helpful hint.",
-  },
-  {
+
     id: "deep-jyotish",
     title: "Deep study",
     to: "/deep-jyotish",
@@ -356,41 +344,6 @@ export const HELP_GUIDES: HelpGuide[] = [
       "You can see which sign each planet is sitting in and whether it is moving forward or looking like it is going backwards. " +
       "It updates by itself, so you can just watch.",
   },
-  {
-    id: "observatory",
-    title: "Observatory",
-    to: "/observatory",
-    group: "Sky watching",
-    blurb: "Look closer at the sky.",
-    tags: ["telescope", "planets", "watch"],
-    script:
-      "The observatory is for looking, not for predicting. " +
-      "It shows the planets and their positions in a bigger, clearer view, so you can learn what is up there tonight.",
-  },
-  {
-    id: "weather",
-    title: "Cosmic weather",
-    to: "/weather",
-    group: "Sky watching",
-    blurb: "The mood of the sky today.",
-    tags: ["mood", "today", "energy"],
-    script:
-      "Think of this as a weather report for the sky's mood. " +
-      "Pick your city and read the short forecast: calm, busy, or a bit bumpy, and one simple tip for the day.",
-  },
-  {
-    id: "astrocartography",
-    title: "Places on the map",
-    to: "/astrocartography",
-    group: "Sky watching",
-    blurb: "Where in the world suits you.",
-    tags: ["travel", "move", "map", "city"],
-    script:
-      "Your chart feels different in different places. " +
-      NEEDS_BIRTH +
-      "The map shows lines across the world and tells you, in plain words, what kind of place each line brings: good for work, good for love, good for rest. " +
-      "Use it when you are thinking about travelling or moving.",
-  },
 
   // ------------------------------------------------------------- Life areas
   {
@@ -429,18 +382,6 @@ export const HELP_GUIDES: HelpGuide[] = [
       "Put in the birth details of the first person, then the second person, and press the button. " +
       "You get a friendliness score, then simple notes on how the two get along in feelings, in habits and in daily life, plus what helps where they clash. " +
       "A low score is not a no. It only shows where the work is.",
-  },
-  {
-    id: "synastry",
-    title: "Two charts together",
-    to: "/synastry",
-    group: "Life areas",
-    blurb: "The finer detail between two people.",
-    tags: ["relationship", "love", "couple"],
-    script:
-      "This looks at two charts side by side and shows where they pull together and where they rub. " +
-      "Put in both sets of birth details. " +
-      "You get plain lines about talking, feelings, attraction and daily habits, with one thing each person can do.",
   },
   {
     id: "career",

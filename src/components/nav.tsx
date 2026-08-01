@@ -80,13 +80,8 @@ const CATALOG: Group[] = [
     items: [
       { to: "/transits", label: "Transits", icon: LineChart },
       { to: "/vedic-transits", label: "Vedic Transits", icon: Moon },
-      { to: "/progressions", label: "Progressions", icon: LineChart },
-      { to: "/synastry", label: "Synastry", icon: Compass },
       { to: "/timeline", label: "Timeline", icon: CalendarClock },
-      { to: "/rectification", label: "Rectification", icon: Target },
-      { to: "/astrocartography", label: "Astrocartography", icon: Globe2 },
-      { to: "/observatory", label: "Observatory", icon: Telescope },
-      { to: "/weather", label: "Cosmic Weather", icon: CloudSun },
+
       { to: "/dreams", label: "Dream Oracle", icon: Feather },
       { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
       { to: "/reports", label: "Reports", icon: FileText },
