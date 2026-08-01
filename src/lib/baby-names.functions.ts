@@ -5,6 +5,8 @@ import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
+import { NAME_BOOK } from "./name-book";
+import { AI_OFFLINE } from "./offline-mode";
 
 const Input = z.object({
   gender: z.enum(["Boy", "Girl", "Unisex"]),
@@ -28,6 +30,8 @@ export const suggestBabyNames = createServerFn({ method: "POST" })
   .middleware([requirePremium])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
+    if (AI_OFFLINE) return { names: pickFromBook(data) };
+
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
@@ -98,3 +102,55 @@ Return exactly ${data.count} entries.`;
 
     return { names: clean };
   });
+
+/**
+ * Picks names straight from Taromaya's own name book, so name ideas cost
+ * nothing and never need an outside AI model.
+ */
+function pickFromBook(data: {
+  gender: "Boy" | "Girl" | "Unisex";
+  tradition: string;
+  syllables: string[];
+  meaningTheme?: string | undefined;
+  count: number;
+}): Suggestion[] {
+  const syll = data.syllables.map((s) => s.toUpperCase()).filter(Boolean);
+  const theme = (data.meaningTheme ?? "")
+    .toLowerCase()
+    .split(/[,\s]+/)
+    .filter((w) => w.length > 2);
+
+  const score = (n: (typeof NAME_BOOK)[number]) => {
+    let s = 0;
+    const upper = n.name.toUpperCase();
+    if (syll.length && syll.some((x) => upper.startsWith(x))) s += 100;
+    if (data.gender !== "Unisex" && (n.gender === data.gender || n.gender === "Unisex")) s += 30;
+    if (data.gender === "Unisex" && n.gender === "Unisex") s += 30;
+    if (data.tradition !== "Any" && n.origin === data.tradition) s += 20;
+    if (theme.length && theme.some((w) => n.meaning.toLowerCase().includes(w))) s += 15;
+    return s;
+  };
+
+  const startSyllable = (name: string) => {
+    const hit = syll.find((x) => name.toUpperCase().startsWith(x));
+    if (hit) return hit.charAt(0) + hit.slice(1).toLowerCase();
+    return name.slice(0, 2);
+  };
+
+  return NAME_BOOK.filter((n) => {
+    if (data.gender !== "Unisex" && n.gender !== data.gender && n.gender !== "Unisex") return false;
+    if (data.tradition !== "Any" && n.origin !== data.tradition && data.tradition !== "Hindu") return false;
+    if (data.tradition === "Hindu" && !["Hindu", "Sanskrit"].includes(n.origin)) return false;
+    return true;
+  })
+    .map((n) => ({ n, s: score(n) }))
+    .sort((a, b) => b.s - a.s || a.n.name.localeCompare(b.n.name))
+    .slice(0, data.count)
+    .map(({ n }) => ({
+      name: n.name,
+      meaning: n.meaning,
+      origin: n.origin,
+      gender: n.gender === "Unisex" ? data.gender : n.gender,
+      syllable: startSyllable(n.name),
+    }));
+}
