@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { VOICE_FILL_EVENT, isFirstOfKind, type SpokenDetails } from "@/lib/voice-parse";
 
-// Day / Month / Year dropdowns — no typing, no invalid dates.
+// Day / Month dropdowns + a typed 4-digit year — no invalid dates.
 // Value and onChange use the ISO `yyyy-mm-dd` string the whole app already uses.
 
 const MONTHS = [
@@ -15,6 +15,7 @@ function daysInMonth(year: number, month: number): number {
 
 const selectCls =
   "w-full rounded-xl bg-black/30 border border-white/10 px-2 py-2 text-sm text-pearl focus:outline-none focus:border-gold/50";
+
 
 export function DateSelect({
   value,
