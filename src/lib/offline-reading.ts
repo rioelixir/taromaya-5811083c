@@ -164,16 +164,21 @@ type Topic = "birth" | "transit" | "numbers" | "match" | "horoscope" | "timing" 
 
 function topicOf(all: string): Topic {
   const t = all.toLowerCase();
-  if (/kundli match|compat|synastry|guna|ashtakoot|match making/.test(t)) return "match";
-  if (/numerolog|life path|destiny|soul urge|mulank|bhagyank|loshu|lo shu/.test(t)) return "numbers";
-  if (/panchang|muhurat|tithi|good time|choghadiya|hora/.test(t)) return "timing";
-  if (/dasha|antardasha|period|varsh/.test(t)) return "period";
-  if (/transit|current sky|gochara|today/.test(t)) return "transit";
-  if (/horoscope|day ahead|week ahead|month ahead/.test(t)) return "horoscope";
+  // The module the reading was asked for wins over stray words in the data.
+  const asked = /\bmodule:\s*([a-z \-]+)/.exec(t)?.[1] ?? "";
+  const both = `${asked} ${t}`;
+  if (/kundli match|compat|synastry|guna|ashtakoot|match making/.test(both)) return "match";
+  if (/numerolog|life path|destiny|soul urge|mulank|bhagyank|loshu|lo shu/.test(both)) return "numbers";
+  if (/muhurat|choghadiya|hora|good time|panchang/.test(asked || "no")) return "timing";
+  if (/horoscope|day ahead|week ahead|month ahead/.test(both)) return "horoscope";
+  if (/lagna|ascendant|birth chart|kundli|natal/.test(both)) return "birth";
+  if (/muhurat|choghadiya|good time/.test(t)) return "timing";
+  if (/dasha|antardasha|varsh/.test(t)) return "period";
+  if (/transit|current sky|gochara/.test(t)) return "transit";
   if (/nakshatra|birth star|pada/.test(t)) return "star";
-  if (/lagna|ascendant|birth chart|kundli|natal/.test(t)) return "birth";
   return "general";
 }
+
 
 const TOPIC_OPENERS: Record<Topic, string[]> = {
   birth: [
