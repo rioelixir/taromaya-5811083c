@@ -1,6 +1,6 @@
-import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
+import { PlacePicker } from "@/components/place-picker";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, NAKSHATRAS, PLANET_GLYPHS, RASHIS } from "@/lib/vedic";
@@ -75,7 +75,142 @@ function ProfileCard({ p, birthPada }: { p: NakshatraProfile; birthPada?: number
         <Chip label="Gem" value={p.gemstone} />
       </div>
 
-      <BirthVoiceBox value={form} onChange={(p) => setForm((prev) => ({ ...prev, ...p }))} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="text-xs uppercase tracking-widest text-emerald-400/80 mb-2">Strengths</div>
+          <ul className="text-sm text-pearl space-y-1">{p.strengths.map((s) => <li key={s}>· {s}</li>)}</ul>
+        </div>
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+          <div className="text-xs uppercase tracking-widest text-red-400/80 mb-2">Shadows</div>
+          <ul className="text-sm text-pearl space-y-1">{p.shadows.map((s) => <li key={s}>· {s}</li>)}</ul>
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="glass rounded-2xl p-4">
+          <div className="text-xs uppercase tracking-widest text-gold/80 mb-2">Favourable</div>
+          <div className="text-sm text-pearl">{p.favourable.join(" · ")}</div>
+        </div>
+        <div className="glass rounded-2xl p-4">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Avoid</div>
+          <div className="text-sm text-pearl">{p.unfavourable.join(" · ")}</div>
+        </div>
+      </div>
+
+      <div className="glass rounded-2xl p-4">
+        <div className="text-xs uppercase tracking-widest text-gold/80 mb-2">Career fields</div>
+        <div className="flex flex-wrap gap-2">
+          {p.career.map((c) => (
+            <span key={c} className="text-xs px-2 py-1 rounded-full bg-gold/10 text-gold border border-gold/20">{c}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-gold/30 bg-gold/5 p-4">
+        <div className="text-xs uppercase tracking-widest text-gold mb-1">Mantra</div>
+        <div className="font-display text-lg text-pearl">{p.mantra}</div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <TIcon className="h-4 w-4 text-gold" />
+          <div className="font-display text-lg text-pearl">Padas & Navamsha</div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {[1, 2, 3, 4].map((k) => {
+            const nav = padaNavamsha(p.index, k);
+            const el = padaElement(p.index, k);
+            const highlight = birthPada === k;
+            return (
+              <div
+                key={k}
+                className={`rounded-xl p-3 border ${
+                  highlight
+                    ? "border-gold/60 bg-gold/10 shadow-[0_0_20px_rgba(212,175,55,0.15)]"
+                    : "border-white/10 bg-white/[0.02]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-pearl">Pada {k}</div>
+                  {highlight && (
+                    <span className="text-[9px] uppercase tracking-widest text-gold">Your pada</span>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {RASHIS[nav]} navamsha · {el}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 italic">{padaTheme(p.index, k)}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NakshatraPage() {
+  const [form, setForm] = useState(DEFAULT);
+  useAutofillBirth<typeof DEFAULT>(setForm);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [partnerNak, setPartnerNak] = useState<number>(0);
+
+  const chart = useMemo(() => {
+    try {
+      const [y, m, d] = form.date.split("-").map(Number);
+      const [hh, mm] = form.time.split(":").map(Number);
+      return computeKundli({
+        year: y, month: m, day: d, hour: hh, minute: mm,
+        tzOffsetHours: Number(form.tz),
+        latitude: Number(form.lat), longitude: Number(form.lon),
+      });
+    } catch {
+      return null;
+    }
+  }, [form]);
+
+  const birthNak = chart?.moonNakshatra.index ?? null;
+  const birthPada = chart?.moonNakshatra.pada;
+  const activeIndex = selected ?? birthNak ?? 0;
+  const profile = nakshatraProfile(activeIndex);
+  const partner = nakshatraProfile(partnerNak);
+
+  const gana = ganaCompat(profile.gana, partner.gana);
+  const nadi = nadiCompat(profile.nadi, partner.nadi);
+  const yoni = yoniCompat(profile.yoni, partner.yoni);
+  const compatTotal = gana.score + nadi.score + yoni.score;
+
+  return (
+    <PageShell
+      eyebrow="Nakshatra Intelligence"
+      title="The 27 lunar mansions"
+      subtitle="Each nakshatra is a personality, a body of stars, and a doorway. Explore the full pada-level chart of your Moon and cross-reference deity, gana, yoni and nadi."
+    >
+      <GlassCard title="Birth data">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            { k: "date", label: "Date", type: "date" },
+            { k: "time", label: "Time", type: "time" },
+            ].map((f) => (
+            <label key={f.k} className="text-xs uppercase tracking-widest text-muted-foreground">
+              {f.label}
+              <input
+                type={f.type}
+                value={(form as any)[f.k]}
+                onChange={(e) => setForm({ ...form, [f.k]: e.target.value })}
+                className="mt-1 w-full glass rounded-xl px-3 py-2 text-sm text-pearl outline-none focus:ring-1 focus:ring-gold/60"
+              />
+            </label>
+          ))}
+        </div>
+        <div className="mt-3">
+          <PlacePicker
+            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
+            onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
+            forDate={form.date}
+            forTime={form.time}
+          />
+        </div>
         {chart && (
           <div className="mt-4 text-sm text-pearl flex flex-wrap gap-4">
             <span>
