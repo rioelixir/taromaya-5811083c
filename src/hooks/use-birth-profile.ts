@@ -42,9 +42,10 @@ export function useSaveBirthProfile() {
   const saveFn = useServerFn(saveBirthProfile);
   return useMutation<BirthProfile, Error, BirthProfileInput>({
     mutationFn: (input) => saveFn({ data: input }),
-    onSuccess: (data) => {
-      qc.setQueryData(["birth-profile"], data);
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["birth-profile"] });
     },
+
   });
 }
 
