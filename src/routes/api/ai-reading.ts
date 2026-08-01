@@ -5,8 +5,8 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
 import { withSupremeSystem } from "@/lib/ai-system";
 import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
-import {
 import { usingOwnAi } from "@/lib/ai-provider.server";
+import {
   ALLOWED_CHAT_MODELS,
   MODEL_EVERYDAY,
   MAX_SYSTEM_CHARS,
@@ -14,6 +14,7 @@ import { usingOwnAi } from "@/lib/ai-provider.server";
   MAX_OUTPUT_TOKENS,
   budget,
 } from "@/lib/ai-models";
+
 
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
