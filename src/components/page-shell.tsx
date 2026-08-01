@@ -133,6 +133,7 @@ export function PageShell({
           </header>
         )}
         {!hideVoice && <VoicePanel />}
+        {!hideLearn && <LevelGuide title={title} />}
         {children}
         {!hideAI && (
           <AIInterpretation
