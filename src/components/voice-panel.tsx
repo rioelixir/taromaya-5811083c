@@ -131,6 +131,18 @@ export function VoicePanel() {
         )}
       </div>
 
+      {listening && (
+        <div className="mt-3 rounded-2xl border border-red-400/30 bg-red-500/5 p-3">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-red-200">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening
+          </div>
+          <p className="mt-1 text-base leading-relaxed text-pearl">
+            {voice.heard || "Start talking — your words show up here."}
+          </p>
+        </div>
+      )}
+
+
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
           type="button"

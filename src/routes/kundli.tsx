@@ -1,8 +1,7 @@
-import { PlacePicker } from "@/components/place-picker";
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { Explain } from "@/components/explain";
 import { ConfidenceNote } from "@/components/confidence-note";
 import { CrossCheckPanel } from "@/components/cross-check-panel";
@@ -37,7 +36,7 @@ import {
   CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
 import { CurrentTransit } from "@/components/current-transit";
-import { DateSelect } from "@/components/date-select";
+import { BirthOneBox } from "@/components/birth-one-box";
 
 
 export const Route = createFileRoute("/kundli")({
@@ -204,7 +203,9 @@ function KundliPage() {
       eyebrow="Vedic Kundli"
       title="Your birth chart"
       subtitle="Sidereal Lahiri calculations, whole-sign houses, divisional charts, Vimshottari dasha, yogas, and doshas — all computed privately in your browser."
+      hideVoice
     >
+
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <BirthForm form={form} setForm={setForm} canSubmit={canSubmit} onCompute={compute} error={error} />
 
@@ -334,25 +335,9 @@ function BirthForm({
   return (
     <GlassCard title="Birth details">
       <div className="grid gap-3">
-        <Field label="Name (optional)">
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your name" />
-        </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <DateSelect value={form.date} onChange={(iso) => setForm({ ...form, date: iso })} />
-          <Field label="Time (24h)"><input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className={inputCls} disabled={form.unknownTime} /></Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Seconds"><input value={form.seconds} onChange={(e) => setForm({ ...form, seconds: e.target.value })} className={inputCls} inputMode="numeric" disabled={form.unknownTime} placeholder="0" /></Field>
-        </div>
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" checked={form.unknownTime} onChange={(e) => setForm({ ...form, unknownTime: e.target.checked })} className="accent-gold" />
-          Time unknown (use noon chart)
-        </label>
-        <PlacePicker
-          value={{ place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-          onChange={(p) => setForm({ ...form, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz })}
-          forDate={form.date}
-          forTime={form.time}
+        <BirthOneBox
+          value={{ name: form.name, date: form.date, time: form.time, place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
+          onChange={(patch: Record<string, string>) => setForm({ ...form, ...patch, unknownTime: false } as FormState)}
         />
         <button
           disabled={!canSubmit} onClick={onCompute}
@@ -366,17 +351,7 @@ function BirthForm({
   );
 }
 
-const inputCls =
-  "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <div className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
-      {children}
-    </label>
-  );
-}
 
 // ── South Indian chart
 const CELL_TO_RASHI: Record<string, number> = {
