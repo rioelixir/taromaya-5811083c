@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Home, ChevronUp, ChevronDown, Check, Sparkles, LayoutGrid } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
