@@ -54,7 +54,18 @@ export function BirthOneBox({
       if (d.date) patch.date = d.date;
       if (d.time) patch.time = d.time;
       onChange(patch);
-      setNote("Got it. Check the details below.");
+
+      // Ask only for what is still missing, and never wipe what we already have.
+      const missing: string[] = [];
+      if (!(d.name || value.name)) missing.push("your name");
+      if (!(d.date || value.date)) missing.push("your birth date");
+      if (!(d.time || value.time)) missing.push("your birth time");
+      if (!(d.place || value.place)) missing.push("your birth place");
+      setNote(
+        missing.length === 0
+          ? "Got it. Check the details below."
+          : `Got it. Now please also say ${missing.join(", ")}.`,
+      );
 
       if (d.place) {
         setBusy(true);
