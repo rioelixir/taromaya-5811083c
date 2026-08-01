@@ -99,6 +99,12 @@ export function PageShell({
   hideVoice?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  // This page already shows its own Back button, so hide the global floating one.
+  useEffect(() => {
+    document.documentElement.classList.add("has-pageshell-back");
+    return () => document.documentElement.classList.remove("has-pageshell-back");
+  }, []);
+
   return (
     <div className="relative flex min-h-dvh w-full flex-col">
       <StarField />
