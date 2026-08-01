@@ -2,7 +2,7 @@ import { useMemo, useState, lazy, Suspense } from "react";
 import { ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { buildNumerologyReport, TRAITS, root, type FullNumerologyReport } from "@/lib/numerology-report";
 import { PlainAIText } from "@/components/plain-ai-text";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { useServerFn } from "@tanstack/react-start";
 
 const LazyGrid = lazy(() => import("@/components/numerology-report-grid"));
@@ -48,7 +48,7 @@ function Bar({ value }: { value: number }) {
 export function NumerologyFullReport({ fullName, birthDate }: { fullName: string; birthDate: string }) {
   const [aiText, setAiText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const ai = useServerFn(aiReading);
+  const ai = aiReading;
 
   const report = useMemo<FullNumerologyReport | null>(() => {
     if (!birthDate) return null;
@@ -75,35 +75,38 @@ export function NumerologyFullReport({ fullName, birthDate }: { fullName: string
     try {
       const res = await ai({
         data: {
-          kind: "numerology",
+          system:
+            "You explain numerology to a complete beginner in warm, plain English. " +
+            "Use only the numbers supplied. Never show any calculation or formula.",
           prompt:
             "Read only the numbers given. Do not invent any calculation. Explain in very simple English for a beginner, " +
             "in one flowing reading: which energies are strongest, which are weakest, where two numbers pull against each other, " +
-            "the repeating pattern in this chart, and three practical things to do next.",
-          context: JSON.stringify({
-            lifePath: report.base.lifePath,
-            mulank: report.vedic.mulank,
-            bhagyank: report.vedic.bhagyank,
-            namank: report.vedic.namank,
-            expression: report.base.destiny,
-            soulUrge: report.base.soulUrge,
-            personality: report.base.personality,
-            maturity: report.base.maturity,
-            balance: report.balanceNumber,
-            karmicDebts: report.karmicDebts,
-            karmicLessons: report.karmicLessons,
-            missingNumbers: report.missingNumbers,
-            hiddenStrengths: report.hiddenStrengths,
-            personalYear: report.base.personalYear,
-            personalMonth: report.base.personalMonth,
-            personalDay: report.base.personalDay,
-            pinnacles: report.pinnacles,
-            challenges: report.challenges,
-            harmony: report.vedic.harmony,
-            lucky: report.lucky,
-          }),
+            "the repeating pattern in this chart, and three practical things to do next.\n\nDATA\n" +
+            JSON.stringify({
+              lifePath: report.base.lifePath,
+              mulank: report.vedic.mulank,
+              bhagyank: report.vedic.bhagyank,
+              namank: report.vedic.namank,
+              expression: report.base.destiny,
+              soulUrge: report.base.soulUrge,
+              personality: report.base.personality,
+              maturity: report.base.maturity,
+              balance: report.balanceNumber,
+              karmicDebts: report.karmicDebts,
+              karmicLessons: report.karmicLessons,
+              missingNumbers: report.missingNumbers,
+              hiddenStrengths: report.hiddenStrengths,
+              personalYear: report.base.personalYear,
+              personalMonth: report.base.personalMonth,
+              personalDay: report.base.personalDay,
+              pinnacles: report.pinnacles,
+              challenges: report.challenges,
+              harmony: report.vedic.harmony,
+              lucky: report.lucky,
+            }),
         },
       });
+
       setAiText(typeof res === "string" ? res : (res as { text?: string })?.text ?? null);
     } catch (e) {
       setAiText(e instanceof Error ? e.message : "Could not create the reading.");

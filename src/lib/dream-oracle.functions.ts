@@ -5,6 +5,7 @@ import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { liveSkySnapshot, signName } from "./live-sky";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
+import { MODEL_EVERYDAY } from "@/lib/ai-models";
 
 const Input = z.object({
   dream: z.string().min(4).max(4000),
@@ -61,7 +62,7 @@ export const interpretDream = createServerFn({ method: "POST" })
     ].join("\n");
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
+      model: gateway(MODEL_EVERYDAY),
       system: withSupremeSystem(system),
       prompt,
     });

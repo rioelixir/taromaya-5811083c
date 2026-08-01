@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { CHINESE_ANIMALS, CHINESE_TRAITS, CHINESE_COMPATIBLE, chineseSign } from "@/lib/chinese-zodiac";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { analyseSadeSati } from "@/lib/dosha-windows";
 import { Loader2, Sparkles, Flame, Moon as MoonIcon, Star } from "lucide-react";
 import {

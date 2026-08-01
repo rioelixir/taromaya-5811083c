@@ -5,6 +5,14 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
 import { withSupremeSystem } from "@/lib/ai-system";
 import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
+import {
+  ALLOWED_CHAT_MODELS,
+  MODEL_EVERYDAY,
+  MAX_SYSTEM_CHARS,
+  MAX_PROMPT_CHARS,
+  MAX_OUTPUT_TOKENS,
+  budget,
+} from "@/lib/ai-models";
 
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
@@ -18,16 +26,11 @@ const BodySchema = z.object({
 });
 
 // Allowlisted chat models — the DB may not override to arbitrary strings.
-const ALLOWED_MODELS = new Set([
-  "google/gemini-3.5-flash",
-  "google/gemini-3.1-flash-lite",
-  "google/gemini-3.1-pro-preview",
-  "openai/gpt-5.4-mini",
-  "openai/gpt-5.4-nano",
-  "openai/gpt-5.5",
-]);
+// Only low-cost models are allowed, so no admin setting can quietly make every
+// reading in the app expensive.
+const ALLOWED_MODELS = new Set<string>(ALLOWED_CHAT_MODELS);
 
-const DEFAULT_MODEL = "google/gemini-3.1-flash-lite";
+const DEFAULT_MODEL = MODEL_EVERYDAY;
 
 export const Route = createFileRoute("/api/ai-reading")({
   server: {
@@ -110,12 +113,17 @@ export const Route = createFileRoute("/api/ai-reading")({
         try {
           const gateway = createLovableAiGatewayProvider(key);
           const model = gateway(modelId);
-          const finalSystem = withSupremeSystem(effectiveSystem + GUARDRAIL).slice(0, 12000);
-          const finalPrompt = prompt.slice(0, 4000);
+          // Hard budgets: a long page of context must never become a big bill.
+          const finalSystem = budget(
+            withSupremeSystem(budget(effectiveSystem, MAX_SYSTEM_CHARS) + GUARDRAIL),
+            MAX_SYSTEM_CHARS + 3000,
+          );
+          const finalPrompt = budget(prompt, MAX_PROMPT_CHARS);
           const result = streamText({
             model,
             system: finalSystem,
             prompt: finalPrompt,
+            maxOutputTokens: MAX_OUTPUT_TOKENS,
             abortSignal: abort.signal,
             onError({ error }) {
               // eslint-disable-next-line no-console
@@ -138,6 +146,7 @@ export const Route = createFileRoute("/api/ai-reading")({
               model,
               system: finalSystem,
               prompt: finalPrompt,
+              maxOutputTokens: MAX_OUTPUT_TOKENS,
               abortSignal: abort.signal,
             });
             acc = gen.text;

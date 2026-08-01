@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
+import { MODEL_DEEP, MAX_OUTPUT_TOKENS } from "./ai-models";
 
 const Input = z.object({
   system: z.string().min(1).max(2000),
@@ -17,7 +18,8 @@ export const aiReading = createServerFn({ method: "POST" })
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
+      model: gateway(MODEL_DEEP),
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
       system: data.system,
       prompt: data.prompt,
     });
