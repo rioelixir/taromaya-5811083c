@@ -69,16 +69,16 @@ export function useVoice(onText: (text: string) => void) {
     setAvailable(!!ctor() || !!navigator.mediaDevices?.getUserMedia);
   }, []);
 
-  /** Keep voice input to one word per tap so the same value is never filled twice. */
-  const firstWord = useCallback((raw: string) => {
-    const text = cleanSpeech(raw, { punctuate: false });
-    return text.split(/\s+/)[0] || "";
+  /** Tidy up the spoken words but keep the whole sentence. */
+  const tidy = useCallback((raw: string) => {
+    return dedupeRepeats(cleanSpeech(raw, { punctuate: false })).trim();
   }, []);
 
   const emit = useCallback((raw: string) => {
-    const word = firstWord(raw);
-    if (word) onTextRef.current(word);
-  }, [firstWord]);
+    const text = tidy(raw);
+    if (text) onTextRef.current(text);
+  }, [tidy]);
+
 
   /* ---------- fallback: record and convert ---------- */
 
