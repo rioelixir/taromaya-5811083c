@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as YantraRouteImport } from './routes/yantra'
-import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as VedicTransitsRouteImport } from './routes/vedic-transits'
 import { Route as VastuRouteImport } from './routes/vastu'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
@@ -18,7 +17,6 @@ import { Route as TransitsRouteImport } from './routes/transits'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TarotRouteImport } from './routes/tarot'
-import { Route as SynastryRouteImport } from './routes/synastry'
 import { Route as StrengthRouteImport } from './routes/strength'
 import { Route as SkyRouteImport } from './routes/sky'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -26,11 +24,8 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SadesatiRouteImport } from './routes/sadesati'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RemediesRouteImport } from './routes/remedies'
-import { Route as RectificationRouteImport } from './routes/rectification'
-import { Route as ProgressionsRouteImport } from './routes/progressions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
-import { Route as ObservatoryRouteImport } from './routes/observatory'
 import { Route as NumerologyRouteImport } from './routes/numerology'
 import { Route as NakshatraLocationRouteImport } from './routes/nakshatra-location'
 import { Route as NakshatraRouteImport } from './routes/nakshatra'
@@ -60,7 +55,6 @@ import { Route as AyurvedaRouteImport } from './routes/ayurveda'
 import { Route as AvakhadaRouteImport } from './routes/avakhada'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
-import { Route as AstrocartographyRouteImport } from './routes/astrocartography'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -89,11 +83,6 @@ import { Route as ApiPublicHooksSkyAlertsRouteImport } from './routes/api/public
 const YantraRoute = YantraRouteImport.update({
   id: '/yantra',
   path: '/yantra',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WeatherRoute = WeatherRouteImport.update({
-  id: '/weather',
-  path: '/weather',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VedicTransitsRoute = VedicTransitsRouteImport.update({
@@ -131,11 +120,6 @@ const TarotRoute = TarotRouteImport.update({
   path: '/tarot',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SynastryRoute = SynastryRouteImport.update({
-  id: '/synastry',
-  path: '/synastry',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StrengthRoute = StrengthRouteImport.update({
   id: '/strength',
   path: '/strength',
@@ -171,16 +155,6 @@ const RemediesRoute = RemediesRouteImport.update({
   path: '/remedies',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RectificationRoute = RectificationRouteImport.update({
-  id: '/rectification',
-  path: '/rectification',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgressionsRoute = ProgressionsRouteImport.update({
-  id: '/progressions',
-  path: '/progressions',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -189,11 +163,6 @@ const ProfileRoute = ProfileRouteImport.update({
 const PanchangRoute = PanchangRouteImport.update({
   id: '/panchang',
   path: '/panchang',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ObservatoryRoute = ObservatoryRouteImport.update({
-  id: '/observatory',
-  path: '/observatory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NumerologyRoute = NumerologyRouteImport.update({
@@ -341,11 +310,6 @@ const AstrologyRoute = AstrologyRouteImport.update({
   path: '/astrology',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AstrocartographyRoute = AstrocartographyRouteImport.update({
-  id: '/astrocartography',
-  path: '/astrocartography',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AiRoute = AiRouteImport.update({
   id: '/ai',
   path: '/ai',
@@ -474,7 +438,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
-  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/avakhada': typeof AvakhadaRoute
@@ -504,11 +467,8 @@ export interface FileRoutesByFullPath {
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
-  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
-  '/progressions': typeof ProgressionsRoute
-  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/sadesati': typeof SadesatiRoute
@@ -516,7 +476,6 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
   '/strength': typeof StrengthRoute
-  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
@@ -524,7 +483,6 @@ export interface FileRoutesByFullPath {
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
-  '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
@@ -551,7 +509,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
-  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/avakhada': typeof AvakhadaRoute
@@ -581,11 +538,8 @@ export interface FileRoutesByTo {
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
-  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
-  '/progressions': typeof ProgressionsRoute
-  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/sadesati': typeof SadesatiRoute
@@ -593,7 +547,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
   '/strength': typeof StrengthRoute
-  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
@@ -601,7 +554,6 @@ export interface FileRoutesByTo {
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
-  '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/birth-details': typeof AuthenticatedBirthDetailsRoute
@@ -630,7 +582,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
-  '/astrocartography': typeof AstrocartographyRoute
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/avakhada': typeof AvakhadaRoute
@@ -660,11 +611,8 @@ export interface FileRoutesById {
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
   '/numerology': typeof NumerologyRoute
-  '/observatory': typeof ObservatoryRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
-  '/progressions': typeof ProgressionsRoute
-  '/rectification': typeof RectificationRoute
   '/remedies': typeof RemediesRoute
   '/reports': typeof ReportsRoute
   '/sadesati': typeof SadesatiRoute
@@ -672,7 +620,6 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sky': typeof SkyRoute
   '/strength': typeof StrengthRoute
-  '/synastry': typeof SynastryRoute
   '/tarot': typeof TarotRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
@@ -680,7 +627,6 @@ export interface FileRoutesById {
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
   '/vedic-transits': typeof VedicTransitsRoute
-  '/weather': typeof WeatherRoute
   '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/birth-details': typeof AuthenticatedBirthDetailsRoute
@@ -709,7 +655,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-terms'
     | '/ai'
-    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/avakhada'
@@ -739,11 +684,8 @@ export interface FileRouteTypes {
     | '/nakshatra'
     | '/nakshatra-location'
     | '/numerology'
-    | '/observatory'
     | '/panchang'
     | '/profile'
-    | '/progressions'
-    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/sadesati'
@@ -751,7 +693,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sky'
     | '/strength'
-    | '/synastry'
     | '/tarot'
     | '/terms'
     | '/timeline'
@@ -759,7 +700,6 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/vastu'
     | '/vedic-transits'
-    | '/weather'
     | '/yantra'
     | '/admin'
     | '/birth-details'
@@ -786,7 +726,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-terms'
     | '/ai'
-    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/avakhada'
@@ -816,11 +755,8 @@ export interface FileRouteTypes {
     | '/nakshatra'
     | '/nakshatra-location'
     | '/numerology'
-    | '/observatory'
     | '/panchang'
     | '/profile'
-    | '/progressions'
-    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/sadesati'
@@ -828,7 +764,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sky'
     | '/strength'
-    | '/synastry'
     | '/tarot'
     | '/terms'
     | '/timeline'
@@ -836,7 +771,6 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/vastu'
     | '/vedic-transits'
-    | '/weather'
     | '/yantra'
     | '/admin'
     | '/birth-details'
@@ -864,7 +798,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/accept-terms'
     | '/ai'
-    | '/astrocartography'
     | '/astrology'
     | '/auth'
     | '/avakhada'
@@ -894,11 +827,8 @@ export interface FileRouteTypes {
     | '/nakshatra'
     | '/nakshatra-location'
     | '/numerology'
-    | '/observatory'
     | '/panchang'
     | '/profile'
-    | '/progressions'
-    | '/rectification'
     | '/remedies'
     | '/reports'
     | '/sadesati'
@@ -906,7 +836,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/sky'
     | '/strength'
-    | '/synastry'
     | '/tarot'
     | '/terms'
     | '/timeline'
@@ -914,7 +843,6 @@ export interface FileRouteTypes {
     | '/varshphal'
     | '/vastu'
     | '/vedic-transits'
-    | '/weather'
     | '/yantra'
     | '/_authenticated/admin'
     | '/_authenticated/birth-details'
@@ -943,7 +871,6 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcceptTermsRoute: typeof AcceptTermsRoute
   AiRoute: typeof AiRoute
-  AstrocartographyRoute: typeof AstrocartographyRoute
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
   AvakhadaRoute: typeof AvakhadaRoute
@@ -973,11 +900,8 @@ export interface RootRouteChildren {
   NakshatraRoute: typeof NakshatraRoute
   NakshatraLocationRoute: typeof NakshatraLocationRoute
   NumerologyRoute: typeof NumerologyRoute
-  ObservatoryRoute: typeof ObservatoryRoute
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
-  ProgressionsRoute: typeof ProgressionsRoute
-  RectificationRoute: typeof RectificationRoute
   RemediesRoute: typeof RemediesRoute
   ReportsRoute: typeof ReportsRoute
   SadesatiRoute: typeof SadesatiRoute
@@ -985,7 +909,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkyRoute: typeof SkyRoute
   StrengthRoute: typeof StrengthRoute
-  SynastryRoute: typeof SynastryRoute
   TarotRoute: typeof TarotRoute
   TermsRoute: typeof TermsRoute
   TimelineRoute: typeof TimelineRoute
@@ -993,7 +916,6 @@ export interface RootRouteChildren {
   VarshphalRoute: typeof VarshphalRoute
   VastuRoute: typeof VastuRoute
   VedicTransitsRoute: typeof VedicTransitsRoute
-  WeatherRoute: typeof WeatherRoute
   YantraRoute: typeof YantraRoute
   ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -1014,13 +936,6 @@ declare module '@tanstack/react-router' {
       path: '/yantra'
       fullPath: '/yantra'
       preLoaderRoute: typeof YantraRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/weather': {
-      id: '/weather'
-      path: '/weather'
-      fullPath: '/weather'
-      preLoaderRoute: typeof WeatherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vedic-transits': {
@@ -1072,13 +987,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TarotRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/synastry': {
-      id: '/synastry'
-      path: '/synastry'
-      fullPath: '/synastry'
-      preLoaderRoute: typeof SynastryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/strength': {
       id: '/strength'
       path: '/strength'
@@ -1128,20 +1036,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RemediesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rectification': {
-      id: '/rectification'
-      path: '/rectification'
-      fullPath: '/rectification'
-      preLoaderRoute: typeof RectificationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/progressions': {
-      id: '/progressions'
-      path: '/progressions'
-      fullPath: '/progressions'
-      preLoaderRoute: typeof ProgressionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -1154,13 +1048,6 @@ declare module '@tanstack/react-router' {
       path: '/panchang'
       fullPath: '/panchang'
       preLoaderRoute: typeof PanchangRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/observatory': {
-      id: '/observatory'
-      path: '/observatory'
-      fullPath: '/observatory'
-      preLoaderRoute: typeof ObservatoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/numerology': {
@@ -1364,13 +1251,6 @@ declare module '@tanstack/react-router' {
       path: '/astrology'
       fullPath: '/astrology'
       preLoaderRoute: typeof AstrologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/astrocartography': {
-      id: '/astrocartography'
-      path: '/astrocartography'
-      fullPath: '/astrocartography'
-      preLoaderRoute: typeof AstrocartographyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai': {
@@ -1586,7 +1466,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcceptTermsRoute: AcceptTermsRoute,
   AiRoute: AiRoute,
-  AstrocartographyRoute: AstrocartographyRoute,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
   AvakhadaRoute: AvakhadaRoute,
@@ -1616,11 +1495,8 @@ const rootRouteChildren: RootRouteChildren = {
   NakshatraRoute: NakshatraRoute,
   NakshatraLocationRoute: NakshatraLocationRoute,
   NumerologyRoute: NumerologyRoute,
-  ObservatoryRoute: ObservatoryRoute,
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,
-  ProgressionsRoute: ProgressionsRoute,
-  RectificationRoute: RectificationRoute,
   RemediesRoute: RemediesRoute,
   ReportsRoute: ReportsRoute,
   SadesatiRoute: SadesatiRoute,
@@ -1628,7 +1504,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkyRoute: SkyRoute,
   StrengthRoute: StrengthRoute,
-  SynastryRoute: SynastryRoute,
   TarotRoute: TarotRoute,
   TermsRoute: TermsRoute,
   TimelineRoute: TimelineRoute,
@@ -1636,7 +1511,6 @@ const rootRouteChildren: RootRouteChildren = {
   VarshphalRoute: VarshphalRoute,
   VastuRoute: VastuRoute,
   VedicTransitsRoute: VedicTransitsRoute,
-  WeatherRoute: WeatherRoute,
   YantraRoute: YantraRoute,
   ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
@@ -1652,3 +1526,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
