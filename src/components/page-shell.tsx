@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Home, ChevronUp, ChevronDown, Check, Sparkles, LayoutGrid } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
@@ -52,21 +52,28 @@ function PageNav({
         <LanguageSwitcher compact />
         <button
           onClick={onToggle}
-          className="inline-flex items-center gap-1 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
-          aria-label={collapsed ? "Expand header" : "Collapse header"}
-          title={collapsed ? "Show header" : "Hide header for focus"}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl glass gold-border px-3 text-sm text-pearl hover:bg-white/10 transition"
+          aria-label={collapsed ? "Show the page title" : "Hide the page title"}
         >
-          {collapsed ? <ChevronDown className="h-4 w-4 text-gold" /> : <ChevronUp className="h-4 w-4 text-gold" />}
+          {collapsed ? <ChevronDown className="h-5 w-5 text-gold" /> : <ChevronUp className="h-5 w-5 text-gold" />}
           <span className="hidden sm:inline">{collapsed ? "Show" : "Focus"}</span>
+        </button>
+        <button
+          onClick={() => window.dispatchEvent(new Event("taromaya:open-menu"))}
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl glass gold-border px-3 text-sm text-pearl hover:bg-white/10 transition"
+          aria-label="See everything"
+        >
+          <LayoutGrid className="h-5 w-5 text-gold" /> <span className="hidden sm:inline">All</span>
         </button>
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl glass gold-border px-3 text-sm text-pearl hover:bg-white/10 transition"
           aria-label="Home"
         >
-          <Home className="h-4 w-4 text-gold" /> Home
+          <Home className="h-5 w-5 text-gold" /> Home
         </Link>
       </div>
+
     </div>
   );
 }

@@ -19,92 +19,93 @@ type Group = { label: string; items: Item[] };
 
 const CATALOG: Group[] = [
   {
-    label: "Essentials",
+    label: "Start here",
     items: [
       { to: "/", label: "Home", icon: LayoutDashboard },
-      { to: "/help", label: "Help — Listen", icon: HelpCircle },
-      { to: "/tarot", label: "Tarot", icon: Sparkles },
-      { to: "/kundli", label: "Kundli", icon: Moon },
-      { to: "/ai", label: "AI Guide", icon: Bot },
-      { to: "/history", label: "History", icon: History },
-      { to: "/profile", label: "Profile", icon: User },
-      { to: "/birth-details", label: "Birth Details", icon: Lock },
+      { to: "/help", label: "Help — listen", icon: HelpCircle },
+      { to: "/tarot", label: "Tarot cards", icon: Sparkles },
+      { to: "/kundli", label: "Birth chart", icon: Moon },
+      { to: "/ai", label: "Ask the guide", icon: Bot },
+      { to: "/history", label: "Past readings", icon: History },
+      { to: "/profile", label: "My profile", icon: User },
+      { to: "/birth-details", label: "My birth details", icon: Lock },
     ],
   },
   {
-    label: "Vedic",
+    label: "Stars and charts",
     items: [
-      { to: "/astrology", label: "Astrology", icon: Stars },
-      { to: "/avakhada", label: "Avakhada", icon: Stars },
-      { to: "/strength", label: "Shadbala & Ashtakavarga", icon: Gauge },
-      { to: "/panchang", label: "Panchang", icon: CalendarDays },
-      { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
-      { to: "/varshphal", label: "Varshphal", icon: Sun },
-      { to: "/prashna", label: "Prashna", icon: CalendarClock },
-      { to: "/deep-jyotish", label: "Deep Jyotish", icon: Stars },
-      { to: "/nakshatra", label: "Nakshatra", icon: Stars },
-      { to: "/nakshatra-location", label: "Nakshatra for Location", icon: Compass },
+      { to: "/astrology", label: "Star reading", icon: Stars },
+      { to: "/avakhada", label: "Birth facts", icon: Stars },
+      { to: "/strength", label: "Planet strength", icon: Gauge },
+      { to: "/panchang", label: "Today's sky", icon: CalendarDays },
+      { to: "/muhurat", label: "Good times to act", icon: CalendarClock },
+      { to: "/varshphal", label: "Your year ahead", icon: Sun },
+      { to: "/prashna", label: "Ask one question", icon: CalendarClock },
+      { to: "/deep-jyotish", label: "Deep star reading", icon: Stars },
+      { to: "/nakshatra", label: "My birth star", icon: Stars },
+      { to: "/nakshatra-location", label: "Star for a place", icon: Compass },
     ],
   },
   {
-    label: "Doshas & Remedies",
+    label: "Fixes and blessings",
     items: [
-      { to: "/remedies", label: "Remedies", icon: Flame },
-      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
-      { to: "/kaalsarp", label: "Kaal Sarp", icon: Waves },
-      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
-      { to: "/yantra", label: "Yantra", icon: Triangle },
-      { to: "/dharma", label: "Dharma", icon: Crown },
+      { to: "/remedies", label: "Simple fixes", icon: Flame },
+      { to: "/sadesati", label: "Saturn's long phase", icon: Snowflake },
+      { to: "/kaalsarp", label: "Kaal Sarp check", icon: Waves },
+      { to: "/mangal-dosha", label: "Mangal check", icon: Flame },
+      { to: "/yantra", label: "Lucky symbols", icon: Triangle },
+      { to: "/dharma", label: "My life path", icon: Crown },
     ],
   },
   {
-    label: "Life",
+    label: "Everyday life",
     items: [
-      { to: "/horoscope", label: "Horoscope", icon: Sun },
-      { to: "/compatibility", label: "Match Making", icon: Heart },
-      { to: "/numerology", label: "Numerology", icon: Hash },
-      { to: "/baby-names", label: "Baby Names", icon: Baby },
-      { to: "/festivals", label: "Festivals", icon: Flame },
-      { to: "/career", label: "Career", icon: Briefcase },
-      { to: "/finance", label: "Finance", icon: Coins },
+      { to: "/horoscope", label: "Daily horoscope", icon: Sun },
+      { to: "/compatibility", label: "Kundli matching", icon: Heart },
+      { to: "/numerology", label: "My numbers", icon: Hash },
+      { to: "/baby-names", label: "Baby names", icon: Baby },
+      { to: "/festivals", label: "Festival dates", icon: Flame },
+      { to: "/career", label: "Work and study", icon: Briefcase },
+      { to: "/finance", label: "Money", icon: Coins },
       { to: "/health", label: "Health", icon: Activity },
-      { to: "/ayurveda", label: "Ayurveda", icon: Leaf },
-      { to: "/chakra", label: "Chakra", icon: Zap },
+      { to: "/ayurveda", label: "Body type", icon: Leaf },
+      { to: "/chakra", label: "Energy centres", icon: Zap },
       { to: "/karma", label: "Karma", icon: InfIcon },
-      { to: "/vastu", label: "Vastu", icon: HomeIcon },
-      { to: "/life-dashboard", label: "Life Dashboard", icon: LayoutGrid },
+      { to: "/vastu", label: "Home and rooms", icon: HomeIcon },
+      { to: "/life-dashboard", label: "Life at a glance", icon: LayoutGrid },
     ],
   },
   {
-    label: "Sky & Transits",
+    label: "Sky moves",
     items: [
-      { to: "/transits", label: "Transits", icon: LineChart },
-      { to: "/vedic-transits", label: "Vedic Transits", icon: Moon },
-      { to: "/timeline", label: "Timeline", icon: CalendarClock },
+      { to: "/transits", label: "Sky moves now", icon: LineChart },
+      { to: "/vedic-transits", label: "Vedic sky moves", icon: Moon },
+      { to: "/timeline", label: "What's coming", icon: CalendarClock },
 
-      { to: "/dreams", label: "Dream Oracle", icon: Feather },
-      { to: "/moon-calendar", label: "Moon Calendar", icon: Moon },
-      { to: "/reports", label: "Reports", icon: FileText },
+      { to: "/dreams", label: "Dream meanings", icon: Feather },
+      { to: "/moon-calendar", label: "Moon calendar", icon: Moon },
+      { to: "/reports", label: "Full reports", icon: FileText },
     ],
   },
   {
-    label: "Library",
+    label: "My things",
     items: [
-      { to: "/saved", label: "Saved Charts", icon: Bookmark },
+      { to: "/saved", label: "Saved charts", icon: Bookmark },
       { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
-      { to: "/blog", label: "Blog", icon: BookOpen },
-      { to: "/faq", label: "FAQ", icon: BookOpen },
+      { to: "/blog", label: "Stories", icon: BookOpen },
+      { to: "/faq", label: "Questions and answers", icon: BookOpen },
     ],
   },
   {
     label: "Account",
     items: [
-      { to: "/profile", label: "Profile", icon: User },
+      { to: "/profile", label: "My profile", icon: User },
       { to: "/settings", label: "Settings", icon: Settings },
     ],
   },
 
 ];
+
 
 function BrandMark() {
   const logo = useAppLogo();
@@ -134,6 +135,13 @@ export function Sidebar() {
   // Close whenever the route changes
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  // Any page can open the full list of modules with one event.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener("taromaya:open-menu", onOpen);
+    return () => window.removeEventListener("taromaya:open-menu", onOpen);
+  }, []);
+
   // Escape to close
   useEffect(() => {
     if (!open) return;
@@ -145,6 +153,7 @@ export function Sidebar() {
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
 
   return <>{open && <ModuleDrawer onClose={() => setOpen(false)} />}</>;
 }
@@ -181,31 +190,33 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
             <div className="min-w-0">
               <div className="font-display text-xl leading-none gold-text">TAROMAYA</div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mt-1 truncate">
-                All Modules
+                Everything in the app
               </div>
             </div>
           </Link>
           <button
             onClick={onClose}
-            className="ml-auto h-9 w-9 grid place-items-center rounded-full hover:bg-black/5"
+            className="ml-auto h-11 w-11 grid place-items-center rounded-full hover:bg-black/5"
             aria-label="Close menu"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="px-5 pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search modules…"
-              className="w-full rounded-xl border border-border/40 bg-white/60 pl-9 pr-3 py-2.5 text-sm"
+              placeholder="Type what you are looking for…"
+              className="min-h-12 w-full rounded-xl border border-border/40 bg-white/60 pl-10 pr-3 py-2.5 text-base"
             />
           </div>
         </div>
+
+
 
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-4">
           {filtered.map((group) => (
@@ -219,12 +230,13 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
                     key={to + label}
                     to={to}
                     onClick={onClose}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+                    className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-base text-foreground hover:bg-primary/8"
                   >
-                    <Icon className="h-4 w-4 text-primary shrink-0" />
+                    <Icon className="h-5 w-5 text-primary shrink-0" />
                     <span className="truncate">{t(label)}</span>
                   </Link>
                 ))}
+
               </div>
             </div>
           ))}
@@ -236,9 +248,9 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
               <Link
                 to="/admin"
                 onClick={onClose}
-                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+                className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-base text-foreground hover:bg-primary/8"
               >
-                <Shield className="h-4 w-4 text-gold shrink-0" />
+                <Shield className="h-5 w-5 text-gold shrink-0" />
                 <span>{t("Control Room")}</span>
               </Link>
             </div>
@@ -249,11 +261,12 @@ function ModuleDrawer({ onClose }: { onClose: () => void }) {
               window.dispatchEvent(new Event("taromaya:open-authors-note"));
               onClose();
             }}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-primary/8"
+            className="w-full flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-base text-foreground hover:bg-primary/8"
           >
-            <Feather className="h-4 w-4 text-primary shrink-0" />
+            <Feather className="h-5 w-5 text-primary shrink-0" />
             <span>{t("Author's Note")}</span>
           </button>
+
         </nav>
 
         <div className="px-4 pb-3 pt-2 border-t border-border/40">
@@ -301,9 +314,9 @@ function AuthFooter({ onClose }: { onClose: () => void }) {
         <Link
           to="/auth"
           onClick={onClose}
-          className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-white font-medium py-2.5 text-sm"
+          className="inline-flex min-h-12 items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-gold to-gold-soft text-white font-medium py-2.5 text-base"
         >
-          <LogIn className="h-4 w-4" /> Sign in
+          <LogIn className="h-5 w-5" /> Sign in
         </Link>
       )}
     </div>
@@ -315,9 +328,9 @@ function AuthFooter({ onClose }: { onClose: () => void }) {
  */
 const bottomNav = [
   { to: "/", label: "Home", icon: HomeIcon },
-  { to: "/tarot", label: "Tarot", icon: Sparkles },
-  { to: "/history", label: "History", icon: History },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/tarot", label: "Cards", icon: Sparkles },
+  { to: "/history", label: "Past", icon: History },
+  { to: "/profile", label: "Me", icon: User },
 ] as const;
 
 export function BottomNav() {
@@ -335,16 +348,16 @@ export function BottomNav() {
             <li key={to}>
               <Link
                 to={to}
-                className="flex flex-col items-center gap-1 py-2.5 text-[11px]"
+                className="flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-xs"
                 aria-current={active ? "page" : undefined}
               >
                 <span
                   className={[
-                    "grid place-items-center h-9 w-9 rounded-full transition-all",
+                    "grid place-items-center h-11 w-11 rounded-full transition-all",
                     active ? "bg-primary/12 text-primary" : "text-muted-foreground",
                   ].join(" ")}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-6 w-6" />
                 </span>
                 <span className={active ? "text-primary font-medium" : "text-muted-foreground"}>
                   {t(label)}
@@ -353,6 +366,7 @@ export function BottomNav() {
             </li>
           );
         })}
+
       </ul>
     </nav>
   );

@@ -38,21 +38,21 @@ export function BackButton({ className }: { className?: string }) {
       type="button"
       onClick={stepBack}
       aria-label="Go back one step"
-      title="Go back one step"
       className={[
-        "inline-flex items-center gap-2 rounded-xl glass gold-border px-3 py-2 text-xs sm:text-sm text-pearl hover:bg-white/10 transition",
+        "inline-flex min-h-11 items-center gap-2 rounded-xl glass gold-border px-4 text-sm text-pearl hover:bg-white/10 transition",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
       {canGoBack ? (
-        <ArrowLeft className="h-4 w-4 text-gold" />
+        <ArrowLeft className="h-5 w-5 text-gold" />
       ) : (
-        <CornerLeftUp className="h-4 w-4 text-gold" />
+        <CornerLeftUp className="h-5 w-5 text-gold" />
       )}
       Back
     </button>
+
   );
 }
 

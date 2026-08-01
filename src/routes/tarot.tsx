@@ -734,15 +734,14 @@ function TarotPage() {
               <button
                 onClick={shuffleAll}
                 className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
-                title="Shuffle every deck"
               >
-                <Shuffle className="h-5 w-5 shrink-0" /> Shuffle
+                <Shuffle className="h-5 w-5 shrink-0" /> Mix the cards
               </button>
               <button
                 onClick={resetSpread}
                 className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
               >
-                <RotateCcw className="h-5 w-5 shrink-0" /> Start over
+                <RotateCcw className="h-5 w-5 shrink-0" /> Clear the board
               </button>
               <button
                 onClick={requestReading}
@@ -754,8 +753,9 @@ function TarotPage() {
                 ) : (
                   <Sparkles className="h-5 w-5 shrink-0" />
                 )}
-                Ask AI
+                Read my cards
               </button>
+
             </div>
           </div>
 
@@ -767,12 +767,13 @@ function TarotPage() {
       {headerCollapsed && (
         <button
           onClick={() => setHeaderCollapsed(false)}
-          className="absolute right-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-xl border border-gold/50 bg-black/80 px-3 py-2 text-gold shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-          aria-label="Show controls"
+          className="absolute right-3 top-3 z-30 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-gold/50 bg-black/80 px-4 py-2 text-gold shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+          aria-label="Open the tarot menu"
         >
-          <ChevronDown className="h-4 w-4" />
-          <span className="text-xs font-semibold uppercase tracking-wider">Show</span>
+          <ChevronDown className="h-5 w-5" />
+          <span className="text-sm font-semibold">Menu</span>
         </button>
+
       )}
 
 
@@ -851,19 +852,20 @@ function TarotPage() {
               />
             ))}
 
-            {/* Always-there Ask AI button, so it works even with the top bar hidden */}
+            {/* Always-there reading button, so it works even with the top bar hidden */}
             <button
               onClick={requestReading}
               disabled={!readyToInterpret || loadingReading}
-              className="absolute top-3 left-3 z-30 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
+              className="absolute top-3 left-3 z-30 inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-base font-semibold text-cosmic shadow-[0_10px_30px_-12px_var(--gold)] transition hover:brightness-110 disabled:opacity-40"
             >
               {loadingReading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-5 w-5" />
               )}
-              Ask AI
+              Read my cards
             </button>
+
 
             {/* Tarot deck stacks — bottom right */}
             <div
