@@ -203,29 +203,25 @@ function Home() {
 function QuickTile({
   to,
   label,
-  hint,
   icon: Icon,
 }: {
   to: string;
   label: string;
-  hint: string;
   icon: typeof Sparkles;
 }) {
   return (
     <Link
       to={to}
-      className="group flex flex-col items-start gap-3 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+      className="group flex min-h-28 flex-col items-start justify-center gap-3 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
     >
-      <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition">
-        <Icon className="h-5 w-5" />
+      <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition">
+        <Icon className="h-6 w-6" />
       </div>
-      <div>
-        <div className="font-medium text-foreground">{label}</div>
-        <div className="text-xs text-muted-foreground">{hint}</div>
-      </div>
+      <div className="text-base font-medium text-foreground">{label}</div>
     </Link>
   );
 }
+
 
 function InfoTile({
   icon: Icon,
