@@ -330,7 +330,10 @@ export function offlineReading(input: ReadingRequest): string {
   const areaLines = areas.map((a, i) => {
     const extra = meanings[i % Math.max(meanings.length, 1)];
     const helpful = person.helpful.length ? person.helpful[i % person.helpful.length] : null;
-    const lift = helpful ? ` Right now ${helpful.planet} is helping this part of your life, so use it.` : "";
+    // Only mention the helpful planet once, on the first area, so it reads naturally.
+    const lift =
+      i === 0 && helpful ? ` Right now ${helpful.planet} is helping this part of your life, so use it.` : "";
+
     let tail = "";
     if (extra && !usedAdvice.has(extra.does)) {
       usedAdvice.add(extra.does);
