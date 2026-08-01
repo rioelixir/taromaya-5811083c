@@ -101,11 +101,13 @@ export function BirthOneBox({
 
   const handleVoice = useCallback(
     (spoken: string) => {
-      setText((prev) => (prev.trim() ? `${prev.trim()} ${spoken}` : spoken));
+      // The box already mirrors the live words, so replace instead of appending.
+      setText(spoken);
       apply(spoken);
     },
     [apply],
   );
+
 
   const voice = useVoice(handleVoice);
   const listening = voice.state === "listening";
