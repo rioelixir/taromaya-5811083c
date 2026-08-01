@@ -5,7 +5,7 @@ import { RTL_LANGS, useLang, type Lang } from "@/lib/i18n";
 const CACHE_KEY = (lang: Lang) => `taromaya.translations.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
 const ATTR_ORIG = "data-i18n-orig";
-const MAX_LEN = 240;
+const MAX_LEN = 900;
 
 function loadCache(lang: Lang): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -119,7 +119,7 @@ async function translatePage(lang: Lang) {
 
 
     const cache = loadCache(lang);
-    const root = document.querySelector("main") || document.body;
+    const root = document.body;
 
     const textNodes: Text[] = [];
     collectTextNodes(root, textNodes);
