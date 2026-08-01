@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { termsStatus } from "@/lib/terms.functions";
+
 import { StarField } from "@/components/star-field";
 import { Sparkles, Loader2, Check } from "lucide-react";
 
