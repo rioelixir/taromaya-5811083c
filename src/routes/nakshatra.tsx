@@ -250,6 +250,23 @@ function NakshatraPage() {
         </GlassCard>
 
         <div className="space-y-6">
+          <GlassCard title="In plain English">
+            <p className="text-sm text-muted-foreground">
+              A nakshatra is one of 27 star patterns the Moon travels through — think of it as a more
+              detailed personality reading than your Moon sign alone. {chart ? (
+                <>Your Moon was in <span className="text-primary">{profile.name}</span>, ruled by{" "}
+                <span className="text-primary">{profile.lord}</span>, whose short story is "{profile.deityShort}".</>
+              ) : (
+                <>Enter your birth date and time above to see your own nakshatra.</>
+              )}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Below is the full profile card (deity, personality traits, career leanings, favourable and
+              unfavourable activities), then a matchmaking tool that compares two nakshatras the way a
+              traditional marriage match would.
+            </p>
+          </GlassCard>
+
           <ProfileCard p={profile} birthPada={birthNak === activeIndex ? birthPada : undefined} />
 
           <GlassCard
