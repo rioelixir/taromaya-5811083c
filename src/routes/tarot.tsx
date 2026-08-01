@@ -672,47 +672,50 @@ function TarotPage() {
       {/* Top control bar - white sheet so every word is easy to read */}
       {!headerCollapsed && (
         <div className="absolute left-0 right-0 top-0 z-30 max-h-[85dvh] overflow-y-auto border-b border-black/10 bg-white px-3 pb-3 pt-2 text-neutral-900 shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] sm:px-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-baseline gap-3">
-              <h1 className="font-display text-xl font-bold text-neutral-900 sm:text-2xl">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-baseline gap-3">
+              <h1 className="truncate font-display text-xl font-bold text-neutral-900 sm:text-2xl">
                 Tarot Board
               </h1>
-              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.3em] text-neutral-600 sm:inline">
+              <span className="hidden whitespace-nowrap text-xs font-semibold text-neutral-600 sm:inline">
                 Pick a deck · pull a card
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 onClick={toggleFullScreen}
-                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 hover:bg-neutral-200"
+                className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
                 aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
               >
                 {isFullScreen ? (
-                  <Minimize className="h-3.5 w-3.5" />
+                  <Minimize className="h-4 w-4 shrink-0" />
                 ) : (
-                  <Maximize className="h-3.5 w-3.5" />
+                  <Maximize className="h-4 w-4 shrink-0" />
                 )}
-                {isFullScreen ? "Exit" : "Full screen"}
+                <span className="hidden sm:inline">{isFullScreen ? "Exit" : "Full screen"}</span>
               </button>
               <button
                 onClick={() => setHeaderCollapsed(true)}
-                className="inline-flex items-center gap-1 rounded-lg border border-neutral-300 bg-neutral-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 hover:bg-neutral-200"
+                className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
                 aria-label="Collapse controls"
               >
-                <ChevronUp className="h-3.5 w-3.5" />
+                <ChevronUp className="h-4 w-4 shrink-0" />
                 Hide
               </button>
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2" data-tour="spread-picker">
+          <div
+            className="-mx-3 mt-2 flex items-center gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+            data-tour="spread-picker"
+          >
             {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
               const active = k === spreadKey;
               return (
                 <button
                   key={k}
                   onClick={() => setSpreadKey(k)}
-                  className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-all ${
+                  className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl border px-4 text-base font-semibold transition-all ${
                     active
                       ? "border-neutral-900 bg-neutral-900 text-white"
                       : "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500"
@@ -722,26 +725,20 @@ function TarotPage() {
                 </button>
               );
             })}
-            <div className="mx-1 hidden h-6 w-px bg-neutral-200 sm:block" aria-hidden />
-            <span className="text-[11px] font-bold uppercase tracking-wide text-neutral-600">
-              5 decks · any spread
-            </span>
           </div>
 
           {/* Which kinds of cards to use — works for every deck, including
               Lost & Found and Health */}
           <div className="mt-2">
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-600">
-              Which cards to use
-            </div>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
+            <div className="text-sm font-bold text-neutral-700">Which cards to use</div>
+            <div className="-mx-3 mt-1 flex items-center gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
               {CARD_GROUPS.map((g) => {
                 const active = g.key === cardGroup;
                 return (
                   <button
                     key={g.key}
                     onClick={() => setCardGroup(g.key)}
-                    className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-all ${
+                    className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-xl border px-4 text-base font-semibold transition-all ${
                       active
                         ? "border-amber-600 bg-amber-100 text-amber-900"
                         : "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500"
@@ -754,40 +751,43 @@ function TarotPage() {
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div className="mt-2 space-y-2">
             <input
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               maxLength={200}
               placeholder="What's on your mind? (optional)"
-              className="min-w-[220px] flex-1 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-base text-neutral-900 placeholder:text-neutral-500 focus:border-neutral-900 focus:outline-none"
+              className="min-h-12 w-full rounded-xl border border-neutral-300 bg-white px-3 text-base text-neutral-900 placeholder:text-neutral-500 focus:border-neutral-900 focus:outline-none"
             />
-            <button
-              onClick={shuffleAll}
-              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-100"
-              title="Shuffle every deck"
-            >
-              <Shuffle className="h-4 w-4" /> Shuffle
-            </button>
-            <button
-              onClick={resetSpread}
-              className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-100"
-            >
-              <RotateCcw className="h-4 w-4" /> Start over
-            </button>
-            <button
-              onClick={requestReading}
-              disabled={!readyToInterpret || loadingReading}
-              className="inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {loadingReading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              Ask AI
-            </button>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+              <button
+                onClick={shuffleAll}
+                className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
+                title="Shuffle every deck"
+              >
+                <Shuffle className="h-5 w-5 shrink-0" /> Shuffle
+              </button>
+              <button
+                onClick={resetSpread}
+                className="inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-900 hover:bg-neutral-100"
+              >
+                <RotateCcw className="h-5 w-5 shrink-0" /> Start over
+              </button>
+              <button
+                onClick={requestReading}
+                disabled={!readyToInterpret || loadingReading}
+                className="col-span-2 inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-neutral-900 px-5 text-base font-bold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {loadingReading ? (
+                  <Loader2 className="h-5 w-5 animate-spin shrink-0" />
+                ) : (
+                  <Sparkles className="h-5 w-5 shrink-0" />
+                )}
+                Ask AI
+              </button>
+            </div>
           </div>
+
         </div>
       )}
 
@@ -796,7 +796,7 @@ function TarotPage() {
       {headerCollapsed && (
         <button
           onClick={() => setHeaderCollapsed(false)}
-          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl border border-r-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[-4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl border border-r-0 border-gold/50 bg-black/80 min-w-11 px-3 py-6 text-gold shadow-[-4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Show controls"
         >
           <div className="flex flex-col items-center gap-2">
@@ -827,7 +827,7 @@ function TarotPage() {
         {/* Nakshatra toggle - always visible on every screen */}
         <button
           onClick={() => setNakshatraPanelOpen(true)}
-          className="absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 px-2 py-5 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute left-0 top-1/2 z-30 -translate-y-1/2 rounded-r-2xl border border-l-0 border-gold/50 bg-black/80 min-w-11 px-3 py-6 text-gold shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
           aria-label="Open Nakshatra panel"
         >
           <div className="flex flex-col items-center gap-2">
