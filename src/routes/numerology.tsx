@@ -47,7 +47,7 @@ const TAB_LABEL: Record<Tab, string> = {
 
 
 function NumerologyPage() {
-  const [tab, setTab] = useState<Tab>("personal");
+  const [tab, setTab] = useState<Tab>("report");
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("1995-06-15");
   const [system, setSystem] = useState<"Pythagorean" | "Chaldean">("Pythagorean");
