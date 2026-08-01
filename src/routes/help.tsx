@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages } from "lucide-react";
-import { HELP_GUIDES, helpGroups, type HelpGuide } from "@/lib/help-guides";
+import { Play, Pause, Loader2, Search, ArrowRight, HelpCircle, Home, Languages, Sparkles } from "lucide-react";
+import { HELP_GUIDES, helpGroups, searchGuides, type HelpGuide } from "@/lib/help-guides";
 import { LANGUAGE_LIST, useLang, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,11 @@ function HelpPage() {
   const [lang, setLang] = useState<Lang>("en");
   const [now, setNow] = useState<PlayState>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  const [group, setGroup] = useState<string>("All");
+  // The phone's own voice is free and instant, so it is the normal way to listen.
+  // The studio voice sounds nicer and is there when someone wants it.
+  const [studio, setStudio] = useState(false);
+  const scriptCache = useRef<Map<string, string>>(new Map());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Start in whatever language the person already picked for the app.
@@ -55,14 +60,14 @@ function HelpPage() {
   };
 
   /** If the voice service is busy, the phone reads it out instead, so help always works. */
-  const speakWithPhone = (guide: HelpGuide) => {
+  const speakWithPhone = (guide: HelpGuide, words?: string) => {
     const synth = window.speechSynthesis;
     if (!synth) {
       setProblem("Voice is not available on this device. Please try again later.");
       setNow(null);
       return;
     }
-    const u = new SpeechSynthesisUtterance(`${guide.title}. ${guide.script}`);
+    const u = new SpeechSynthesisUtterance(words ?? `${guide.title}. ${guide.script}`);
     u.lang = lang === "en" ? "en-IN" : lang;
     u.rate = 0.95;
     u.onend = () => setNow(null);
@@ -72,11 +77,38 @@ function HelpPage() {
     setNow({ id: guide.id, status: "playing" });
   };
 
+  /** Gets the guide words in the chosen language, and remembers them. */
+  const wordsFor = async (guide: HelpGuide): Promise<string> => {
+    if (lang === "en") return `${guide.title}. ${guide.script}`;
+    const key = `${guide.id}:${lang}`;
+    const kept = scriptCache.current.get(key);
+    if (kept) return kept;
+    const res = await fetch(
+      `/api/public/help-audio?text=1&id=${encodeURIComponent(guide.id)}&lang=${encodeURIComponent(lang)}`,
+    );
+    if (!res.ok) throw new Error("no words");
+    const data = (await res.json()) as { text?: string };
+    const text = data.text?.trim();
+    if (!text) throw new Error("no words");
+    scriptCache.current.set(key, text);
+    return text;
+  };
+
   const play = async (guide: HelpGuide) => {
     if (now?.id === guide.id) { stop(); return; }
     stop();
     setProblem(null);
     setNow({ id: guide.id, status: "loading" });
+
+    if (!studio) {
+      try {
+        speakWithPhone(guide, await wordsFor(guide));
+      } catch {
+        speakWithPhone(guide);
+      }
+      return;
+    }
+
     try {
       const res = await fetch(
         `/api/public/help-audio?id=${encodeURIComponent(guide.id)}&lang=${encodeURIComponent(lang)}`,
@@ -95,12 +127,9 @@ function HelpPage() {
   };
 
   const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    if (!needle) return HELP_GUIDES;
-    return HELP_GUIDES.filter((g) =>
-      `${g.title} ${g.blurb} ${g.group}`.toLowerCase().includes(needle),
-    );
-  }, [q]);
+    const found = searchGuides(q);
+    return group === "All" ? found : found.filter((g) => g.group === group);
+  }, [q, group]);
 
   return (
     <div className="container-page pt-20 sm:pt-24 pb-16">
@@ -149,6 +178,40 @@ function HelpPage() {
           </select>
         </div>
       </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {["All", ...helpGroups()].map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => { stop(); setGroup(name); }}
+            aria-pressed={group === name}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-xs transition",
+              group === name
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+            )}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => { stop(); setStudio((v) => !v); }}
+        aria-pressed={studio}
+        className={cn(
+          "mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
+          studio
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+        )}
+      >
+        <Sparkles className="h-4 w-4" />
+        {studio ? "Nicer voice is on" : "Use a nicer voice"}
+      </button>
 
       {problem && <p className="mt-3 text-sm text-muted-foreground">{problem}</p>}
 
