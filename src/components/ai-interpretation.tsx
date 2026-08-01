@@ -227,6 +227,32 @@ export function AIInterpretation({
         </div>
       </div>
 
+      <fieldset className="mt-5">
+        <legend className="text-sm text-foreground">
+          Which parts of life should this reading talk about? Pick any, or leave all off.
+        </legend>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {LIFE_AREAS.map((a) => {
+            const on = areas.includes(a.id);
+            return (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => toggleArea(a.id)}
+                aria-pressed={on}
+                className={`min-h-11 rounded-full border px-4 py-2 text-sm transition ${
+                  on
+                    ? "border-primary bg-primary/15 text-foreground"
+                    : "border-border bg-background/40 text-foreground hover:border-primary/50"
+                }`}
+              >
+                <span aria-hidden="true">{a.emoji}</span> {a.label}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
 
       {error && (
         <div
