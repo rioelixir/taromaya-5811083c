@@ -57,17 +57,50 @@ function clean(line: string): string {
     .trim();
 }
 
-/** Facts worth repeating back, cleaned of symbols and labels. */
-function factsFrom(prompt: string, limit = 8): string[] {
+/**
+ * Turn one data line into something a reader can understand: no coordinates,
+ * no degrees, no short codes, no engine words. Returns "" when nothing is left
+ * worth saying.
+ */
+function humanise(line: string): string {
+  let s = line
+    .replace(/\(-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\)/g, "") // coordinates
+    .replace(/\bayanamsa[^·\n]*/gi, "")
+    .replace(/\bhouses?:\s*[a-z-]+/gi, "")
+    .replace(/\bsidereal\b/gi, "")
+    .replace(/\bstrong AV\b/gi, "strong")
+    .replace(/\bp(\d)\b/g, "part $1")
+    .replace(/\(R\)/g, "moving backwards")
+    .replace(/\b(\d{1,2})\s+\d{1,2}(\s+\d{1,2})?\b(?=\s*(·|$))/g, "") // bare degree numbers
+    .replace(/\s*·\s*/g, " · ")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s*·\s*$/g, "")
+    .trim();
+  s = clean(s);
+  if (/^(planets|gochara|next \d+ days|dasha-lord transits)\b/i.test(s)) return "";
+  if (!/[a-z]{4}/i.test(s)) return "";
+  return s;
+}
+
+/** Facts worth repeating back, cleaned of symbols and inner workings. */
+function factsFrom(prompt: string, limit = 7): string[] {
   const out: string[] = [];
+  const seen = new Set<string>();
   for (const raw of prompt.split(/\n|;/)) {
-    const line = clean(raw);
-    if (!line || line.length < 6 || line.length > 160) continue;
-    if (/^(question|write|reply|return|keep it|do not|never|use only|shape of|rules?)\b/i.test(line)) continue;
-    if (/json|markdown|word[s]? ?limit|under \d+ words|=== /i.test(line)) continue;
+    const first = clean(raw);
+    if (!first || first.length < 6) continue;
+    if (/^(question|write|reply|return|keep it|do not|never|use only|shape of|rules?)\b/i.test(first)) continue;
+    if (/json|markdown|word[s]? ?limit|under \d+ words|===/i.test(first)) continue;
+    const line = humanise(first);
+    if (!line || line.length < 6 || line.length > 150) continue;
+    const key = line.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
     out.push(line);
     if (out.length >= limit) break;
   }
+
   return out;
 }
 
