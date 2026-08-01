@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireHttpAuth } from "@/lib/http-auth.server";
+import { aiFetch, aiModel, aiSource } from "@/lib/ai-provider.server";
 
 /** Turns a short recording into text. Used only when the browser has no built-in listener. */
 export const Route = createFileRoute("/api/transcribe")({
@@ -9,8 +10,7 @@ export const Route = createFileRoute("/api/transcribe")({
         const auth = await requireHttpAuth(request);
         if (auth instanceof Response) return auth;
 
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+        if (!aiSource()) return new Response("Voice input is not set up", { status: 500 });
 
         let form: FormData;
         try {
@@ -30,17 +30,13 @@ export const Route = createFileRoute("/api/transcribe")({
         const language = form.get("language");
 
         const upstream = new FormData();
-        upstream.append("model", "openai/gpt-4o-mini-transcribe");
+        upstream.append("model", aiModel("stt"));
         upstream.append("file", file, "recording.wav");
         if (typeof language === "string" && /^[a-z]{2}$/.test(language)) {
           upstream.append("language", language);
         }
 
-        const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${key}` },
-          body: upstream,
-        });
+        const res = await aiFetch("audio/transcriptions", { body: upstream });
 
         if (!res.ok) {
           const body = await res.text().catch(() => "");

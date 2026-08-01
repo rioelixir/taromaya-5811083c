@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { guideById } from "@/lib/help-guides";
 import { LANGUAGE_LIST } from "@/lib/i18n";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
+import { aiFetch, aiModel, aiSource } from "@/lib/ai-provider.server";
 
 /**
  * Reads one help guide out loud, in any language the app supports.
@@ -20,18 +21,16 @@ export const Route = createFileRoute("/api/public/help-audio")({
         const language = LANGUAGE_LIST.find((l) => l.code === langCode);
         if (!language) return new Response("Unknown language", { status: 400 });
 
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Voice is not set up", { status: 500 });
+        if (!aiSource()) return new Response("Voice is not set up", { status: 500 });
 
         let spoken = `${guide.title}. ${guide.script}`;
 
         // Non-English listeners hear the same guide in their own language.
         if (language.code !== "en") {
-          const t = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          const t = await aiFetch("chat/completions", {
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: MODEL_EVERYDAY,
+              model: aiModel("text", MODEL_EVERYDAY),
               messages: [
                 {
                   role: "system",
@@ -62,14 +61,10 @@ export const Route = createFileRoute("/api/public/help-audio")({
           });
         }
 
-        const res = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json",
-          },
+        const res = await aiFetch("audio/speech", {
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "openai/gpt-4o-mini-tts",
+            model: aiModel("tts"),
             voice: "alloy",
             input: spoken,
             response_format: "mp3",

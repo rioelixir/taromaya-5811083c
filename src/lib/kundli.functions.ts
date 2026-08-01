@@ -4,6 +4,8 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
+import { MODEL_DEEP } from "@/lib/ai-models";
+import { usingOwnAi } from "@/lib/ai-provider.server";
 
 const PlanetSchema = z.object({
   name: z.string(),
@@ -25,8 +27,8 @@ export const interpretKundli = createServerFn({ method: "POST" })
   .middleware([requirePremium])
   .inputValidator((data: unknown) => KundliInterpretSchema.parse(data))
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
+    const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
+    if (!key) throw new Error("AI is not set up");
     const gateway = createLovableAiGatewayProvider(key);
 
     const table = data.planets
@@ -56,7 +58,7 @@ Planets:
 ${table}`;
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
+      model: gateway(MODEL_DEEP),
       system: withSupremeSystem(system),
       prompt: user,
     });
