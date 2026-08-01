@@ -209,14 +209,15 @@ function TarotPage() {
     setPlaced([]);
     setReading(null);
     setError(null);
-    setDecks(makeDeckStacks(uploaded));
-  }, [uploaded]);
+    setDecks(makeDeckStacks(uploaded, cardGroup));
+  }, [uploaded, cardGroup]);
 
-  // Rebuild the draw stacks whenever the admin-uploaded decks load or change.
+  // Rebuild the draw stacks whenever the admin-uploaded decks load or change,
+  // or the user picks a different group of cards.
   useEffect(() => {
     setPlaced([]);
-    setDecks(makeDeckStacks(uploaded));
-  }, [uploaded]);
+    setDecks(makeDeckStacks(uploaded, cardGroup));
+  }, [uploaded, cardGroup]);
 
   useEffect(() => {
     setPlaced([]);
