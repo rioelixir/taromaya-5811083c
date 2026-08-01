@@ -126,7 +126,12 @@ export function DateSelect({
           list="taromaya-year-list"
           value={yearText}
           onChange={(e) => commitYear(e.target.value)}
-          onBlur={(e) => commitYear(e.target.value)}
+          onBlur={(e) => {
+            const digits = e.target.value.replace(/\D/g, "");
+            if (digits.length === 4) commitYear(digits);
+            else setYearText(year ? String(year) : "");
+          }}
+
         />
         <datalist id="taromaya-year-list">
           {years.map((y) => (
