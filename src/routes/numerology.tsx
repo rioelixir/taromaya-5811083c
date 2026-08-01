@@ -23,6 +23,9 @@ import { Loader2, Sparkles } from "lucide-react";
 
 
 export const Route = createFileRoute("/numerology")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: typeof search.tab === "string" ? search.tab : undefined,
+  }),
   component: () => (<PremiumGate featureName="Numerology"><NumerologyPage /></PremiumGate>),
   head: () => ({
     meta: [
@@ -31,6 +34,7 @@ export const Route = createFileRoute("/numerology")({
     ],
   }),
 });
+
 
 type Tab = "report" | "personal" | "vedic" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
@@ -77,7 +81,11 @@ function FullReportTab({
 }
 
 function NumerologyPage() {
-  const [tab, setTab] = useState<Tab>("report");
+  const { tab: tabParam } = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(
+    tabParam && tabParam in TAB_LABEL ? (tabParam as Tab) : "report",
+  );
+
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("1995-06-15");
   const [system, setSystem] = useState<"Pythagorean" | "Chaldean">("Pythagorean");
