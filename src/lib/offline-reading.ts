@@ -378,11 +378,17 @@ export function offlineReading(input: ReadingRequest): string {
             : "For picking a good day or hour, use the Muhurat section rather than guessing.";
 
   // 7. Small, clear actions.
-  const actions = (meanings.length ? meanings.slice(0, 3).map((m) => cap(m.does)) : []).concat(
-    areas[0] ? `Give ${areas[0].label.toLowerCase()} ten honest minutes today` : "",
-    "Pick the one line above that feels most true and act on it today",
-    "Write down how it goes, so you can spot the pattern later",
-  );
+  const actions = meanings
+    .map((m) => m.does)
+    .filter((d) => !usedAdvice.has(d))
+    .slice(0, 3)
+    .map((d) => cap(d))
+    .concat(
+      areas[0] ? `Give ${areas[0].label.toLowerCase()} ten honest minutes today` : "",
+      "Pick the one line above that feels most true and act on it today",
+      "Write down how it goes, so you can spot the pattern later",
+    );
+
 
   return composeReading([
     section("answer", answer),
