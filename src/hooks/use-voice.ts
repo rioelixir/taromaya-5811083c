@@ -163,17 +163,28 @@ export function useVoice(onText: (text: string) => void) {
         rec.onresult = (e: any) => {
           if (pausedRef.current) return;
           let interim = "";
+          let gotFinal = false;
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const r = e.results[i];
-            // Store by slot, never append: a repeated event overwrites instead of doubling.
-            if (r.isFinal) slotsRef.current[i] = String(r[0].transcript || "").trim();
-            else interim += r[0].transcript;
+            // Only one word per mic tap: take the first final word and stop.
+            if (r.isFinal) {
+              const word = firstWord(String(r[0].transcript || ""));
+              if (word) {
+                slotsRef.current[i] = word;
+                gotFinal = true;
+              }
+            } else {
+              interim += r[0].transcript;
+            }
           }
           finalRef.current = dedupeRepeats(
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
-          setHeard(dedupeRepeats(`${finalRef.current} ${interim}`.trim()));
+          setHeard(firstWord(`${finalRef.current} ${interim}`.trim()));
           waitForQuiet();
+          if (gotFinal) {
+            setTimeout(() => stopRef.current(), 0);
+          }
         };
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
