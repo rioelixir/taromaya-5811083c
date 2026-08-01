@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard, Sparkles, Stars, Moon, CalendarDays, Hash, Heart, Bot,
   BookOpen, FileText, History, Bookmark, User, Settings,
-  Users, LineChart, Compass, LogOut, LogIn, Menu, X, Search,
+  Users, LineChart, Compass, LogOut, LogIn, X, Search,
   Flame, CalendarClock, Crown, Target, Globe2, Telescope, CloudSun, Feather, Baby, Leaf, Zap, Infinity as InfIcon, Home as HomeIcon, Waves, Snowflake, Triangle,
   Briefcase, Coins, Activity, LayoutGrid, Gauge, Lock, Sun, Shield, HelpCircle,
 } from "lucide-react";
@@ -146,19 +146,7 @@ export function Sidebar() {
     };
   }, [open]);
 
-  return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        data-tour="menu-button"
-        className="fixed top-3 left-3 z-40 h-11 w-11 grid place-items-center rounded-full glass gold-border hover:bg-white/40 transition"
-        aria-label="Open menu"
-      >
-        <Menu className="h-5 w-5 text-gold" />
-      </button>
-      {open && <ModuleDrawer onClose={() => setOpen(false)} />}
-    </>
-  );
+  return <>{open && <ModuleDrawer onClose={() => setOpen(false)} />}</>;
 }
 
 function ModuleDrawer({ onClose }: { onClose: () => void }) {
