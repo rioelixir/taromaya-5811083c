@@ -73,9 +73,14 @@ export function NakshatraPanel({
   onContext?: (ctx: StarContext) => void;
 }) {
   const { meta } = useNakshatraMeta();
-  const [date, setDate] = useState<string>(() => todayDate());
-  const [time, setTime] = useState<string>(() => nowTime());
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
   const [place, setPlace] = useState<PlaceValue>({ place: "", lat: "", lon: "", tz: "" });
+
+  useEffect(() => {
+    setDate(todayDate());
+    setTime(nowTime());
+  }, []);
   const [result, setResult] = useState<NakshatraResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
