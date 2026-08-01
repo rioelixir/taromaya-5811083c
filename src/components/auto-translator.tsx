@@ -213,9 +213,12 @@ export function AutoTranslator() {
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
       unsub();
       observer.disconnect();
     };
+
   }, [lang, router]);
 
   return null;
