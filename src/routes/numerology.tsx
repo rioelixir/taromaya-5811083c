@@ -53,7 +53,7 @@ function NumerologyPage() {
     <PageShell
       eyebrow="Numerology"
       title="The vibration of numbers"
-      subtitle="Pythagorean and Chaldean systems, personal-year timelines, mobile-number analysis, and compatibility."
+      subtitle="Pythagorean and Chaldean systems, personal-year timelines, mobile-number analysis, and Kundli matching."
     >
       <div className="mb-6 flex flex-wrap gap-2">
         {(Object.keys(TAB_LABEL) as Tab[]).map((t) => (
@@ -392,7 +392,7 @@ function CompatibilityNumerology() {
           <BigNum label={a.name || "A"} n={rA.lifePath} />
           <GlassCard>
             <div className="text-center">
-              <div className="text-xs uppercase tracking-widest text-muted-foreground">Match Making</div>
+              <div className="text-xs uppercase tracking-widest text-muted-foreground">Kundli Matching</div>
               <div className="font-display text-5xl gold-text mt-2">{compat.score}%</div>
               <div className="mt-3 text-sm text-pearl">{compat.note}</div>
             </div>
