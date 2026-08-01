@@ -318,16 +318,19 @@ export function offlineReading(input: ReadingRequest): string {
   }
 
   // 4. Real life, area by area, tuned to what the reader asked to hear about.
+  const usedAdvice = new Set<string>();
   const areaLines = areas.map((a, i) => {
     const extra = meanings[i % Math.max(meanings.length, 1)];
-    const helpful = person.helpful[i % Math.max(person.helpful.length, 1)];
-    const lift =
-      helpful && person.helpful.length
-        ? ` Right now ${helpful.planet} is helping this part of your life, so use it.`
-        : "";
-    const tail = extra ? ` ${cap(extra.does)}.` : "";
+    const helpful = person.helpful.length ? person.helpful[i % person.helpful.length] : null;
+    const lift = helpful ? ` Right now ${helpful.planet} is helping this part of your life, so use it.` : "";
+    let tail = "";
+    if (extra && !usedAdvice.has(extra.does)) {
+      usedAdvice.add(extra.does);
+      tail = ` ${cap(extra.does)}.`;
+    }
     return `${a.emoji} ${a.label}: ${a.base}${lift}${tail}`;
   });
+
 
   // 5. The reasoning, said out loud, from the reader's own details.
   const why: string[] = [];
