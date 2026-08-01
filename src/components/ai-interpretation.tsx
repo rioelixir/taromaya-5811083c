@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { buildGuideContext, type SavedKundliRow } from "@/lib/ai-context";
 import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
+import { LIFE_AREAS, READING_FRAMEWORK_RULES, type LifeAreaId } from "@/lib/reading-frame";
 import { PlainAIText } from "@/components/plain-ai-text";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
 import { useLang } from "@/lib/i18n";
+
 
 function profileToRow(p: BirthProfile): SavedKundliRow {
   return {
