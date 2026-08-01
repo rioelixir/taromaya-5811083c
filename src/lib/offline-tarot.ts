@@ -179,6 +179,6 @@ export function offlineTarotReading(draw: OfflineDraw): string {
     ][n % 4],
   );
 
-  return lines.join("\n");
+  return lines.join("\n\n");
 }
 
