@@ -17,7 +17,7 @@ export type BirthOneBoxValue = {
   tz?: string;
 };
 
-const EXAMPLE = "My name is Ria. I was born on 18 August 1995 at 4:35 in the evening in Delhi.";
+
 
 /**
  * One box for the whole birth form.

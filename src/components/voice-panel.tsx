@@ -26,7 +26,7 @@ function fillTime(time: string): boolean {
   return insertSpokenText(box, time);
 }
 
-const EXAMPLE = "My name is Ria. I was born on 18 August 1995 at 4:35 in the evening in Delhi.";
+
 
 type Got = { label: string; value: string };
 
