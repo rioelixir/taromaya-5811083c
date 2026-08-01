@@ -6,6 +6,8 @@ import { StarField } from "@/components/star-field";
 import { Sparkles, Loader2, Mail } from "lucide-react";
 import { useAppLogo } from "@/hooks/use-app-logo";
 import { queueAuthorsNote } from "@/components/authors-note-modal";
+import { termsStatus } from "@/lib/terms.functions";
+
 
 function AuthLogo() {
   const logo = useAppLogo();
@@ -44,11 +46,6 @@ export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — TAROMAYA" }] }),
 });
 
-async function checkIsAdmin(userId: string): Promise<boolean> {
-  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  return !!data;
-}
-
 async function markTermsAccepted(userId: string) {
   await supabase
     .from("profiles")
@@ -58,20 +55,16 @@ async function markTermsAccepted(userId: string) {
 
 async function routeAfterAuth(navigate: ReturnType<typeof useNavigate>) {
   const { data } = await supabase.auth.getUser();
-  const user = data.user;
-  if (!user) return;
-  if (await checkIsAdmin(user.id)) {
-    navigate({ to: "/" });
-    return;
+  if (!data.user) return;
+  // Server-side gate: admins and allowlisted verified accounts skip the terms.
+  try {
+    const status = await termsStatus();
+    navigate({ to: status.satisfied ? "/" : "/accept-terms" });
+  } catch {
+    navigate({ to: "/accept-terms" });
   }
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("terms_accepted_at")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (profile?.terms_accepted_at) navigate({ to: "/" });
-  else navigate({ to: "/accept-terms" });
 }
+
 
 function AuthPage() {
   const navigate = useNavigate();
