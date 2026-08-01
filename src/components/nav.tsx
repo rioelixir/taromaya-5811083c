@@ -135,6 +135,13 @@ export function Sidebar() {
   // Close whenever the route changes
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  // Any page can open the full list of modules with one event.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener("taromaya:open-menu", onOpen);
+    return () => window.removeEventListener("taromaya:open-menu", onOpen);
+  }, []);
+
   // Escape to close
   useEffect(() => {
     if (!open) return;
@@ -146,6 +153,7 @@ export function Sidebar() {
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
 
   return <>{open && <ModuleDrawer onClose={() => setOpen(false)} />}</>;
 }
