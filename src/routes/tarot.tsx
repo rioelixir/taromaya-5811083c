@@ -28,8 +28,6 @@ import {
   ChevronUp,
   ChevronDown,
   Star,
-  Maximize,
-  Minimize,
 } from "lucide-react";
 
 const DESIGNER_NOTE_KEY = "tarot-designer-note-shown";
@@ -71,10 +69,10 @@ type Slot = { index: number; label: string; x: number; y: number };
 
 const CARD_W = 86;
 const CARD_H = 132;
-// Deck stacks are shown at a medium size so they are easy to tap but do not
-// dominate the board. Placed cards keep their own size above.
-const MINI_W = 90;
-const MINI_H = 138;
+// Deck stacks are shown at the smallest practical size so the board stays open.
+// Placed cards keep their own size above.
+const MINI_W = 64;
+const MINI_H = 98;
 
 type DeckStacks = Record<DeckKey, UploadedCard[]>;
 
@@ -115,23 +113,6 @@ function TarotPage() {
   // Hidden by default: the board itself is the whole screen until the user
   // taps "Show" to reveal the deck/spread controls.
   const [headerCollapsed, setHeaderCollapsed] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  useEffect(() => {
-    const onChange = () => setIsFullScreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onChange);
-    onChange();
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
-  const toggleFullScreen = async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await document.documentElement.requestFullscreen();
-    } catch {
-      /* some browsers block full screen; the board is already full-page */
-    }
-  };
   const [designerNote, setDesignerNote] = useState(false);
   const designerNoteFired = useRef(false);
   const [starCtx, setStarCtx] = useState<StarContext>({});
@@ -685,18 +666,6 @@ function TarotPage() {
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <button
-                onClick={toggleFullScreen}
-                className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
-                aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
-              >
-                {isFullScreen ? (
-                  <Minimize className="h-4 w-4 shrink-0" />
-                ) : (
-                  <Maximize className="h-4 w-4 shrink-0" />
-                )}
-                <span className="hidden sm:inline">{isFullScreen ? "Exit" : "Full screen"}</span>
-              </button>
-              <button
                 onClick={() => setHeaderCollapsed(true)}
                 className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-xl border border-neutral-300 bg-neutral-100 px-3 text-sm font-bold text-neutral-900 hover:bg-neutral-200"
                 aria-label="Collapse controls"
@@ -806,15 +775,6 @@ function TarotPage() {
         </button>
       )}
 
-      {/* Full-screen toggle - sits just below the Show button on the right */}
-      <button
-        onClick={toggleFullScreen}
-        className="absolute right-3 top-14 z-30 rounded-full border border-gold/40 bg-black/70 p-2 text-gold-soft hover:bg-black/90"
-        aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
-        title={isFullScreen ? "Exit full screen" : "Full screen"}
-      >
-        {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-      </button>
 
 
 
@@ -933,7 +893,7 @@ function TarotPage() {
                       title={`${meta.name} — ${meta.tagline}`}
                     >
                       <div
-                        className="relative w-[90px] h-[138px] sm:w-[100px] sm:h-[154px] md:w-[110px] md:h-[170px]"
+                        className="relative w-[64px] h-[98px]"
                       >
                         {[0, 1, 2].map((i) => {
                           const isTop = i === 0 && !empty;
@@ -961,11 +921,11 @@ function TarotPage() {
                             >
                               {!empty && (
                                 <div
-                                  className="absolute inset-2 rounded-xl border flex items-center justify-center"
+                                  className="absolute inset-1 rounded-xl border flex items-center justify-center"
                                   style={{ borderColor: `${meta.accent}40` }}
                                 >
                                   <div
-                                    className="font-display text-2xl sm:text-3xl"
+                                    className="font-display text-lg"
                                     style={{ color: `${meta.accent}` }}
                                   >
                                     {meta.glyph}
@@ -977,12 +937,12 @@ function TarotPage() {
                         })}
                       </div>
                       <div
-                        className="mt-2 w-full rounded-md bg-black/60 px-1 py-0.5 text-sm sm:text-base font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                        className="mt-1.5 w-full rounded-md bg-black/60 px-1 py-0.5 text-[10px] font-bold text-center leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                         style={{ color: meta.accent }}
                       >
                         {meta.shortName}
                       </div>
-                      <div className="text-xs sm:text-sm font-semibold text-board-fg/90 leading-tight">
+                      <div className="text-[10px] font-semibold text-board-fg/90 leading-tight">
                         {cardGroup === "all"
                           ? `${subDeck.length}/${meta.expected}`
                           : `${subDeck.length} cards`}
