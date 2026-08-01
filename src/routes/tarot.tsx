@@ -933,7 +933,7 @@ function TarotPage() {
                       title={`${meta.name} — ${meta.tagline}`}
                     >
                       <div
-                        className="relative w-[110px] h-[170px] sm:w-[130px] sm:h-[200px] md:w-[150px] md:h-[230px]"
+                        className="relative w-[90px] h-[138px] sm:w-[100px] sm:h-[154px] md:w-[110px] md:h-[170px]"
                       >
                         {[0, 1, 2].map((i) => {
                           const isTop = i === 0 && !empty;
