@@ -23,23 +23,16 @@ function AcceptTerms() {
         navigate({ to: "/auth" });
         return;
       }
-      const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: data.user.id,
-        _role: "admin",
-      });
-      if (isAdmin) {
-        navigate({ to: "/" });
-        return;
+      try {
+        const status = await termsStatus();
+        if (status.satisfied) {
+          navigate({ to: "/" });
+          return;
+        }
+      } catch {
+        // fall through and show the terms
       }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("terms_accepted_at")
-        .eq("id", data.user.id)
-        .maybeSingle();
-      if (profile?.terms_accepted_at) {
-        navigate({ to: "/" });
-        return;
-      }
+
       setChecking(false);
     })();
   }, [navigate]);
