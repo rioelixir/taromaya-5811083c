@@ -163,16 +163,11 @@ export function useVoice(onText: (text: string) => void) {
         rec.onresult = (e: any) => {
           if (pausedRef.current) return;
           let interim = "";
-          let gotFinal = false;
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const r = e.results[i];
-            // Only one word per mic tap: take the first final word and stop.
             if (r.isFinal) {
-              const word = firstWord(String(r[0].transcript || ""));
-              if (word) {
-                slotsRef.current[i] = word;
-                gotFinal = true;
-              }
+              const said = String(r[0].transcript || "").trim();
+              if (said) slotsRef.current[i] = said;
             } else {
               interim += r[0].transcript;
             }
@@ -180,12 +175,10 @@ export function useVoice(onText: (text: string) => void) {
           finalRef.current = dedupeRepeats(
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
-          setHeard(firstWord(`${finalRef.current} ${interim}`.trim()));
+          setHeard(tidy(`${finalRef.current} ${interim}`.trim()));
           waitForQuiet();
-          if (gotFinal) {
-            setTimeout(() => stopRef.current(), 0);
-          }
         };
+
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
           if (err === "not-allowed" || err === "service-not-allowed") {
