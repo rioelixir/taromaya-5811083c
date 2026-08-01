@@ -17,7 +17,7 @@ import {
   spellingCheck, nameDeepMeaning, missingAlphabets, spellingVariants,
   mobileDobMatch,
 } from "@/lib/name-spelling";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { NumerologyFullReport } from "@/components/numerology-report";
 import { Loader2, Sparkles } from "lucide-react";
 

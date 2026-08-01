@@ -11,7 +11,7 @@ import {
   SIGN_NAMES, SIGN_GLYPHS, ASPECTS, type HouseSystem,
 } from "@/lib/western";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";
 import { Loader2, Sparkles } from "lucide-react";
 

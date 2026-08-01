@@ -15,7 +15,7 @@ import {
   type Station, type Ingress, type EclipseEvent, type TimelineHit,
 } from "@/lib/transits-timeline";
 import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { ForecastStrip } from "@/components/forecast-strip";
 import { Loader2, Sparkles, RefreshCw, RotateCcw, ArrowRight, Eclipse, CalendarRange } from "lucide-react";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";

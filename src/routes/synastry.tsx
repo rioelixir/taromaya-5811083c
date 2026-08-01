@@ -9,7 +9,7 @@ import { synastryAspects, houseOverlay, compositeChart, synastryScore } from "@/
 import { computeKundli, formatDegree, PLANET_GLYPHS, type PlanetName } from "@/lib/vedic";
 import { ashtakootMilan } from "@/lib/ashtakoot";
 import { findAspectHits, fmtDay } from "@/lib/transits-timeline";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { Loader2, Sparkles, Heart, Flame, Zap } from "lucide-react";
 
 

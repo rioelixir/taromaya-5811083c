@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
+import { MODEL_EVERYDAY } from "@/lib/ai-models";
 
 const Input = z.object({
   gender: z.enum(["Boy", "Girl", "Unisex"]),
@@ -59,7 +60,7 @@ ${theme}
 Return exactly ${data.count} entries.`;
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
+      model: gateway(MODEL_EVERYDAY),
       system: withSupremeSystem(system),
       prompt,
     });

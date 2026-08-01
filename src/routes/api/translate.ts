@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { requireHttpAuth } from "@/lib/http-auth.server";
 import { LANGUAGE_LIST } from "@/lib/i18n";
+import { MODEL_EVERYDAY } from "@/lib/ai-models";
 
 type Body = { lang?: string; strings?: string[] };
 
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/api/translate")({
 
         const gateway = createLovableAiGatewayProvider(key);
         const { text } = await generateText({
-          model: gateway("google/gemini-3.1-flash-lite"),
+          model: gateway(MODEL_EVERYDAY),
           system,
           prompt,
         });

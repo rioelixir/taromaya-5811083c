@@ -9,7 +9,7 @@ import { computeKundli, RASHIS, PLANET_SHORT, formatDegree } from "@/lib/vedic";
 import { ashtakootMilan } from "@/lib/ashtakoot";
 import { computeWesternChart, SIGN_NAMES, SIGN_GLYPHS } from "@/lib/western";
 import { synastryAspects, compositeChart, synastryScore } from "@/lib/synastry";
-import { aiReading } from "@/lib/ai-reading.functions";
+import { aiReading } from "@/lib/ai-cache";
 import { deepCompat } from "@/lib/compat-deep";
 import { Loader2, Sparkles, Heart, CheckCircle2, XCircle, ShieldCheck, ShieldAlert } from "lucide-react";
 

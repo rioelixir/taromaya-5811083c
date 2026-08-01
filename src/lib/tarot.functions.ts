@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
+import { MODEL_DEEP } from "@/lib/ai-models";
 
 const DrawSchema = z.object({
   spreadLabel: z.string(),
@@ -55,7 +56,7 @@ STRICT ACCURACY RULES — non-negotiable:
 
     // Try to load the editable prompt from the admin CMS.
     let system = fallbackSystem;
-    let modelId = "openai/gpt-5.5";
+    let modelId = MODEL_DEEP;
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: row } = await supabaseAdmin

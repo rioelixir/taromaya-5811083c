@@ -3,6 +3,7 @@ import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { withSupremeSystem } from "@/lib/ai-system";
 import { createClient } from "@supabase/supabase-js";
+import { MODEL_EVERYDAY } from "@/lib/ai-models";
 
 type Body = {
   messages?: UIMessage[];
@@ -55,7 +56,7 @@ export const Route = createFileRoute("/api/chat")({
         const system = withSupremeSystem(contextual);
 
         const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-3.5-flash");
+        const model = gateway(MODEL_EVERYDAY);
 
         try {
           const result = streamText({
