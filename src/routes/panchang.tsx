@@ -135,7 +135,7 @@ function PanchangPage() {
           </div>
         </GlassCard>
 
-        <GlassCard title="Auspicious Muhurats">
+        <GlassCard title="Auspicious Muhurats" desc="Good windows are listed first, then the windows most people avoid for new starts.">
           <div className="space-y-2 text-sm">
             <MuhurtaRow label="Abhijit" range={p.abhijitMuhurat} good />
             <MuhurtaRow label="Brahma" range={p.brahmaMuhurat} good />
@@ -149,16 +149,16 @@ function PanchangPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Chaughadiya — Day">
+        <GlassCard title="Chaughadiya — Day" desc="The daytime is split into small windows. Green ones are fine for starting things, marked ones are better skipped.">
           <ChaughadiyaTable rows={p.chaughadiyaDay} />
         </GlassCard>
-        <GlassCard title="Chaughadiya — Night">
+        <GlassCard title="Chaughadiya — Night" desc="The same idea for the night, from sunset to next sunrise.">
           <ChaughadiyaTable rows={p.chaughadiyaNight} />
         </GlassCard>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Special notes">
+        <GlassCard title="Special notes" desc="Extra traditional warnings that apply to this date.">
           <div className="space-y-3 text-sm">
             <div>
               <div className="text-xs text-muted-foreground">Disha Shool (avoid direction)</div>
@@ -176,7 +176,7 @@ function PanchangPage() {
             )}
           </div>
         </GlassCard>
-        <GlassCard title="Astronomical">
+        <GlassCard title="Astronomical" desc="The raw sky numbers behind everything above, if you want to check them.">
           <div className="text-xs text-muted-foreground">Julian Day: <span className="text-pearl">{p.julianDay.toFixed(4)}</span></div>
           <div className="text-xs text-muted-foreground mt-1">Sun–Moon elongation: <span className="text-pearl">{(p.tithi.number - 1) * 12 + "°"}</span></div>
         </GlassCard>
@@ -184,10 +184,10 @@ function PanchangPage() {
 
       {/* Hora — Planetary Hours */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <GlassCard title="Hora — Day (Sunrise → Sunset)">
+        <GlassCard title="Hora — Day (Sunrise → Sunset)" desc="Each hour of the day is looked after by one planet. Pick the hour that matches your task.">
           <HoraTable rows={horas.filter(h => h.isDay)} nowIdx={nowHora?.index ?? -1} />
         </GlassCard>
-        <GlassCard title="Hora — Night (Sunset → Sunrise)">
+        <GlassCard title="Hora — Night (Sunset → Sunrise)" desc="The same planetary hours, carried on through the night.">
           <HoraTable rows={horas.filter(h => !h.isDay)} nowIdx={nowHora?.index ?? -1} />
         </GlassCard>
       </div>
