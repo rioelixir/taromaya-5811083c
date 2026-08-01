@@ -985,7 +985,9 @@ function TarotPage() {
                         {meta.shortName}
                       </div>
                       <div className="text-[11px] font-semibold text-board-fg/90 leading-tight">
-                        {subDeck.length}/{meta.expected}
+                        {cardGroup === "all"
+                          ? `${subDeck.length}/${meta.expected}`
+                          : `${subDeck.length} cards`}
                       </div>
                     </div>
                   );
@@ -993,7 +995,9 @@ function TarotPage() {
               </div>
               <div className="text-sm text-board-fg/85 pointer-events-auto text-center pt-1">
                 {!loadingDecks && totalCards === 0
-                  ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                  ? cardGroup === "all"
+                    ? "No card pictures yet. An admin can add them in Admin, then Assets."
+                    : "No cards of this kind yet. Pick All cards to use the full decks."
                   : "Tap a deck, or hold and drag a card onto the board"}
               </div>
             </div>
