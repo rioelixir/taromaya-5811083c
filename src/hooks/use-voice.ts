@@ -232,7 +232,7 @@ export function useVoice(onText: (text: string) => void) {
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, [waitForQuiet]);
+  }, [waitForQuiet, tidy]);
 
   const teardown = useCallback(() => {
     activeRef.current = false;
