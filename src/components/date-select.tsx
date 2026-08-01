@@ -52,6 +52,23 @@ export function DateSelect({
 
   const boxRef = useRef<HTMLDivElement>(null);
 
+  // The year is typed, so it keeps its own draft text until 4 digits are in.
+  const [yearText, setYearText] = useState(ys && year ? String(year) : "");
+  useEffect(() => {
+    setYearText(year ? String(year) : "");
+  }, [year]);
+
+  const commitYear = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 4);
+    setYearText(digits);
+    if (digits.length < 4) return;
+    let y = Number(digits);
+    if (y < minYear) y = minYear;
+    if (y > maxYear) y = maxYear;
+    setYearText(String(y));
+    emit(y, month, day);
+  };
+
   // Voice: when someone speaks a date, the first date box on the page takes it.
   useEffect(() => {
     const onFill = (e: Event) => {
@@ -98,20 +115,26 @@ export function DateSelect({
             </option>
           ))}
         </select>
-        <select
+        <input
           aria-label="Year"
           className={selectCls}
-          value={year || ""}
-          onChange={(e) => emit(Number(e.target.value), month, day)}
-        >
-          <option value="">YYYY</option>
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={4}
+          placeholder="YYYY"
+          list="taromaya-year-list"
+          value={yearText}
+          onChange={(e) => commitYear(e.target.value)}
+          onBlur={(e) => commitYear(e.target.value)}
+        />
+        <datalist id="taromaya-year-list">
           {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
+            <option key={y} value={y} />
           ))}
-        </select>
+        </datalist>
       </div>
     </div>
   );
 }
+
