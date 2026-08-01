@@ -208,19 +208,51 @@ export function NakshatraPanel({
         <Star className="h-4 w-4 shrink-0" /> Current Nakshatra
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Tell us the time now and where you are. We find the Moon's Nakshatra for this
+        Pick the date, the time and where you are. We find the Moon's Nakshatra for that
         moment and pull its card on its own.
       </p>
 
-      <label className="block text-xs uppercase tracking-widest text-muted-foreground">
-        Current time
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
-        />
-      </label>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground">
+          Date
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Date for the Nakshatra"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground">
+          Time
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Time for the Nakshatra"
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded-lg border border-gold/25 bg-gold/5 px-2 py-1 text-gold/90">
+          {prettyDate(date)}
+        </span>
+        <span className="rounded-lg border border-white/15 px-2 py-1 text-pearl/85">{time}</span>
+        {date !== todayDate() && (
+          <button
+            onClick={() => {
+              setDate(todayDate());
+              setTime(nowTime());
+            }}
+            className="rounded-lg border border-white/15 px-2 py-1 text-pearl/85 hover:bg-white/[0.06]"
+          >
+            Use today
+          </button>
+        )}
+      </div>
 
       <PlacePicker value={place} onChange={setPlace} label="Current place" worldwide />
 
