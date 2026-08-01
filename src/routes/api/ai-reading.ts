@@ -6,6 +6,7 @@ import { requireHttpAuth } from "@/lib/http-auth.server";
 import { withSupremeSystem } from "@/lib/ai-system";
 import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
 import {
+import { usingOwnAi } from "@/lib/ai-provider.server";
   ALLOWED_CHAT_MODELS,
   MODEL_EVERYDAY,
   MAX_SYSTEM_CHARS,
@@ -53,7 +54,8 @@ export const Route = createFileRoute("/api/ai-reading")({
         }
         const { system, prompt, promptKey } = parsed.data;
 
-        const key = process.env.LOVABLE_API_KEY;
+        // Any active provider will do: the owner's own key, or the gateway.
+        const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
         if (!key) {
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
