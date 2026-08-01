@@ -7,6 +7,8 @@ import { withSupremeSystem } from "@/lib/ai-system";
 import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
 import { usingOwnAi } from "@/lib/ai-provider.server";
 import {
+import { offlineReading } from "@/lib/offline-reading";
+import { AI_OFFLINE } from "@/lib/offline-mode";
   ALLOWED_CHAT_MODELS,
   MODEL_EVERYDAY,
   MAX_SYSTEM_CHARS,
@@ -56,6 +58,14 @@ export const Route = createFileRoute("/api/ai-reading")({
         const { system, prompt, promptKey } = parsed.data;
 
         // Any active provider will do: the owner's own key, or the gateway.
+        // Offline mode: Taromaya writes the reading itself, no paid model.
+        if (AI_OFFLINE) {
+          return new Response(
+            JSON.stringify({ text: offlineReading({ system: system ?? "", prompt }) }),
+            { headers: { "Content-Type": "application/json" } },
+          );
+        }
+
         const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
         if (!key) {
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireHttpAuth } from "@/lib/http-auth.server";
 import { aiFetch, aiModel, aiSource } from "@/lib/ai-provider.server";
+import { AI_OFFLINE } from "@/lib/offline-mode";
 
 /** Turns a short recording into text. Used only when the browser has no built-in listener. */
 export const Route = createFileRoute("/api/transcribe")({
@@ -17,6 +18,12 @@ export const Route = createFileRoute("/api/transcribe")({
           form = await request.formData();
         } catch {
           return new Response("Send the recording as form data.", { status: 400 });
+        }
+
+        // Offline mode: speech is handled by the phone or browser itself, so no
+        // paid speech model is called here.
+        if (AI_OFFLINE) {
+          return new Response("Voice typing works right on your device here.", { status: 501 });
         }
 
         const file = form.get("file");

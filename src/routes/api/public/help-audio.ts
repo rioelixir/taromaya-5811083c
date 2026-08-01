@@ -3,6 +3,7 @@ import { guideById } from "@/lib/help-guides";
 import { LANGUAGE_LIST } from "@/lib/i18n";
 import { MODEL_EVERYDAY } from "@/lib/ai-models";
 import { aiFetch, aiModel, aiSource } from "@/lib/ai-provider.server";
+import { AI_OFFLINE } from "@/lib/offline-mode";
 
 /**
  * Reads one help guide out loud, in any language the app supports.
@@ -20,6 +21,12 @@ export const Route = createFileRoute("/api/public/help-audio")({
         if (!guide) return new Response("Unknown guide", { status: 404 });
         const language = LANGUAGE_LIST.find((l) => l.code === langCode);
         if (!language) return new Response("Unknown language", { status: 400 });
+
+        // Offline mode: the help voice is spoken by the device itself, so no
+        // paid voice model is called.
+        if (AI_OFFLINE) {
+          return new Response("Your device will read this guide out loud.", { status: 501 });
+        }
 
         if (!aiSource()) return new Response("Voice is not set up", { status: 500 });
 
