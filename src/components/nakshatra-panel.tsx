@@ -110,9 +110,10 @@ export function NakshatraPanel({
     [cards, meta],
   );
 
-  const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time;
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
+  const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time && validDate;
 
-  // As soon as a place and a time are set, work out the Nakshatra of this moment.
+  // As soon as a date, time and place are set, work out the Nakshatra for that moment.
   useEffect(() => {
     if (!ready) {
       setResult(null);
@@ -125,17 +126,9 @@ export function NakshatraPanel({
     const id = window.setTimeout(() => {
       try {
         const tz = Number(place.tz);
-        // Today's date at that place, at the chosen clock time.
-        const localNow = new Date(Date.now() + tz * 3600 * 1000);
+        const [yy, mo, dd] = date.split("-").map(Number);
         const [hh, mm] = time.split(":").map(Number);
-        const utcMs =
-          Date.UTC(
-            localNow.getUTCFullYear(),
-            localNow.getUTCMonth(),
-            localNow.getUTCDate(),
-            hh || 0,
-            mm || 0,
-          ) - tz * 3600 * 1000;
+        const utcMs = Date.UTC(yy, (mo || 1) - 1, dd || 1, hh || 0, mm || 0) - tz * 3600 * 1000;
 
         const snap = computeNakshatraForLocation({
           date: new Date(utcMs),
@@ -159,7 +152,7 @@ export function NakshatraPanel({
       cancelled = true;
       window.clearTimeout(id);
     };
-  }, [ready, place.lat, place.lon, place.tz, time, buildResult]);
+  }, [ready, place.lat, place.lon, place.tz, date, time, buildResult]);
 
   // Keep the board's Ask AI in step with the Nakshatra of this moment.
   useEffect(() => {
