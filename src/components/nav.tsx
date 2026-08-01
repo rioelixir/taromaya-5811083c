@@ -147,7 +147,6 @@ export function Sidebar() {
   }, [open]);
 
   return <>{open && <ModuleDrawer onClose={() => setOpen(false)} />}</>;
-
 }
 
 function ModuleDrawer({ onClose }: { onClose: () => void }) {
