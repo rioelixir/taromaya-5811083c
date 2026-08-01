@@ -97,6 +97,8 @@ function factsFrom(prompt: string, limit = 7): string[] {
     const first = clean(raw);
     if (!first || first.length < 6) continue;
     if (/^(question|write|reply|return|keep it|do not|never|use only|shape of|rules?)\b/i.test(first)) continue;
+    if (/^(module|user intent|selected life areas|output|context)\b/i.test(first)) continue;
+
     if (/json|markdown|word[s]? ?limit|under \d+ words|===/i.test(first)) continue;
     const line = humanise(first);
     if (!line || line.length < 6 || line.length > 150) continue;
