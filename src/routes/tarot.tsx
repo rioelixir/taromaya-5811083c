@@ -782,11 +782,11 @@ function TarotPage() {
           </div>
         )}
 
-        {/* Canvas — fills remaining viewport */}
-        <div className="relative flex flex-1 min-h-0 flex-col">
+        {/* Canvas — fills the whole page */}
+        <div className="relative flex h-full w-full flex-col">
           <div
             ref={canvasRef}
-            className="relative flex-1 min-h-0 border-t border-white/5 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
+            className="relative h-full w-full flex-1 bg-gradient-to-b from-cosmic/60 via-midnight/40 to-black/60 overflow-hidden touch-none select-none"
           >
             {/* subtle grid glow */}
             <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_35%,rgba(212,175,55,0.10),transparent_60%)]" />
