@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { requirePremium } from "./premium-guard";
 import { withSupremeSystem } from "./ai-system";
+import { MODEL_DEEP } from "@/lib/ai-models";
 import { usingOwnAi } from "@/lib/ai-provider.server";
 
 const PlanetSchema = z.object({
