@@ -34,6 +34,25 @@ function nowTime(): string {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+/** "YYYY-MM-DD" for today, in the viewer's own clock. */
+function todayDate(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Friendly "Sat, 1 Aug 2026" from a "YYYY-MM-DD" string. */
+function prettyDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 /**
  * Left-side Nakshatra panel for the tarot board.
  * The user only picks the time now and the place they are in.
@@ -54,6 +73,7 @@ export function NakshatraPanel({
   onContext?: (ctx: StarContext) => void;
 }) {
   const { meta } = useNakshatraMeta();
+  const [date, setDate] = useState<string>(() => todayDate());
   const [time, setTime] = useState<string>(() => nowTime());
   const [place, setPlace] = useState<PlaceValue>({ place: "", lat: "", lon: "", tz: "" });
   const [result, setResult] = useState<NakshatraResult | null>(null);
@@ -90,9 +110,10 @@ export function NakshatraPanel({
     [cards, meta],
   );
 
-  const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time;
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
+  const ready = place.lat !== "" && place.lon !== "" && place.tz !== "" && !!time && validDate;
 
-  // As soon as a place and a time are set, work out the Nakshatra of this moment.
+  // As soon as a date, time and place are set, work out the Nakshatra for that moment.
   useEffect(() => {
     if (!ready) {
       setResult(null);
@@ -105,17 +126,9 @@ export function NakshatraPanel({
     const id = window.setTimeout(() => {
       try {
         const tz = Number(place.tz);
-        // Today's date at that place, at the chosen clock time.
-        const localNow = new Date(Date.now() + tz * 3600 * 1000);
+        const [yy, mo, dd] = date.split("-").map(Number);
         const [hh, mm] = time.split(":").map(Number);
-        const utcMs =
-          Date.UTC(
-            localNow.getUTCFullYear(),
-            localNow.getUTCMonth(),
-            localNow.getUTCDate(),
-            hh || 0,
-            mm || 0,
-          ) - tz * 3600 * 1000;
+        const utcMs = Date.UTC(yy, (mo || 1) - 1, dd || 1, hh || 0, mm || 0) - tz * 3600 * 1000;
 
         const snap = computeNakshatraForLocation({
           date: new Date(utcMs),
@@ -139,7 +152,7 @@ export function NakshatraPanel({
       cancelled = true;
       window.clearTimeout(id);
     };
-  }, [ready, place.lat, place.lon, place.tz, time, buildResult]);
+  }, [ready, place.lat, place.lon, place.tz, date, time, buildResult]);
 
   // Keep the board's Ask AI in step with the Nakshatra of this moment.
   useEffect(() => {
@@ -195,19 +208,51 @@ export function NakshatraPanel({
         <Star className="h-4 w-4 shrink-0" /> Current Nakshatra
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Tell us the time now and where you are. We find the Moon's Nakshatra for this
+        Pick the date, the time and where you are. We find the Moon's Nakshatra for that
         moment and pull its card on its own.
       </p>
 
-      <label className="block text-xs uppercase tracking-widest text-muted-foreground">
-        Current time
-        <input
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
-        />
-      </label>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground">
+          Date
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Date for the Nakshatra"
+          />
+        </label>
+
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground">
+          Time
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl outline-none focus:border-gold/50"
+            aria-label="Time for the Nakshatra"
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded-lg border border-gold/25 bg-gold/5 px-2 py-1 text-gold/90">
+          {prettyDate(date)}
+        </span>
+        <span className="rounded-lg border border-white/15 px-2 py-1 text-pearl/85">{time}</span>
+        {date !== todayDate() && (
+          <button
+            onClick={() => {
+              setDate(todayDate());
+              setTime(nowTime());
+            }}
+            className="rounded-lg border border-white/15 px-2 py-1 text-pearl/85 hover:bg-white/[0.06]"
+          >
+            Use today
+          </button>
+        )}
+      </div>
 
       <PlacePicker value={place} onChange={setPlace} label="Current place" worldwide />
 
@@ -231,7 +276,7 @@ export function NakshatraPanel({
         <div className="space-y-3">
           <div className="rounded-2xl border border-gold/25 bg-black/30 p-3">
             <div className="text-xs uppercase tracking-widest text-muted-foreground">
-              Nakshatra right now
+              Nakshatra for {prettyDate(date)}, {time}
             </div>
             <div className="font-display text-lg text-pearl">{NAKSHATRAS[result.index]}</div>
             <div className="text-xs text-muted-foreground">{nakshatraLine}</div>

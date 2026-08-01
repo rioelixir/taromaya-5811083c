@@ -6,7 +6,7 @@ const CACHE_KEY = (lang: Lang) => `taromaya.translations.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
 const ATTR_ORIG = "data-i18n-orig";
 const MAX_LEN = 900;
-const ATTRS = ["placeholder", "aria-label", "title", "alt"] as const;
+const ATTRS = ["placeholder", "aria-label", "title", "alt", "label", "value"] as const;
 
 /** What we last wrote into a text node, so re-renders get re-translated. */
 const doneText = new WeakMap<Text, { src: string; out: string }>();
@@ -78,12 +78,21 @@ function collectTextNodes(root: Node, out: Text[]) {
 }
 
 function collectAttrs(root: Element, out: Array<{ el: Element; attr: string }>) {
-  const nodes = root.querySelectorAll("[placeholder], [aria-label], [title], [alt]");
+  const nodes = root.querySelectorAll(
+    "[placeholder], [aria-label], [title], [alt], option[label], optgroup[label], input[type=submit], input[type=button], input[type=reset]",
+  );
   const all: Element[] = [root, ...Array.from(nodes)];
   for (const el of all) {
     if (isInSkipTree(el)) continue;
     const prev = doneAttr.get(el) ?? {};
     for (const a of ATTRS) {
+      // `value` is only a visible label on button-like inputs; never touch typed values.
+      if (a === "value") {
+        const tag = el.tagName;
+        const type = (el.getAttribute("type") ?? "").toLowerCase();
+        if (tag !== "INPUT" || !["submit", "button", "reset"].includes(type)) continue;
+      }
+      if (a === "label" && el.tagName !== "OPTION" && el.tagName !== "OPTGROUP") continue;
       const v = el.getAttribute(a);
       if (!v) continue;
       if (prev[a] && prev[a].out === v) continue; // already translated, unchanged
