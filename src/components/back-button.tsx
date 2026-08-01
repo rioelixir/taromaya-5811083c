@@ -59,8 +59,13 @@ export function BackButton({ className }: { className?: string }) {
 /** Floating back button for pages that don't use PageShell. */
 export function FloatingBackButton() {
   return (
-    <div className="fixed left-3 top-3 z-40 sm:left-4 sm:top-4" data-no-translate>
+    <div
+      data-global-back
+      className="fixed left-3 top-3 z-40 sm:left-4 sm:top-4"
+      data-no-translate
+    >
       <BackButton className="shadow-lg backdrop-blur" />
     </div>
   );
 }
+
