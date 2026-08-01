@@ -69,16 +69,16 @@ export function useVoice(onText: (text: string) => void) {
     setAvailable(!!ctor() || !!navigator.mediaDevices?.getUserMedia);
   }, []);
 
-  /** Keep voice input to one word per tap so the same value is never filled twice. */
-  const firstWord = useCallback((raw: string) => {
-    const text = cleanSpeech(raw, { punctuate: false });
-    return text.split(/\s+/)[0] || "";
+  /** Tidy up the spoken words but keep the whole sentence. */
+  const tidy = useCallback((raw: string) => {
+    return dedupeRepeats(cleanSpeech(raw, { punctuate: false })).trim();
   }, []);
 
   const emit = useCallback((raw: string) => {
-    const word = firstWord(raw);
-    if (word) onTextRef.current(word);
-  }, [firstWord]);
+    const text = tidy(raw);
+    if (text) onTextRef.current(text);
+  }, [tidy]);
+
 
   /* ---------- fallback: record and convert ---------- */
 
@@ -163,16 +163,11 @@ export function useVoice(onText: (text: string) => void) {
         rec.onresult = (e: any) => {
           if (pausedRef.current) return;
           let interim = "";
-          let gotFinal = false;
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const r = e.results[i];
-            // Only one word per mic tap: take the first final word and stop.
             if (r.isFinal) {
-              const word = firstWord(String(r[0].transcript || ""));
-              if (word) {
-                slotsRef.current[i] = word;
-                gotFinal = true;
-              }
+              const said = String(r[0].transcript || "").trim();
+              if (said) slotsRef.current[i] = said;
             } else {
               interim += r[0].transcript;
             }
@@ -180,12 +175,10 @@ export function useVoice(onText: (text: string) => void) {
           finalRef.current = dedupeRepeats(
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
-          setHeard(firstWord(`${finalRef.current} ${interim}`.trim()));
+          setHeard(tidy(`${finalRef.current} ${interim}`.trim()));
           waitForQuiet();
-          if (gotFinal) {
-            setTimeout(() => stopRef.current(), 0);
-          }
         };
+
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
           if (err === "not-allowed" || err === "service-not-allowed") {
@@ -239,7 +232,7 @@ export function useVoice(onText: (text: string) => void) {
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, [waitForQuiet]);
+  }, [waitForQuiet, tidy]);
 
   const teardown = useCallback(() => {
     activeRef.current = false;

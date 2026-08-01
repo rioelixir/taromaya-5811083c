@@ -101,11 +101,13 @@ export function BirthOneBox({
 
   const handleVoice = useCallback(
     (spoken: string) => {
-      setText((prev) => (prev.trim() ? `${prev.trim()} ${spoken}` : spoken));
+      // The box already mirrors the live words, so replace instead of appending.
+      setText(spoken);
       apply(spoken);
     },
     [apply],
   );
+
 
   const voice = useVoice(handleVoice);
   const listening = voice.state === "listening";
@@ -124,7 +126,7 @@ export function BirthOneBox({
   ].filter(Boolean) as { label: string; value: string }[];
 
   const status: { key: string; label: string; hint: string; tone: string } = listening
-    ? { key: "listening", label: "Listening", hint: "Speak now — say one word at a time.", tone: "text-red-200 border-red-400/40 bg-red-500/10" }
+    ? { key: "listening", label: "Listening", hint: "Speak your whole line — the words fill the box below.", tone: "text-red-200 border-red-400/40 bg-red-500/10" }
     : working || busy
       ? { key: "working", label: "Processing", hint: "Writing down what you said…", tone: "text-amber-200 border-amber-400/40 bg-amber-500/10" }
       : chips.length > 0

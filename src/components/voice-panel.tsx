@@ -83,7 +83,7 @@ export function VoicePanel() {
         Your birth details — one box
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        Tap the mic and say one word at a time.
+        Tap the mic and say your details — the words appear below.
       </p>
 
       <div
@@ -103,7 +103,7 @@ export function VoicePanel() {
             }
           }}
           aria-label="Birth details in one box"
-          placeholder={listening ? "Say one word…" : "Tap the mic and say one word at a time"}
+          placeholder={listening ? "Listening… your words appear here" : "Tap the mic and speak your birth details"}
           className="min-h-[3.5rem] w-full resize-none bg-transparent px-2 py-1 text-base leading-relaxed text-pearl outline-none placeholder:text-muted-foreground"
         />
         {voice.available && (
@@ -136,7 +136,7 @@ export function VoicePanel() {
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening
           </div>
           <p className="mt-1 text-base leading-relaxed text-pearl">
-            {voice.heard || "Say one word…"}
+            {voice.heard || "Listening…"}
           </p>
         </div>
       )}
@@ -161,10 +161,10 @@ export function VoicePanel() {
         )}
         <span className="text-xs text-muted-foreground">
           {listening
-            ? "I am listening. Say one word."
+            ? "I am listening. Keep speaking."
             : working
               ? "Writing it down…"
-              : "Tap the microphone and say one word."}
+              : "Tap the microphone and speak."}
         </span>
       </div>
 
