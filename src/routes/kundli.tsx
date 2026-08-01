@@ -1,7 +1,7 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { Explain } from "@/components/explain";
 import { ConfidenceNote } from "@/components/confidence-note";
 import { CrossCheckPanel } from "@/components/cross-check-panel";
@@ -350,8 +350,6 @@ function BirthForm({
 }
 
 
-const inputCls =
-  "w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50";
 
 // ── South Indian chart
 const CELL_TO_RASHI: Record<string, number> = {
