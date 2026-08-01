@@ -43,7 +43,9 @@ const OWN_MODEL_SECRET: Record<AiKind, string> = {
 
 function ownKey(): string | undefined {
   const key = process.env["AI_API_KEY"]?.trim();
-  return key ? key : undefined;
+  // A real provider key is long. Anything shorter is a placeholder, and using it
+  // would break every AI feature, so it is ignored on purpose.
+  return key && key.length >= 20 ? key : undefined;
 }
 
 /** True when AI runs on the owner's own key, so no Lovable credits are used. */
