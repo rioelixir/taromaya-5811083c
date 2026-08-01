@@ -123,6 +123,14 @@ export function BirthOneBox({
     value.place ? { label: "Place", value: value.place } : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
+  const status: { key: string; label: string; hint: string; tone: string } = listening
+    ? { key: "listening", label: "Listening", hint: "Speak now — say one word at a time.", tone: "text-red-200 border-red-400/40 bg-red-500/10" }
+    : working || busy
+      ? { key: "working", label: "Processing", hint: "Writing down what you said…", tone: "text-amber-200 border-amber-400/40 bg-amber-500/10" }
+      : chips.length > 0
+        ? { key: "done", label: "Saved", hint: "Details captured. You can add more or read below.", tone: "text-emerald-200 border-emerald-400/40 bg-emerald-500/10" }
+        : { key: "idle", label: "Ready", hint: "Tap the big mic to start speaking.", tone: "text-gold border-gold/40 bg-gold/10" };
+
   return (
     <div className="space-y-3" data-no-voice>
       <div>
@@ -130,13 +138,53 @@ export function BirthOneBox({
           Your birth details — one box
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tap the mic and say one word at a time.
+          Tap the mic, then say your name, birth date, birth time and birth place.
         </p>
       </div>
 
+      {/* The mic sits above the box so it is the first thing everyone sees. */}
+      {voice.available && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-black/20 p-4">
+          <button
+            type="button"
+            onClick={() => (listening ? voice.stop() : voice.start())}
+            disabled={working}
+            aria-label={listening ? "Stop listening" : "Tap to speak your details"}
+            aria-pressed={listening}
+            className={cn(
+              "relative flex h-20 w-20 items-center justify-center rounded-full transition active:scale-95 disabled:opacity-70",
+              listening
+                ? "bg-red-500 text-white shadow-[0_0_0_10px_rgba(239,68,68,0.18)]"
+                : "bg-gold/20 text-gold gold-border hover:bg-gold/30",
+            )}
+          >
+            {listening && (
+              <span className="absolute inset-0 animate-ping rounded-full bg-red-400/30" />
+            )}
+            {working ? <Loader2 className="h-8 w-8 animate-spin" />
+              : listening ? <Square className="h-8 w-8" />
+              : <Mic className="h-9 w-9" />}
+          </button>
+
+          <span
+            aria-live="polite"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs uppercase tracking-widest",
+              status.tone,
+            )}
+          >
+            {status.key === "listening" && <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" />}
+            {status.key === "working" && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {status.key === "done" && <Check className="h-3.5 w-3.5" />}
+            {status.label}
+          </span>
+          <p className="text-center text-sm text-muted-foreground">{status.hint}</p>
+        </div>
+      )}
+
       <div
         className={cn(
-          "flex items-end gap-2 rounded-2xl border bg-black/30 p-2 transition",
+          "rounded-2xl border bg-black/30 p-2 transition",
           listening ? "border-red-400/60" : "border-white/10 focus-within:border-gold/50",
         )}
       >
@@ -151,45 +199,20 @@ export function BirthOneBox({
             }
           }}
           aria-label="Birth details in one box"
-          placeholder={listening ? "Say one word…" : "Tap the mic and say one word at a time"}
+          placeholder={
+            listening
+              ? "Listening… your words appear here"
+              : "Example: Riaa, born 15 June 1995 at 7:45 in the morning in New Delhi"
+          }
           className="min-h-[4.5rem] w-full resize-none bg-transparent px-2 py-1 text-base leading-relaxed text-pearl outline-none placeholder:text-muted-foreground"
         />
-        {voice.available && (
-          <button
-            type="button"
-            onClick={() => (listening ? voice.stop() : voice.start())}
-            disabled={working}
-            aria-label={listening ? "Stop listening" : "Speak your details"}
-            className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition",
-              listening
-                ? "bg-red-500 text-white shadow-[0_0_0_6px_rgba(239,68,68,0.18)]"
-                : "bg-gold/20 text-gold gold-border hover:bg-gold/30 active:scale-95",
-            )}
-          >
-            {working ? <Loader2 className="h-5 w-5 animate-spin" />
-              : listening ? <Square className="h-5 w-5" />
-              : <Mic className="h-6 w-6" />}
-          </button>
-        )}
       </div>
-
-      {listening && (
-        <div className="rounded-2xl border border-red-400/30 bg-red-500/5 p-3">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-red-200">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening
-          </div>
-          <p className="mt-1 text-base leading-relaxed text-pearl">
-            {voice.heard || "Say one word…"}
-          </p>
-        </div>
-      )}
 
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => apply(text)}
-          className="inline-flex items-center gap-2 rounded-full bg-gold/15 px-4 py-2 text-sm text-gold gold-border hover:bg-gold/25"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full bg-gold/15 px-5 text-sm text-gold gold-border hover:bg-gold/25"
         >
           <CornerDownLeft className="h-4 w-4" /> Use these details
         </button>
@@ -197,7 +220,7 @@ export function BirthOneBox({
           <button
             type="button"
             onClick={() => { setText(""); setNote(null); voice.clear(); }}
-            className="rounded-full bg-white/5 px-4 py-2 text-sm text-pearl/90 hover:bg-white/10"
+            className="inline-flex min-h-11 items-center rounded-full bg-white/5 px-5 text-sm text-pearl/90 hover:bg-white/10"
           >
             Clear
           </button>
