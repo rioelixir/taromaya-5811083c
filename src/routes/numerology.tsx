@@ -70,7 +70,14 @@ function NumerologyPage() {
           </button>
         ))}
       </div>
+      {tab === "report" && (
+        <FullReportTab
+          fullName={fullName} setFullName={setFullName}
+          birthDate={birthDate} setBirthDate={setBirthDate}
+        />
+      )}
       {tab === "personal" && (
+
         <PersonalNumerology
           fullName={fullName} setFullName={setFullName}
           birthDate={birthDate} setBirthDate={setBirthDate}
