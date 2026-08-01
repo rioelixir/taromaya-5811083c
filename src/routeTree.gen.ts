@@ -69,7 +69,6 @@ import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as ApiTranslateRouteImport } from './routes/api/translate'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
@@ -386,11 +385,6 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
-const ApiTranslateRoute = ApiTranslateRouteImport.update({
-  id: '/api/translate',
-  path: '/api/translate',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   id: '/api/transcribe',
   path: '/api/transcribe',
@@ -543,7 +537,6 @@ export interface FileRoutesByFullPath {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
-  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -621,7 +614,6 @@ export interface FileRoutesByTo {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
-  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -701,7 +693,6 @@ export interface FileRoutesById {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
-  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -781,7 +772,6 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
-    | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -859,7 +849,6 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
-    | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -938,7 +927,6 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
-    | '/api/translate'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -1010,7 +998,6 @@ export interface RootRouteChildren {
   ApiAiReadingRoute: typeof ApiAiReadingRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
-  ApiTranslateRoute: typeof ApiTranslateRoute
   InviteCodeRoute: typeof InviteCodeRoute
   PagesSlugRoute: typeof PagesSlugRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -1442,13 +1429,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/api/translate': {
-      id: '/api/translate'
-      path: '/api/translate'
-      fullPath: '/api/translate'
-      preLoaderRoute: typeof ApiTranslateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/transcribe': {
       id: '/api/transcribe'
       path: '/api/transcribe'
@@ -1661,7 +1641,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiReadingRoute: ApiAiReadingRoute,
   ApiChatRoute: ApiChatRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
-  ApiTranslateRoute: ApiTranslateRoute,
   InviteCodeRoute: InviteCodeRoute,
   PagesSlugRoute: PagesSlugRoute,
   ShareTokenRoute: ShareTokenRoute,
