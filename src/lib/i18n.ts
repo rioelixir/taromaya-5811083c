@@ -1,5 +1,5 @@
 // Client-side i18n. English base + AI-powered translation for every language.
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 /** Every language the app can be read in. `en` is the base language. */
 export const LANGUAGE_LIST = [
@@ -84,8 +84,16 @@ export function setLang(next: Lang) {
 }
 
 export function useLang(): Lang {
-  return useSyncExternalStore(subscribe, readLang, () => "en");
+  const stored = useSyncExternalStore(subscribe, readLang, (): Lang => "en");
+  // Render English on the very first paint so the server and browser agree,
+  // then switch to the chosen language.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  return hydrated ? stored : "en";
 }
+
 
 type Entry = { en: string; hi: string; hr: string };
 
