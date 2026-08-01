@@ -232,22 +232,40 @@ function HelpPage() {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => { stop(); setStudio((v) => !v); }}
-        aria-pressed={studio}
-        className={cn(
-          "mt-3 inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
-          studio
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => { stop(); setStudio((v) => !v); }}
+          aria-pressed={studio}
+          className={cn(
+            "inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 py-2 text-xs transition",
+            studio
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border/50 bg-white/60 text-muted-foreground hover:bg-white",
+          )}
+        >
+          <Sparkles className="h-4 w-4" />
+          {studio ? "Nicer voice is on" : "Use a nicer voice"}
+        </button>
+        {now && (
+          <button
+            type="button"
+            onClick={stop}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border/50 bg-white/60 px-3 py-2 text-xs text-muted-foreground transition hover:bg-white"
+          >
+            <Square className="h-4 w-4" /> Stop
+          </button>
         )}
-      >
-        <Sparkles className="h-4 w-4" />
-        {studio ? "Nicer voice is on" : "Use a nicer voice"}
-      </button>
+      </div>
+
+      {needsStudio && !studio && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          This device has no voice for this language, so the nicer voice will read it for you.
+        </p>
+      )}
 
       {problem && <p className="mt-3 text-sm text-muted-foreground">{problem}</p>}
+
 
       {helpGroups().map((group) => {
         const items = filtered.filter((g) => g.group === group);
