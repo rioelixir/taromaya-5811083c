@@ -90,10 +90,11 @@ function shuffle<T>(arr: T[]): T[] {
   return d;
 }
 
-// Shuffle each admin-uploaded deck into a draw stack.
-function makeDeckStacks(source: DeckStacks): DeckStacks {
+// Shuffle each admin-uploaded deck into a draw stack, keeping only the chosen
+// group of cards (all / major only / minor only / court only).
+function makeDeckStacks(source: DeckStacks, group: CardGroup = "all"): DeckStacks {
   return Object.fromEntries(
-    DECK_LIST.map((m) => [m.key, shuffle(source[m.key] ?? [])]),
+    DECK_LIST.map((m) => [m.key, shuffle(filterCardsByGroup(source[m.key] ?? [], group))]),
   ) as unknown as DeckStacks;
 }
 
