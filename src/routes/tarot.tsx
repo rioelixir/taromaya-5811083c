@@ -792,34 +792,28 @@ function TarotPage() {
       )}
 
 
-      {/* Show controls button - vertical pill on the right edge */}
+      {/* Show controls button - compact pill in the top-right corner */}
       {headerCollapsed && (
         <button
           onClick={() => setHeaderCollapsed(false)}
-          className="absolute right-0 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl border border-r-0 border-gold/50 bg-black/80 min-w-11 px-3 py-6 text-gold shadow-[-4px_0_20px_rgba(0,0,0,0.4)]"
+          className="absolute right-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-xl border border-gold/50 bg-black/80 px-3 py-2 text-gold shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
           aria-label="Show controls"
         >
-          <div className="flex flex-col items-center gap-2">
-            <ChevronDown className="h-4 w-4" />
-            <span
-              className="text-[11px] font-semibold uppercase tracking-[0.25em]"
-              style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
-            >
-              Show
-            </span>
-          </div>
+          <ChevronDown className="h-4 w-4" />
+          <span className="text-xs font-semibold uppercase tracking-wider">Show</span>
         </button>
       )}
 
-      {/* Full-screen toggle - tiny, always reachable, no distraction */}
+      {/* Full-screen toggle - sits just below the Show button on the right */}
       <button
         onClick={toggleFullScreen}
-        className="absolute right-3 top-3 z-30 rounded-full border border-gold/40 bg-black/70 p-2 text-gold-soft hover:bg-black/90"
+        className="absolute right-3 top-14 z-30 rounded-full border border-gold/40 bg-black/70 p-2 text-gold-soft hover:bg-black/90"
         aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
         title={isFullScreen ? "Exit full screen" : "Full screen"}
       >
         {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
       </button>
+
 
 
       {/* Board row: full-page canvas with collapsible Nakshatra drawer */}
