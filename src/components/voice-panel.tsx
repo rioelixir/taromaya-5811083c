@@ -68,10 +68,11 @@ export function VoicePanel() {
       ? "Writing it down…"
       : "Talk instead of typing";
   const help = listening
-    ? "Say it all in one go. I stop by myself when you go quiet."
+    ? "Take your time. Tap the red circle again when you are done."
     : working
       ? "Give me a second."
-      : "Tap the big circle once, then just talk.";
+      : "Tap once to start. Tap again to stop. Nothing is timed.";
+
 
   return (
     <div className="mb-5 rounded-3xl glass gold-border p-5 text-center sm:p-6" data-no-voice>
