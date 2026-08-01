@@ -640,41 +640,48 @@ function TarotPage() {
     >
       <StarField />
 
-      {/* Top control bar */}
-      <div className="relative z-20 w-full px-4 sm:px-6 pt-3 pb-2 backdrop-blur-sm bg-black/20 border-b border-white/5 shrink-0">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-baseline gap-3 flex-wrap">
-            <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
-            {!headerCollapsed && (
-              <span className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+      {/* Top control bar - overlay so the board stays full-page */}
+      <div
+        className={cn(
+          "absolute left-0 right-0 top-0 z-30 transition-colors duration-300",
+          headerCollapsed ? "bg-transparent" : "border-b border-white/10 bg-black/90 backdrop-blur-md",
+        )}
+      >
+        <div className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4">
+          {!headerCollapsed && (
+            <div className="flex items-baseline gap-3">
+              <h1 className="font-display text-xl sm:text-2xl gold-text">Tarot Board</h1>
+              <span className="hidden text-[10px] uppercase tracking-[0.35em] text-muted-foreground sm:inline">
                 Pick a deck · pull a card
               </span>
-            )}
+            </div>
+          )}
+          <div className={cn("flex", headerCollapsed ? "ml-auto" : "")}>
+            <button
+              onClick={() => setHeaderCollapsed((v) => !v)}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-black/40 px-2 py-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:bg-white/5 hover:text-pearl"
+              aria-label={headerCollapsed ? "Expand controls" : "Collapse controls"}
+            >
+              {headerCollapsed ? (
+                <ChevronDown className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronUp className="h-3.5 w-3.5" />
+              )}
+              {headerCollapsed ? "Show" : "Hide"}
+            </button>
           </div>
-          <button
-            onClick={() => setHeaderCollapsed((v) => !v)}
-            className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-1 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-pearl hover:bg-white/5"
-            aria-label={headerCollapsed ? "Expand controls" : "Collapse controls"}
-          >
-            {headerCollapsed ? (
-              <ChevronDown className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronUp className="h-3.5 w-3.5" />
-            )}
-            {headerCollapsed ? "Show" : "Hide"}
-          </button>
         </div>
 
         {!headerCollapsed && (
-          <>
-            <div className="mt-2 flex flex-wrap items-center gap-2" data-tour="spread-picker">
+          <div className="px-3 pb-3 sm:px-4">
+            <div className="flex flex-wrap items-center gap-2" data-tour="spread-picker">
               {(Object.keys(SPREADS) as SpreadKey[]).map((k) => {
                 const active = k === spreadKey;
                 return (
                   <button
                     key={k}
                     onClick={() => setSpreadKey(k)}
-                    className={`text-xs sm:text-sm rounded-xl px-3 py-2 border transition-all ${
+                    className={`rounded-xl border px-3 py-2 text-xs transition-all sm:text-sm ${
                       active
                         ? "border-gold/60 bg-gold/10 text-pearl shadow-[0_0_20px_-8px_var(--gold)]"
                         : "border-white/10 bg-white/[0.02] text-muted-foreground hover:border-white/25 hover:text-pearl"
@@ -690,13 +697,13 @@ function TarotPage() {
               </span>
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-2 items-center">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 maxLength={200}
                 placeholder="What's on your mind? (optional)"
-                className="flex-1 min-w-[220px] rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold/50"
+                className="min-w-[220px] flex-1 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-pearl placeholder:text-muted-foreground/60 focus:border-gold/50 focus:outline-none"
               />
               <button
                 onClick={shuffleAll}
@@ -714,7 +721,7 @@ function TarotPage() {
               <button
                 onClick={requestReading}
                 disabled={!readyToInterpret || loadingReading}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium px-4 py-2 text-sm hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft px-4 py-2 text-sm font-medium text-cosmic transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {loadingReading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -724,7 +731,7 @@ function TarotPage() {
                 Ask AI
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
