@@ -14,11 +14,13 @@ const GOOGLE_CODE: Record<string, string> = {
 };
 
 /** Google's free (key-less) translate endpoint. No AI credits are used. */
-async function gtx(lang: string, text: string): Promise<string | null> {
+async function gtx(lang: string, text: string, wantRoman = false): Promise<{ text: string; roman: string | null } | null> {
   const url =
     "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" +
     encodeURIComponent(GOOGLE_CODE[lang] ?? lang) +
-    "&dt=t&q=" +
+    "&dt=t" +
+    (wantRoman ? "&dt=rm" : "") +
+    "&q=" +
     encodeURIComponent(text);
 
   try {
@@ -26,43 +28,78 @@ async function gtx(lang: string, text: string): Promise<string | null> {
     if (!res.ok) return null;
     const data = (await res.json()) as unknown;
     if (!Array.isArray(data) || !Array.isArray(data[0])) return null;
-    const out = (data[0] as unknown[])
-      .map((seg) => (Array.isArray(seg) && typeof seg[0] === "string" ? seg[0] : ""))
-      .join("");
-    return out.trim() ? out : null;
+    let out = "";
+    let roman = "";
+    for (const seg of data[0] as unknown[]) {
+      if (!Array.isArray(seg)) continue;
+      if (typeof seg[0] === "string") out += seg[0];
+      // With dt=rm Google adds segments carrying the romanization of the
+      // translated text at index 2 (source romanization sits at index 3).
+      else if (typeof seg[2] === "string") roman += seg[2];
+    }
+    if (!out.trim()) return null;
+    return { text: out, roman: roman.trim() ? roman.trim() : null };
   } catch {
     return null;
   }
 }
 
 /**
- * Hinglish (Hindi words in Latin letters) is produced by translating to Hindi
- * and then transliterating the Devanagari back into Latin letters.
+ * Fallback Devanagari -> Latin transliteration (used only when Google does not
+ * return its own romanization). Handles the inherent "a", matras and virama
+ * properly instead of blindly replacing letters.
  */
-const DEVA_MAP: Array<[RegExp, string]> = [
-  [/क्ष/g, "ksh"], [/ज्ञ/g, "gy"], [/श्र/g, "shr"],
-  [/ा/g, "a"], [/ि/g, "i"], [/ी/g, "ee"], [/ु/g, "u"], [/ू/g, "oo"],
-  [/े/g, "e"], [/ै/g, "ai"], [/ो/g, "o"], [/ौ/g, "au"], [/ृ/g, "ri"],
-  [/ं/g, "n"], [/ँ/g, "n"], [/ः/g, "h"], [/्/g, ""],
-  [/अ/g, "a"], [/आ/g, "aa"], [/इ/g, "i"], [/ई/g, "ee"], [/उ/g, "u"], [/ऊ/g, "oo"],
-  [/ए/g, "e"], [/ऐ/g, "ai"], [/ओ/g, "o"], [/औ/g, "au"], [/ऋ/g, "ri"],
-  [/क/g, "ka"], [/ख/g, "kha"], [/ग/g, "ga"], [/घ/g, "gha"], [/ङ/g, "na"],
-  [/च/g, "cha"], [/छ/g, "chha"], [/ज/g, "ja"], [/झ/g, "jha"], [/ञ/g, "na"],
-  [/ट/g, "ta"], [/ठ/g, "tha"], [/ड/g, "da"], [/ढ/g, "dha"], [/ण/g, "na"],
-  [/त/g, "ta"], [/थ/g, "tha"], [/द/g, "da"], [/ध/g, "dha"], [/न/g, "na"],
-  [/प/g, "pa"], [/फ/g, "pha"], [/ब/g, "ba"], [/भ/g, "bha"], [/म/g, "ma"],
-  [/य/g, "ya"], [/र/g, "ra"], [/ल/g, "la"], [/व/g, "va"],
-  [/श/g, "sha"], [/ष/g, "sha"], [/स/g, "sa"], [/ह/g, "ha"],
-  [/ळ/g, "la"], [/ऱ/g, "ra"], [/़/g, ""], [/।/g, "."],
-];
+const CONS: Record<string, string> = {
+  "क":"k","ख":"kh","ग":"g","घ":"gh","ङ":"n",
+  "च":"ch","छ":"chh","ज":"j","झ":"jh","ञ":"n",
+  "ट":"t","ठ":"th","ड":"d","ढ":"dh","ण":"n",
+  "त":"t","थ":"th","द":"d","ध":"dh","न":"n",
+  "प":"p","फ":"ph","ब":"b","भ":"bh","म":"m",
+  "य":"y","र":"r","ल":"l","व":"v","ळ":"l","ऱ":"r",
+  "श":"sh","ष":"sh","स":"s","ह":"h",
+  "क़":"q","ख़":"kh","ग़":"g","ज़":"z","ड़":"r","ढ़":"rh","फ़":"f",
+};
+const MATRA: Record<string, string> = {
+  "ा":"a","ि":"i","ी":"ee","ु":"u","ू":"oo","े":"e","ै":"ai","ो":"o","ौ":"au","ृ":"ri",
+};
+const VOWEL: Record<string, string> = {
+  "अ":"a","आ":"aa","इ":"i","ई":"ee","उ":"u","ऊ":"oo","ए":"e","ऐ":"ai","ओ":"o","औ":"au","ऋ":"ri",
+};
 
-function toLatin(hindi: string): string {
-  let s = hindi;
-  for (const [re, rep] of DEVA_MAP) s = s.replace(re, rep);
-  // "kaa" style clean-up so words read naturally
-  s = s.replace(/aa+/g, "aa").replace(/a([aeiou])/g, "$1");
-  return s.replace(/\s+/g, " ").trim();
+function toLatin(src: string): string {
+  const s = src.replace(/[़]/g, "");
+  let out = "";
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (CONS[ch]) {
+      out += CONS[ch];
+      const next = s[i + 1] ?? "";
+      if (next === "्") {
+        i++; // no inherent vowel
+      } else if (MATRA[next]) {
+        out += MATRA[next];
+        i++;
+      } else if (next === "ं" || next === "ँ" || next === "ः") {
+        // inherent a then nasal, handled next loop
+        out += "a";
+      } else {
+        // Drop the inherent "a" at the end of a word for natural Hinglish.
+        const isWordEnd = next === "" || /[\s.,!?;:।'"()\-]/.test(next);
+        out += isWordEnd ? "" : "a";
+      }
+      continue;
+    }
+    if (VOWEL[ch]) { out += VOWEL[ch]; continue; }
+    if (MATRA[ch]) { out += MATRA[ch]; continue; }
+    if (ch === "ं" || ch === "ँ") { out += "n"; continue; }
+    if (ch === "ः") { out += "h"; continue; }
+    if (ch === "्") continue;
+    if (ch === "।") { out += "."; continue; }
+    out += ch;
+  }
+  return out.replace(/\s+/g, " ").trim();
 }
+
 
 export const Route = createFileRoute("/api/public/translate")({
   server: {
