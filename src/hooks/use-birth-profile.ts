@@ -2,16 +2,29 @@ import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getBirthProfile, saveBirthProfile, type BirthProfile } from "@/lib/birth-profile.functions";
+import { useAuth } from "@/hooks/use-auth";
 
 
 export function useBirthProfile() {
   const fetchFn = useServerFn(getBirthProfile);
+  const { user, loading } = useAuth();
   return useQuery<BirthProfile | null>({
-    queryKey: ["birth-profile"],
-    queryFn: () => fetchFn(),
+    queryKey: ["birth-profile", user?.id ?? null],
+    // Only ask the server once we know someone is signed in — otherwise the
+    // protected function replies "Unauthorized" and blanks the page.
+    enabled: !loading && !!user,
+    queryFn: async () => {
+      try {
+        return (await fetchFn()) ?? null;
+      } catch {
+        return null;
+      }
+    },
+    retry: false,
     staleTime: 60_000,
   });
 }
+
 
 export type BirthProfileInput = {
   full_name: string;
@@ -29,9 +42,10 @@ export function useSaveBirthProfile() {
   const saveFn = useServerFn(saveBirthProfile);
   return useMutation<BirthProfile, Error, BirthProfileInput>({
     mutationFn: (input) => saveFn({ data: input }),
-    onSuccess: (data) => {
-      qc.setQueryData(["birth-profile"], data);
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["birth-profile"] });
     },
+
   });
 }
 
