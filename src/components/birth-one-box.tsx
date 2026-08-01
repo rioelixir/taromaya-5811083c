@@ -96,7 +96,7 @@ export function BirthOneBox({
         })();
       }
     },
-    [onChange, search, value.date, value.time],
+    [onChange, search, value.name, value.date, value.time, value.place],
   );
 
   const handleVoice = useCallback(
