@@ -67,26 +67,28 @@ export function AIInterpretation({
           : lang === "hr"
           ? "Write the ENTIRE reading in Roman Hinglish — Hindi words written in Latin/English script, natural and conversational."
           : "Write the reading in simple English.";
+      const chosen = areas.length ? areas : null;
+      const chosenLabels = (chosen ?? [])
+        .map((id) => LIFE_AREAS.find((a) => a.id === id))
+        .filter(Boolean)
+        .map((a) => `${a!.emoji} ${a!.label}`);
       const system = [
         `You are Taromaya's master ${module} interpreter — an experienced Vedic astrologer + tarot reader speaking to a curious 10-year-old best friend.`,
         langInstr,
         PLAIN_ELI10_RULES,
+        READING_FRAMEWORK_RULES,
         "You MUST ground every claim in the CONTEXT + MODULE DATA blocks. Never invent numbers, degrees, dasha lords, dates, or placements.",
-        "OUTPUT — use exactly these picture-emoji section titles, each on its own line, in this order. Skip any section CONTEXT does not support:",
-        "⭐ Summary  (2 short lines)",
-        "🪐 What the chart says  (3 short bullets, each naming the placement, e.g. Moon in Cancer)",
-        "🔎 Why  (1 bullet — house, lord or aspect)",
-        "🕰️ Right now  (1 bullet — today's sky meeting your chart)",
-        "✅ Do this week  (3 tiny steps)",
-        "⚠️ Gently avoid  (2 short bullets)",
-        "🍀 Lucky today  (colors, numbers, best time window)",
-        "🙏 Simple remedy  (1 line)",
-        "📊 Confidence  (one line: Confidence: HIGH or MEDIUM or LOW — HIGH only with full chart + dasha + transits)",
-        "Rules: total under 220 words. No death, medical, legal or exam predictions. No made-up Sanskrit quotes.",
+        "Personalize hard: name the reader's own birth details, birth star, running life season and today's sky when you explain WHY your advice fits them. Never give generic sun-sign talk.",
+        chosenLabels.length
+          ? `The reader selected these life areas, so the In real life section must cover exactly these, one line each: ${chosenLabels.join(", ")}.`
+          : "The reader selected no life areas, so cover only the areas the data clearly supports.",
+        "After the Remember section add one final line: Confidence: HIGH or MEDIUM or LOW — HIGH only with full birth chart plus life season plus today's sky.",
+        "Rules: total under 260 words. No death, medical, legal or exam predictions. No made-up Sanskrit quotes.",
       ].join("\n");
       const prompt = [
         `MODULE: ${module}`,
         intent ? `USER INTENT: ${intent}` : "",
+        chosenLabels.length ? `SELECTED LIFE AREAS: ${chosenLabels.join(", ")}` : "",
         "",
         "=== CONTEXT (birth chart + today's sky) ===",
         context,
@@ -94,7 +96,7 @@ export function AIInterpretation({
         "=== MODULE DATA (this page's live values) ===",
         snapshot?.trim() || "(no page data — read the module from context)",
         "",
-        "Write the reading now, following the exact heading order above.",
+        "Write the reading now, following the exact reading shape above.",
       ].filter(Boolean).join("\n");
 
       // Retry once on transient network / 5xx; surface 402/429 verbatim.
@@ -113,10 +115,12 @@ export function AIInterpretation({
           body: JSON.stringify({
             system: system.slice(0, 3000),
             prompt: prompt.slice(0, 6000),
+            ...(chosen ? { areas: chosen } : {}),
           }),
           signal: ctrl.signal,
         });
       };
+
 
       let res = await doFetch();
       if (!res.ok && res.status >= 500) {
