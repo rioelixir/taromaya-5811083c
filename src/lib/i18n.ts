@@ -23,7 +23,7 @@ export const LANGUAGE_LIST = [
   { code: "kok", label: "कोंकणी", ai: "Konkani" },
   { code: "mai", label: "मैथिली", ai: "Maithili" },
   { code: "sd", label: "سنڌي", ai: "Sindhi" },
-  { code: "ks", label: "کٲشُر", ai: "Kashmiri" },
+  
   { code: "mni", label: "ꯃꯤꯇꯩꯂꯣꯟ", ai: "Manipuri (Meitei)" },
   { code: "es", label: "Español", ai: "Spanish" },
   { code: "fr", label: "Français", ai: "French" },
