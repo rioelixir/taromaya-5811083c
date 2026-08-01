@@ -767,12 +767,13 @@ function TarotPage() {
       {headerCollapsed && (
         <button
           onClick={() => setHeaderCollapsed(false)}
-          className="absolute right-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-xl border border-gold/50 bg-black/80 px-3 py-2 text-gold shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-          aria-label="Show controls"
+          className="absolute right-3 top-3 z-30 inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-gold/50 bg-black/80 px-4 py-2 text-gold shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+          aria-label="Open the tarot menu"
         >
-          <ChevronDown className="h-4 w-4" />
-          <span className="text-xs font-semibold uppercase tracking-wider">Show</span>
+          <ChevronDown className="h-5 w-5" />
+          <span className="text-sm font-semibold">Menu</span>
         </button>
+
       )}
 
 
