@@ -277,6 +277,7 @@ function HelpPage() {
               {items.map((g) => {
                 const active = now?.id === g.id;
                 const loading = active && now?.status === "loading";
+                const playing = active && now?.status === "playing";
                 return (
                   <div
                     key={g.id}
@@ -286,7 +287,13 @@ function HelpPage() {
                       <button
                         type="button"
                         onClick={() => void play(g)}
-                        aria-label={active ? `Stop the guide for ${g.title}` : `Listen to the guide for ${g.title}`}
+                        aria-label={
+                          playing
+                            ? `Pause the guide for ${g.title}`
+                            : active && now?.status === "paused"
+                              ? `Carry on the guide for ${g.title}`
+                              : `Listen to the guide for ${g.title}`
+                        }
                         className={cn(
                           "grid h-12 w-12 shrink-0 place-items-center rounded-full transition active:scale-95",
                           active
@@ -296,12 +303,13 @@ function HelpPage() {
                       >
                         {loading ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : active ? (
+                        ) : playing ? (
                           <Pause className="h-5 w-5" />
                         ) : (
                           <Play className="h-5 w-5" />
                         )}
                       </button>
+
                       <div className="min-w-0">
                         <div className="font-medium text-foreground">{g.title}</div>
                         <div className="text-xs text-muted-foreground">{g.blurb}</div>
