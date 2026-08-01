@@ -1,4 +1,6 @@
 import { PLAIN_ELI10_RULES } from "./ai-format";
+import { READING_FRAMEWORK_RULES } from "./reading-frame";
+
 
 /**
  * Shared operating rules put in front of every module's own system prompt.
