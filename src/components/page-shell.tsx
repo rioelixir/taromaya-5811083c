@@ -7,7 +7,6 @@ import { AIInterpretation } from "@/components/ai-interpretation";
 
 
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { VoicePanel } from "@/components/voice-panel";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -81,7 +80,6 @@ export function PageShell({
   aiSnapshot,
   aiIntent,
   hideAI,
-  hideVoice,
 }: {
   eyebrow?: string;
   title: string;
@@ -130,7 +128,7 @@ export function PageShell({
             )}
           </header>
         )}
-        {!hideVoice && <VoicePanel />}
+        
         {children}
         {!hideAI && (
           <AIInterpretation
