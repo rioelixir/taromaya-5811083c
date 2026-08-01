@@ -81,7 +81,11 @@ function FullReportTab({
 }
 
 function NumerologyPage() {
-  const [tab, setTab] = useState<Tab>("report");
+  const { tab: tabParam } = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(
+    tabParam && tabParam in TAB_LABEL ? (tabParam as Tab) : "report",
+  );
+
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("1995-06-15");
   const [system, setSystem] = useState<"Pythagorean" | "Chaldean">("Pythagorean");
