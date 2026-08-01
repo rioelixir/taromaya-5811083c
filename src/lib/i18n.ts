@@ -1,5 +1,5 @@
 // Client-side i18n. English base + AI-powered translation for every language.
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 /** Every language the app can be read in. `en` is the base language. */
 export const LANGUAGE_LIST = [
