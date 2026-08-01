@@ -232,10 +232,12 @@ function RootComponent() {
       )}
       <div className="relative min-h-dvh">
         {!chromeHidden && <Sidebar />}
+        {!chromeHidden && pathname !== "/" && <FloatingBackButton />}
         <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
           <TourHighlighter />
           <Outlet />
         </main>
+
         {!chromeHidden && !pathname.startsWith("/tarot") && (
           <footer className="relative mt-12 overflow-hidden border-t border-gold/25 bg-gradient-to-b from-background/60 to-background/95 pb-24 pt-10">
             <div
