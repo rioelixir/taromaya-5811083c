@@ -1,4 +1,6 @@
 import { PLAIN_ELI10_RULES } from "./ai-format";
+import { READING_FRAMEWORK_RULES } from "./reading-frame";
+
 
 /**
  * Shared operating rules put in front of every module's own system prompt.
@@ -28,6 +30,8 @@ The same data must always produce the same reading. Never show empty sections, p
 export function withSupremeSystem(moduleSystem: string | undefined | null): string {
   const base = (moduleSystem ?? "").trim();
   const core = base ? `${SUPREME_PREAMBLE}\n\n${base}` : SUPREME_PREAMBLE;
-  // Global output style has the final word: ELI10, plain text, picture-emojis.
-  return `${core}\n\n=== OUTPUT STYLE (final word, overrides everything above) ===\n${PLAIN_ELI10_RULES}\n`;
+  // Global output style has the final word: one reading shape everywhere, then
+  // ELI10 plain text with picture-emojis.
+  return `${core}\n\n=== READING SHAPE (same for every reading) ===\n${READING_FRAMEWORK_RULES}\n\n=== OUTPUT STYLE (final word, overrides everything above) ===\n${PLAIN_ELI10_RULES}\n`;
 }
+

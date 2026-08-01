@@ -21,6 +21,11 @@ import {
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
   prompt: z.string().trim().min(1, "prompt required").max(6000),
+  /** Life areas the reader ticked, so the reading speaks to those parts of life. */
+  areas: z
+    .array(z.enum(["mood", "work", "money", "love", "health", "purpose"]))
+    .max(6)
+    .optional(),
   promptKey: z
     .string()
     .trim()
@@ -28,6 +33,7 @@ const BodySchema = z.object({
     .regex(/^[a-z0-9_.-]+$/i, "invalid promptKey")
     .optional(),
 });
+
 
 // Allowlisted chat models — the DB may not override to arbitrary strings.
 // Only low-cost models are allowed, so no admin setting can quietly make every
@@ -55,16 +61,17 @@ export const Route = createFileRoute("/api/ai-reading")({
             { status: 400 },
           );
         }
-        const { system, prompt, promptKey } = parsed.data;
+        const { system, prompt, promptKey, areas } = parsed.data;
 
         // Any active provider will do: the owner's own key, or the gateway.
         // Offline mode: Taromaya writes the reading itself, no paid model.
+        // Plain text, because the client streams the body straight to the page.
         if (AI_OFFLINE) {
-          return new Response(
-            JSON.stringify({ text: offlineReading({ system: system ?? "", prompt }) }),
-            { headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(offlineReading({ system: system ?? "", prompt, areas }), {
+            headers: { "Content-Type": "text/plain; charset=utf-8" },
+          });
         }
+
 
         const key = process.env.LOVABLE_API_KEY ?? (usingOwnAi() ? "own" : undefined);
         if (!key) {
