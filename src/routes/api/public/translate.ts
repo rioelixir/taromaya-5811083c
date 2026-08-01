@@ -3,13 +3,24 @@ import { LANGUAGE_LIST } from "@/lib/i18n";
 
 type Body = { lang?: string; strings?: string[] };
 
+/** App language code -> the code Google's translate endpoint expects. */
+const GOOGLE_CODE: Record<string, string> = {
+  zh: "zh-CN",
+  he: "iw",
+  mni: "mni-Mtei",
+  kok: "gom",
+  pa: "pa",
+  sa: "sa",
+};
+
 /** Google's free (key-less) translate endpoint. No AI credits are used. */
 async function gtx(lang: string, text: string): Promise<string | null> {
   const url =
     "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" +
-    encodeURIComponent(lang) +
+    encodeURIComponent(GOOGLE_CODE[lang] ?? lang) +
     "&dt=t&q=" +
     encodeURIComponent(text);
+
   try {
     const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
     if (!res.ok) return null;
