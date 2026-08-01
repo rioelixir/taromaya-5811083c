@@ -41,7 +41,7 @@ const TAB_LABEL: Record<Tab, string> = {
   essence: "Essence",
   name: "Name",
   mobile: "Mobile",
-  compat: "Compat.",
+  compat: "Kundli Matching",
 };
 
 function NumerologyPage() {
@@ -53,7 +53,7 @@ function NumerologyPage() {
     <PageShell
       eyebrow="Numerology"
       title="The vibration of numbers"
-      subtitle="Pythagorean and Chaldean systems, personal-year timelines, mobile-number analysis, and compatibility."
+      subtitle="Pythagorean and Chaldean systems, personal-year timelines, mobile-number analysis, and Kundli matching."
     >
       <div className="mb-6 flex flex-wrap gap-2">
         {(Object.keys(TAB_LABEL) as Tab[]).map((t) => (
@@ -90,7 +90,7 @@ function NumerologyPage() {
       {tab === "essence" && <EssenceTab fullName={fullName} birthDate={birthDate} />}
       {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
       {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
-      {tab === "compat" && <CompatibilityNumerology />}
+      {tab === "compat" && <KundliMatchingNumerology />}
 
       <ConfidenceNote noteKey="numerology" className="mt-6" />
     </PageShell>
@@ -367,7 +367,7 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
 }
 
 
-function CompatibilityNumerology() {
+function KundliMatchingNumerology() {
   const [a, setA] = useState({ name: "", date: "1995-06-15" });
   const [b, setB] = useState({ name: "", date: "1994-11-22" });
   const rA = useMemo(() => (a.date ? computeNumerology({ fullName: a.name || "A", birthDate: a.date }) : null), [a]);
@@ -392,7 +392,7 @@ function CompatibilityNumerology() {
           <BigNum label={a.name || "A"} n={rA.lifePath} />
           <GlassCard>
             <div className="text-center">
-              <div className="text-xs uppercase tracking-widest text-muted-foreground">Match Making</div>
+              <div className="text-xs uppercase tracking-widest text-muted-foreground">Kundli Matching</div>
               <div className="font-display text-5xl gold-text mt-2">{compat.score}%</div>
               <div className="mt-3 text-sm text-pearl">{compat.note}</div>
             </div>
