@@ -21,6 +21,11 @@ import {
 const BodySchema = z.object({
   system: z.string().trim().max(6000).optional(),
   prompt: z.string().trim().min(1, "prompt required").max(6000),
+  /** Life areas the reader ticked, so the reading speaks to those parts of life. */
+  areas: z
+    .array(z.enum(["mood", "work", "money", "love", "health", "purpose"]))
+    .max(6)
+    .optional(),
   promptKey: z
     .string()
     .trim()
@@ -28,6 +33,7 @@ const BodySchema = z.object({
     .regex(/^[a-z0-9_.-]+$/i, "invalid promptKey")
     .optional(),
 });
+
 
 // Allowlisted chat models — the DB may not override to arbitrary strings.
 // Only low-cost models are allowed, so no admin setting can quietly make every
