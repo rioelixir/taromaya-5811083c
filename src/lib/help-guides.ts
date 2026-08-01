@@ -419,18 +419,6 @@ export const HELP_GUIDES: HelpGuide[] = [
       "A low score is not a no. It only shows where the work is.",
   },
   {
-    id: "synastry",
-    title: "Two charts together",
-    to: "/synastry",
-    group: "Life areas",
-    blurb: "The finer detail between two people.",
-    tags: ["relationship", "love", "couple"],
-    script:
-      "This looks at two charts side by side and shows where they pull together and where they rub. " +
-      "Put in both sets of birth details. " +
-      "You get plain lines about talking, feelings, attraction and daily habits, with one thing each person can do.",
-  },
-  {
     id: "career",
     title: "Career",
     to: "/career",
