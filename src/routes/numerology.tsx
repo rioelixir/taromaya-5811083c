@@ -41,7 +41,7 @@ const TAB_LABEL: Record<Tab, string> = {
   essence: "Essence",
   name: "Name",
   mobile: "Mobile",
-  compat: "Compat.",
+  compat: "Kundli Matching",
 };
 
 function NumerologyPage() {
