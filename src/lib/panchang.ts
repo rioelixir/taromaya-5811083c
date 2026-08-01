@@ -181,10 +181,14 @@ export function computePanchang(input: PanchangInput): Panchang {
 
   const wd = dayStart.getDay();
 
-  // Abhijit Muhurat: 8th muhurta of day (~24 min around solar noon)
+  // Abhijit Muhurat: 8th muhurta of day (~24 min either side of true solar
+  // noon). Prefer the astronomically exact solar noon (solarNoon, from
+  // SearchHourAngle) over the sunrise/sunset midpoint — the two can differ
+  // by several minutes because of the equation of time, and Abhijit is a
+  // fixed 48-minute window, so that difference matters.
   let abhijit: [Date, Date] | null = null;
   if (sunrise && sunset) {
-    const noon = sunrise.getTime() + (sunset.getTime() - sunrise.getTime()) / 2;
+    const noon = (solarNoon ?? new Date(sunrise.getTime() + (sunset.getTime() - sunrise.getTime()) / 2)).getTime();
     const half = 24 * 60 * 1000; // ±24 min → 48 min (1 muhurta)
     abhijit = [new Date(noon - half), new Date(noon + half)];
   }

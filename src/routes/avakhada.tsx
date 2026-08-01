@@ -125,6 +125,22 @@ function AvakhadaPage() {
             </div>
 
             <GlassCard>
+              <h3 className="mb-2 font-serif text-lg">In plain English</h3>
+              <p className="text-sm text-muted-foreground">
+                This is a quick snapshot of your birth chart, the kind an elder might read out at a naming
+                ceremony. Your rising sign (Lagna) is <span className="text-primary">{av.ascendant.rashi}</span>,
+                your Moon sign is <span className="text-primary">{av.moonSign.rashi}</span>, and your Moon sits
+                in the <span className="text-primary">{av.nakshatra.name}</span> constellation. Traditionally,
+                names for this birth would start with the sound{" "}
+                <span className="text-primary">{av.nameSyllable}</span>.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The two boxes below give the exact placements first, then the classical labels (Varna, Yoni,
+                Gana and so on) used in matchmaking and traditional readings, each explained in one line.
+              </p>
+            </GlassCard>
+
+            <GlassCard>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <Cell label="Lagna" value={av.ascendant.rashi} sub={`Lord: ${av.ascendant.lord}`} />
                 <Cell label="Rashi (Moon)" value={av.moonSign.rashi} sub={`Lord: ${av.moonSign.lord}`} />

@@ -76,6 +76,23 @@ function StrengthPage() {
         {shad && av && (
           <div className="space-y-4">
             <GlassCard>
+              <h3 className="mb-2 font-serif text-lg">In plain English</h3>
+              <p className="text-sm text-muted-foreground">
+                Think of this page as a report card for each planet in your chart. Some planets are placed
+                in a way that makes them act powerfully and reliably; others are placed in a weaker spot and
+                need more support (through timing or remedies) to show their best side. The strongest planet
+                here is <span className="text-primary">{[...shad].sort((a, b) => b.ratio - a.ratio)[0].planet}</span>,
+                and the one most in need of support is{" "}
+                <span className="text-primary">{[...shad].sort((a, b) => a.ratio - b.ratio)[0].planet}</span>.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Further down, two advanced tables break this down in classical Vedic detail: Shadbala (a
+                six-part strength score for each planet) and Ashtakavarga (a point count showing which signs
+                are lucky for each planet).
+              </p>
+            </GlassCard>
+
+            <GlassCard>
               <div className="mb-3 flex items-center gap-2">
                 <Gauge className="h-4 w-4 text-gold" />
                 <h3 className="font-serif text-lg">Shadbala (Six-fold Strength)</h3>
