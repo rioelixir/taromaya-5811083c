@@ -203,7 +203,7 @@ const PEARL:   [number, number, number] = [240, 235, 220];
 const MUTED:   [number, number, number] = [160, 155, 140];
 const LINE:    [number, number, number] = [70, 65, 90];
 
-function buildPdf(key: ReportKey, b: Birth) {
+export function buildPdf(key: ReportKey, b: Birth) {
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
