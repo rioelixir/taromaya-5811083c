@@ -220,6 +220,12 @@ export function useVoice(onText: (text: string) => void) {
             activeRef.current = false;
             setState("error");
             setMessage("Please allow the microphone so we can hear you.");
+            return;
+          }
+          // A dropped connection or a quiet moment must not end a long talk:
+          // keep every word heard so far and let onend start us again.
+          if (err === "network") {
+            setMessage("The connection wobbled. Your words so far are safe — keep talking.");
           }
         };
         rec.onend = () => {
@@ -228,9 +234,17 @@ export function useVoice(onText: (text: string) => void) {
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
           slotsRef.current = [];
-          if (activeRef.current) {
-            try { rec.start(); } catch { /* restart race */ }
-          }
+          finalRef.current = committedRef.current;
+          if (!activeRef.current) return;
+          const restart = (tries: number) => {
+            if (!activeRef.current) return;
+            try {
+              rec.start();
+            } catch {
+              if (tries < 8) setTimeout(() => restart(tries + 1), 300 * (tries + 1));
+            }
+          };
+          restart(0);
         };
         recRef.current = rec;
         rec.start();
@@ -260,6 +274,13 @@ export function useVoice(onText: (text: string) => void) {
       source.connect(node);
       node.connect(ctxAudio.destination);
       mediaRef.current = { stream, ctx: ctxAudio, node, source, chunks };
+      // Long talks are written down piece by piece, so a phone that runs out of
+      // room — or a connection that drops — never loses the earlier minutes.
+      if (flushRef.current) clearInterval(flushRef.current);
+      flushRef.current = setInterval(() => {
+        if (!activeRef.current || pausedRef.current) return;
+        void flushSegment(false);
+      }, 20000);
       setState("listening");
       waitForQuiet(12000);
     } catch {
@@ -267,7 +288,8 @@ export function useVoice(onText: (text: string) => void) {
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, [waitForQuiet, tidy]);
+  }, [waitForQuiet, tidy, flushSegment]);
+
 
   const teardown = useCallback(() => {
     activeRef.current = false;
