@@ -77,10 +77,18 @@ export function birthProfileToFormFields(p: BirthProfile) {
   };
 }
 
+/** Details the person just spoke or typed — saved details must never replace these. */
+const spokenFields = new Set<string>();
+
+/** Remember that the person gave these details themselves, just now. */
+export function markBirthGiven(keys: string[]) {
+  for (const k of keys) spokenFields.add(k);
+}
+
 /**
  * Autofill a module form with the user's saved birth profile once it loads.
- * Only hydrates the fields the form actually has, and only runs once so the
- * user can freely edit afterwards without being overwritten.
+ * Anything the person spoke or typed in this visit wins: saved details only
+ * fill the gaps, so a fresh birth date is never quietly replaced.
  */
 export function useAutofillBirth<T extends Record<string, unknown>>(
   setForm: (updater: (prev: T) => T) => void,
@@ -94,10 +102,11 @@ export function useAutofillBirth<T extends Record<string, unknown>>(
     setForm((prev) => {
       const next = { ...prev } as Record<string, unknown>;
       for (const [k, v] of Object.entries(fields)) {
-        if (k in next) next[k] = v;
+        if (k in next && !spokenFields.has(k)) next[k] = v;
       }
       return next as T;
     });
   }, [profile, setForm]);
   return profile ?? null;
 }
+
