@@ -371,12 +371,14 @@ export function useVoice(onText: (text: string) => void) {
     slotsRef.current = [];
     committedRef.current = "";
     const m = teardown();
+    mediaRef.current = null;
     if (m) {
       m.stream.getTracks().forEach((t) => t.stop());
       m.node.disconnect();
       m.source.disconnect();
       m.ctx.close().catch(() => {});
     }
+
     finalRef.current = "";
     interimRef.current = "";
     setHeard("");
