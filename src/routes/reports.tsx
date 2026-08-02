@@ -301,6 +301,11 @@ export function buildPdf(key: ReportKey, b: Birth) {
     const lines = pdf.splitTextToSize(pdfSafe(romanToArabicText(text)), w - margin * 2) as string[];
     for (const ln of lines) {
       ensureRoom(size + 12);
+      // newPage() resets the font to the gold running-head style, so restore
+      // body styling on every line rather than once per paragraph.
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(size);
+      pdf.setTextColor(230, 225, 210);
       pdf.text(ln, margin, y);
       y += size + 4;
     }
@@ -769,6 +774,7 @@ export function buildPdf(key: ReportKey, b: Birth) {
       );
 
       const pvb = computePanchavargeeyaBala(vp.chart);
+      ensureRoom(200);
       drawH("Panchavargeeya Bala");
       drawP("Five-fold Tajika strength: sign dignity, distance from the exaltation point, term lord, decan lord and ninth-part lord. The combined score is reduced to Vishwa points out of twenty, which ranks how freely each planet can deliver this year.");
       drawTable(
@@ -802,6 +808,7 @@ export function buildPdf(key: ReportKey, b: Birth) {
       );
 
       const ysum = summariseYear(vp.chart, vp.muntha.house, vp.varshesh, pvb);
+      ensureRoom(220);
       drawH("Year Reading");
       drawP(ysum.theme);
       drawSub("Working in your favour");
