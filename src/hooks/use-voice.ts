@@ -150,14 +150,20 @@ export function useVoice(onText: (text: string) => void) {
     return null;
   }, []);
 
-  /** Turn whatever has been recorded so far into words, keeping earlier pieces. */
+  /** Turn whatever has been recorded so far into words, keeping earlier pieces.
+   *  Each piece keeps its own place in line, so a slow piece can never jump ahead
+   *  of a later one. */
   const flushSegment = useCallback(async (final: boolean) => {
     const m = mediaRef.current;
     if (!m) return;
     const chunks = m.chunks.splice(0, m.chunks.length);
-    if (chunks.length === 0) return;
+    if (chunks.length === 0) {
+      if (final) await queueRef.current;
+      return;
+    }
     const blob = encodeWav(chunks, m.ctx.sampleRate);
     if (blob.size < 2048) {
+      if (final) await queueRef.current;
       if (final && !committedRef.current) {
         setState("idle");
         setMessage("That was too quiet. Tap and speak again.");
@@ -165,14 +171,24 @@ export function useVoice(onText: (text: string) => void) {
       return;
     }
     if (final) setState("working");
-    const text = await send(blob);
-    if (text === null) {
-      setMessage("One part of your talk could not be written down. The rest is kept.");
-      return;
-    }
-    committedRef.current = dedupeRepeats(`${committedRef.current} ${text}`.trim());
-    setHeard(tidy(committedRef.current));
+    const slot = segmentsRef.current.length;
+    segmentsRef.current.push("");
+    const job = (async () => {
+      const text = await send(blob);
+      if (text === null) {
+        setMessage("One part of your talk could not be written down. The rest is kept.");
+        return;
+      }
+      segmentsRef.current[slot] = text;
+      committedRef.current = dedupeRepeats(
+        segmentsRef.current.filter(Boolean).join(" ").trim(),
+      );
+      setHeard(tidy(committedRef.current));
+    })();
+    queueRef.current = queueRef.current.then(() => job).catch(() => {});
+    await queueRef.current;
   }, [send, tidy]);
+
 
 
   /* ---------- controls ---------- */
