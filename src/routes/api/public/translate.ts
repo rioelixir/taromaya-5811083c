@@ -130,8 +130,9 @@ export const Route = createFileRoute("/api/public/translate")({
         }
         const lang = typeof body.lang === "string" ? body.lang : "";
         const strings = Array.isArray(body.strings)
-          ? body.strings.filter((s) => typeof s === "string" && s.length <= 900).slice(0, 60)
+          ? body.strings.filter((s) => typeof s === "string" && s.length <= 2000).slice(0, 60)
           : [];
+
 
         const known = LANGUAGE_LIST.some((l) => l.code === lang);
         if (!lang || !known || lang === "en" || strings.length === 0) {
