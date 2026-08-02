@@ -123,11 +123,13 @@ export function NameRemedyPanel({ fullName, birthDate }: { fullName: string; bir
     { header: "Note", cell: (o: NameOption) => o.note, className: "text-pearl" },
   ];
 
-  const avoidColumns: Column<typeof plan.avoid[number]>[] = [
-    { header: "Spelling", cell: (o: NameOption) => o.spelling, className: "text-amber-200" },
-    { header: "Root", cell: (o: NameOption) => o.root, align: "right" },
-    { header: "Harmony", cell: (o: NameOption) => `${o.score} / 100`, align: "right" },
+  type AvoidOption = (typeof plan.avoid)[number];
+  const avoidColumns: Column<AvoidOption>[] = [
+    { header: "Spelling", cell: (o: AvoidOption) => o.spelling, className: "text-amber-200" },
+    { header: "Root", cell: (o: AvoidOption) => o.root, align: "right" },
+    { header: "Harmony", cell: (o: AvoidOption) => `${o.score} / 100`, align: "right" },
   ];
+
 
   return (
     <div className="mt-6">
