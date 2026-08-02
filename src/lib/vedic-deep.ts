@@ -186,7 +186,7 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
       Math.abs(p.longitude - EXALT[name]),
       360 - Math.abs(p.longitude - EXALT[name]),
     );
-    let sthana = (1 - distFromExalt / 180) * 1.0; // 0..1 rupa
+    let sthana = (1 - distFromExalt / 180) * 1.5; // 0..1.5 rupas
     if (OWN_SIGNS[name].includes(p.rashi)) sthana += 0.5;
 
     // Dig bala — full strength in DIG_HOUSE, zero opposite it.
@@ -204,10 +204,10 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     const sunHouse = norm12(sun.rashi - ascRashi) + 1;
     const isDayChart = sunHouse >= 7;
     const isBenefic = name === "Jupiter" || name === "Venus" || name === "Moon" || name === "Mercury";
-    const kala = (isDayChart === isBenefic ? 0.7 : 1.2); // 0..1.5 rupas
+    const kala = (isDayChart === isBenefic ? 0.9 : 1.5); // 0..1.5 rupas
 
     // Chesta bala — retrograde planets get full chesta.
-    const chesta = p.retrograde ? 1.0 : (name === "Sun" || name === "Moon" ? 0.8 : 0.5); // 0..1 rupa
+    const chesta = p.retrograde ? 1.25 : (name === "Sun" || name === "Moon" ? 1.0 : 0.65); // 0..1.25 rupas
 
     // Naisargika — classical.
     const naisargika = NAISARGIKA[name];
@@ -216,7 +216,7 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     // Every planet casts a 7th-house (opposition) aspect; Mars also casts
     // special aspects to houses 4 and 8, Jupiter to 5 and 9, Saturn to 3 and 10
     // (the classical Parashari special-aspect rule).
-    let drig = 0.5; // 0..1 rupa
+    let drig = 0.75; // 0..1.5 rupas
     chart.planets.forEach((q) => {
       if (q.name === name) return;
       const diff = norm12(q.rashi - p.rashi) + 1;
