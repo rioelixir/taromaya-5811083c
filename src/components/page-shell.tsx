@@ -141,8 +141,11 @@ export function PageShell({
           </header>
         )}
         
-        {!hideVoice && <AskBox module={aiModule ?? title} />}
-        {children}
+        {hideVoice ? (
+          children
+        ) : (
+          <UniversalInput module={aiModule ?? title}>{children}</UniversalInput>
+        )}
 
         {!hideAI && (
           <AIInterpretation
