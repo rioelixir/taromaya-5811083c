@@ -145,33 +145,40 @@ function restoreEnglish() {
 async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<string, string>> {
   if (strings.length === 0) return {};
   const map: Record<string, string> = {};
-  const CHUNK = 50;
+  // Long paragraphs (AI readings) go in smaller batches so nothing is dropped.
+  const short = strings.filter((s) => s.length <= 200);
+  const long = strings.filter((s) => s.length > 200);
   const batches: string[][] = [];
-  for (let i = 0; i < strings.length; i += CHUNK) batches.push(strings.slice(i, i + CHUNK));
+  for (let i = 0; i < short.length; i += 40) batches.push(short.slice(i, i + 40));
+  for (let i = 0; i < long.length; i += 8) batches.push(long.slice(i, i + 8));
+
+  const send = async (batch: string[], attempt = 0): Promise<void> => {
+    try {
+      const res = await fetch("/api/public/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang, strings: batch }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const { translations } = (await res.json()) as { translations: string[] };
+      if (!Array.isArray(translations)) return;
+      translations.forEach((t, idx) => {
+        const src = batch[idx];
+        if (src && t && typeof t === "string") map[src] = t;
+      });
+    } catch {
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 350 * (attempt + 1)));
+        await send(batch, attempt + 1);
+      }
+    }
+  };
 
   // Fire every batch at once so the page finishes translating in one round trip window.
-  await Promise.all(
-    batches.map(async (batch) => {
-      try {
-        const res = await fetch("/api/public/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang, strings: batch }),
-        });
-        if (!res.ok) return;
-        const { translations } = (await res.json()) as { translations: string[] };
-        if (!Array.isArray(translations)) return;
-        translations.forEach((t, idx) => {
-          const src = batch[idx];
-          if (src && t && typeof t === "string") map[src] = t;
-        });
-      } catch {
-        /* skip batch */
-      }
-    }),
-  );
+  await Promise.all(batches.map((b) => send(b)));
   return map;
 }
+
 
 function applyText(nodes: Text[], cache: Record<string, string>) {
   nodes.forEach((n) => {
