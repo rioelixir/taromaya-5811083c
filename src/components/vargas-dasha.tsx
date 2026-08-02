@@ -24,22 +24,28 @@ type Chart = {
 };
 
 const VARGAS: { n: number; code: string; name: string }[] = [
-  { n: 1,  code: "D1",  name: "Rashi" },
+  { n: 1,  code: "D1",  name: "Rashi · overall life" },
   { n: 2,  code: "D2",  name: "Hora · wealth" },
   { n: 3,  code: "D3",  name: "Drekkana · siblings" },
+  { n: 4,  code: "D4",  name: "Chaturthamsa · home & property" },
+  { n: 5,  code: "D5",  name: "Panchamsa · fame & authority" },
+  { n: 6,  code: "D6",  name: "Shashtamsa · health" },
   { n: 7,  code: "D7",  name: "Saptamsa · progeny" },
+  { n: 8,  code: "D8",  name: "Ashtamsa · sudden events" },
   { n: 9,  code: "D9",  name: "Navamsha · spouse & dharma" },
   { n: 10, code: "D10", name: "Dashamsa · career" },
+  { n: 11, code: "D11", name: "Rudramsa · gains & income" },
   { n: 12, code: "D12", name: "Dwadashamsa · parents" },
-  { n: 16, code: "D16", name: "Shodashamsa · vehicles" },
+  { n: 16, code: "D16", name: "Shodashamsha · vehicles" },
   { n: 20, code: "D20", name: "Vimshamsa · spirituality" },
-  { n: 24, code: "D24", name: "Chaturvimshamsa · learning" },
+  { n: 24, code: "D24", name: "Chaturvimshamsha · learning" },
   { n: 27, code: "D27", name: "Nakshatramsa · strengths" },
   { n: 30, code: "D30", name: "Trimshamsa · afflictions" },
   { n: 40, code: "D40", name: "Khavedamsa · maternal" },
   { n: 45, code: "D45", name: "Akshavedamsa · paternal" },
   { n: 60, code: "D60", name: "Shashtiamsa · karma" },
 ];
+
 
 function toVarga(chart: Chart, n: number): Chart {
   if (n === 1) return chart;
