@@ -22,7 +22,7 @@ import { NumerologyFullReport } from "@/components/numerology-report";
 import { MobileRemedyPanel, NameRemedyPanel } from "@/components/numerology-remedies-panel";
 import {
   NameChartPanel, DashaPanel, CurrentGridPanel, GuidancePanel,
-  HebrewTarotPanel, ProfilesPanel, type SavedProfile, type DashaTab,
+  ProfilesPanel, type SavedProfile, type DashaTab,
 } from "@/components/numerology-pro-panels";
 
 import { Loader2, Sparkles } from "lucide-react";
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/numerology")({
 });
 
 
-type Tab = "report" | "personal" | "vedic" | "namechart" | "maha" | "antar" | "pratyantar" | "personalyear" | "anydate" | "forecast" | "currentgrid" | "guidance" | "hebrew" | "profiles" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
+type Tab = "report" | "personal" | "vedic" | "namechart" | "maha" | "antar" | "pratyantar" | "personalyear" | "anydate" | "forecast" | "currentgrid" | "guidance" | "profiles" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   report: "Full Report",
   personal: "Personal",
@@ -56,7 +56,6 @@ const TAB_LABEL: Record<Tab, string> = {
   forecast: "Forecast",
   currentgrid: "Current grid",
   guidance: "Decisions",
-  hebrew: "Hebrew and tarot",
   profiles: "Profiles",
   timeline: "Timeline",
   loshu: "Lo Shu",
@@ -201,12 +200,6 @@ function NumerologyPage() {
         <>
           <GlassCard><NumBox birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
           <div className="mt-6"><GuidancePanel birthDate={birthDate} /></div>
-        </>
-      )}
-      {tab === "hebrew" && (
-        <>
-          <GlassCard><NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
-          <div className="mt-6"><HebrewTarotPanel fullName={fullName} /></div>
         </>
       )}
       {tab === "profiles" && (
