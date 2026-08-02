@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 import { GlobalChrome } from "@/components/global-chrome";
+import { LanguageGate } from "@/components/language-gate";
 import { StarField } from "@/components/star-field";
 import { FloatingBackButton } from "@/components/back-button";
 
@@ -219,6 +220,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AutoTranslator />
+      <LanguageGate />
       <WorkSessionKeeper />
       <AuthorsNoteModal open={showAuthorsNote} onClose={() => setShowAuthorsNote(false)} />
 

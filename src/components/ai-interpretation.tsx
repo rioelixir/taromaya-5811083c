@@ -7,6 +7,7 @@ import { PLAIN_ELI10_RULES } from "@/lib/ai-format";
 import { LIFE_AREAS, READING_FRAMEWORK_RULES, type LifeAreaId } from "@/lib/reading-frame";
 import { PlainAIText } from "@/components/plain-ai-text";
 import type { BirthProfile } from "@/lib/birth-profile.functions";
+import { aiLanguageRule } from "@/lib/ai-language";
 import { useLang } from "@/lib/i18n";
 
 
@@ -59,12 +60,7 @@ export function AIInterpretation({
     try {
       const row = profile ? profileToRow(profile) : null;
       const context = buildGuideContext(row);
-      const langInstr =
-        lang === "hi"
-          ? "Write the ENTIRE reading in Hindi (Devanagari script). Do not use English words except proper names."
-          : lang === "hr"
-          ? "Write the ENTIRE reading in Roman Hinglish — Hindi words written in Latin/English script, natural and conversational."
-          : "Write the reading in simple English.";
+      const langInstr = aiLanguageRule(lang);
       const chosen = areas.length ? areas : null;
       const chosenLabels = (chosen ?? [])
         .map((id) => LIFE_AREAS.find((a) => a.id === id))
