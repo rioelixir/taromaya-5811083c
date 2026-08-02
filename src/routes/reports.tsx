@@ -336,19 +336,23 @@ export function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(9.5);
     rows.forEach((r, idx) => {
-      ensureRoom(20);
+      // Wrap every cell so nothing is silently truncated; the row grows to fit.
+      const wrapped = r.map((cell, ci) =>
+        pdf.splitTextToSize(pdfSafe(cell ?? ""), cols[ci] - 12) as string[]);
+      const lineCount = Math.max(1, ...wrapped.map((l) => l.length));
+      const rowH = lineCount * 12 + 4;
+      ensureRoom(rowH + 8);
       if (idx % 2 === 0) {
         pdf.setFillColor(20, 22, 44);
-        pdf.rect(margin, y - 10, totalW, 16, "F");
+        pdf.rect(margin, y - 10, totalW, rowH, "F");
       }
       pdf.setTextColor(...PEARL);
       let cx = margin + 8;
-      r.forEach((cell, ci) => {
-        const cellLines = pdf.splitTextToSize(pdfSafe(cell ?? ""), cols[ci] - 12) as string[];
-        pdf.text(cellLines[0] ?? "", cx, y + 2);
+      wrapped.forEach((cellLines, ci) => {
+        cellLines.forEach((ln, li) => pdf.text(ln, cx, y + 2 + li * 12));
         cx += cols[ci];
       });
-      y += 16;
+      y += rowH;
     });
     y += 10;
   };
