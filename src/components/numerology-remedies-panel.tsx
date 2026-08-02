@@ -167,7 +167,7 @@ export function NameRemedyPanel({ fullName, birthDate }: { fullName: string; bir
           <div className="mt-4">
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Spellings to avoid</div>
             <div className="mt-2">
-              <DataTable columns={avoidColumns} rows={plan.avoid} rowKey={(o: NameOption) => o.spelling} />
+              <DataTable columns={avoidColumns} rows={plan.avoid} rowKey={(o: AvoidOption) => o.spelling} />
             </div>
           </div>
         )}
