@@ -172,8 +172,8 @@ function PeriodCard({ p, label }: { p: Period; label: string }) {
   );
 }
 
-type DashaTab = "maha" | "antar" | "pratyantar" | "personal" | "date" | "forecast";
-const DASHA_TAB_LABEL: Record<DashaTab, string> = {
+export type DashaTab = "maha" | "antar" | "pratyantar" | "personal" | "date" | "forecast";
+export const DASHA_TAB_LABEL: Record<DashaTab, string> = {
   maha: "Mahadasha",
   antar: "Antardasha",
   pratyantar: "Pratyantar Dasha",
@@ -195,8 +195,9 @@ function LadderRows({ rows, prefix }: { rows: Period[]; prefix?: string }) {
   );
 }
 
-export function DashaPanel({ birthDate }: { birthDate: string }) {
-  const [sub, setSub] = useState<DashaTab>("maha");
+export function DashaPanel({ birthDate, view }: { birthDate: string; view?: DashaTab }) {
+  const [subState, setSub] = useState<DashaTab>("maha");
+  const sub = view ?? subState;
   const [queryDate, setQueryDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [fromYear, setFromYear] = useState(() => new Date().getFullYear());
   const [span, setSpan] = useState(10);
@@ -219,19 +220,22 @@ export function DashaPanel({ birthDate }: { birthDate: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2">
-        {(Object.keys(DASHA_TAB_LABEL) as DashaTab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setSub(t)}
-            className={`min-h-[44px] rounded-full px-4 py-2 text-xs uppercase tracking-widest ${
-              sub === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"
-            }`}
-          >
-            {DASHA_TAB_LABEL[t]}
-          </button>
-        ))}
-      </div>
+      {!view && (
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(DASHA_TAB_LABEL) as DashaTab[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setSub(t)}
+              className={`min-h-[44px] rounded-full px-4 py-2 text-xs uppercase tracking-widest ${
+                sub === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"
+              }`}
+            >
+              {DASHA_TAB_LABEL[t]}
+            </button>
+          ))}
+        </div>
+      )}
+
 
       {sub === "maha" && (
         <>
