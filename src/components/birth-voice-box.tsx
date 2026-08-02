@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { BirthOneBox, type BirthOneBoxValue } from "@/components/birth-one-box";
+import { BirthOneBox, type BirthOneBoxValue, type OneBoxField } from "@/components/birth-one-box";
 
 export type BirthLike = {
   name?: string;
@@ -22,17 +22,25 @@ export function BirthVoiceBox({
   value,
   onChange,
   children,
+  title,
+  subtitle,
+  example,
+  need,
 }: {
   value: BirthOneBoxValue;
   onChange: (patch: BirthOneBoxValue) => void;
   /** The old fields, kept hidden as a fallback. */
   children?: React.ReactNode;
+  title?: string;
+  subtitle?: string;
+  example?: string;
+  need?: OneBoxField[];
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="space-y-3">
-      <BirthOneBox value={value} onChange={onChange} />
+      <BirthOneBox value={value} onChange={onChange} title={title} subtitle={subtitle} example={example} need={need} />
 
       {children ? (
         <>
