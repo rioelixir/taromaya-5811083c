@@ -552,7 +552,7 @@ export function buildNumerologyReport(input: {
       id: "hidden", title: "Hidden Gifts",
       eli10: "Less visible strengths that others tend to overlook.",
       expert: `Repeated grid numbers (${hiddenStrengths.join(", ") || "none"}) mark reinforced abilities. Karmic lessons (${karmicLessons.join(", ") || "none"}) are missing name-values — skills that must be learned deliberately in this life.`,
-      bullets: [...lpT.hidden, ...TRAITS[root(vedic.bhagyank)].hidden],
+      bullets: Array.from(new Set([...lpT.hidden, ...TRAITS[root(vedic.bhagyank)].hidden])),
     },
     {
       id: "career", title: "Career",

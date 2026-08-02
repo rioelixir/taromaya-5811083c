@@ -11,7 +11,14 @@ import { romanToArabicText } from "@/lib/ai-format";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS, NAKSHATRAS, formatDegree } from "@/lib/vedic";
 import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/vedic-extended";
-import { computeAshtakavarga } from "@/lib/vedic-deep";
+import { computeAshtakavarga, computeShadbala, computeLalKitab, recommendGemstones } from "@/lib/vedic-deep";
+import { computeVarshphal } from "@/lib/varshphal";
+import { computeTajikaAspects, detectTajikaYogas, computeHarshaBala } from "@/lib/varshphal-deep";
+import { computeCharaKarakas, computeArudhaPadas } from "@/lib/jaimini";
+import { vargaSign } from "@/lib/vargas";
+import { computeChara, computeNarayana, computeKalachakra } from "@/lib/dasha-sign";
+import { computeAshtottari, computeYogini } from "@/lib/vedic-extended";
+import { buildNumerologyReport } from "@/lib/numerology-report";
 import { computeVedicTransits, computeSadeSati } from "@/lib/vedic-transits";
 import { computeNumerology } from "@/lib/numerology";
 import { loShuGrid } from "@/lib/numerology-deep";
@@ -31,9 +38,12 @@ export const Route = createFileRoute("/reports")({
   }),
 });
 
-type ReportKey = "grand" | "life" | "career" | "love" | "wealth" | "yearly" | "remedy";
+type ReportKey =
+  | "brihat" | "grand" | "life" | "career" | "love" | "wealth" | "yearly" | "remedy"
+  | "varsha" | "lalkitab" | "numbers";
 
 const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: string[] }> = {
+  brihat:  { title: "Brihat Kundli", desc: "The great horoscope — the classical book-length casting of your chart, section by section.", sections: ["Rashi Chart","Planet & Bhava Tables","Divisional Charts D1 to D12","Chara Karakas & Arudha Padas","Shadbala Strengths","Ashtakavarga","All Timing Systems","Yogas & Doshas","Gemstones & Remedies"] },
   grand:   { title: "Grand Cosmic Blueprint", desc: "The complete dossier — Vedic + Western + Numerology + live transits.", sections: ["Rashi Chart","Planet & House Tables","Vimshottari (live)","Ashtakavarga","Live Gochara & Sade Sati","Yogas & Doshas","Numerology + Lo Shu","12-Month Transits","Remedies"] },
   life:    { title: "Life Blueprint",   desc: "A complete portrait of who you are and why you're here.", sections: ["Rashi Chart","Planet Table","Vimshottari Dasha","Ashtakavarga","Yogas & Doshas","Lo Shu Grid","Guiding Themes"] },
   career:  { title: "Career Compass",   desc: "Your work, calling, and how to move.", sections: ["Rashi Chart","10th House & Sun","Destiny Number","Dasha Windows","Live Transits","Action Plan"] },
@@ -41,7 +51,20 @@ const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: st
   wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Sarvashtakavarga","Personal Year","Lo Shu Grid","Wealth Rituals"] },
   yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Live Gochara","Monthly Themes"] },
   remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Rashi Chart","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
+  varsha:  { title: "Varshaphal · Annual Book", desc: "The solar-return year read the Tajika way, from Muntha to the year lord.", sections: ["Annual Chart","Muntha & Varshesh","Sahams","Tajika Aspects","Ithasala Yogas","Harsha Bala","Year Guidance"] },
+  lalkitab:{ title: "Lal Kitab Dossier", desc: "The Lal Kitab reading of every planet with its own household remedies.", sections: ["Rashi Chart","Planet by Planet","Debts & Blind Planets","Household Upaya","Sequence of Practice"] },
+  numbers: { title: "Numerology Compendium", desc: "The complete number book — Pythagorean, Chaldean, Vedic and Lo Shu in one volume.", sections: ["Core Numbers","Why & How Each Number Works","Lucky Set","Karmic Debts & Lessons","Cycles & Pinnacles","Lo Shu Grid","Year Outlook"] },
 };
+
+// jsPDF's built-in fonts use WinAnsi, which mangles prime/double-prime marks.
+function pdfSafe(t: string): string {
+  return t
+    .replace(/\u2032/g, "'").replace(/\u2033/g, '"')
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...")
+    .replace(/\u2192/g, "to").replace(/\u2194/g, "and")
+    .replace(/[\u2190-\u21FF]/g, "-").replace(/[\u2094\u211E]/g, "R");
+}
 
 function todayIso() { return new Date().toISOString().slice(0, 10); }
 
@@ -190,7 +213,7 @@ const PEARL:   [number, number, number] = [240, 235, 220];
 const MUTED:   [number, number, number] = [160, 155, 140];
 const LINE:    [number, number, number] = [70, 65, 90];
 
-function buildPdf(key: ReportKey, b: Birth) {
+export function buildPdf(key: ReportKey, b: Birth) {
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
@@ -225,14 +248,26 @@ function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
     pdf.text("TAROMAYA", margin, 30, { charSpace: 3 });
-    pdf.text(meta.title.toUpperCase(), w - margin, 30, { align: "right", charSpace: 3 });
+    // jsPDF ignores charSpace when aligning right, so place the running title
+    // manually from its measured width to keep it inside the margin.
+    const runTitle = pdfSafe(meta.title.toUpperCase());
+    let runSpace = 3;
+    let runW = pdf.getTextWidth(runTitle) + runSpace * (runTitle.length - 1);
+    if (runW > w - margin * 2 - 130) {
+      runSpace = 1;
+      pdf.setFontSize(8);
+      runW = pdf.getTextWidth(runTitle) + runSpace * (runTitle.length - 1);
+    }
+    pdf.text(runTitle, w - margin - runW, 30, { charSpace: runSpace });
     pdf.setDrawColor(...LINE);
     pdf.setLineWidth(0.3);
     pdf.line(margin, 40, w - margin, 40);
     y = 72;
   };
+  // Footer sits at h-36; never let content reach it.
+  const FOOTER_SAFE = 64;
   const ensureRoom = (need = 60) => {
-    if (y > h - need) newPage();
+    if (y > h - Math.max(need, FOOTER_SAFE)) newPage();
   };
 
   const drawH = (label: string) => {
@@ -247,7 +282,8 @@ function buildPdf(key: ReportKey, b: Birth) {
     y += 28;
   };
   const drawSub = (label: string) => {
-    ensureRoom(40);
+    // Keep a sub-heading with at least the first lines that follow it.
+    ensureRoom(96);
     pdf.setTextColor(...GOLD_SOFT);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
@@ -259,7 +295,7 @@ function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFontSize(size);
     pdf.setTextColor(230, 225, 210);
     // Plain numbers only — never Roman numerals in a report.
-    const lines = pdf.splitTextToSize(romanToArabicText(text), w - margin * 2) as string[];
+    const lines = pdf.splitTextToSize(pdfSafe(romanToArabicText(text)), w - margin * 2) as string[];
     for (const ln of lines) {
       ensureRoom(size + 12);
       pdf.text(ln, margin, y);
@@ -273,9 +309,9 @@ function buildPdf(key: ReportKey, b: Birth) {
     for (const [k, v] of rows) {
       ensureRoom(24);
       pdf.setTextColor(...MUTED);
-      pdf.text(k, margin, y);
+      pdf.text(pdfSafe(k), margin, y);
       pdf.setTextColor(...PEARL);
-      const lines = pdf.splitTextToSize(v, w - margin * 2 - keyWidth) as string[];
+      const lines = pdf.splitTextToSize(pdfSafe(v), w - margin * 2 - keyWidth) as string[];
       lines.forEach((ln, i) => {
         if (i > 0) { ensureRoom(20); y += 14; }
         pdf.text(ln, margin + keyWidth, y);
@@ -300,19 +336,23 @@ function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(9.5);
     rows.forEach((r, idx) => {
-      ensureRoom(20);
+      // Wrap every cell so nothing is silently truncated; the row grows to fit.
+      const wrapped = r.map((cell, ci) =>
+        pdf.splitTextToSize(pdfSafe(cell ?? ""), cols[ci] - 12) as string[]);
+      const lineCount = Math.max(1, ...wrapped.map((l) => l.length));
+      const rowH = lineCount * 12 + 4;
+      ensureRoom(rowH + 8);
       if (idx % 2 === 0) {
         pdf.setFillColor(20, 22, 44);
-        pdf.rect(margin, y - 10, totalW, 16, "F");
+        pdf.rect(margin, y - 10, totalW, rowH, "F");
       }
       pdf.setTextColor(...PEARL);
       let cx = margin + 8;
-      r.forEach((cell, ci) => {
-        const cellLines = pdf.splitTextToSize(cell ?? "", cols[ci] - 12) as string[];
-        pdf.text(cellLines[0] ?? "", cx, y + 2);
+      wrapped.forEach((cellLines, ci) => {
+        cellLines.forEach((ln, li) => pdf.text(ln, cx, y + 2 + li * 12));
         cx += cols[ci];
       });
-      y += 16;
+      y += rowH;
     });
     y += 10;
   };
@@ -334,14 +374,21 @@ function buildPdf(key: ReportKey, b: Birth) {
   pdf.text("TAROMAYA · COSMIC INTELLIGENCE", margin, 96, { charSpace: 4 });
 
   pdf.setTextColor(...PEARL);
-  pdf.setFontSize(40);
   pdf.setFont("helvetica", "bold");
-  pdf.text(meta.title, margin, 220);
+  // Shrink long titles so they never run under the star ornament.
+  const titleMax = w - margin * 2 - 90;
+  let titleSize = 40;
+  pdf.setFontSize(titleSize);
+  while (pdf.getTextWidth(meta.title) > titleMax && titleSize > 22) {
+    titleSize -= 1;
+    pdf.setFontSize(titleSize);
+  }
+  pdf.text(pdfSafe(meta.title), margin, 220);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(13);
   pdf.setTextColor(200, 195, 180);
-  pdf.text(meta.desc, margin, 252, { maxWidth: w - margin * 2 });
+  pdf.text(pdfSafe(meta.desc), margin, 252, { maxWidth: w - margin * 2 });
 
   // ornament star
   drawStar(pdf, w - margin - 40, 190, 24);
@@ -369,7 +416,7 @@ function buildPdf(key: ReportKey, b: Birth) {
   drawKV([
     ["Name", b.name],
     ["Date & Time", `${b.date} · ${b.time} (UTC${Number(b.tz) >= 0 ? "+" : ""}${b.tz})`],
-    ["Place", `${b.place}  (${b.lat}°, ${b.lon}°)`],
+    ["Place", b.place],
     ["Ascendant (Lagna)", `${RASHIS[chart.ascendant.rashi]} · ${formatDegree(chart.ascendant.degreeInRashi)}`],
     ["Moon Nakshatra", `${NAKSHATRAS[chart.moonNakshatra.index]} · pada ${chart.moonNakshatra.pada} · lord ${chart.moonNakshatra.lord}`],
     ["Life Path / Destiny / Soul", `${num.lifePath}  ·  ${num.destiny}  ·  ${num.soulUrge}`],
@@ -466,7 +513,7 @@ function buildPdf(key: ReportKey, b: Birth) {
   }
 
   // ============ Ashtakavarga (Sarva bindus) ============
-  if (key === "grand" || key === "life" || key === "wealth") {
+  if (key === "grand" || key === "life" || key === "wealth" || key === "brihat") {
     newPage();
     drawH("Ashtakavarga · Sarva Bindus");
     drawP("The Sarvashtakavarga totals combined-strength points per sign (max 337). Signs with 30+ bindus are areas of favor; below 25 need protection.");
@@ -549,7 +596,7 @@ function buildPdf(key: ReportKey, b: Birth) {
   }
 
   // ============ Lo Shu Grid ============
-  if (key === "grand" || key === "life" || key === "wealth") {
+  if (key === "grand" || key === "life" || key === "wealth" || key === "numbers") {
     try {
       newPage();
       drawH("Lo Shu · Birth Grid");
@@ -564,6 +611,261 @@ function buildPdf(key: ReportKey, b: Birth) {
     } catch { /* ignore */ }
   }
 
+
+  // ============ Brihat Kundli · classical long form ============
+  if (key === "brihat") {
+    const SHORT = ["Ar","Ta","Ge","Cn","Le","Vi","Li","Sc","Sg","Cp","Aq","Pi"];
+    newPage();
+    drawH("Divisional Charts · D1 to D12");
+    drawP("Each divisional chart re-reads the same planets at a finer resolution. The sign a planet holds in a division shows how that part of life is actually delivered.");
+    const divs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    drawTable(
+      ["Planet", ...divs.map((d) => `D${d}`)],
+      chart.planets.map((p) => [p.name.slice(0, 3), ...divs.map((d) => SHORT[vargaSign(p.longitude, d)])]),
+      [56, ...divs.map(() => 39)],
+    );
+    drawP("The ascendant runs " + divs.map((d) => `D${d} ${SHORT[vargaSign(chart.ascendant.longitude, d)]}`).join(", ") + ".");
+
+    const lite = {
+      ascendant: { rashi: chart.ascendant.rashi, degreeInRashi: chart.ascendant.degreeInRashi },
+      planets: chart.planets.map((p) => ({
+        name: p.name, longitude: p.longitude, rashi: p.rashi,
+        house: ((p.rashi - chart.ascendant.rashi + 12) % 12) + 1,
+        degreeInRashi: p.degreeInRashi, retrograde: !!p.retrograde,
+      })),
+    };
+    newPage();
+    drawH("Chara Karakas");
+    drawP("The karakas rank your planets by degree. The Atmakaraka carries the soul agenda of the life; the rest describe the people and duties around it.");
+    drawTable(
+      ["Karaka", "Planet", "Sign", "Degree"],
+      computeCharaKarakas(lite).map((k) => [k.karaka, k.planet, RASHIS[k.rashi], formatDegree(k.degree)]),
+      [150, 110, 120, 90],
+    );
+    drawH("Arudha Padas");
+    drawP("An arudha is the visible shadow of a house — what other people see and speak about, as opposed to what is literally there.");
+    drawTable(
+      ["Pada", "Sign", "Meaning"],
+      computeArudhaPadas(lite).map((a) =>
+        [`A${a.house}`, RASHIS[a.arudha], `Shadow of house ${a.house}, ruled by ${a.lord}`]),
+      [80, 120, 250],
+    );
+
+    newPage();
+    drawH("Shadbala · Six-fold Strength");
+    drawP("Shadbala totals six measurable strengths for each planet. A planet above its required minimum can deliver what it promises; below it, the promise needs support.");
+    const sb = computeShadbala(chart);
+    drawTable(
+      ["Planet", "Total (rupas)", "Required", "Ratio", "Verdict"],
+      sb.map((r) => [r.planet, r.total.toFixed(2), r.required.toFixed(2), r.ratio.toFixed(2),
+        r.ratio >= 1.2 ? "Strong" : r.ratio >= 1 ? "Adequate" : "Needs support"]),
+      [90, 110, 90, 70, 120],
+    );
+
+    drawH("Gemstones");
+    try {
+      const gem = recommendGemstones(chart, sb);
+      drawKV([
+        ["Primary", `${gem.primary.stone} for ${gem.primary.for} · ${gem.primary.metal} · ${gem.primary.finger} finger`],
+        ["Supporting", `${gem.supporting.stone} for ${gem.supporting.for} · ${gem.supporting.day}`],
+        ["Rudraksha", `${gem.rudraksha.mukhi} for ${gem.rudraksha.for} — ${gem.rudraksha.benefit}`],
+        ["Avoid", gem.avoid.join(", ") || "None flagged"],
+        ["Notes", gem.notes],
+      ]);
+    } catch { drawP("Gemstone guidance unavailable for this chart."); }
+
+    newPage();
+    drawH("All Timing Systems · Current Position");
+    drawP("Reading several dasha systems side by side is the classical cross-check. When two or more agree on a lord or a theme, the timing is considered reliable.");
+    const sign = {
+      ascendant: { rashi: chart.ascendant.rashi },
+      planets: chart.planets.map((p) => ({ name: p.name, rashi: p.rashi })),
+    };
+    const systems: [string, { currentMaha: { lord: string; end: Date }; currentAntar: { lord: string; end: Date } }][] = [
+      ["Vimshottari", dasha],
+      ["Ashtottari", computeAshtottari(birthDate, chart.moonNakshatra.index, moonDegInNak)],
+      ["Yogini", computeYogini(birthDate, chart.moonNakshatra.index, moonDegInNak)],
+      ["Chara", computeChara(sign, birthDate)],
+      ["Narayana", computeNarayana(sign, birthDate)],
+      ["Kalachakra", computeKalachakra(birthDate, moon.longitude)],
+    ];
+    drawTable(
+      ["System", "Major period", "Sub period", "Sub ends"],
+      systems.map(([name, t]) => [name, t.currentMaha.lord, t.currentAntar.lord, fmtDate(t.currentAntar.end)]),
+      [110, 140, 140, 100],
+    );
+  }
+
+  // ============ Varshaphal · annual book ============
+  if (key === "varsha") {
+    try {
+      newPage();
+      const targetYear = new Date().getFullYear();
+      const vp = computeVarshphal({
+        birth: {
+          year: Y, month: M, day: D, hour: hh, minute: mm,
+          tzOffsetHours: Number(b.tz), latitude: Number(b.lat), longitude: Number(b.lon),
+        },
+        targetYear,
+      });
+      drawH(`Annual Chart · ${targetYear}`);
+      drawKV([
+        ["Solar return", vp.returnLocal],
+        ["Age completed", `${vp.ageCompleted} years`],
+        ["Annual Lagna", `${RASHIS[vp.chart.ascendant.rashi]} · ${formatDegree(vp.chart.ascendant.degreeInRashi)}`],
+        ["Muntha", `${RASHIS[vp.muntha.rashi]} · house ${vp.muntha.house} · lord ${vp.muntha.lord}`],
+        ["Varshesh (year lord)", vp.varshesh],
+      ]);
+      drawP(vp.varsheshReason);
+
+      const vsize = Math.min(w - margin * 2, 300);
+      ensureRoom(vsize + 30);
+      drawSouthIndianChart(pdf, (w - vsize) / 2, y, vsize, vp.chart);
+      y += vsize + 18;
+
+      newPage();
+      drawH("Sahams · Sensitive Points of the Year");
+      drawP("A saham is a calculated point, not a planet. It marks where a particular theme of the year concentrates, and the lord of that sign carries the theme.");
+      drawTable(
+        ["Saham", "Sign", "Lord"],
+        vp.sahams.slice(0, 16).map((sh) => [sh.name, RASHIS[sh.rashi], sh.lord]),
+        [200, 130, 120],
+      );
+
+      const aspects = computeTajikaAspects(vp.chart);
+      drawH("Tajika Aspects");
+      drawTable(
+        ["Pair", "Aspect", "Orb", "Motion", "Nature"],
+        aspects.slice(0, 14).map((a) => [
+          `${a.from} to ${a.to}`, a.aspect, `${a.orbDeg.toFixed(1)} deg`,
+          a.applying ? "Applying" : "Separating", a.nature,
+        ]),
+        [140, 110, 70, 100, 80],
+      );
+
+      const yogas2 = detectTajikaYogas(aspects);
+      if (yogas2.length) {
+        newPage();
+        drawH("Ithasala and Isarapha Yogas");
+        drawP("An applying aspect (Ithasala) means the matter completes; a separating one (Isarapha) means it slips away. This is the Tajika way of answering whether a plan for the year lands.");
+        for (const yg of yogas2.slice(0, 10)) {
+          drawSub(`${yg.name} · ${yg.planets.join(" and ")} · ${yg.quality}`);
+          drawP(yg.description);
+        }
+      }
+
+      drawH("Harsha Bala");
+      drawP("Harsha Bala scores five classical dignities out of twenty five. The highest scorer usually runs the most visible chapter of the year.");
+      drawTable(
+        ["Planet", "Score", "Reading"],
+        computeHarshaBala(vp.chart).map((h2) => [
+          h2.planet, `${h2.total} / 25`,
+          h2.total >= 15 ? "Delivers freely" : h2.total >= 10 ? "Works with effort" : "Needs support",
+        ]),
+        [110, 100, 250],
+      );
+
+      drawH("Year Guidance");
+      drawP(`The Muntha sits in house ${vp.muntha.house} of the annual chart, so the year asks for attention on that department first. ${vp.varshesh} rules the year, which means its weekday, its mantra and its habits are the practical levers. Work with the applying aspects early in the year and let the separating ones go.`);
+    } catch (e) {
+      drawP(`The annual chart could not be computed: ${e instanceof Error ? e.message : "unknown reason"}.`);
+    }
+  }
+
+  // ============ Lal Kitab dossier ============
+  if (key === "lalkitab") {
+    newPage();
+    drawH("Lal Kitab · Planet by Planet");
+    drawP("Lal Kitab reads the chart as a house-by-house account book. Each planet has a position, a verdict and a household remedy that costs almost nothing to perform.");
+    const rows = computeLalKitab(chart, RASHIS);
+    drawTable(
+      ["Planet", "House", "Sign", "Status"],
+      rows.map((r) => [r.planet, `H${r.house}`, r.rashi, r.status]),
+      [110, 70, 130, 90],
+    );
+    for (const r of rows) {
+      drawSub(`${r.planet} · house ${r.house} · ${r.status}`);
+      drawP(r.reading);
+      drawP(`Upaya: ${r.remedy}`);
+    }
+    drawH("Sequence of Practice");
+    drawP("Begin with the weakest planet in the table above and keep its remedy for forty days without a break. Add a second remedy only after the first is steady. Lal Kitab remedies are never to be performed for another person without their knowledge.");
+  }
+
+  // ============ Numerology compendium ============
+  if (key === "numbers") {
+    try {
+      newPage();
+      const full = buildNumerologyReport({ fullName: b.name, birthDate: b.date });
+      drawH("Core Numbers");
+      drawTable(
+        ["Number", "Value", "Ruler"],
+        full.core.map((c) => [c.label, String(c.value), c.planet]),
+        [220, 90, 140],
+      );
+      for (const c of full.core) {
+        ensureRoom(120);
+        drawSub(`${c.label} ${c.value}`);
+        drawP(c.what);
+        drawP(`Why it applies: ${c.why}`);
+        drawP(`How it shows up: ${c.influence}`);
+        drawP(`Opportunities: ${c.opportunities}`);
+        drawP(`Challenges: ${c.challenges}`);
+        if (c.remedies?.length) drawP(`Practical steps: ${c.remedies.join("; ")}`);
+      }
+
+      newPage();
+      drawH("Lucky Set");
+      drawKV([
+        ["Numbers", full.lucky.numbers.join(", ")],
+        ["Dates", full.lucky.dates.join(", ")],
+        ["Days", full.lucky.days.join(", ")],
+        ["Colours", full.lucky.colors.join(", ")],
+        ["Direction / Metal / Gem", `${full.lucky.direction} · ${full.lucky.metal} · ${full.lucky.gem}`],
+        ["Friendly numbers", full.lucky.friendly.join(", ")],
+        ["Challenging numbers", full.lucky.challenging.join(", ")],
+      ]);
+
+      drawH("Karmic Picture");
+      drawKV([
+        ["Balance number", String(full.balanceNumber)],
+        ["Missing numbers", full.missingNumbers.join(", ") || "None"],
+        ["Hidden strengths", full.hiddenStrengths.join(", ") || "None"],
+        ["Karmic debts", full.karmicDebts.join(", ") || "None"],
+        ["Karmic lessons", full.karmicLessons.join(", ") || "None"],
+        ["Favourable years", full.favourableYears.join(", ")],
+        ["Testing years", full.challengingYears.join(", ")],
+      ]);
+
+      newPage();
+      drawH("Cycles and Pinnacles");
+      drawTable(
+        ["Stage", "Ages", "Number", "Theme"],
+        [
+          ...full.cycles.map((c) => [c.label, `${c.from} to ${c.to}`, String(c.n), c.note]),
+          ...full.pinnacles.map((c) => [c.label, `${c.from} to ${c.to}`, String(c.n), c.note]),
+        ],
+        [110, 90, 60, 220],
+      );
+      drawH("Challenge Numbers");
+      drawTable(
+        ["Challenge", "Number", "Meaning"],
+        full.challenges.map((c) => [c.label, String(c.n), c.note]),
+        [120, 70, 290],
+      );
+
+      for (const sec of full.sections.slice(0, 12)) {
+        ensureRoom(110);
+        drawSub(sec.title);
+        drawP(sec.expert || sec.eli10);
+        if (sec.bullets?.length) drawP(sec.bullets.join("; "));
+      }
+      drawH("Confidence");
+      drawP(`${full.confidence.note} ${full.confidence.factors.join(" ")}`);
+    } catch (e) {
+      drawP(`The number book could not be built: ${e instanceof Error ? e.message : "unknown reason"}.`);
+    }
+  }
 
   // ============ Report-specific interpretation ============
   newPage();
@@ -633,6 +935,28 @@ function buildPdf(key: ReportKey, b: Birth) {
         ["Behaviour", r.behaviour.join("; ")],
       ]);
     }
+  }
+
+  if (key === "brihat") {
+    drawSub("How to read this book");
+    drawP(`Read the divisional charts as departments of one life, not as separate horoscopes. Your ${RASHIS[chart.ascendant.rashi]} Lagna and the Moon in ${NAKSHATRAS[chart.moonNakshatra.index]} set the frame; the strengths table says which planets can act now, and the timing tables say when. Where two dasha systems name the same planet, treat that period as the reliable one for a decision.`);
+    drawSub("Priority Grahas");
+    for (const p of priorities.slice(0, 4)) drawKV([[p.planet, p.reasons.join(" · ") || "Baseline focus."]]);
+  }
+
+  if (key === "varsha") {
+    drawSub("Using the year book");
+    drawP("An annual chart is a lens on the natal promise, never a replacement for it. Check any plan against both: if the birth chart allows it and the year supports it, act; if only the year supports it, keep the commitment small.");
+  }
+
+  if (key === "lalkitab") {
+    drawSub("Using the dossier");
+    drawP("Lal Kitab works by simple, physical acts done consistently. Choose one, keep it for forty days, and note what changes in a journal. Consistency matters more than scale.");
+  }
+
+  if (key === "numbers") {
+    drawSub("Using the compendium");
+    drawP(`Your Life Path ${num.lifePath} is the road; the Expression ${num.destiny} is the vehicle; the Soul Urge ${num.soulUrge} is the driver. When a decision feels wrong, one of the three is being ignored. Personal Year ${num.personalYear} sets this year's weather.`);
   }
 
   if (key === "grand") {
@@ -738,7 +1062,7 @@ function drawSouthIndianChart(
       const px = cx + 4 + (i % 3) * (cell - 8) / 3;
       const py = cy + 22 + Math.floor(i / 3) * 11;
       const label = shortPlanet[p.name] ?? p.name.slice(0, 2);
-      pdf.text(p.retrograde ? `${label}\u2094` : label, px, py);
+      pdf.text(p.retrograde ? `${label} R` : label, px, py);
     });
   }
 

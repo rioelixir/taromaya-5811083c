@@ -272,7 +272,10 @@ function buildDashaTree(
   const maha: MahaPeriod[] = [];
   let cursor = startOfFirstMaha;
   const L = seq.length;
-  for (let i = 0; i < L; i++) {
+  // Short cycles (Yogini 36y, Ashtottari 108y) repeat after one round, so
+  // build enough rounds to cover a full human lifespan from birth.
+  const rounds = Math.max(1, Math.ceil(130 / totalYears));
+  for (let i = 0; i < L * rounds; i++) {
     const d = seq[(startingIndex + i) % L];
     if (d.years <= 0) { continue; }
     const mahaEnd = new Date(cursor.getTime() + yearsMs(d.years));
