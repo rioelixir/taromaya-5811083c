@@ -13,8 +13,20 @@ const GOOGLE_CODE: Record<string, string> = {
   sa: "sa",
 };
 
+/** Server-side memo so repeat strings never hit the network twice. */
+const memo = new Map<string, string>();
+const MEMO_MAX = 5000;
+function memoGet(key: string) {
+  return memo.get(key);
+}
+function memoSet(key: string, value: string) {
+  if (memo.size > MEMO_MAX) memo.clear();
+  memo.set(key, value);
+}
+
 /** Google's free (key-less) translate endpoint. No AI credits are used. */
 async function gtx(lang: string, text: string, wantRoman = false): Promise<{ text: string; roman: string | null } | null> {
+
   const url =
     "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" +
     encodeURIComponent(GOOGLE_CODE[lang] ?? lang) +
