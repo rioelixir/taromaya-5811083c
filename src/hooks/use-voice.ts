@@ -298,11 +298,12 @@ export function useVoice(onText: (text: string) => void) {
     activeRef.current = false;
     pausedRef.current = false;
     clearSilence();
+    if (flushRef.current) clearInterval(flushRef.current);
+    flushRef.current = null;
     const rec = recRef.current;
     recRef.current = null;
     if (rec) { try { rec.stop(); rec.abort(); } catch { /* already stopped */ } }
     const m = mediaRef.current;
-    mediaRef.current = null;
     return m;
   }, [clearSilence]);
 
@@ -321,32 +322,46 @@ export function useVoice(onText: (text: string) => void) {
       .replace(/\s+/g, " ")
       .trim() || heard.trim();
     const m = teardown();
-    finalRef.current = "";
-    interimRef.current = "";
-    slotsRef.current = [];
-    committedRef.current = "";
-    setHeard("");
-
 
     if (hadRec) {
+      mediaRef.current = null;
+      finalRef.current = "";
+      interimRef.current = "";
+      slotsRef.current = [];
+      committedRef.current = "";
+      setHeard("");
       setState("idle");
       emit(spoken);
       return;
     }
     if (m) {
+      // Stop the mic but keep the recorded tail, then write down the last piece
+      // and hand over every piece from the whole talk.
       m.stream.getTracks().forEach((t) => t.stop());
       m.node.disconnect();
       m.source.disconnect();
-      const blob = encodeWav(m.chunks, m.ctx.sampleRate);
+      await flushSegment(true);
+      mediaRef.current = null;
       await m.ctx.close().catch(() => {});
-      if (blob.size < 2048) {
+      const all = committedRef.current.trim();
+      finalRef.current = "";
+      interimRef.current = "";
+      slotsRef.current = [];
+      committedRef.current = "";
+      setHeard("");
+      if (!all) {
         setState("idle");
-        setMessage("That was too quiet. Tap and speak again.");
         return;
       }
-      await send(blob);
+      setState("idle");
+      setMessage(null);
+      emit(all);
+      return;
     }
-  }, [emit, heard, send, teardown]);
+    mediaRef.current = null;
+    setState("idle");
+  }, [emit, heard, flushSegment, teardown]);
+
   stopRef.current = () => { void stop(); };
 
 
