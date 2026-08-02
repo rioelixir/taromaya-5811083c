@@ -628,6 +628,7 @@ function TarotPage() {
             keywords: [],
             image: c.card.image,
           })),
+          lang,
           placeNakshatra: starCtx.placeNakshatra,
           placeName: starCtx.placeName,
           nakshatraCard: starCtx.nakshatraCard,
