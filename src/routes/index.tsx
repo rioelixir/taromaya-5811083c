@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Sparkles, Star, CalendarDays, Bot, ArrowRight, LayoutGrid, Sun, Moon, Feather, Headphones, Heart, Hash, Sigma } from "lucide-react";
+import {
+  Sparkles, Star, CalendarDays, Bot, ArrowRight, Sun, Moon, Feather, Headphones,
+  Heart, Hash, Sigma, Grid3X3, Music, Compass, Stars, Gauge, CalendarClock, Flame,
+  Snowflake, Waves, Triangle, Crown, Briefcase, Coins, Activity, Leaf, Zap,
+  Infinity as InfIcon, Home as HomeIcon, LineChart, FileText, Bookmark, BookOpen,
+  History, User, Settings, Baby, LayoutGrid, HelpCircle,
+} from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -14,6 +20,12 @@ export const Route = createFileRoute("/")({
         content:
           "Tarot, Vedic astrology, kundli, panchang, numerology and an AI oracle — one calm, luxurious platform.",
       },
+      { property: "og:title", content: "TAROMAYA — Your Cosmic Portal" },
+      {
+        property: "og:description",
+        content:
+          "Tarot, kundli, kundli matching, panchang, numerology systems and more in one professional consultation platform.",
+      },
     ],
   }),
 });
@@ -25,9 +37,101 @@ const today = () =>
     day: "numeric",
   });
 
+type Tile = { to: string; label: string; icon: typeof Sparkles; search?: Record<string, string> };
+
+const CORE: Tile[] = [
+  { to: "/tarot", label: "Tarot", icon: Sparkles },
+  { to: "/kundli", label: "Kundli", icon: Moon },
+  { to: "/compatibility", label: "Kundli matching", icon: Heart },
+  { to: "/panchang", label: "Panchang", icon: CalendarDays },
+];
+
+const NUMBERS: Tile[] = [
+  { to: "/numerology", label: "Western numerology", icon: Hash, search: { tab: "report" } },
+  { to: "/numerology", label: "Lo Shu grid", icon: Grid3X3, search: { tab: "loshu" } },
+  { to: "/numerology", label: "Vedic numerology", icon: Sigma, search: { tab: "vedic" } },
+  { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Star },
+];
+
+const MISC: Tile[] = [
+  { to: "/dreams", label: "Dreams", icon: Feather },
+  { to: "/meditation", label: "Meditation and music", icon: Music },
+  { to: "/ai", label: "Ask the guide", icon: Bot },
+  { to: "/help", label: "Audio guide", icon: Headphones },
+];
+
+const MORE: { label: string; items: Tile[] }[] = [
+  {
+    label: "Vedic astrology",
+    items: [
+      { to: "/astrology", label: "Chart analysis", icon: Stars },
+      { to: "/avakhada", label: "Avakhada details", icon: Stars },
+      { to: "/strength", label: "Planetary strength", icon: Gauge },
+      { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
+      { to: "/varshphal", label: "Annual forecast", icon: Sun },
+      { to: "/prashna", label: "Prashna", icon: CalendarClock },
+      { to: "/deep-jyotish", label: "Advanced Jyotish", icon: Stars },
+      { to: "/nakshatra", label: "Birth nakshatra", icon: Stars },
+      { to: "/nakshatra-location", label: "Nakshatra by place", icon: Compass },
+      { to: "/nadi", label: "Nadi astrology", icon: Hash },
+    ],
+  },
+  {
+    label: "Doshas and remedies",
+    items: [
+      { to: "/remedies", label: "Remedies", icon: Flame },
+      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
+      { to: "/kaalsarp", label: "Kaal Sarp analysis", icon: Waves },
+      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
+      { to: "/yantra", label: "Yantra guidance", icon: Triangle },
+      { to: "/dharma", label: "Dharma and life path", icon: Crown },
+    ],
+  },
+  {
+    label: "Life and guidance",
+    items: [
+      { to: "/horoscope", label: "Daily horoscope", icon: Sun },
+      { to: "/career", label: "Career and education", icon: Briefcase },
+      { to: "/finance", label: "Finances", icon: Coins },
+      { to: "/health", label: "Health", icon: Activity },
+      { to: "/ayurveda", label: "Ayurvedic constitution", icon: Leaf },
+      { to: "/chakra", label: "Chakra assessment", icon: Zap },
+      { to: "/karma", label: "Karmic analysis", icon: InfIcon },
+      { to: "/vastu", label: "Vastu", icon: HomeIcon },
+      { to: "/life-dashboard", label: "Life dashboard", icon: LayoutGrid },
+      { to: "/baby-names", label: "Baby names", icon: Baby },
+      { to: "/calculators", label: "Calculators", icon: Hash },
+      { to: "/festivals", label: "Festival calendar", icon: Flame },
+    ],
+  },
+  {
+    label: "Transits and forecasts",
+    items: [
+      { to: "/transits", label: "Current transits", icon: LineChart },
+      { to: "/vedic-transits", label: "Vedic transits", icon: Moon },
+      { to: "/timeline", label: "Forecast timeline", icon: CalendarClock },
+      { to: "/moon-calendar", label: "Lunar calendar", icon: Moon },
+      { to: "/sky", label: "Live sky", icon: Stars },
+      { to: "/reports", label: "Full reports", icon: FileText },
+    ],
+  },
+  {
+    label: "Library and account",
+    items: [
+      { to: "/saved", label: "Saved charts", icon: Bookmark },
+      { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
+      { to: "/history", label: "Reading history", icon: History },
+      { to: "/blog", label: "Articles", icon: BookOpen },
+      { to: "/faq", label: "Frequently asked questions", icon: HelpCircle },
+      { to: "/birth-details", label: "Birth details", icon: User },
+      { to: "/profile", label: "Profile", icon: User },
+      { to: "/settings", label: "Settings", icon: Settings },
+    ],
+  },
+];
+
 function Home() {
   const branding = useBranding();
-  // Shown after the page loads so the date always matches the reader's own clock.
   const [dateLine, setDateLine] = useState("");
   useEffect(() => setDateLine(today()), []);
   const { user } = useAuth();
@@ -38,7 +142,6 @@ function Home() {
 
   return (
     <div className="container-page pt-20 sm:pt-24 pb-12">
-      {/* Greeting */}
       <div className="min-h-[1rem] text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
         {dateLine}
       </div>
@@ -53,7 +156,6 @@ function Home() {
           : branding.heroDescription}
       </p>
 
-      {/* Primary CTA */}
       <div className="mt-8 flex flex-wrap gap-3" data-tour="hero-start">
         <Link
           to="/tarot"
@@ -72,57 +174,9 @@ function Home() {
         </Link>
       </div>
 
-
-      {/* Quick actions — 4 large tiles */}
-      <section className="mt-12" data-tour="quick-actions">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl">Start here</h2>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <QuickTile to="/tarot" label="Tarot cards" icon={Sparkles} />
-          <QuickTile to="/kundli" label="Birth chart" icon={Star} />
-          <QuickTile to="/panchang" label="Today's sky" icon={CalendarDays} />
-          <QuickTile to="/ai" label="Ask the guide" icon={Bot} />
-        </div>
-      </section>
-
-      {/* Matching & numbers */}
-      <section className="mt-10">
-        <h2 className="mb-4 font-display text-xl">Matching and numbers</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <Link
-            to="/numerology"
-            search={{ tab: "compat" }}
-            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
-          >
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Heart className="h-6 w-6" />
-            </div>
-            <div className="min-w-0 text-base font-medium text-foreground">Kundli matching</div>
-          </Link>
-          <Link
-            to="/numerology"
-            search={{ tab: "report" }}
-            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
-          >
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Hash className="h-6 w-6" />
-            </div>
-            <div className="min-w-0 text-base font-medium text-foreground">Numerology</div>
-          </Link>
-          <Link
-            to="/numerology"
-            search={{ tab: "vedic" }}
-            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
-          >
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-              <Sigma className="h-6 w-6" />
-            </div>
-            <div className="min-w-0 text-base font-medium text-foreground">Vedic numbers</div>
-          </Link>
-        </div>
-      </section>
-
+      <TileSection title="Core readings" tiles={CORE} tour="quick-actions" />
+      <TileSection title="Numerology systems" tiles={NUMBERS} />
+      <TileSection title="Miscellaneous" tiles={MISC} />
 
       {/* Today */}
       <section className="mt-10">
@@ -134,84 +188,92 @@ function Home() {
         </div>
       </section>
 
-      {/* Help — audio guides for every module */}
-      <section className="mt-10">
-        <h2 className="mb-4 font-display text-xl">Need help? Just listen</h2>
-        <Link
-          to="/help"
-          className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
-        >
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
-            <Headphones className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1 text-base font-medium text-foreground">
-            Listen and learn
-          </div>
-          <ArrowRight className="h-5 w-5 text-primary shrink-0" />
-        </Link>
-      </section>
-
-      {/* Guides — visible to everyone */}
+      {/* Guides */}
       <section className="mt-10">
         <h2 className="mb-4 font-display text-xl">Guides</h2>
-        <div className="grid grid-cols-1 gap-3 sm:gap-4">
-          <button
-            type="button"
-            data-tour="guides"
-            onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
-            className="group flex min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
-          >
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition shrink-0">
-              <Feather className="h-6 w-6" />
-            </div>
-            <div className="min-w-0 text-base font-medium text-foreground">Author's note</div>
-          </button>
-
-        </div>
-
-      </section>
-
-      {/* Explore all */}
-      <section className="mt-10">
         <button
           type="button"
-          data-tour="explore-all"
-          onClick={() => window.dispatchEvent(new Event("taromaya:open-menu"))}
-          className="w-full flex min-h-16 items-center justify-between gap-4 rounded-2xl border border-border/40 bg-white/60 px-5 py-4 text-left hover:bg-white/90 transition"
+          data-tour="guides"
+          onClick={() => window.dispatchEvent(new Event("taromaya:open-authors-note"))}
+          className="group flex w-full min-h-16 items-center gap-4 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 text-left hover:bg-white/95 hover:border-primary/40 transition-all"
         >
-          <div className="font-display text-lg">See everything</div>
           <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
-            <LayoutGrid className="h-6 w-6" />
+            <Feather className="h-6 w-6" />
           </div>
+          <div className="min-w-0 text-base font-medium text-foreground">Author's note</div>
         </button>
       </section>
 
+      {/* All remaining modules, listed in full on the page */}
+      <section className="mt-12" data-tour="explore-all">
+        <h2 className="mb-1 font-display text-xl">All modules</h2>
+        <p className="mb-5 text-sm text-muted-foreground">
+          Everything in Taromaya, right here on this page.
+        </p>
+        <div className="space-y-8">
+          {MORE.map((group) => (
+            <div key={group.label}>
+              <div className="mb-3 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                {group.label}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {group.items.map((item) => (
+                  <ModuleLink key={item.to + item.label} {...item} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
-function QuickTile({
-  to,
-  label,
-  icon: Icon,
+function TileSection({
+  title,
+  tiles,
+  tour,
 }: {
-  to: string;
-  label: string;
-  icon: typeof Sparkles;
+  title: string;
+  tiles: Tile[];
+  tour?: string;
 }) {
   return (
-    <Link
-      to={to}
-      className="group flex min-h-28 flex-col items-start justify-center gap-3 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
-    >
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition">
-        <Icon className="h-6 w-6" />
+    <section className="mt-10" data-tour={tour}>
+      <h2 className="mb-4 font-display text-xl">{title}</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {tiles.map(({ to, label, icon: Icon, search }) => (
+          <Link
+            key={to + label}
+            to={to}
+            search={search as never}
+            className="group flex min-h-28 flex-col items-start justify-center gap-3 rounded-2xl border border-border/40 bg-white/70 p-4 sm:p-5 hover:bg-white/95 hover:border-primary/40 transition-all"
+          >
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition">
+              <Icon className="h-6 w-6" />
+            </div>
+            <div className="text-base font-medium text-foreground">{label}</div>
+          </Link>
+        ))}
       </div>
-      <div className="text-base font-medium text-foreground">{label}</div>
-    </Link>
+    </section>
   );
 }
 
+function ModuleLink({ to, label, icon: Icon, search }: Tile) {
+  return (
+    <Link
+      to={to}
+      search={search as never}
+      className="flex min-h-16 items-center gap-3 rounded-2xl border border-border/40 bg-white/70 px-4 py-3 hover:bg-white/95 hover:border-primary/40 transition-all"
+    >
+      <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
+        <Icon className="h-5 w-5" />
+      </div>
+      <span className="min-w-0 text-sm font-medium text-foreground">{label}</span>
+    </Link>
+  );
+}
 
 function InfoTile({
   icon: Icon,

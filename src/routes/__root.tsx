@@ -11,7 +11,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Sidebar } from "@/components/nav";
+
 import { GlobalChrome } from "@/components/global-chrome";
 import { StarField } from "@/components/star-field";
 import { FloatingBackButton } from "@/components/back-button";
@@ -234,8 +234,7 @@ function RootComponent() {
         </div>
       )}
       <div className="relative min-h-dvh">
-        {!chromeHidden && <Sidebar />}
-        {!chromeHidden && <GlobalChrome showRail={!pathname.startsWith("/tarot")} showLanguage={!pathname.startsWith("/tarot")} />}
+        {!chromeHidden && <GlobalChrome showRail={false} showLanguage={!pathname.startsWith("/tarot")} />}
         {!chromeHidden && pathname !== "/" && <FloatingBackButton />}
         <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
           <TourHighlighter />
