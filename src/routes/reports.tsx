@@ -14,6 +14,9 @@ import { computeVimshottari, detectYogas, detectDoshas, fmtDate } from "@/lib/ve
 import { computeAshtakavarga, computeShadbala, computeLalKitab, recommendGemstones } from "@/lib/vedic-deep";
 import { computeVarshphal } from "@/lib/varshphal";
 import { computeTajikaAspects, detectTajikaYogas, computeHarshaBala } from "@/lib/varshphal-deep";
+import {
+  computePanchavargeeyaBala, computePatyayiniDasha, computeMuddaDasha, summariseYear,
+} from "@/lib/varshphal-tajika";
 import { computeCharaKarakas, computeArudhaPadas } from "@/lib/jaimini";
 import { vargaSign } from "@/lib/vargas";
 import { computeChara, computeNarayana, computeKalachakra } from "@/lib/dasha-sign";
@@ -51,7 +54,7 @@ const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: st
   wealth:  { title: "Wealth Portrait",  desc: "Money, resources, and the flow of abundance.", sections: ["Rashi Chart","2nd & 11th Houses","Sarvashtakavarga","Personal Year","Lo Shu Grid","Wealth Rituals"] },
   yearly:  { title: "Yearly Forecast",  desc: "The 12 months ahead, in prose and precise dates.", sections: ["Rashi Chart","Personal Year","Ingresses","Retrogrades & Eclipses","Live Gochara","Monthly Themes"] },
   remedy:  { title: "Remedy Dossier",   desc: "The classical toolkit for your afflicted grahas.", sections: ["Rashi Chart","Priority Planets","Mantras","Gemstones","Charity & Fasting"] },
-  varsha:  { title: "Varshaphal · Annual Book", desc: "The solar-return year read the Tajika way, from Muntha to the year lord.", sections: ["Annual Chart","Muntha & Varshesh","Sahams","Tajika Aspects","Ithasala Yogas","Harsha Bala","Year Guidance"] },
+  varsha:  { title: "Varshaphal · Annual Book", desc: "The solar-return year read the Tajika way, from Muntha to the year lord.", sections: ["Annual Chart","Muntha & Varshesh","Sahams","Tajika Aspects","Ithasala Yogas","Harsha Bala","Panchavargeeya Bala","Mudda Dasha","Patyayini Dasha","Year Reading"] },
   lalkitab:{ title: "Lal Kitab Dossier", desc: "The Lal Kitab reading of every planet with its own household remedies.", sections: ["Rashi Chart","Planet by Planet","Debts & Blind Planets","Household Upaya","Sequence of Practice"] },
   numbers: { title: "Numerology Compendium", desc: "The complete number book — Pythagorean, Chaldean, Vedic and Lo Shu in one volume.", sections: ["Core Numbers","Why & How Each Number Works","Lucky Set","Karmic Debts & Lessons","Cycles & Pinnacles","Lo Shu Grid","Year Outlook"] },
 };
@@ -298,6 +301,11 @@ export function buildPdf(key: ReportKey, b: Birth) {
     const lines = pdf.splitTextToSize(pdfSafe(romanToArabicText(text)), w - margin * 2) as string[];
     for (const ln of lines) {
       ensureRoom(size + 12);
+      // newPage() resets the font to the gold running-head style, so restore
+      // body styling on every line rather than once per paragraph.
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(size);
+      pdf.setTextColor(230, 225, 210);
       pdf.text(ln, margin, y);
       y += size + 4;
     }
@@ -764,6 +772,49 @@ export function buildPdf(key: ReportKey, b: Birth) {
         ]),
         [110, 100, 250],
       );
+
+      const pvb = computePanchavargeeyaBala(vp.chart);
+      ensureRoom(200);
+      drawH("Panchavargeeya Bala");
+      drawP("Five-fold Tajika strength: sign dignity, distance from the exaltation point, term lord, decan lord and ninth-part lord. The combined score is reduced to Vishwa points out of twenty, which ranks how freely each planet can deliver this year.");
+      drawTable(
+        ["Planet", "Vishwa", "Grade", "Strongest source"],
+        [...pvb].sort((a, b) => b.vishwa - a.vishwa).map((b) => {
+          const best = [...b.components].sort(
+            (x, y2) => y2.points / y2.max - x.points / x.max)[0];
+          return [b.planet, `${b.vishwa} / 20`, b.grade, `${best.label} — ${best.note}`];
+        }),
+        [90, 80, 100, 190],
+      );
+
+      drawH("Mudda Dasha · the year in sequence");
+      drawP("The Vimshottari order compressed into this single solar year, beginning from the lord of the Moon's star in the annual chart. Each ruler colours its own stretch of the year.");
+      drawTable(
+        ["Ruler", "From", "To", "Days"],
+        computeMuddaDasha(vp.chart, vp.returnUTC).map((m) => [
+          m.lord, fmtDate(m.start), fmtDate(m.end), String(m.days),
+        ]),
+        [110, 130, 130, 90],
+      );
+
+      drawH("Patyayini Dasha · degree division");
+      drawP("The year divided by the degrees each planet and the annual ascendant have travelled inside their sign, weighted by annual strength. It is read alongside Mudda for finer timing.");
+      drawTable(
+        ["Ruler", "From", "To", "Days"],
+        computePatyayiniDasha(vp.chart, vp.returnUTC).map((m) => [
+          m.lord, fmtDate(m.start), fmtDate(m.end), String(m.days),
+        ]),
+        [110, 130, 130, 90],
+      );
+
+      const ysum = summariseYear(vp.chart, vp.muntha.house, vp.varshesh, pvb);
+      ensureRoom(220);
+      drawH("Year Reading");
+      drawP(ysum.theme);
+      drawSub("Working in your favour");
+      ysum.supports.forEach((line) => drawP(line));
+      drawSub("Needs care");
+      ysum.cautions.forEach((line) => drawP(line));
 
       drawH("Year Guidance");
       drawP(`The Muntha sits in house ${vp.muntha.house} of the annual chart, so the year asks for attention on that department first. ${vp.varshesh} rules the year, which means its weekday, its mantra and its habits are the practical levers. Work with the applying aspects early in the year and let the separating ones go.`);
