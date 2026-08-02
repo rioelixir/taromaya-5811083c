@@ -10,6 +10,8 @@ import { listKundlis } from "@/lib/kundli-storage.functions";
 import { buildGuideContext, GUIDE_SYSTEM_PROMPT, type SavedKundliRow } from "@/lib/ai-context";
 import { createJournalEntry } from "@/lib/journal.functions";
 import { PlainAIText } from "@/components/plain-ai-text";
+import { aiLanguageRule } from "@/lib/ai-language";
+import { useLang } from "@/lib/i18n";
 
 
 export const Route = createFileRoute("/ai")({
@@ -59,6 +61,10 @@ function AiPage() {
     [kundlis, selectedId],
   );
 
+  const lang = useLang();
+  const langRef = useRef(lang);
+  useEffect(() => { langRef.current = lang; }, [lang]);
+
   const transport = useMemo(() => new DefaultChatTransport({
     api: "/api/chat",
     headers: async (): Promise<Record<string, string>> => {
@@ -69,7 +75,7 @@ function AiPage() {
 
     body: () => ({
       context: buildGuideContext(selectedRow),
-      system: GUIDE_SYSTEM_PROMPT,
+      system: `${GUIDE_SYSTEM_PROMPT}\n\n${aiLanguageRule(langRef.current)}`,
     }),
   }), [selectedRow]);
 

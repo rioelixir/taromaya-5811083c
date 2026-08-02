@@ -6,45 +6,6 @@ export const LANGUAGE_LIST = [
   { code: "en", label: "English", ai: "English" },
   { code: "hi", label: "हिंदी", ai: "Hindi in Devanagari script" },
   { code: "hr", label: "Hinglish", ai: "Roman Hinglish (Hindi words written in Latin script, natural and conversational)" },
-  { code: "bn", label: "বাংলা", ai: "Bengali" },
-  { code: "mr", label: "मराठी", ai: "Marathi" },
-  { code: "te", label: "తెలుగు", ai: "Telugu" },
-  { code: "ta", label: "தமிழ்", ai: "Tamil" },
-  { code: "gu", label: "ગુજરાતી", ai: "Gujarati" },
-  { code: "kn", label: "ಕನ್ನಡ", ai: "Kannada" },
-  { code: "ml", label: "മലയാളം", ai: "Malayalam" },
-  { code: "pa", label: "ਪੰਜਾਬੀ", ai: "Punjabi in Gurmukhi script" },
-  { code: "or", label: "ଓଡ଼ିଆ", ai: "Odia" },
-  { code: "as", label: "অসমীয়া", ai: "Assamese" },
-  { code: "ur", label: "اردو", ai: "Urdu" },
-  { code: "ne", label: "नेपाली", ai: "Nepali" },
-  { code: "si", label: "සිංහල", ai: "Sinhala" },
-  { code: "sa", label: "संस्कृतम्", ai: "Sanskrit" },
-  { code: "kok", label: "कोंकणी", ai: "Konkani" },
-  { code: "mai", label: "मैथिली", ai: "Maithili" },
-  { code: "sd", label: "سنڌي", ai: "Sindhi" },
-  
-  { code: "mni", label: "ꯃꯤꯇꯩꯂꯣꯟ", ai: "Manipuri (Meitei)" },
-  { code: "es", label: "Español", ai: "Spanish" },
-  { code: "fr", label: "Français", ai: "French" },
-  { code: "de", label: "Deutsch", ai: "German" },
-  { code: "pt", label: "Português", ai: "Portuguese" },
-  { code: "it", label: "Italiano", ai: "Italian" },
-  { code: "ru", label: "Русский", ai: "Russian" },
-  { code: "ar", label: "العربية", ai: "Arabic" },
-  { code: "tr", label: "Türkçe", ai: "Turkish" },
-  { code: "fa", label: "فارسی", ai: "Persian (Farsi)" },
-  { code: "zh", label: "中文", ai: "Simplified Chinese" },
-  { code: "ja", label: "日本語", ai: "Japanese" },
-  { code: "ko", label: "한국어", ai: "Korean" },
-  { code: "id", label: "Bahasa Indonesia", ai: "Indonesian" },
-  { code: "ms", label: "Bahasa Melayu", ai: "Malay" },
-  { code: "th", label: "ไทย", ai: "Thai" },
-  { code: "vi", label: "Tiếng Việt", ai: "Vietnamese" },
-  { code: "nl", label: "Nederlands", ai: "Dutch" },
-  { code: "pl", label: "Polski", ai: "Polish" },
-  { code: "sw", label: "Kiswahili", ai: "Swahili" },
-  { code: "he", label: "עברית", ai: "Hebrew" },
 ] as const;
 
 export const LANGUAGES = LANGUAGE_LIST.map((l) => l.code) as unknown as readonly Lang[];
@@ -55,7 +16,7 @@ export const LANGUAGE_LABELS = Object.fromEntries(
 ) as Record<Lang, string>;
 
 /** Right-to-left languages, used to flip page direction. */
-export const RTL_LANGS: readonly Lang[] = ["ar", "ur", "fa", "he", "sd"];
+export const RTL_LANGS: readonly string[] = [];
 
 const STORAGE_KEY = "taromaya.lang";
 
@@ -76,6 +37,7 @@ function subscribe(cb: () => void) {
 
 export function setLang(next: Lang) {
   if (typeof window === "undefined") return;
+  markLangChosen();
   const prev = readLang();
   if (prev === next) return;
   window.localStorage.setItem(STORAGE_KEY, next);
@@ -83,6 +45,28 @@ export function setLang(next: Lang) {
   // No reload: the translator restores English text and re-translates in place.
   window.dispatchEvent(new CustomEvent("taromaya:lang", { detail: next }));
 }
+
+const SESSION_CHOSEN_KEY = "taromaya.lang.chosen";
+
+/** True once the reader has picked a language in this browser session. */
+export function hasChosenLang(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    return window.sessionStorage.getItem(SESSION_CHOSEN_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+/** Remember that the reader picked a language for this session. */
+export function markLangChosen() {
+  try {
+    window.sessionStorage.setItem(SESSION_CHOSEN_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
 
 
 export function useLang(): Lang {
@@ -97,7 +81,7 @@ export function useLang(): Lang {
 }
 
 
-type Entry = { en: string } & Partial<Record<Lang, string>>;
+type Entry = { en: string } & Record<string, string | undefined>;
 
 /**
  * Reviewed translations for the app's core professional terminology.

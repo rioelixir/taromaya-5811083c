@@ -15,6 +15,7 @@ import {
 } from "@/lib/tarot-decks";
 import { useUploadedDecks } from "@/hooks/use-uploaded-decks";
 import { interpretTarot } from "@/lib/tarot.functions";
+import { useLang } from "@/lib/i18n";
 import { PlainAIText } from "@/components/plain-ai-text";
 import { useOverlayBackGuard } from "@/hooks/use-overlay-back";
 import { NakshatraPanel, type StarContext } from "@/components/nakshatra-panel";
@@ -134,6 +135,7 @@ function TarotPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 1200, h: 800 });
   const interpret = useServerFn(interpretTarot);
+  const lang = useLang();
 
   // Show the one-time designer note on the first click in the Tarot module, then fade it out.
   useEffect(() => {
@@ -628,6 +630,7 @@ function TarotPage() {
             keywords: [],
             image: c.card.image,
           })),
+          lang,
           placeNakshatra: starCtx.placeNakshatra,
           placeName: starCtx.placeName,
           nakshatraCard: starCtx.nakshatraCard,
