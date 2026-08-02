@@ -154,7 +154,7 @@ export const Route = createFileRoute("/api/public/translate")({
               resolved.set(s, cached);
               return;
             }
-            const hit = await gtx(target, s, hinglish);
+            const hit = await translate(target, s, hinglish);
             if (!hit) {
               resolved.set(s, s);
               return;
@@ -163,6 +163,7 @@ export const Route = createFileRoute("/api/public/translate")({
             const out = hinglish ? (hit.roman ?? toLatin(hit.text)) : hit.text;
             memoSet(key, out);
             resolved.set(s, out);
+
           }),
         );
         const results = strings.map((s) => resolved.get(s) ?? s);
