@@ -1,5 +1,5 @@
 // Shared input validation helpers used across module forms.
-// Every error returns a plain-language, ELI10 message.
+// Every error returns a clear, plain-language message.
 import { z } from "zod";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;

@@ -211,16 +211,17 @@ export function AIInterpretation({
           <Button
             onClick={reveal}
             disabled={loading}
-            aria-label={text ? "Read it again" : "Read this for me"}
+            aria-label={text ? "Regenerate reading" : "Reveal reading"}
             className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-12 text-base"
           >
             {loading ? (
-              <><Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" /> Reading…</>
+              <><Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden="true" /> Preparing…</>
             ) : text ? (
-              <><RefreshCw className="mr-2 h-5 w-5" aria-hidden="true" /> Read again</>
+              <><RefreshCw className="mr-2 h-5 w-5" aria-hidden="true" /> Regenerate reading</>
             ) : (
-              <><Sparkles className="mr-2 h-5 w-5" aria-hidden="true" /> Read this for me</>
+              <><Sparkles className="mr-2 h-5 w-5" aria-hidden="true" /> Reveal reading</>
             )}
+
           </Button>
 
         </div>

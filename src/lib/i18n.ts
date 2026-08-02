@@ -95,10 +95,51 @@ export function useLang(): Lang {
 }
 
 
-type Entry = { en: string; hi: string; hr: string };
+type Entry = { en: string } & Partial<Record<Lang, string>>;
+
+/**
+ * Reviewed translations for the app's core professional terminology.
+ * Keys are the English string itself. Languages without a reviewed entry fall
+ * back to English here and are translated live by the AI translator.
+ */
+const CORE_TERMS: Record<string, Entry> = {
+  "Overview":              { en: "Overview", hi: "अवलोकन", hr: "Overview", bn: "সংক্ষিপ্ত বিবরণ", mr: "आढावा", gu: "ઝલક", ta: "மேலோட்டம்", te: "సమగ్ర వివరణ" },
+  "Vedic astrology":       { en: "Vedic astrology", hi: "वैदिक ज्योतिष", hr: "Vedic Jyotish", bn: "বৈদিক জ্যোতিষ", mr: "वैदिक ज्योतिष", gu: "વૈદિક જ્યોતિષ", ta: "வேத ஜோதிடம்", te: "వైదిక జ్యోతిష్యం" },
+  "Doshas and remedies":   { en: "Doshas and remedies", hi: "दोष और उपाय", hr: "Dosh aur upay", bn: "দোষ ও প্রতিকার", mr: "दोष आणि उपाय", gu: "દોષ અને ઉપાય", ta: "தோஷங்கள் மற்றும் பரிகாரங்கள்", te: "దోషాలు మరియు పరిహారాలు" },
+  "Life and relationships":{ en: "Life and relationships", hi: "जीवन और संबंध", hr: "Jeevan aur rishte", bn: "জীবন ও সম্পর্ক", mr: "जीवन आणि नातेसंबंध", gu: "જીવન અને સંબંધો", ta: "வாழ்க்கை மற்றும் உறவுகள்", te: "జీవితం మరియు సంబంధాలు" },
+  "Transits and forecasts":{ en: "Transits and forecasts", hi: "गोचर और भविष्यवाणी", hr: "Gochar aur forecast", bn: "গোচর ও পূর্বাভাস", mr: "गोचर आणि अंदाज", gu: "ગોચર અને આગાહી", ta: "கோச்சாரம் மற்றும் முன்னறிவிப்பு", te: "గోచారం మరియు అంచనాలు" },
+  "Janma Kundli":          { en: "Janma Kundli", hi: "जन्म कुंडली", hr: "Janma Kundli", bn: "জন্ম কুণ্ডলী", mr: "जन्म कुंडली", gu: "જન્મ કુંડળી", ta: "ஜாதகம்", te: "జన్మ కుండలి" },
+  "Tarot consultation":    { en: "Tarot consultation", hi: "टैरो परामर्श", hr: "Tarot consultation", bn: "টैরো পরামর্শ", mr: "टॅरो सल्ला", gu: "ટેરો પરામર્શ", ta: "டாரோ ஆலோசனை", te: "టారో సలహా" },
+  "Chart analysis":        { en: "Chart analysis", hi: "कुंडली विश्लेषण", hr: "Kundli analysis", bn: "কুণ্ডলী বিশ্লেষণ", mr: "कुंडली विश्लेषण", gu: "કુંડળી વિશ્લેષણ", ta: "ஜாதக பரிசீலனை", te: "కుండలి విశ్లేషణ" },
+  "Planetary strength":    { en: "Planetary strength", hi: "ग्रह बल", hr: "Grah bal", bn: "গ্রহবল", mr: "ग्रहबल", gu: "ગ્રહબળ", ta: "கிரக பலம்", te: "గ్రహ బలం" },
+  "Annual forecast":       { en: "Annual forecast", hi: "वर्षफल", hr: "Varshphal", bn: "বর্ষফল", mr: "वर्षफल", gu: "વર્ષફળ", ta: "வருட பலன்", te: "వర్షఫలం" },
+  "Advanced Jyotish":      { en: "Advanced Jyotish", hi: "उन्नत ज्योतिष", hr: "Advanced Jyotish", bn: "উচ্চতর জ্যোতিষ", mr: "प्रगत ज्योतिष", gu: "પ્રગત જ્યોતિષ", ta: "மேம்பட்ட ஜோதிடம்", te: "అధునాతన జ్యోతిష్యం" },
+  "Birth nakshatra":       { en: "Birth nakshatra", hi: "जन्म नक्षत्र", hr: "Janma Nakshatra", bn: "জন্ম নক্ষত্র", mr: "जन्म नक्षत्र", gu: "જન્મ નક્ષત્ર", ta: "பிறப்பு நட்சத்திரம்", te: "జన్మ నక్షత్రం" },
+  "Remedies":              { en: "Remedies", hi: "उपाय", hr: "Upay", bn: "প্রতিকার", mr: "उपाय", gu: "ઉપાય", ta: "பரிகாரம்", te: "పరిహారాలు" },
+  "Numerology":            { en: "Numerology", hi: "अंक ज्योतिष", hr: "Ank Jyotish", bn: "সংখ্যাতত্ত্ব", mr: "अंकशास्त्र", gu: "અંકશાસ્ત્ર", ta: "எண் கணிதம்", te: "సంఖ్యా శాస్త్రం" },
+  "Kundli matching":       { en: "Kundli matching", hi: "कुंडली मिलान", hr: "Kundli milan", bn: "কুণ্ডলী মিলন", mr: "कुंडली जुळणी", gu: "કુંડળી મેળાપ", ta: "ஜாதகப் பொருத்தம்", te: "కుండలి మ్యాచింగ్" },
+  "Career and education":  { en: "Career and education", hi: "करियर और शिक्षा", hr: "Career aur shiksha", bn: "কর্মজীবন ও শিক্ষা", mr: "करिअर आणि शिक्षण", gu: "કારકિર્દી અને શિક્ષણ", ta: "பணி மற்றும் கல்வி", te: "వృత్తి మరియు విద్య" },
+  "Finances":              { en: "Finances", hi: "वित्त", hr: "Paisa aur finance", bn: "আর্থিক বিষয়", mr: "आर्थिक बाबी", gu: "નાણાકીય બાબતો", ta: "நிதி", te: "ఆర్థిక విషయాలు" },
+  "Health":                { en: "Health", hi: "स्वास्थ्य", hr: "Swasthya", bn: "স্বাস্থ্য", mr: "आरोग्य", gu: "આરોગ્ય", ta: "உடல்நலம்", te: "ఆరోగ్యం" },
+  "Current transits":      { en: "Current transits", hi: "वर्तमान गोचर", hr: "Current gochar", bn: "বর্তমান গোচর", mr: "चालू गोचर", gu: "ચાલુ ગોચર", ta: "தற்போதைய கோச்சாரம்", te: "ప్రస్తుత గోచారం" },
+  "Forecast timeline":     { en: "Forecast timeline", hi: "भविष्य समय-रेखा", hr: "Forecast timeline", bn: "পূর্বাভাস সময়রেখা", mr: "अंदाज कालरेषा", gu: "આગાહી સમયરેખા", ta: "முன்னறிவிப்பு காலவரிசை", te: "అంచనా కాలరేఖ" },
+  "Reading history":       { en: "Reading history", hi: "पिछले पाठ", hr: "Purani readings", bn: "পূর্বের পাঠ", mr: "मागील वाचने", gu: "અગાઉના પાઠ", ta: "முந்தைய வாசிப்புகள்", te: "గత రీడింగ్‌లు" },
+  "Saved charts":          { en: "Saved charts", hi: "सहेजी कुंडलियाँ", hr: "Saved kundlis", bn: "সংরক্ষিত কুণ্ডলী", mr: "जतन केलेल्या कुंडल्या", gu: "સાચવેલી કુંડળીઓ", ta: "சேமித்த ஜாதகங்கள்", te: "సేవ్ చేసిన కుండలిలు" },
+  "Profile":               { en: "Profile", hi: "प्रोफ़ाइल", hr: "Profile", bn: "প্রোফাইল", mr: "प्रोफाइल", gu: "પ્રોફાઇલ", ta: "சுயவிவரம்", te: "ప్రొఫైల్" },
+  "Birth details":         { en: "Birth details", hi: "जन्म विवरण", hr: "Janm details", bn: "জন্ম বিবরণ", mr: "जन्म तपशील", gu: "જન્મ વિગતો", ta: "பிறப்பு விவரங்கள்", te: "జన్మ వివరాలు" },
+  "Generate":              { en: "Generate", hi: "तैयार करें", hr: "Generate karo", bn: "তৈরি করুন", mr: "तयार करा", gu: "તૈયાર કરો", ta: "உருவாக்கு", te: "సృష్టించు" },
+  "Summary":               { en: "Summary", hi: "सारांश", hr: "Summary", bn: "সারসংক্ষেপ", mr: "सारांश", gu: "સારાંશ", ta: "சுருக்கம்", te: "సారాంశం" },
+  "Detailed analysis":     { en: "Detailed analysis", hi: "विस्तृत विश्लेषण", hr: "Detailed analysis", bn: "বিস্তারিত বিশ্লেষণ", mr: "सविस्तर विश्लेषण", gu: "વિગતવાર વિશ્લેષણ", ta: "விரிவான பரிசீலனை", te: "వివరణాత్మక విశ్లేషణ" },
+  "Opportunities":         { en: "Opportunities", hi: "अवसर", hr: "Mauke", bn: "সুযোগ", mr: "संधी", gu: "તકો", ta: "வாய்ப்புகள்", te: "అవకాశాలు" },
+  "Challenges to manage":  { en: "Challenges to manage", hi: "संभालने योग्य चुनौतियाँ", hr: "Challenges", bn: "সামলানোর চ্যালেঞ্জ", mr: "हाताळायच्या अडचणी", gu: "સંભાળવાના પડકારો", ta: "கவனிக்க வேண்டிய சவால்கள்", te: "నిర్వహించాల్సిన సవాళ్లు" },
+  "Timing":                { en: "Timing", hi: "समय", hr: "Timing", bn: "সময়", mr: "वेळ", gu: "સમય", ta: "நேரம்", te: "సమయం" },
+  "Recommended next steps":{ en: "Recommended next steps", hi: "अगले सुझाए कदम", hr: "Agle steps", bn: "পরবর্তী প্রস্তাবিত পদক্ষেপ", mr: "पुढील शिफारस केलेली पावले", gu: "આગળના સૂચિત પગલાં", ta: "அடுத்த பரிந்துரைகள்", te: "తదుపరి సూచించిన చర్యలు" },
+};
 
 /** Dictionary keyed by the English string itself for painless in-place use. */
 const DICT: Record<string, Entry> = {
+  ...CORE_TERMS,
+
   // Nav groups
   "Home":            { en: "Home",            hi: "मुख्य",         hr: "Home" },
   "Horoscopes":      { en: "Horoscopes",      hi: "राशिफल",       hr: "Rashifal" },

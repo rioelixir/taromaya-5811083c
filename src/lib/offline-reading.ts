@@ -190,46 +190,66 @@ function topicOf(all: string): Topic {
 
 const TOPIC_OPENERS: Record<Topic, string[]> = {
   birth: [
-    "This is the map you were born with. It shows the shape of your nature, not a fixed future.",
-    "Here is your birth map in plain words. Think of it as your starting kit, not your ending.",
+    "This is a reading of the chart you were born with. It describes your natural temperament and the conditions you tend to work with, rather than a fixed outcome.",
+    "This reading works from your own birth chart. It sets out your underlying disposition and the areas of life it most often shapes.",
   ],
   transit: [
-    "This is the sky today moving over your own map. It is weather, so it passes.",
-    "Here is what today's sky is doing to your chart. Weather, not fate.",
+    "This reading covers current planetary movement across your birth chart. Transits describe passing conditions, so their influence is time-bound.",
+    "This is an assessment of today's planetary positions in relation to your chart. Treat it as prevailing conditions rather than fate.",
   ],
   numbers: [
-    "These are your birth numbers. They show your habits and your natural style.",
-    "Here is what your numbers say about how you think, choose and act.",
+    "This is a numerological profile drawn from your birth date and name. It describes decision-making style, natural strengths and recurring patterns.",
+    "This reading interprets your core numbers and what they indicate about how you think, choose and work.",
   ],
   match: [
-    "Two charts always have easy parts and hard parts. Both are normal, and both are useful.",
-    "Here is how these two fit together, the smooth bits and the bumpy bits.",
+    "This is a comparative reading of two charts. Every pairing carries areas of natural ease and areas that require deliberate effort; both are informative.",
+    "This assessment sets out where the two charts support each other and where friction is likely, with practical guidance for each.",
   ],
   horoscope: [
-    "Think of this as the weather for your mood, so you can dress for it.",
-    "Here is the mood of the days ahead and how to work with it.",
+    "This is a short-range forecast of prevailing conditions, intended to help you plan the days ahead.",
+    "This reading describes the tone of the coming days and how best to work with it.",
   ],
   timing: [
-    "This is about the calm times and the noisy times of the day for what you plan.",
-    "Here is when the day helps you and when it asks you to wait.",
+    "This is a timing assessment: the more supportive and less supportive windows for what you are planning.",
+    "This reading identifies when conditions favour action and when it is better to wait.",
   ],
   period: [
-    "A life period is like a season. It has its own jobs and its own gifts.",
-    "Here is the season you are walking through and what it is asking of you.",
+    "This reading covers the planetary period you are currently in. A period behaves like a long season, with its own demands and its own openings.",
+    "This is an assessment of your current life period and what it is asking of you.",
   ],
   star: [
-    "Your birth star adds flavour to everything else in your chart.",
-    "Here is what your star is adding to the whole picture.",
+    "This reading interprets your birth nakshatra, which colours the rest of the chart.",
+    "This is an assessment of your birth star and what it contributes to the wider picture.",
   ],
-  general: ["Here is the simple version, in plain words.", "Let us keep this easy to follow."],
+  general: [
+    "This is a structured reading of the details supplied, set out clearly and in order.",
+    "Here is a considered interpretation of the information provided.",
+  ],
 };
 
 const CLOSERS = [
-  "Nothing here is fixed. Your choices still steer the ship.",
-  "Take what helps and leave the rest. You know your life best.",
-  "Small steady steps work better than one big jump.",
-  "Come back to this in a week and see what has changed.",
+  "Astrological and symbolic readings describe tendencies and likely conditions, not certainties; your own decisions remain the deciding factor.",
+  "Take what is useful and set aside what does not apply. This reading is guidance, not instruction.",
+  "Consistent, incremental action produces better results here than a single decisive move.",
+  "Revisit this reading after a week and note what has actually shifted; that record is the most reliable guide you have.",
 ];
+
+/** Favourable conditions drawn from what the data supports. */
+const OPPORTUNITY_LINES = [
+  "Conditions favour consolidation: existing work, relationships and commitments respond better than new ventures started from scratch.",
+  "Communication and negotiation are supported here, so conversations you have been postponing are worth scheduling.",
+  "This is a productive period for learning and preparation, which pays off once conditions shift.",
+  "Support is available from people who already know your work; asking directly is likely to be met well.",
+];
+
+/** Honest difficulties, framed as manageable. */
+const CHALLENGE_LINES = [
+  "Impatience is the main risk in this period. Deadlines set too tightly are the most likely source of avoidable error.",
+  "Expect some delay in matters that depend on other people; build slack into your plans rather than pressing harder.",
+  "Energy is uneven here, so guard against overcommitting on a good day and paying for it across the following week.",
+  "Written details, paperwork and agreements deserve a second review before you commit to them.",
+];
+
 
 /** Everything the data mentions, kept in named groups so the story joins up. */
 type Found = {
@@ -302,7 +322,7 @@ export function offlineReading(input: ReadingRequest): string {
   // 1. Straight answer, in the right voice for what was asked.
   const answer = [
     pick(TOPIC_OPENERS[topic], n),
-    person.name ? `This one is written for ${person.name}, from their own details.` : "",
+    person.name ? `It is prepared for ${person.name} from the details supplied.` : "",
   ];
 
   // 2. The facts, repeated back so the reader can check them.
@@ -395,11 +415,17 @@ export function offlineReading(input: ReadingRequest): string {
     .slice(0, 3)
     .map((d) => cap(d))
     .concat(
-      areas[0] ? `Give ${areas[0].label.toLowerCase()} ten honest minutes today` : "",
-      "Pick the one line above that feels most true and act on it today",
-      "Write down how it goes, so you can spot the pattern later",
+      areas[0] ? `Give ${areas[0].label.toLowerCase()} a protected ten minutes today` : "",
+      "Choose the single observation above that rings truest and act on it this week",
+      "Keep a short written record of the outcome so the pattern becomes visible",
     );
 
+  // Two distinct lines each, so no sentence is ever repeated in one reading.
+  const twoOf = (list: string[], offset: number) => {
+    const a = list[offset % list.length];
+    const b = list[(offset + 1 + (offset % (list.length - 1))) % list.length];
+    return (a === b ? [a] : [a, b]).map((l) => `• ${l}`);
+  };
 
   return composeReading([
     section("answer", answer),
@@ -407,7 +433,11 @@ export function offlineReading(input: ReadingRequest): string {
     section("meaning", story.length ? story : meanings.map((m) => `• ${cap(m.is)}, so ${m.feels}.`)),
     section("areas", areaLines),
     section("why", why),
+    section("opportunities", twoOf(OPPORTUNITY_LINES, n)),
+    section("challenges", twoOf(CHALLENGE_LINES, n >> 2)),
+
     section("timing", [timing]),
+
     section(
       "steps",
       actions

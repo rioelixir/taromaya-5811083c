@@ -149,8 +149,8 @@ function BirthDetailsPage() {
 
               <div className="flex items-center justify-between gap-3 pt-2">
                 <p className="text-[11px] text-muted-foreground max-w-md">
-                  <b className="text-foreground">ELI10:</b> This is where and when you were born.
-                  We use it to calculate your sky map. It stays with your account only.
+                  <b className="text-foreground">Why we ask:</b> your date, time and place of birth are
+                  required to calculate your chart accurately. They remain private to your account.
                 </p>
                 <button
                   type="submit"

@@ -15,7 +15,7 @@ export const DEFAULT_TOUR: TourStep[] = [
   { title: "1. Save your birth details once", body: "Open Birth Details from the menu and save your date, exact time, and place. Every module (Kundli, Dasha, Panchang, Numerology, Match Making) auto-fills from this." },
   { title: "2. Kundli", body: "Your full Vedic chart with North / South Indian diamonds, Vargas D1–D60, Vimshottari Dasha, Yogas, Doshas, Ashtakavarga, Shadbala, and KP sub-lords." },
   { title: "3. Tarot", body: "Draw from Rider-Waite, Nakshatra, Health, Lost & Found, or Soulmates decks with 1-card, Yes/No, Past-Present-Future, or freestyle spreads. No reversed cards, no reshuffling mid-draw." },
-  { title: "4. AI Reading", body: "Every module has an AI interpretation in plain English (ELI10) or Hindi. Uses your chart directly — no vague generic text." },
+  { title: "4. AI Reading", body: "Every module includes a professional AI interpretation in your chosen language, written from your own chart rather than generic text." },
   { title: "5. Voice", body: "Tap the microphone and speak — say a page name to move around, or tap a box first and speak to fill it in." },
   { title: "You’re ready", body: "Tap Skip anytime. You can restart this tour from How to Use TAROMAYA in the menu." },
 ];
