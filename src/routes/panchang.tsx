@@ -13,6 +13,7 @@ import { Sun, Moon, Clock, MapPin, Sparkles, CalendarDays, ShieldAlert, Flame } 
 import { Explain } from "@/components/explain";
 import { ConfidenceNote } from "@/components/confidence-note";
 import { CrossCheckPanel } from "@/components/cross-check-panel";
+import { PanchangClassicalPanels } from "@/components/panchang-classical-panels";
 
 
 export const Route = createFileRoute("/panchang")({
@@ -210,6 +211,8 @@ function PanchangPage() {
           </div>
         </div>
       )}
+
+      <PanchangClassicalPanels panchang={p} latitude={Number(lat)} longitude={Number(lon)} />
 
       <ConfidenceNote noteKey="panchang-timings" />
 

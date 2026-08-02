@@ -36,6 +36,8 @@ import {
   CheckCircle2, XCircle, Gem, Scroll, Activity, Grid3x3, KeyRound, Download,
 } from "lucide-react";
 import { CurrentTransit } from "@/components/current-transit";
+import { KundliClassicalPanels } from "@/components/kundli-classical-panels";
+import { computePanchang } from "@/lib/panchang";
 import { BirthOneBox } from "@/components/birth-one-box";
 
 
@@ -64,7 +66,7 @@ const DEFAULTS: FormState = {
   elevation: "0", unknownTime: false,
 };
 
-type TabId = "overview" | "transit" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "reading";
+type TabId = "overview" | "transit" | "vargas" | "dasha" | "yogas" | "doshas" | "planets" | "ashtaka" | "shadbala" | "kp" | "lalkitab" | "gems" | "classical" | "reading";
 const TABS: { id: TabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "transit", label: "Current Transit" },
@@ -78,6 +80,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "kp", label: "KP Sub-Lords" },
   { id: "lalkitab", label: "Lal Kitab" },
   { id: "gems", label: "Gemstones" },
+  { id: "classical", label: "Classical details" },
   { id: "reading", label: "AI Reading" },
 ];
 
@@ -290,6 +293,9 @@ function KundliPage() {
             {tab === "kp" && <KPTab chart={chart} />}
             {tab === "lalkitab" && <LalKitabTab chart={chart} />}
             {tab === "gems" && <GemstonesTab chart={chart} />}
+            {tab === "classical" && (
+              <ClassicalTab chart={chart} birthDate={birthDate} latitude={Number(form.lat)} longitude={Number(form.lon)} />
+            )}
             {tab === "reading" && <ReadingTab reading={reading} loading={loadingReading} />}
 
             <ConfidenceNote
@@ -643,6 +649,29 @@ const DASHA_META: Record<DashaSystem, { label: string; totalYears: number; desc:
   yogini:      { label: "Yogini",       totalYears: 36,  desc: "36-year, 8-yogini cycle — quick, event-focused predictive tool." },
   ashtottari:  { label: "Ashtottari",   totalYears: 108, desc: "108-year, 8-lord dasha — traditional supplement for karma & longevity." },
 };
+
+function ClassicalTab({ chart, birthDate, latitude, longitude }: { chart: KundliChart; birthDate: Date; latitude: number; longitude: number }) {
+  const day = useMemo(
+    () => computePanchang({ date: birthDate, latitude, longitude }),
+    [birthDate, latitude, longitude],
+  );
+  const next = useMemo(
+    () => computePanchang({
+      date: new Date(birthDate.getTime() + 86400000),
+      latitude, longitude,
+    }),
+    [birthDate, latitude, longitude],
+  );
+  return (
+    <KundliClassicalPanels
+      chart={chart}
+      birth={birthDate}
+      sunrise={day.sunrise}
+      sunset={day.sunset}
+      nextSunrise={next.sunrise}
+    />
+  );
+}
 
 function DashaTab({ chart, birthDate }: { chart: KundliChart; birthDate: Date }) {
   const NAK_SPAN = 360 / 27;
