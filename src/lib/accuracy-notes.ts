@@ -167,7 +167,25 @@ export const ACCURACY_NOTES: Record<string, AccuracyNote> = Object.fromEntries(
       ],
       inputs: ["Birth date", "Full birth name spelling"],
     }),
+    N({
+      key: "nadi",
+      section: "Nadi astrology",
+      confidence: "sensitive",
+      summary: "The nadi amsa is one 12-arc-minute slice of the zodiac, so a few minutes of birth time can move you to the neighbouring leaf.",
+      assumptions: [
+        "Lahiri (Chitrapaksha) ayanamsa and the true node for Rahu.",
+        "Each sign is divided into 150 nadi amsas, giving 1800 divisions of the zodiac.",
+        "Nadi type Adi, Madhya or Antya comes from the birth Nakshatra, the same value used for Nadi Dosha in matching.",
+      ],
+      edgeCases: [
+        "The Moon moves about one nadi amsa every 24 minutes, so an uncertain birth time changes the leaf number.",
+        "When the Moon amsa and the Ascendant amsa disagree, a reader opens both bundles and confirms with family names.",
+        "Palm-leaf verse text is not calculated. Only the bundle, kandam and leaf address are derived.",
+      ],
+      inputs: ["Birth date", "Exact birth time", "Birth place"],
+    }),
   ].map((n) => [n.key, n]),
+
 );
 
 export function accuracyNote(key: string): AccuracyNote | undefined {
