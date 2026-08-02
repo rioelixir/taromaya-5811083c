@@ -177,7 +177,7 @@ About 380 words.`,
       {sign && (tab === "western" || tab === "vedic") && (
         <div className="mt-8 space-y-4">
           <SignDomainPanel
-            signIndex={(tab === "vedic" ? RASHIS : SIGN_NAMES).indexOf(sign)}
+            signIndex={(tab === "vedic" ? (RASHIS as readonly string[]) : (SIGN_NAMES as readonly string[])).indexOf(sign)}
             system={tab === "vedic" ? "vedic" : "western"}
             period={period}
             now={today}
