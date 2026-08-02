@@ -336,7 +336,7 @@ function BirthForm({
       <div className="grid gap-3">
         <BirthOneBox
           value={{ name: form.name, date: form.date, time: form.time, place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-          onChange={(patch: Record<string, string>) => setForm((prev) => ({ ...prev, ...patch, unknownTime: false }) as FormState)}
+          onChange={(patch: Record<string, string>) => { console.log('DBG kundli patch', JSON.stringify(patch)); setForm((prev) => { const n = { ...prev, ...patch, unknownTime: false } as FormState; console.log('DBG kundli next', n.name, n.date, n.time, n.place); return n; }); }}
           onGenerate={canSubmit ? onCompute : undefined}
         />
 
