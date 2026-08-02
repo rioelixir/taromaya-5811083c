@@ -197,7 +197,7 @@ function NumerologyPage() {
         <ProfilesPanel
           fullName={fullName}
           birthDate={birthDate}
-          onSelect={(p) => { setFullName(p.name); setBirthDate(p.birthDate); setTab("report"); }}
+          onSelect={(p: SavedProfile) => { setFullName(p.name); setBirthDate(p.birthDate); setTab("report"); }}
         />
       )}
 
