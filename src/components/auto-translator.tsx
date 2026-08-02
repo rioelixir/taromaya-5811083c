@@ -12,22 +12,35 @@ const ATTRS = ["placeholder", "aria-label", "title", "alt", "label", "value"] as
 const doneText = new WeakMap<Text, { src: string; out: string }>();
 const doneAttr = new WeakMap<Element, Record<string, { src: string; out: string }>>();
 
+/** Every node/attribute we touched, so switching language can restore English. */
+const touchedText = new Set<Text>();
+const touchedAttr = new Set<Element>();
+
+const memCache: Partial<Record<Lang, Record<string, string>>> = {};
+
 function loadCache(lang: Lang): Record<string, string> {
+  if (memCache[lang]) return memCache[lang]!;
   if (typeof window === "undefined") return {};
   try {
     const raw = window.localStorage.getItem(CACHE_KEY(lang));
-    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    memCache[lang] = raw ? (JSON.parse(raw) as Record<string, string>) : {};
   } catch {
-    return {};
+    memCache[lang] = {};
   }
+  return memCache[lang]!;
 }
 
+let saveTimer = 0;
 function saveCache(lang: Lang, cache: Record<string, string>) {
-  try {
-    window.localStorage.setItem(CACHE_KEY(lang), JSON.stringify(cache));
-  } catch {
-    /* ignore quota */
-  }
+  memCache[lang] = cache;
+  clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(() => {
+    try {
+      window.localStorage.setItem(CACHE_KEY(lang), JSON.stringify(cache));
+    } catch {
+      /* ignore quota */
+    }
+  }, 400);
 }
 
 function shouldTranslate(text: string): boolean {
@@ -101,39 +114,94 @@ function collectAttrs(root: Element, out: Array<{ el: Element; attr: string }>) 
   }
 }
 
+/** Put every touched node/attribute back to its English source text. */
+function restoreEnglish() {
+  touchedText.forEach((n) => {
+    const prev = doneText.get(n);
+    if (prev && n.nodeValue === prev.out) n.nodeValue = prev.src;
+    doneText.delete(n);
+  });
+  touchedText.clear();
+  touchedAttr.forEach((el) => {
+    let store: Record<string, string> = {};
+    try {
+      store = JSON.parse(el.getAttribute(ATTR_ORIG) || "{}");
+    } catch {
+      /* noop */
+    }
+    Object.entries(store).forEach(([attr, orig]) => el.setAttribute(attr, orig));
+    el.removeAttribute(ATTR_ORIG);
+    doneAttr.delete(el);
+  });
+  touchedAttr.clear();
+}
+
 async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<string, string>> {
   if (strings.length === 0) return {};
   const map: Record<string, string> = {};
-  const CHUNK = 30;
+  const CHUNK = 50;
   const batches: string[][] = [];
   for (let i = 0; i < strings.length; i += CHUNK) batches.push(strings.slice(i, i + CHUNK));
 
-  // Run batches in parallel (capped) so the page finishes translating fast.
-  const LIMIT = 4;
-  for (let i = 0; i < batches.length; i += LIMIT) {
-    const slice = batches.slice(i, i + LIMIT);
-    await Promise.all(
-      slice.map(async (batch) => {
-        try {
-          const res = await fetch("/api/public/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ lang, strings: batch }),
-          });
-          if (!res.ok) return;
-          const { translations } = (await res.json()) as { translations: string[] };
-          if (!Array.isArray(translations)) return;
-          translations.forEach((t, idx) => {
-            const src = batch[idx];
-            if (src && t && typeof t === "string") map[src] = t;
-          });
-        } catch {
-          /* skip batch */
-        }
-      }),
-    );
-  }
+  // Fire every batch at once so the page finishes translating in one round trip window.
+  await Promise.all(
+    batches.map(async (batch) => {
+      try {
+        const res = await fetch("/api/public/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, strings: batch }),
+        });
+        if (!res.ok) return;
+        const { translations } = (await res.json()) as { translations: string[] };
+        if (!Array.isArray(translations)) return;
+        translations.forEach((t, idx) => {
+          const src = batch[idx];
+          if (src && t && typeof t === "string") map[src] = t;
+        });
+      } catch {
+        /* skip batch */
+      }
+    }),
+  );
   return map;
+}
+
+function applyText(nodes: Text[], cache: Record<string, string>) {
+  nodes.forEach((n) => {
+    const raw = n.nodeValue ?? "";
+    const key = raw.trim();
+    const translated = cache[key];
+    if (!translated || translated === key) return;
+    const leading = raw.match(/^\s*/)?.[0] ?? "";
+    const trailing = raw.match(/\s*$/)?.[0] ?? "";
+    const out = leading + translated + trailing;
+    if (out === raw) return;
+    n.nodeValue = out;
+    doneText.set(n, { src: raw, out });
+    touchedText.add(n);
+  });
+}
+
+function applyAttrs(targets: Array<{ el: Element; attr: string }>, cache: Record<string, string>) {
+  targets.forEach(({ el, attr }) => {
+    const v = el.getAttribute(attr) ?? "";
+    const translated = cache[v.trim()];
+    if (!translated || translated === v.trim()) return;
+    let store: Record<string, string> = {};
+    try {
+      store = JSON.parse(el.getAttribute(ATTR_ORIG) || "{}");
+    } catch {
+      /* noop */
+    }
+    if (store[attr] == null) store[attr] = v;
+    el.setAttribute(ATTR_ORIG, JSON.stringify(store));
+    el.setAttribute(attr, translated);
+    const prev = doneAttr.get(el) ?? {};
+    prev[attr] = { src: v, out: translated };
+    doneAttr.set(el, prev);
+    touchedAttr.add(el);
+  });
 }
 
 let running = false;
@@ -157,6 +225,10 @@ async function translatePage(lang: Lang) {
     collectAttrs(root, attrTargets);
     if (textNodes.length === 0 && attrTargets.length === 0) return;
 
+    // 1) Instant pass — everything already cached shows up with zero delay.
+    applyText(textNodes, cache);
+    applyAttrs(attrTargets, cache);
+
     const uniq = new Set<string>();
     textNodes.forEach((n) => {
       const raw = (n.nodeValue ?? "").trim();
@@ -166,50 +238,22 @@ async function translatePage(lang: Lang) {
       const v = (el.getAttribute(attr) ?? "").trim();
       if (v && cache[v] == null) uniq.add(v);
     });
+    if (uniq.size === 0) return;
 
-    if (uniq.size > 0) {
-      const fetched = await fetchTranslations(lang, Array.from(uniq));
-      Object.assign(cache, fetched);
-      saveCache(lang, cache);
-    }
+    // 2) Fetch only what is missing, then apply the rest.
+    const fetched = await fetchTranslations(lang, Array.from(uniq));
+    Object.assign(cache, fetched);
+    saveCache(lang, cache);
 
-    // Apply text nodes
-    textNodes.forEach((n) => {
-      const raw = n.nodeValue ?? "";
-      const key = raw.trim();
-      const translated = cache[key];
-      if (!translated || translated === key) return;
-      const leading = raw.match(/^\s*/)?.[0] ?? "";
-      const trailing = raw.match(/\s*$/)?.[0] ?? "";
-      const out = leading + translated + trailing;
-      if (out === raw) return;
-      n.nodeValue = out;
-      doneText.set(n, { src: raw, out });
-    });
-
-    // Apply attributes
-    attrTargets.forEach(({ el, attr }) => {
-      const v = el.getAttribute(attr) ?? "";
-      const translated = cache[v.trim()];
-      if (!translated || translated === v.trim()) return;
-      let store: Record<string, string> = {};
-      try {
-        store = JSON.parse(el.getAttribute(ATTR_ORIG) || "{}");
-      } catch {
-        /* noop */
-      }
-      if (store[attr] == null) store[attr] = v;
-      el.setAttribute(ATTR_ORIG, JSON.stringify(store));
-      el.setAttribute(attr, translated);
-      const prev = doneAttr.get(el) ?? {};
-      prev[attr] = { src: v, out: translated };
-      doneAttr.set(el, prev);
-    });
+    const pendingText = textNodes.filter((n) => fetched[(n.nodeValue ?? "").trim()]);
+    const pendingAttrs = attrTargets.filter(({ el, attr }) => fetched[(el.getAttribute(attr) ?? "").trim()]);
+    applyText(pendingText, cache);
+    applyAttrs(pendingAttrs, cache);
   } finally {
     running = false;
     if (queued) {
       queued = false;
-      setTimeout(() => translatePage(lang), 80);
+      setTimeout(() => translatePage(lang), 60);
     }
   }
 }
@@ -222,6 +266,9 @@ export function AutoTranslator() {
     if (typeof window === "undefined") return;
     document.documentElement.lang = lang === "hr" ? "en-IN" : lang;
     document.documentElement.dir = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
+
+    // Switching language: put English back first, then translate afresh.
+    restoreEnglish();
     if (lang === "en") return;
 
     let raf = 0;
@@ -233,15 +280,15 @@ export function AutoTranslator() {
       });
     };
 
-    // A few passes after hydration so late-mounting panels are covered too.
-    const timers = [250, 900, 2000, 4000].map((d) => setTimeout(() => schedule(), d));
+    schedule();
+    const timers = [150, 600, 1600, 3500].map((d) => setTimeout(() => schedule(), d));
     const unsub = router.subscribe("onResolved", () => {
-      setTimeout(() => schedule(), 150);
-      setTimeout(() => schedule(), 900);
+      schedule();
+      setTimeout(() => schedule(), 500);
     });
 
     // Watch DOM changes (new panels, re-renders, streamed AI text).
-    const observer = new MutationObserver(() => schedule(120));
+    const observer = new MutationObserver(() => schedule(60));
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 
     return () => {

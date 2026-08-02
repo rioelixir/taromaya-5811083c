@@ -13,8 +13,20 @@ const GOOGLE_CODE: Record<string, string> = {
   sa: "sa",
 };
 
+/** Server-side memo so repeat strings never hit the network twice. */
+const memo = new Map<string, string>();
+const MEMO_MAX = 5000;
+function memoGet(key: string) {
+  return memo.get(key);
+}
+function memoSet(key: string, value: string) {
+  if (memo.size > MEMO_MAX) memo.clear();
+  memo.set(key, value);
+}
+
 /** Google's free (key-less) translate endpoint. No AI credits are used. */
 async function gtx(lang: string, text: string, wantRoman = false): Promise<{ text: string; roman: string | null } | null> {
+
   const url =
     "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" +
     encodeURIComponent(GOOGLE_CODE[lang] ?? lang) +
@@ -130,15 +142,30 @@ export const Route = createFileRoute("/api/public/translate")({
         const hinglish = lang === "hr";
         const target = hinglish ? "hi" : lang;
 
-        const results = await Promise.all(
-          strings.map(async (s) => {
+        // Translate each distinct string once, even if it repeats in the batch.
+        const unique = Array.from(new Set(strings));
+        const resolved = new Map<string, string>();
+        await Promise.all(
+          unique.map(async (s) => {
+            const key = `${lang}\u0000${s}`;
+            const cached = memoGet(key);
+            if (cached != null) {
+              resolved.set(s, cached);
+              return;
+            }
             const hit = await gtx(target, s, hinglish);
-            if (!hit) return s;
-            if (!hinglish) return hit.text;
+            if (!hit) {
+              resolved.set(s, s);
+              return;
+            }
             // Prefer Google's own romanization; fall back to transliteration.
-            return hit.roman ?? toLatin(hit.text);
+            const out = hinglish ? (hit.roman ?? toLatin(hit.text)) : hit.text;
+            memoSet(key, out);
+            resolved.set(s, out);
           }),
         );
+        const results = strings.map((s) => resolved.get(s) ?? s);
+
 
 
         return new Response(JSON.stringify({ translations: results }), { headers: json() });
