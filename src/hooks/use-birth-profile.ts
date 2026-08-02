@@ -99,7 +99,6 @@ export function useAutofillBirth<T extends Record<string, unknown>>(
     if (done.current || !profile) return;
     done.current = true;
     const fields = birthProfileToFormFields(profile);
-    console.log('DBG autofill', JSON.stringify([...spokenFields]));
     setForm((prev) => {
       const next = { ...prev } as Record<string, unknown>;
       for (const [k, v] of Object.entries(fields)) {
