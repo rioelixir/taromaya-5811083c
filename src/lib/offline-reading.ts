@@ -322,7 +322,7 @@ export function offlineReading(input: ReadingRequest): string {
   // 1. Straight answer, in the right voice for what was asked.
   const answer = [
     pick(TOPIC_OPENERS[topic], n),
-    person.name ? `This one is written for ${person.name}, from their own details.` : "",
+    person.name ? `It is prepared for ${person.name} from the details supplied.` : "",
   ];
 
   // 2. The facts, repeated back so the reader can check them.
