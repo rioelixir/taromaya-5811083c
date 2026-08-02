@@ -64,6 +64,7 @@ import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VedicNumerologyIndexRouteImport } from './routes/vedic-numerology.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
@@ -359,6 +360,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VedicNumerologyIndexRoute = VedicNumerologyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VedicNumerologyRoute,
+} as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
@@ -516,7 +522,7 @@ export interface FileRoutesByFullPath {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
-  '/vedic-numerology': typeof VedicNumerologyRoute
+  '/vedic-numerology': typeof VedicNumerologyRouteWithChildren
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -534,6 +540,7 @@ export interface FileRoutesByFullPath {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
@@ -592,7 +599,6 @@ export interface FileRoutesByTo {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
-  '/vedic-numerology': typeof VedicNumerologyRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -610,6 +616,7 @@ export interface FileRoutesByTo {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
@@ -670,7 +677,7 @@ export interface FileRoutesById {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
-  '/vedic-numerology': typeof VedicNumerologyRoute
+  '/vedic-numerology': typeof VedicNumerologyRouteWithChildren
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -688,6 +695,7 @@ export interface FileRoutesById {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
@@ -766,6 +774,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology/'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
@@ -824,7 +833,6 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/vastu'
-    | '/vedic-numerology'
     | '/vedic-transits'
     | '/yantra'
     | '/admin'
@@ -842,6 +850,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
@@ -919,6 +928,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology/'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
@@ -979,7 +989,7 @@ export interface RootRouteChildren {
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
   VastuRoute: typeof VastuRoute
-  VedicNumerologyRoute: typeof VedicNumerologyRoute
+  VedicNumerologyRoute: typeof VedicNumerologyRouteWithChildren
   VedicTransitsRoute: typeof VedicTransitsRoute
   YantraRoute: typeof YantraRoute
   ApiAiReadingRoute: typeof ApiAiReadingRoute
@@ -1381,6 +1391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vedic-numerology/': {
+      id: '/vedic-numerology/'
+      path: '/'
+      fullPath: '/vedic-numerology/'
+      preLoaderRoute: typeof VedicNumerologyIndexRouteImport
+      parentRoute: typeof VedicNumerologyRoute
+    }
     '/share/$token': {
       id: '/share/$token'
       path: '/share/$token'
@@ -1561,6 +1578,18 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface VedicNumerologyRouteChildren {
+  VedicNumerologyIndexRoute: typeof VedicNumerologyIndexRoute
+}
+
+const VedicNumerologyRouteChildren: VedicNumerologyRouteChildren = {
+  VedicNumerologyIndexRoute: VedicNumerologyIndexRoute,
+}
+
+const VedicNumerologyRouteWithChildren = VedicNumerologyRoute._addFileChildren(
+  VedicNumerologyRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1614,7 +1643,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
   VastuRoute: VastuRoute,
-  VedicNumerologyRoute: VedicNumerologyRoute,
+  VedicNumerologyRoute: VedicNumerologyRouteWithChildren,
   VedicTransitsRoute: VedicTransitsRoute,
   YantraRoute: YantraRoute,
   ApiAiReadingRoute: ApiAiReadingRoute,
