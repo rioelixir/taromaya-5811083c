@@ -326,7 +326,7 @@ function BirthForm({
   form, setForm, canSubmit, onCompute, error,
 }: {
   form: FormState;
-  setForm: (f: FormState) => void;
+  setForm: React.Dispatch<React.SetStateAction<FormState>>;
   canSubmit: boolean;
   onCompute: () => void;
   error: string | null;
