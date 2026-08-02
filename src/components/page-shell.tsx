@@ -89,7 +89,8 @@ export function PageShell({
   aiSnapshot,
   aiIntent,
   hideAI,
-}: {
+  hideVoice,
+
   eyebrow?: string;
   title: string;
   subtitle?: string;
