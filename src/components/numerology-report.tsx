@@ -155,7 +155,7 @@ export function NumerologyFullReport({ fullName, birthDate }: { fullName: string
         className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-50"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        Ask AI to read all my numbers together
+        Ask AI to read all your numerology together
       </button>
       {aiText && (
         <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
