@@ -2,6 +2,7 @@
 // Consumes any ChartLite-shaped object; internally casts to KundliChart.
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { DataTable, type Column } from "@/components/data-table";
 import {
   computeShadbala,
   computeAshtakavarga,
@@ -73,6 +74,29 @@ export function StrengthsPanel({ chart }: { chart: unknown }) {
   const bhavaMax = Math.max(...bhava.map((r) => r.total), 1);
   const bindusMax = Math.max(...av.sarva, 1);
 
+  const shadColumns: Column<ShadbalaRow>[] = [
+    { header: "Planet", cell: (r: ShadbalaRow) => <span className="text-foreground/90">{r.planet}</span> },
+    { header: "Total", cell: (r: ShadbalaRow) => bar(r.total, shadMax, r.ratio >= 1 ? "emerald" : "rose") },
+    { header: "Rupas", align: "right", cell: (r: ShadbalaRow) => <span className="tabular-nums">{r.total.toFixed(2)}</span> },
+    {
+      header: "Req · Ratio",
+      align: "right",
+      cell: (r: ShadbalaRow) => (
+        <span className={`tabular-nums ${r.ratio >= 1 ? "text-emerald-300" : "text-rose-300"}`}>
+          {r.required.toFixed(1)} · {r.ratio.toFixed(2)}×
+        </span>
+      ),
+    },
+  ];
+
+  const bhavaColumns: Column<BhavaBalaRow>[] = [
+    { header: "Bh", cell: (r: BhavaBalaRow) => <span className="text-primary/90">H{r.house}</span> },
+    { header: "Sign", cell: (r: BhavaBalaRow) => RASHIS[r.sign] },
+    { header: "Lord", cell: (r: BhavaBalaRow) => <span className="text-muted-foreground">{r.lord}</span> },
+    { header: "Total", cell: (r: BhavaBalaRow) => bar(r.total, bhavaMax, "amber") },
+    { header: "Rupas", align: "right", cell: (r: BhavaBalaRow) => <span className="tabular-nums">{r.total.toFixed(2)}</span> },
+  ];
+
   return (
     <Card className="glass-card space-y-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -91,22 +115,9 @@ export function StrengthsPanel({ chart }: { chart: unknown }) {
       </div>
 
       {tab === "shad" && (
-        <div className="space-y-2">
-          <div className="grid grid-cols-[64px_1fr_auto_auto] items-center gap-x-3 gap-y-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-            <span>Planet</span><span>Total</span><span className="text-right">Rupas</span><span className="text-right">Req · Ratio</span>
-          </div>
-          {shad.map((r) => {
-            const pass = r.ratio >= 1;
-            return (
-              <div key={r.planet} className="grid grid-cols-[64px_1fr_auto_auto] items-center gap-x-3 font-mono text-xs">
-                <span className="text-foreground/90">{r.planet}</span>
-                {bar(r.total, shadMax, pass ? "emerald" : "rose")}
-                <span className="text-right tabular-nums">{r.total.toFixed(2)}</span>
-                <span className={`text-right tabular-nums ${pass ? "text-emerald-300" : "text-rose-300"}`}>{r.required.toFixed(1)} · {r.ratio.toFixed(2)}×</span>
-              </div>
-            );
-          })}
-          <div className="pt-1 text-[10px] leading-relaxed text-muted-foreground">
+        <div className="space-y-3 font-mono text-xs">
+          <DataTable columns={shadColumns} rows={shad} rowKey={(r: ShadbalaRow) => r.planet} />
+          <div className="pt-1 text-[10px] font-sans leading-relaxed text-muted-foreground">
             Six-fold strength in Rupas: Sthana · Dig · Kala · Chesta · Naisargika · Drig. Ratio ≥ 1× meets Parashari minimum.
           </div>
           {/* Component breakdown — six mini bar charts per planet */}
@@ -144,20 +155,9 @@ export function StrengthsPanel({ chart }: { chart: unknown }) {
       )}
 
       {tab === "bhava" && (
-        <div className="space-y-2">
-          <div className="grid grid-cols-[36px_56px_64px_1fr_auto] items-center gap-x-3 text-[11px] uppercase tracking-wider text-muted-foreground">
-            <span>Bh</span><span>Sign</span><span>Lord</span><span>Total</span><span className="text-right">Rupas</span>
-          </div>
-          {bhava.map((r) => (
-            <div key={r.house} className="grid grid-cols-[36px_56px_64px_1fr_auto] items-center gap-x-3 font-mono text-xs">
-              <span className="text-primary/90">H{r.house}</span>
-              <span>{RASHIS[r.sign]}</span>
-              <span className="text-muted-foreground">{r.lord}</span>
-              {bar(r.total, bhavaMax, "amber")}
-              <span className="text-right tabular-nums">{r.total.toFixed(2)}</span>
-            </div>
-          ))}
-          <div className="pt-1 text-[10px] leading-relaxed text-muted-foreground">
+        <div className="space-y-3 font-mono text-xs">
+          <DataTable columns={bhavaColumns} rows={bhava} rowKey={(r: BhavaBalaRow) => r.house} />
+          <div className="pt-1 text-[10px] font-sans leading-relaxed text-muted-foreground">
             Bhava Bala ≈ lord's Shadbala + occupants' Shadbala + 25% of 7th-aspect strength.
           </div>
         </div>

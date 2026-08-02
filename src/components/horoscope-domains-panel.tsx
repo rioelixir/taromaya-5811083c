@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { GlassCard } from "@/components/page-shell";
 import {
   buildSignReading, chineseDomainReadings, numeroscopeDay,
-  type DomainReading, type Period, type ChineseDomainReading,
+  type DomainReading, type Period, type ChineseDomainReading, type Placement,
 } from "@/lib/horoscope-domains";
 import { ChevronRight, TrendingUp, Minus, TriangleAlert, Sparkles } from "lucide-react";
+import { DataTable, type Column } from "@/components/data-table";
 
 function ScoreBar({ value }: { value: number }) {
   return (
@@ -74,6 +75,27 @@ function DomainAccordion({ d }: { d: DomainReading }) {
   );
 }
 
+const placementColumns: Column<Placement>[] = [
+  {
+    header: "Planet",
+    cell: (p: Placement) => (
+      <span className="text-pearl">{p.planet}{p.retrograde && p.planet !== "Rahu" && p.planet !== "Ketu" ? " retrograde" : ""}</span>
+    ),
+  },
+  {
+    header: "Position",
+    cell: (p: Placement) => (
+      <span className="text-muted-foreground">{p.sign} {p.degreeInSign.toFixed(1)} degrees</span>
+    ),
+  },
+  { header: "House", align: "right", cell: (p: Placement) => p.house },
+];
+
+const luckyColumns: Column<{ field: string; value: string }>[] = [
+  { header: "Field", cell: (r: { field: string; value: string }) => <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{r.field}</span> },
+  { header: "Value", cell: (r: { field: string; value: string }) => <span className="text-pearl">{r.value}</span> },
+];
+
 export function SignDomainPanel({
   signIndex, system, period, now,
 }: { signIndex: number; system: "western" | "vedic"; period: Period; now: Date }) {
@@ -94,13 +116,18 @@ export function SignDomainPanel({
           </div>
         </div>
         <p className="mt-3 text-[15px] leading-relaxed text-pearl/90">{reading.summary}</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-5 text-xs">
-          {[["Number", String(reading.lucky.number)], ["Colour", reading.lucky.colour], ["Direction", reading.lucky.direction], ["Best day", reading.lucky.day], ["Gemstone", reading.lucky.gemstone]].map(([k, v]) => (
-            <div key={k} className="rounded-lg border border-white/10 p-2">
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{k}</div>
-              <div className="text-pearl mt-0.5">{v}</div>
-            </div>
-          ))}
+        <div className="mt-4 text-xs">
+          <DataTable
+            columns={luckyColumns}
+            rows={[
+              { field: "Number", value: String(reading.lucky.number) },
+              { field: "Colour", value: reading.lucky.colour },
+              { field: "Direction", value: reading.lucky.direction },
+              { field: "Best day", value: reading.lucky.day },
+              { field: "Gemstone", value: reading.lucky.gemstone },
+            ]}
+            rowKey={(r: { field: string; value: string }) => r.field}
+          />
         </div>
       </GlassCard>
 
@@ -109,13 +136,12 @@ export function SignDomainPanel({
       </div>
 
       <GlassCard title="Planetary positions used for this reading">
-        <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 text-xs">
-          {reading.placements.map((p) => (
-            <div key={p.planet} className="rounded-lg border border-white/10 p-2">
-              <div className="text-pearl">{p.planet}{p.retrograde && p.planet !== "Rahu" && p.planet !== "Ketu" ? " retrograde" : ""}</div>
-              <div className="text-muted-foreground">{p.sign} {p.degreeInSign.toFixed(1)} degrees · house {p.house}</div>
-            </div>
-          ))}
+        <div className="text-xs">
+          <DataTable
+            columns={placementColumns}
+            rows={reading.placements}
+            rowKey={(p: (typeof reading.placements)[number]) => p.planet}
+          />
         </div>
       </GlassCard>
     </div>
@@ -194,13 +220,17 @@ export function NumeroscopePanel({ now }: { now: Date }) {
               </div>
               <Sparkles className="w-5 h-5 text-gold" />
             </div>
-            <div className="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-4 text-xs">
-              {[["Personal year", reading.personalYear], ["Personal month", reading.personalMonth], ["Personal day", reading.personalDay], ["Universal day", reading.universalDay]].map(([k, v]) => (
-                <div key={k as string} className="rounded-lg border border-white/10 p-2">
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{k as string}</div>
-                  <div className="text-pearl mt-0.5">{v as number}</div>
-                </div>
-              ))}
+            <div className="mt-4 text-xs">
+              <DataTable
+                columns={luckyColumns}
+                rows={[
+                  { field: "Personal year", value: String(reading.personalYear) },
+                  { field: "Personal month", value: String(reading.personalMonth) },
+                  { field: "Personal day", value: String(reading.personalDay) },
+                  { field: "Universal day", value: String(reading.universalDay) },
+                ]}
+                rowKey={(r: { field: string; value: string }) => r.field}
+              />
             </div>
           </GlassCard>
           <GlassCard>
