@@ -11,7 +11,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Sidebar } from "@/components/nav";
+
 import { GlobalChrome } from "@/components/global-chrome";
 import { StarField } from "@/components/star-field";
 import { FloatingBackButton } from "@/components/back-button";
