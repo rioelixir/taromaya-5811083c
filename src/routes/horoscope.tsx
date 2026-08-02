@@ -16,6 +16,9 @@ import {
   chineseYearForecast, rashiLord, SIGN_ELEMENT, SIGN_MODALITY, SIGN_RULER,
 } from "@/lib/horoscope";
 import { RASHIS, NAKSHATRAS } from "@/lib/vedic";
+import { SignDomainPanel, ChineseDomainPanel, NumeroscopePanel } from "@/components/horoscope-domains-panel";
+import { buildSignReading } from "@/lib/horoscope-domains";
+
 
 export const Route = createFileRoute("/horoscope")({
   component: () => (<PremiumGate featureName="Horoscope"><HoroscopePage /></PremiumGate>),
@@ -29,7 +32,7 @@ export const Route = createFileRoute("/horoscope")({
 
 type Period = "Daily" | "Weekly" | "Monthly" | "Yearly";
 const PERIODS: Period[] = ["Daily", "Weekly", "Monthly", "Yearly"];
-type Tab = "western" | "vedic" | "nakshatra" | "chinese";
+type Tab = "western" | "vedic" | "nakshatra" | "chinese" | "numeroscope";
 
 function seedFor(sign: string, period: Period, date: Date): number {
   const key = `${sign}-${period}-${date.getFullYear()}-${
@@ -116,7 +119,7 @@ About 380 words.`,
 
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {(["western","vedic","nakshatra","chinese"] as Tab[]).map((t) => (
+        {(["western","vedic","nakshatra","chinese","numeroscope"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -124,9 +127,10 @@ About 380 words.`,
               tab === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground hover:text-pearl"
             }`}
           >
-            {t === "western" ? "Western" : t === "vedic" ? "Vedic Rashiphal" : t === "nakshatra" ? "Nakshatra" : "Chinese"}
+            {t === "western" ? "Western" : t === "vedic" ? "Vedic Rashiphal" : t === "nakshatra" ? "Nakshatra" : t === "chinese" ? "Chinese" : "Numeroscope"}
           </button>
         ))}
+
       </div>
 
       {(tab === "western" || tab === "vedic") && (
@@ -166,52 +170,66 @@ About 380 words.`,
       )}
 
       {tab === "western" && (
-        <WesternGrid onSelect={(s) => generateReading(s, "western")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
+        <WesternGrid today={today} onSelect={(s) => generateReading(s, "western")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
       )}
       {tab === "vedic" && (
         <VedicGrid today={today} onSelect={(s) => generateReading(s, "vedic", "Include Vedic Moon influence.")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
       )}
       {tab === "nakshatra" && <NakshatraTab today={today} />}
       {tab === "chinese" && <ChineseTab today={today} onSelect={(a) => { setTab("western"); generateReading(a, "western"); }} />}
+      {tab === "numeroscope" && <NumeroscopePanel now={today} />}
+
 
       {sign && (tab === "western" || tab === "vedic") && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-4">
+          <SignDomainPanel
+            signIndex={(tab === "vedic" ? (RASHIS as readonly string[]) : (SIGN_NAMES as readonly string[])).indexOf(sign)}
+            system={tab === "vedic" ? "vedic" : "western"}
+            period={period}
+            now={today}
+          />
           <GlassCard>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3 gap-3">
               <div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">{period} · {tab === "vedic" ? "Rashiphal" : "Sun-sign"}</div>
-                <div className="font-display text-3xl gold-text">{sign}</div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">Extended narrative · {period}</div>
+                <div className="font-display text-2xl gold-text">{sign}</div>
               </div>
               <Sparkles className="w-5 h-5 text-gold" />
             </div>
             {loading && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" /> Aligning the stars…
+                <Loader2 className="w-4 h-4 animate-spin" /> Preparing the detailed reading…
               </div>
             )}
             {currentReading && (
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{currentReading}</div>
+              <div className="text-[15px] leading-relaxed text-pearl/90 whitespace-pre-wrap">{currentReading}</div>
             )}
           </GlassCard>
         </div>
       )}
+
 
       <ConfidenceNote noteKey="horoscope" className="mt-6" />
     </PageShell>
   );
 }
 
-function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
+function WesternGrid({ onSelect, readings, cacheKey, period, today }: {
   onSelect: (sign: string) => void;
   luck: (s: string) => { scores: Record<string, number>; luckyNumber: number; luckyColor: string; direction: string; gemstone: string };
   readings: Record<string, string>;
   cacheKey: (s: string, p: Period, m: string) => string;
   period: Period;
+  today: Date;
 }) {
+  const all = useMemo(
+    () => SIGN_NAMES.map((_, i) => buildSignReading(i, "western", period, today)),
+    [period, today],
+  );
   return (
     <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
       {SIGN_NAMES.map((s, i) => {
-        const l = luck(s);
+        const r = all[i];
         const cached = !!readings[cacheKey(s, period, "western")];
         return (
           <button
@@ -228,19 +246,19 @@ function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
               <div className="text-3xl gold-text font-serif">{SIGN_GLYPHS[i]}</div>
             </div>
             <div className="mt-3 space-y-1.5">
-              {SCORE_KEYS.map((k) => (
-                <div key={k}>
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
-                    <span>{k}</span><span>{l.scores[k]}%</span>
+              {r.domains.map((d) => (
+                <div key={d.domain}>
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>{d.domain}</span><span>{d.score}%</span>
                   </div>
                   <div className="h-1 rounded-full bg-white/5 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${l.scores[k]}%` }} />
+                    <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${d.score}%` }} />
                   </div>
                 </div>
               ))}
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-              <span>#{l.luckyNumber}</span><span>· {l.luckyColor}</span><span>· {l.direction}</span>
+              <span>Overall {r.overall}%</span><span>· {r.lucky.colour}</span><span>· {r.lucky.direction}</span>
             </div>
           </button>
         );
@@ -248,6 +266,7 @@ function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
     </div>
   );
 }
+
 
 function VedicGrid({ today, onSelect, readings, cacheKey, period }: {
   today: Date;
@@ -361,6 +380,16 @@ function ChineseTab({ today, onSelect }: { today: Date; onSelect: (animal: strin
     return chineseYearForecast(person, currentYear);
   }, [birthYear, currentYear]);
   const personSign = chineseSign(birthYear);
+  const CLASH: Record<string, string> = {
+    Rat: "Horse", Ox: "Goat", Tiger: "Monkey", Rabbit: "Rooster", Dragon: "Dog", Snake: "Pig",
+    Horse: "Rat", Goat: "Ox", Monkey: "Tiger", Rooster: "Rabbit", Dog: "Dragon", Pig: "Snake",
+  };
+  const relation: "harmony" | "clash" | "self" | "neutral" =
+    personSign.animal === forecast.yearAnimal ? "self"
+    : CLASH[personSign.animal] === forecast.yearAnimal ? "clash"
+    : (CHINESE_COMPATIBLE[personSign.animal] as readonly string[]).includes(forecast.yearAnimal) ? "harmony"
+    : "neutral";
+
 
   return (
     <div className="space-y-4">
@@ -415,6 +444,17 @@ function ChineseTab({ today, onSelect }: { today: Date; onSelect: (animal: strin
           </div>
         </div>
       </GlassCard>
+
+      <ChineseDomainPanel
+        personAnimal={personSign.animal}
+        personElement={personSign.element}
+        yearAnimal={forecast.yearAnimal}
+        yearElement={forecast.yearElement}
+        relation={relation}
+        year={currentYear}
+      />
+
+
 
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
         {CHINESE_ANIMALS.map((animal) => {
