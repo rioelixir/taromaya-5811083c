@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { DataTable, type Column } from "@/components/data-table";
 import {
   kpPlanets,
   kpCusps,
@@ -39,6 +40,58 @@ export function KPPanel({ chart }: Props) {
     return rulingPlanets(new Date(), asc, moon.longitude);
   }, [chart]);
 
+  const rows = tab === "positions" ? positions : cusps;
+  const posCols: Column<(typeof positions)[number]>[] = [
+    { header: tab === "cusps" ? "Cusp" : "Planet", cell: (r) => <span className="font-display text-primary">{r.who}</span> },
+    { header: "Sign", cell: (r) => KP_RASHIS[r.sign] },
+    { header: "Nakshatra", cell: (r) => KP_NAKSHATRAS[r.nakshatra] },
+    { header: "Star lord", className: "font-mono text-primary", cell: (r) => r.starLord },
+    { header: "Sub lord", className: "font-mono text-primary", cell: (r) => r.subLord },
+    { header: "Sub-sub lord", className: "font-mono text-muted-foreground", cell: (r) => r.subSubLord },
+  ];
+
+  const chips = (arr: string[]) =>
+    arr.length ? (
+      <span className="flex flex-wrap gap-1">
+        {arr.map((n) => (
+          <span key={n} className={chipCls}>{n}</span>
+        ))}
+      </span>
+    ) : (
+      <span className="text-muted-foreground">—</span>
+    );
+
+  const sigCols: Column<(typeof sig)[number]>[] = [
+    { header: "House", cell: (r) => <span className="font-display text-primary">House {r.house}</span> },
+    { header: "Sign", cell: (r) => KP_RASHIS[r.sign] },
+    { header: "A · star of occupants", cell: (r) => chips(r.A) },
+    { header: "B · occupants", cell: (r) => chips(r.B) },
+    { header: "C · star of lord", cell: (r) => chips(r.C) },
+    { header: "D · house lord", cell: (r) => chips(r.D) },
+    {
+      header: "Combined",
+      cell: (r) => (
+        <span className="flex flex-wrap gap-1">
+          {r.combined.map((n) => (
+            <span key={n} className={chipCls + " border-primary/40 text-primary"}>{n}</span>
+          ))}
+        </span>
+      ),
+    },
+  ];
+
+  const rulingRows = ruling
+    ? [
+        { label: "Weekday lord", value: ruling.weekdayLord },
+        { label: "Moon sign lord", value: ruling.moonSignLord },
+        { label: "Moon star lord", value: ruling.moonStarLord },
+        { label: "Moon sub lord", value: ruling.moonSubLord },
+        { label: "Lagna sign lord", value: ruling.ascSignLord },
+        { label: "Lagna star lord", value: ruling.ascStarLord },
+        { label: "Lagna sub lord", value: ruling.ascSubLord },
+      ]
+    : [];
+
   return (
     <Card className="glass-card space-y-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -62,100 +115,43 @@ export function KPPanel({ chart }: Props) {
       </div>
 
       {(tab === "positions" || tab === "cusps") && (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {(tab === "positions" ? positions : cusps).map((r, i) => (
-            <div key={i} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-display text-sm text-primary">{r.who}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {KP_RASHIS[r.sign]} · {KP_NAKSHATRAS[r.nakshatra]}
-                </span>
-              </div>
-              <div className="mt-2 flex items-center gap-1 text-[11px]">
-                <span className={chipCls + " border-primary/40 bg-primary/10 text-primary"}>{r.starLord}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className={chipCls + " border-primary/40 bg-primary/10 text-primary"}>{r.subLord}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className={chipCls + " text-muted-foreground"}>{r.subSubLord}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DataTable columns={posCols} rows={rows} rowKey={(r) => r.who} />
       )}
 
       {tab === "significators" && (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            4-fold significators per house: A) planets in star of occupants,
-            B) occupants, C) planets in star of house-lord, D) house-lord.
-          </p>
-          <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
-            {sig.map((row) => (
-              <div key={row.house} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
-                <div className="flex items-baseline justify-between">
-                  <span className="font-display text-sm text-primary">House {row.house}</span>
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{KP_RASHIS[row.sign]}</span>
-                </div>
-                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {([["A", row.A], ["B", row.B], ["C", row.C], ["D", row.D]] as const).map(([k, arr]) => (
-                    <div key={k}>
-                      <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{k}</div>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {arr.length ? arr.map((n) => <span key={n} className={chipCls}>{n}</span>) : <span className="text-muted-foreground">—</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-2 border-t border-border/30 pt-2">
-                  <div className="text-[9px] uppercase tracking-widest text-muted-foreground">Combined</div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {row.combined.map((n) => <span key={n} className={chipCls + " border-primary/40 text-primary"}>{n}</span>)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DataTable
+          columns={sigCols}
+          rows={sig}
+          rowKey={(r) => r.house}
+          maxHeight="24rem"
+          caption="4-fold significators per house: A) planets in star of occupants, B) occupants, C) planets in star of house-lord, D) house-lord."
+        />
       )}
 
-
       {tab === "ruling" && (
-        <div className="space-y-3 text-xs">
-          {!ruling ? (
-            <p className="text-muted-foreground">Moon position required.</p>
-          ) : (
-            <>
-              <p className="text-muted-foreground">
-                Ruling planets for the query moment. Live-transit variants are
-                used across Horary and event-timing selections.
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {[
-                  ["Weekday lord", ruling.weekdayLord],
-                  ["Moon sign lord", ruling.moonSignLord],
-                  ["Moon star lord", ruling.moonStarLord],
-                  ["Moon sub lord", ruling.moonSubLord],
-                  ["Lagna sign lord", ruling.ascSignLord],
-                  ["Lagna star lord", ruling.ascStarLord],
-                  ["Lagna sub lord", ruling.ascSubLord],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between rounded-lg border border-border/40 bg-background/30 px-3 py-2">
-                    <span className="text-muted-foreground">{k}</span>
-                    <span className="font-mono text-primary">{v}</span>
-                  </div>
+        !ruling ? (
+          <p className="text-xs text-muted-foreground">Moon position required.</p>
+        ) : (
+          <div className="space-y-3">
+            <DataTable
+              columns={[
+                { header: "Ruling factor", cell: (r: { label: string }) => r.label },
+                { header: "Planet", align: "right", className: "font-mono text-primary", cell: (r: { value: string }) => r.value },
+              ]}
+              rows={rulingRows}
+              rowKey={(r) => r.label}
+              caption="Ruling planets for the query moment. Live-transit variants are used across Horary and event-timing selections."
+            />
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Combined RP set</div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {ruling.combined.map((n) => (
+                  <span key={n} className={chipCls}>{n}</span>
                 ))}
               </div>
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Combined RP set</div>
-                <div className="mt-1 flex flex-wrap gap-1.5">
-                  {ruling.combined.map((n) => (
-                    <span key={n} className={chipCls}>{n}</span>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )
       )}
     </Card>
   );
