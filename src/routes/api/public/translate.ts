@@ -24,37 +24,108 @@ function memoSet(key: string, value: string) {
   memo.set(key, value);
 }
 
+/** Hosts that serve the same key-less translate payload. Some block edge servers. */
+const GTX_HOSTS = [
+  "https://translate.googleapis.com/translate_a/single",
+  "https://clients5.google.com/translate_a/single",
+  "https://translate.google.com/translate_a/single",
+];
+
 /** Google's free (key-less) translate endpoint. No AI credits are used. */
 async function gtx(lang: string, text: string, wantRoman = false): Promise<{ text: string; roman: string | null } | null> {
-
-  const url =
-    "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" +
+  const query =
+    "?client=gtx&sl=en&tl=" +
     encodeURIComponent(GOOGLE_CODE[lang] ?? lang) +
     "&dt=t" +
     (wantRoman ? "&dt=rm" : "") +
     "&q=" +
     encodeURIComponent(text);
 
-  try {
-    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    if (!res.ok) return null;
-    const data = (await res.json()) as unknown;
-    if (!Array.isArray(data) || !Array.isArray(data[0])) return null;
-    let out = "";
-    let roman = "";
-    for (const seg of data[0] as unknown[]) {
-      if (!Array.isArray(seg)) continue;
-      if (typeof seg[0] === "string") out += seg[0];
-      // With dt=rm Google adds segments carrying the romanization of the
-      // translated text at index 2 (source romanization sits at index 3).
-      else if (typeof seg[2] === "string") roman += seg[2];
+  for (const host of GTX_HOSTS) {
+    try {
+      const res = await fetch(host + query, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          Accept: "*/*",
+          "Accept-Language": "en-US,en;q=0.9",
+        },
+      });
+      if (!res.ok) continue;
+      const data = (await res.json()) as unknown;
+      if (!Array.isArray(data) || !Array.isArray(data[0])) continue;
+      let out = "";
+      let roman = "";
+      for (const seg of data[0] as unknown[]) {
+        if (!Array.isArray(seg)) continue;
+        if (typeof seg[0] === "string") out += seg[0];
+        // With dt=rm Google adds segments carrying the romanization of the
+        // translated text at index 2 (source romanization sits at index 3).
+        else if (typeof seg[2] === "string") roman += seg[2];
+      }
+      if (!out.trim()) continue;
+      return { text: out, roman: roman.trim() ? roman.trim() : null };
+    } catch {
+      /* try the next host */
     }
-    if (!out.trim()) return null;
-    return { text: out, roman: roman.trim() ? roman.trim() : null };
-  } catch {
-    return null;
   }
+  return null;
 }
+
+/**
+ * Last-resort translator used when every key-less endpoint is unreachable
+ * (published edge servers are sometimes blocked). Keeps the app fully
+ * translated instead of silently falling back to English.
+ */
+async function aiTranslate(lang: string, texts: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const key = process.env["LOVABLE_API_KEY"]?.trim();
+  if (!key || texts.length === 0) return out;
+  const target = LANGUAGE_LIST.find((l) => l.code === lang)?.ai ?? lang;
+
+  const batches: string[][] = [];
+  for (let i = 0; i < texts.length; i += 20) batches.push(texts.slice(i, i + 20));
+
+  await Promise.all(
+    batches.map(async (batch) => {
+      try {
+        const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            messages: [
+              {
+                role: "system",
+                content:
+                  `Translate each item of the JSON array from English into ${target}. ` +
+                  "Reply with ONLY a JSON array of the same length, same order, translations as plain strings. " +
+                  "Keep numbers, names and formatting. No commentary.",
+              },
+              { role: "user", content: JSON.stringify(batch) },
+            ],
+          }),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const raw = data.choices?.[0]?.message?.content ?? "";
+        const match = raw.match(/\[[\s\S]*\]/);
+        if (!match) return;
+        const arr = JSON.parse(match[0]) as unknown;
+        if (!Array.isArray(arr)) return;
+        arr.forEach((t, i) => {
+          const src = batch[i];
+          if (src && typeof t === "string" && t.trim()) out.set(src, t.trim());
+        });
+      } catch {
+        /* leave these strings in English */
+      }
+    }),
+  );
+  return out;
+}
+
+
 
 /**
  * Fallback Devanagari -> Latin transliteration (used only when Google does not
@@ -179,6 +250,7 @@ export const Route = createFileRoute("/api/public/translate")({
         // Translate each distinct string once, even if it repeats in the batch.
         const unique = Array.from(new Set(strings));
         const resolved = new Map<string, string>();
+        const missed: string[] = [];
         await Promise.all(
           unique.map(async (s) => {
             const key = `${lang}\u0000${s}`;
@@ -189,7 +261,7 @@ export const Route = createFileRoute("/api/public/translate")({
             }
             const hit = await translate(target, s, hinglish);
             if (!hit) {
-              resolved.set(s, s);
+              missed.push(s);
               return;
             }
             // Prefer Google's own romanization; fall back to transliteration.
@@ -199,7 +271,22 @@ export const Route = createFileRoute("/api/public/translate")({
 
           }),
         );
+
+        // Anything the key-less endpoints could not reach goes through the AI fallback.
+        if (missed.length > 0) {
+          const ai = await aiTranslate(lang, missed);
+          missed.forEach((s) => {
+            const out = ai.get(s);
+            if (out) {
+              memoSet(`${lang}\u0000${s}`, out);
+              resolved.set(s, out);
+            } else {
+              resolved.set(s, s);
+            }
+          });
+        }
         const results = strings.map((s) => resolved.get(s) ?? s);
+
 
 
 
