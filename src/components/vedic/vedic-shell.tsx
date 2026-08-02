@@ -5,13 +5,14 @@ import { UniversalInput } from "@/components/universal-input";
 import { greeting } from "@/lib/vedic-num/dashboard";
 import { cn } from "@/lib/utils";
 
-const NAV = [
+const NAV: { to: string; label: string; icon: typeof Home; exact?: boolean }[] = [
   { to: "/vedic-numerology", label: "Home", icon: Home, exact: true },
   { to: "/vedic-numerology/calculator", label: "Calculator", icon: Calculator },
   { to: "/vedic-numerology/reports", label: "Reports", icon: FileText },
   { to: "/vedic-numerology/remedies", label: "Remedies", icon: HeartHandshake },
   { to: "/vedic-numerology/profile", label: "Profile", icon: User },
-] as const;
+];
+
 
 /** Premium glass panel used everywhere inside the Vedic product. */
 export function VCard({
