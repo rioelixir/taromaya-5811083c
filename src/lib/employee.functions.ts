@@ -38,7 +38,34 @@ async function log(
   }
 }
 
-/** Called when a signed-in person opens the app. Starts or refreshes their work session. */
+/** The work email for the signed-in person, taken from the verified token. */
+async function workEmail(context: { claims: any; userId: string }, admin: any) {
+  const fromToken = typeof context.claims?.email === "string" ? context.claims.email : null;
+  if (fromToken) return fromToken;
+  const { data } = await admin.from("profiles").select("email").eq("id", context.userId).maybeSingle();
+  return (data?.email as string | null) ?? null;
+}
+
+/** Turns off employee access for this person and kills any live session rows. */
+async function revokeEverything(admin: any, userId: string, reason: string) {
+  const now = new Date().toISOString();
+  await admin
+    .from("work_sessions")
+    .update({ revoked_at: now, revoked_by: userId })
+    .eq("user_id", userId)
+    .is("revoked_at", null);
+  await admin
+    .from("employees")
+    .update({ is_active: false, updated_at: now })
+    .eq("user_id", userId)
+    .eq("is_active", true);
+  await log(admin, userId, userId, "employee_access_revoked", { reason });
+}
+
+/**
+ * Called when a signed-in person opens the app. We ask taromaya.com whether they
+ * are working right now; only then does a free work session exist.
+ */
 export const startWorkSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { device?: string } | undefined) => ({
@@ -46,12 +73,34 @@ export const startWorkSession = createServerFn({ method: "POST" })
   }))
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { verifyWorkSession } = await import("./work-verify.server");
     const now = new Date();
+
+    const email = await workEmail(context as any, supabaseAdmin);
+    const check = await verifyWorkSession(email);
+
+    if (!check.active) {
+      await revokeEverything(supabaseAdmin, context.userId, check.reason);
+      return { sessionId: null as string | null, resumed: false, active: false, reason: check.reason };
+    }
+
+    // taromaya.com says they are working, so mirror that here. This row is only a
+    // cache of the answer, never a list anyone has to maintain by hand.
+    await supabaseAdmin.from("employees").upsert({
+      user_id: context.userId,
+      is_active: true,
+      note: "Verified automatically by taromaya.com work login",
+      updated_at: now.toISOString(),
+    });
+
+    const endsAt = check.expiresAt
+      ? new Date(check.expiresAt)
+      : new Date(now.getTime() + SESSION_HOURS * 3600 * 1000);
 
     // Reuse a session that is still alive so refreshes do not pile up rows.
     const { data: live } = await supabaseAdmin
       .from("work_sessions")
-      .select("id, expires_at")
+      .select("id")
       .eq("user_id", context.userId)
       .is("revoked_at", null)
       .gt("expires_at", now.toISOString())
@@ -63,9 +112,9 @@ export const startWorkSession = createServerFn({ method: "POST" })
     if (live?.id) {
       await supabaseAdmin
         .from("work_sessions")
-        .update({ last_seen_at: now.toISOString() })
+        .update({ last_seen_at: now.toISOString(), expires_at: endsAt.toISOString() })
         .eq("id", live.id);
-      return { sessionId: live.id as string, resumed: true };
+      return { sessionId: live.id as string, resumed: true, active: true, reason: check.reason };
     }
 
     const { data: created, error } = await supabaseAdmin
@@ -74,7 +123,7 @@ export const startWorkSession = createServerFn({ method: "POST" })
         user_id: context.userId,
         device: data.device,
         last_seen_at: now.toISOString(),
-        expires_at: new Date(now.getTime() + SESSION_HOURS * 3600 * 1000).toISOString(),
+        expires_at: endsAt.toISOString(),
       })
       .select("id")
       .single();
@@ -82,11 +131,15 @@ export const startWorkSession = createServerFn({ method: "POST" })
 
     await log(supabaseAdmin, context.userId, context.userId, "session_started", {
       device: data.device,
+      verified: true,
     });
-    return { sessionId: created.id as string, resumed: false };
+    return { sessionId: created.id as string, resumed: false, active: true, reason: check.reason };
   });
 
-/** Keeps the session marked as alive. Returns false once it is dead or revoked. */
+/**
+ * Keeps the session alive. Every beat re-asks taromaya.com, so signing out there
+ * takes access away here within one beat, without anyone refreshing anything.
+ */
 export const heartbeatWorkSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { sessionId: string }) => {
@@ -95,6 +148,15 @@ export const heartbeatWorkSession = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { verifyWorkSession } = await import("./work-verify.server");
+
+    const email = await workEmail(context as any, supabaseAdmin);
+    const check = await verifyWorkSession(email);
+    if (!check.active) {
+      await revokeEverything(supabaseAdmin, context.userId, check.reason);
+      return { active: false, reason: check.reason };
+    }
+
     const now = new Date().toISOString();
     const { data: row, error } = await supabaseAdmin
       .from("work_sessions")
@@ -106,7 +168,7 @@ export const heartbeatWorkSession = createServerFn({ method: "POST" })
       .select("id")
       .maybeSingle();
     if (error) throw error;
-    return { active: !!row };
+    return { active: !!row, reason: row ? "verified" : "not_working" };
   });
 
 /** Ends the session on sign out. Access falls back to the normal rules right away. */
@@ -146,6 +208,7 @@ export const myAccessStatus = createServerFn({ method: "GET" })
       isPremium: !!premium,
     };
   });
+
 
 /* ------------------------------- admin side ------------------------------- */
 

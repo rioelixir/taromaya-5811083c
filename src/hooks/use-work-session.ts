@@ -8,7 +8,7 @@ import {
 } from "@/lib/employee.functions";
 
 const KEY = "taromaya_work_session";
-const BEAT_MS = 3 * 60 * 1000; // keep-alive well inside the 15 minute window
+const BEAT_MS = 60 * 1000; // re-checks taromaya.com every minute
 
 export type AccessStatus = {
   isEmployee: boolean;
@@ -63,6 +63,13 @@ export function useWorkSession() {
           typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 200) : undefined;
         const { sessionId } = await startWorkSession({ data: { device } });
         if (!alive) return;
+        if (!sessionId) {
+          // taromaya.com says this person is not working right now.
+          window.sessionStorage.removeItem(KEY);
+          stop();
+          await refresh();
+          return;
+        }
         window.sessionStorage.setItem(KEY, sessionId);
         await refresh();
 
@@ -88,6 +95,7 @@ export function useWorkSession() {
         if (alive) setLoading(false);
       }
     };
+
 
     (async () => {
       const { data } = await supabase.auth.getUser();
