@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS } from "@/lib/vedic";
 import { computeAshtakavarga, computeShadbala } from "@/lib/vedic-deep";
+import { ashtakavargaNarrative, shadbalaNarrative } from "@/lib/vedic-narrative";
+
 import { MapPin, Gauge, Grid3x3 } from "lucide-react";
 
 export const Route = createFileRoute("/strength")({
@@ -68,21 +70,14 @@ function StrengthPage() {
         {shad && av && (
           <div className="space-y-4">
             <GlassCard>
-              <h3 className="mb-2 font-serif text-lg">In plain English</h3>
-              <p className="text-sm text-muted-foreground">
-                Think of this page as a report card for each planet in your chart. Some planets are placed
-                in a way that makes them act powerfully and reliably; others are placed in a weaker spot and
-                need more support (through timing or remedies) to show their best side. The strongest planet
-                here is <span className="text-primary">{[...shad].sort((a, b) => b.ratio - a.ratio)[0].planet}</span>,
-                and the one most in need of support is{" "}
-                <span className="text-primary">{[...shad].sort((a, b) => a.ratio - b.ratio)[0].planet}</span>.
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Further down, two advanced tables break this down in classical Vedic detail: Shadbala (a
-                six-part strength score for each planet) and Ashtakavarga (a point count showing which signs
-                are lucky for each planet).
-              </p>
+              <h3 className="mb-2 font-serif text-lg">Consultation summary</h3>
+              <div className="space-y-3 text-sm leading-relaxed">
+                {shadbalaNarrative(shad).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
             </GlassCard>
+
 
             <GlassCard>
               <div className="mb-3 flex items-center gap-2">
@@ -172,10 +167,13 @@ function StrengthPage() {
                   </tbody>
                 </table>
               </div>
-              <p className="mt-3 text-[10px] text-muted-foreground">
-                Bindus per rashi across all seven planets form the <span className="text-primary">Sarva Ashtakavarga</span>. Signs with ≥ 30 bindus are auspicious houses of gain; ≤ 25 indicate reduced yield.
-              </p>
+              <div className="mt-4 space-y-3 border-t border-border/20 pt-3 text-sm leading-relaxed">
+                {ashtakavargaNarrative(av).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
             </GlassCard>
+
 
             <GlassCard>
               <h3 className="mb-2 font-serif text-lg">Reading the report</h3>
