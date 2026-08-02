@@ -248,10 +248,17 @@ export function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
     pdf.text("TAROMAYA", margin, 30, { charSpace: 3 });
+    // jsPDF ignores charSpace when aligning right, so place the running title
+    // manually from its measured width to keep it inside the margin.
     const runTitle = pdfSafe(meta.title.toUpperCase());
-    const runSpace = pdf.getTextWidth(runTitle) + runTitle.length * 3 > w - margin * 2 - 140 ? 0.8 : 3;
-    pdf.setFontSize(runSpace === 3 ? 9 : 8);
-    pdf.text(runTitle, w - margin, 30, { align: "right", charSpace: runSpace });
+    let runSpace = 3;
+    let runW = pdf.getTextWidth(runTitle) + runSpace * (runTitle.length - 1);
+    if (runW > w - margin * 2 - 130) {
+      runSpace = 1;
+      pdf.setFontSize(8);
+      runW = pdf.getTextWidth(runTitle) + runSpace * (runTitle.length - 1);
+    }
+    pdf.text(runTitle, w - margin - runW, 30, { charSpace: runSpace });
     pdf.setDrawColor(...LINE);
     pdf.setLineWidth(0.3);
     pdf.line(margin, 40, w - margin, 40);
