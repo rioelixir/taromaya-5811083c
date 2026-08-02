@@ -250,6 +250,7 @@ export const Route = createFileRoute("/api/public/translate")({
         // Translate each distinct string once, even if it repeats in the batch.
         const unique = Array.from(new Set(strings));
         const resolved = new Map<string, string>();
+        const missed: string[] = [];
         await Promise.all(
           unique.map(async (s) => {
             const key = `${lang}\u0000${s}`;
@@ -260,7 +261,7 @@ export const Route = createFileRoute("/api/public/translate")({
             }
             const hit = await translate(target, s, hinglish);
             if (!hit) {
-              resolved.set(s, s);
+              missed.push(s);
               return;
             }
             // Prefer Google's own romanization; fall back to transliteration.
@@ -270,7 +271,22 @@ export const Route = createFileRoute("/api/public/translate")({
 
           }),
         );
+
+        // Anything the key-less endpoints could not reach goes through the AI fallback.
+        if (missed.length > 0) {
+          const ai = await aiTranslate(lang, missed);
+          missed.forEach((s) => {
+            const out = ai.get(s);
+            if (out) {
+              memoSet(`${lang}\u0000${s}`, out);
+              resolved.set(s, out);
+            } else {
+              resolved.set(s, s);
+            }
+          });
+        }
         const results = strings.map((s) => resolved.get(s) ?? s);
+
 
 
 
