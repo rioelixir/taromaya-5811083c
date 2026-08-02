@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { GlassCard } from "@/components/page-shell";
 import { Explain } from "@/components/explain";
+import { DataTable, type Column } from "@/components/data-table";
 import {
   nameChart, nameHarmony, spellingOptions, ROOT_MEANINGS,
-  type NameSystem,
+  type NameSystem, type WordChart,
 } from "@/lib/name-numerology-pro";
 import {
   birthNumbers, dashaAt, mahadashaTimeline, personalCycles,
@@ -24,6 +25,25 @@ function Row({ k, v }: { k: string; v: React.ReactNode }) {
   );
 }
 
+type FieldValue = { field: string; value: React.ReactNode };
+
+const FV_COLUMNS: Column<FieldValue>[] = [
+  { header: "Field", cell: (r: FieldValue) => r.field, className: "text-muted-foreground" },
+  { header: "Value", cell: (r: FieldValue) => r.value, align: "right", className: "text-pearl" },
+];
+
+function FieldValueTable({ rows }: { rows: FieldValue[] }) {
+  return <DataTable columns={FV_COLUMNS} rows={rows} rowKey={(r) => r.field} />;
+}
+
+type TextItem = { text: string };
+
+function TextList({ title, items }: { title: string; items: string[] }) {
+  const rows: TextItem[] = items.map((s) => ({ text: s }));
+  const columns: Column<TextItem>[] = [{ header: title, cell: (r: TextItem) => r.text, className: "text-pearl" }];
+  return <DataTable columns={columns} rows={rows} rowKey={(r: TextItem, i: number) => i} />;
+}
+
 function Head({ title, note }: { title: string; note?: string }) {
   return (
     <div className="mb-3">
@@ -34,6 +54,27 @@ function Head({ title, note }: { title: string; note?: string }) {
 }
 
 // ── Name numerology: Chaldean chart, compound numbers, spelling study ───────
+
+const WORD_COLUMNS: Column<WordChart>[] = [
+  {
+    header: "Word",
+    cell: (w: WordChart) => (
+      <div>
+        <div className="mb-1.5 flex flex-wrap gap-1.5">
+          {w.cells.map((c, i) => (
+            <span key={`${w.word}-${i}`} className={`inline-flex min-w-[38px] flex-col items-center rounded-lg border px-2 py-1 ${c.isVowel ? "border-gold/40 bg-gold/10" : "border-white/10"}`}>
+              <span className="text-sm text-pearl">{c.letter}</span>
+              <span className="text-xs text-gold">{c.value}</span>
+            </span>
+          ))}
+        </div>
+        <div className="text-pearl">{w.word}</div>
+      </div>
+    ),
+  },
+  { header: "Total → Root", cell: (w: WordChart) => `${w.compound} → ${w.root}`, align: "right" },
+  { header: "Meaning", cell: (w: WordChart) => w.compoundMeaning, className: "text-muted-foreground" },
+];
 
 export function NameChartPanel({ fullName, birthDate }: { fullName: string; birthDate: string }) {
   const [system, setSystem] = useState<NameSystem>("Chaldean");
@@ -55,6 +96,30 @@ export function NameChartPanel({ fullName, birthDate }: { fullName: string; birt
   }
   const { b, chart, harmony, spelling } = data;
 
+  const chartRows: FieldValue[] = [
+    { field: "Full name total (compound)", value: chart.compound },
+    { field: "Single digit (root)", value: `${chart.root} — ${NUMBER_PLANET[chart.root] ?? ""}` },
+    { field: "Vowel total (soul urge input)", value: `${chart.vowelTotal} → ${chart.vowelRoot}` },
+    { field: "Consonant total (personality input)", value: `${chart.consonantTotal} → ${chart.consonantRoot}` },
+    { field: "Values missing from the name", value: chart.missingValues.join(", ") || "none" },
+    { field: "Values repeated three or more times", value: chart.repeatedValues.map((r) => `${r.value} × ${r.count}`).join(", ") || "none" },
+  ];
+
+  const spellingBetterColumns: Column<(typeof spelling.better)[number]>[] = [
+    { header: "Spelling", cell: (o) => o.spelling, className: "text-pearl" },
+    { header: "Change", cell: (o) => o.change, className: "text-muted-foreground" },
+    { header: "Total → Root", cell: (o) => `${o.compound} → ${o.root}`, align: "right" },
+    { header: "Score", cell: (o) => `${o.score} / 100`, align: "right" },
+    { header: "Note", cell: (o) => o.note, className: "text-pearl" },
+  ];
+
+  const spellingAvoidColumns: Column<(typeof spelling.avoid)[number]>[] = [
+    { header: "Spelling", cell: (o) => o.spelling, className: "text-amber-200" },
+    { header: "Change", cell: (o) => o.change, className: "text-muted-foreground" },
+    { header: "Total → Root", cell: (o) => `${o.compound} → ${o.root}`, align: "right" },
+    { header: "Score", cell: (o) => `${o.score} / 100`, align: "right" },
+  ];
+
   return (
     <div className="space-y-6">
       <GlassCard>
@@ -75,29 +140,9 @@ export function NameChartPanel({ fullName, birthDate }: { fullName: string; birt
             ? "Chaldean gives each letter a value from 1 to 8 by sound. The full total is read as a compound number, and only then reduced to a single digit."
             : "Pythagorean numbers the alphabet in order from 1 to 9 and keeps 11, 22 and 33 as master numbers."}
         />
-        <div className="space-y-4">
-          {chart.words.map((w) => (
-            <div key={w.word}>
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                {w.cells.map((c, i) => (
-                  <span key={`${w.word}-${i}`} className={`inline-flex min-w-[42px] flex-col items-center rounded-lg border px-2 py-1 ${c.isVowel ? "border-gold/40 bg-gold/10" : "border-white/10"}`}>
-                    <span className="text-base text-pearl">{c.letter}</span>
-                    <span className="text-sm text-gold">{c.value}</span>
-                  </span>
-                ))}
-              </div>
-              <p className="text-base text-pearl">{w.word}: total {w.compound}, reduced {w.root}</p>
-              <p className="text-sm text-muted-foreground">{w.compoundMeaning}</p>
-            </div>
-          ))}
-        </div>
+        <DataTable columns={WORD_COLUMNS} rows={chart.words} rowKey={(w: WordChart) => w.word} />
         <div className="mt-4">
-          <Row k="Full name total (compound)" v={chart.compound} />
-          <Row k="Single digit (root)" v={`${chart.root} — ${NUMBER_PLANET[chart.root] ?? ""}`} />
-          <Row k="Vowel total (soul urge input)" v={`${chart.vowelTotal} → ${chart.vowelRoot}`} />
-          <Row k="Consonant total (personality input)" v={`${chart.consonantTotal} → ${chart.consonantRoot}`} />
-          <Row k="Values missing from the name" v={chart.missingValues.join(", ") || "none"} />
-          <Row k="Values repeated three or more times" v={chart.repeatedValues.map((r) => `${r.value} × ${r.count}`).join(", ") || "none"} />
+          <FieldValueTable rows={chartRows} />
         </div>
         <p className="mt-3 text-base text-pearl">{chart.compoundMeaning}</p>
         <p className="mt-2 text-sm text-muted-foreground">{ROOT_MEANINGS[chart.root]}</p>
@@ -105,22 +150,20 @@ export function NameChartPanel({ fullName, birthDate }: { fullName: string; birt
 
       <GlassCard>
         <Head title="Name against birth numbers" note="A name is judged against the birth day number and the destiny number, never on its own." />
-        <Row k="Name number" v={harmony.namank} />
-        <Row k="Birth day number (Mulank)" v={`${b.mulank} — ${NUMBER_PLANET[b.mulank]}`} />
-        <Row k="Destiny number (Bhagyank)" v={`${b.bhagyank} — ${NUMBER_PLANET[b.bhagyank]}`} />
-        <Row k="Name with day number" v={harmony.withMulank} />
-        <Row k="Name with destiny number" v={harmony.withBhagyank} />
-        <Row k="Spelling score" v={`${harmony.score} out of 100`} />
+        <FieldValueTable
+          rows={[
+            { field: "Name number", value: harmony.namank },
+            { field: "Birth day number (Mulank)", value: `${b.mulank} — ${NUMBER_PLANET[b.mulank]}` },
+            { field: "Destiny number (Bhagyank)", value: `${b.bhagyank} — ${NUMBER_PLANET[b.bhagyank]}` },
+            { field: "Name with day number", value: harmony.withMulank },
+            { field: "Name with destiny number", value: harmony.withBhagyank },
+            { field: "Spelling score", value: `${harmony.score} out of 100` },
+          ]}
+        />
         <p className="mt-3 text-base text-pearl">{harmony.verdict}</p>
         <div className="mt-3 grid gap-4 md:grid-cols-2">
-          <div>
-            <p className="text-sm uppercase tracking-widest text-gold">Strengths</p>
-            <ul className="mt-1 space-y-1 text-base text-pearl">{harmony.strengths.map((s) => <li key={s}>{s}</li>)}</ul>
-          </div>
-          <div>
-            <p className="text-sm uppercase tracking-widest text-gold">Weak points</p>
-            <ul className="mt-1 space-y-1 text-base text-pearl">{harmony.weaknesses.map((s) => <li key={s}>{s}</li>)}</ul>
-          </div>
+          <TextList title="Strengths" items={harmony.strengths} />
+          <TextList title="Weak points" items={harmony.weaknesses} />
         </div>
       </GlassCard>
 
@@ -130,22 +173,13 @@ export function NameChartPanel({ fullName, birthDate }: { fullName: string; birt
         <div className="mt-4 space-y-3">
           <p className="text-sm uppercase tracking-widest text-gold">Stronger options</p>
           {spelling.better.length === 0 && <p className="text-base text-muted-foreground">Nothing scores higher than your current spelling. Keep it and use it consistently everywhere.</p>}
-          {spelling.better.map((o) => (
-            <div key={o.spelling} className="rounded-xl border border-white/10 p-3">
-              <p className="text-base text-pearl">{o.spelling}</p>
-              <p className="text-sm text-muted-foreground">{o.change}. Total {o.compound}, root {o.root}, score {o.score}.</p>
-              <p className="mt-1 text-sm text-muted-foreground">{o.note}</p>
-            </div>
-          ))}
+          {spelling.better.length > 0 && (
+            <DataTable columns={spellingBetterColumns} rows={spelling.better} rowKey={(o) => o.spelling} />
+          )}
           {spelling.avoid.length > 0 && (
             <>
               <p className="mt-4 text-sm uppercase tracking-widest text-gold">Spellings to avoid</p>
-              {spelling.avoid.map((o) => (
-                <div key={o.spelling} className="rounded-xl border border-white/10 p-3">
-                  <p className="text-base text-pearl">{o.spelling}</p>
-                  <p className="text-sm text-muted-foreground">{o.change}. Total {o.compound}, root {o.root}, score {o.score}.</p>
-                </div>
-              ))}
+              <DataTable columns={spellingAvoidColumns} rows={spelling.avoid} rowKey={(o) => o.spelling} />
             </>
           )}
         </div>
@@ -164,10 +198,12 @@ function PeriodCard({ p, label }: { p: Period; label: string }) {
       <p className="text-lg text-pearl">Number {p.lord} — {p.planet}</p>
       <p className="text-sm text-muted-foreground">{fmt(p.start)} to {fmt(p.end)} ({p.years.toFixed(2)} years)</p>
       <p className="mt-2 text-base text-pearl">{p.focus}</p>
-      <p className="mt-2 text-sm text-gold">Opportunities</p>
-      <ul className="text-base text-pearl">{p.opportunities.map((o) => <li key={o}>{o}</li>)}</ul>
-      <p className="mt-2 text-sm text-gold">Challenges</p>
-      <ul className="text-base text-pearl">{p.challenges.map((o) => <li key={o}>{o}</li>)}</ul>
+      <div className="mt-2">
+        <TextList title="Opportunities" items={p.opportunities} />
+      </div>
+      <div className="mt-2">
+        <TextList title="Challenges" items={p.challenges} />
+      </div>
     </div>
   );
 }
@@ -182,17 +218,13 @@ export const DASHA_TAB_LABEL: Record<DashaTab, string> = {
   forecast: "Forecast",
 };
 
+const LADDER_COLUMNS = (prefix?: string): Column<Period>[] => [
+  { header: "Period", cell: (p: Period) => (prefix ? `${prefix} / ${p.lord}` : `Number ${p.lord} — ${p.planet}`) },
+  { header: "Range", cell: (p: Period) => `${fmt(p.start)} to ${fmt(p.end)}`, align: "right", className: "text-muted-foreground" },
+];
+
 function LadderRows({ rows, prefix }: { rows: Period[]; prefix?: string }) {
-  return (
-    <div className="space-y-1">
-      {rows.map((p) => (
-        <div key={p.start.toISOString()} className="flex flex-wrap justify-between gap-2 border-b border-white/5 py-2 text-base last:border-0">
-          <span className="text-pearl">{prefix ? `${prefix} / ${p.lord}` : `Number ${p.lord} — ${p.planet}`}</span>
-          <span className="text-muted-foreground">{fmt(p.start)} to {fmt(p.end)}</span>
-        </div>
-      ))}
-    </div>
-  );
+  return <DataTable columns={LADDER_COLUMNS(prefix)} rows={rows} rowKey={(p: Period) => p.start.toISOString()} />;
 }
 
 export function DashaPanel({ birthDate, view }: { birthDate: string; view?: DashaTab }) {
@@ -217,6 +249,13 @@ export function DashaPanel({ birthDate, view }: { birthDate: string; view?: Dash
 
   if (!data) return <GlassCard><p className="text-base text-muted-foreground">Give a valid birth date to build the period ladder.</p></GlassCard>;
   const { now, ladder, cycles, prediction, forecast } = data;
+
+  const forecastColumns: Column<(typeof forecast)[number]>[] = [
+    { header: "Year", cell: (r) => r.year },
+    { header: "Personal year", cell: (r) => r.personalYear, align: "right" },
+    { header: "Major / Sub / Fine", cell: (r) => `${r.mahaLord} / ${r.antarLord} / ${r.pratyantarLord}`, align: "right" },
+    { header: "Headline", cell: (r) => r.headline, className: "text-muted-foreground" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -289,16 +328,24 @@ export function DashaPanel({ birthDate, view }: { birthDate: string; view?: Dash
       {sub === "personal" && (
         <GlassCard>
           <Head title="Personal year, month and day" />
-          <Row k="Personal year" v={cycles.personalYear} />
-          <Row k="Personal month" v={cycles.personalMonth} />
-          <Row k="Personal day" v={cycles.personalDay} />
-          <Row k="Universal year" v={cycles.universalYear} />
+          <FieldValueTable
+            rows={[
+              { field: "Personal year", value: cycles.personalYear },
+              { field: "Personal month", value: cycles.personalMonth },
+              { field: "Personal day", value: cycles.personalDay },
+              { field: "Universal year", value: cycles.universalYear },
+            ]}
+          />
           <p className="mt-3 text-base text-pearl">{cycles.theme}</p>
-          <div className="mt-3 space-y-1 text-base text-pearl">
-            <p><span className="text-gold">Career. </span>{cycles.career}</p>
-            <p><span className="text-gold">Money. </span>{cycles.money}</p>
-            <p><span className="text-gold">Health. </span>{cycles.health}</p>
-            <p><span className="text-gold">Relationships. </span>{cycles.relationship}</p>
+          <div className="mt-3">
+            <FieldValueTable
+              rows={[
+                { field: "Career", value: cycles.career },
+                { field: "Money", value: cycles.money },
+                { field: "Health", value: cycles.health },
+                { field: "Relationships", value: cycles.relationship },
+              ]}
+            />
           </div>
         </GlassCard>
       )}
@@ -338,14 +385,7 @@ export function DashaPanel({ birthDate, view }: { birthDate: string; view?: Dash
                 className="ml-2 min-h-[44px] w-24 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl" />
             </label>
           </div>
-          <div className="space-y-2">
-            {forecast.map((r) => (
-              <div key={r.year} className="rounded-xl border border-white/10 p-3">
-                <p className="text-base text-pearl">{r.year} — personal year {r.personalYear}, major {r.mahaLord}, sub {r.antarLord}, fine {r.pratyantarLord}</p>
-                <p className="text-sm text-muted-foreground">{r.headline}</p>
-              </div>
-            ))}
-          </div>
+          <DataTable columns={forecastColumns} rows={forecast} rowKey={(r) => r.year} />
         </GlassCard>
       )}
     </div>
@@ -370,19 +410,17 @@ export function CurrentGridPanel({ birthDate }: { birthDate: string }) {
         ))}
       </div>
       <div className="mt-4">
-        <Row k="Active numbers" v={grid.activeNumbers.join(", ") || "none"} />
-        <Row k="Strong numbers" v={grid.strongNumbers.join(", ") || "none"} />
-        <Row k="Missing numbers" v={grid.missingNumbers.join(", ") || "none"} />
+        <FieldValueTable
+          rows={[
+            { field: "Active numbers", value: grid.activeNumbers.join(", ") || "none" },
+            { field: "Strong numbers", value: grid.strongNumbers.join(", ") || "none" },
+            { field: "Missing numbers", value: grid.missingNumbers.join(", ") || "none" },
+          ]}
+        />
       </div>
       <div className="mt-3 grid gap-4 md:grid-cols-2">
-        <div>
-          <p className="text-sm uppercase tracking-widest text-gold">Current strengths</p>
-          <ul className="mt-1 space-y-1 text-base text-pearl">{grid.strengths.map((s) => <li key={s}>{s}</li>)}</ul>
-        </div>
-        <div>
-          <p className="text-sm uppercase tracking-widest text-gold">Current weak spots</p>
-          <ul className="mt-1 space-y-1 text-base text-pearl">{grid.weaknesses.map((s) => <li key={s}>{s}</li>)}</ul>
-        </div>
+        <TextList title="Current strengths" items={grid.strengths} />
+        <TextList title="Current weak spots" items={grid.weaknesses} />
       </div>
     </GlassCard>
   );
@@ -393,17 +431,14 @@ export function CurrentGridPanel({ birthDate }: { birthDate: string }) {
 export function GuidancePanel({ birthDate }: { birthDate: string }) {
   const rows = useMemo(() => { try { return practicalGuidance(birthDate); } catch { return null; } }, [birthDate]);
   if (!rows) return <GlassCard><p className="text-base text-muted-foreground">Give a valid birth date.</p></GlassCard>;
+  const columns: Column<(typeof rows)[number]>[] = [
+    { header: "Area", cell: (r) => r.area, className: "text-gold" },
+    { header: "Advice", cell: (r) => r.advice, className: "text-pearl" },
+  ];
   return (
     <GlassCard>
       <Head title="Practical decisions" note="How your numbers apply to real choices. Treat these as timing preferences, not as replacements for professional advice." />
-      <div className="space-y-3">
-        {rows.map((r) => (
-          <div key={r.area} className="rounded-xl border border-white/10 p-3">
-            <p className="text-base text-gold">{r.area}</p>
-            <p className="text-base text-pearl">{r.advice}</p>
-          </div>
-        ))}
-      </div>
+      <DataTable columns={columns} rows={rows} rowKey={(r) => r.area} />
     </GlassCard>
   );
 }
@@ -412,6 +447,14 @@ export function GuidancePanel({ birthDate }: { birthDate: string }) {
 
 export function HebrewTarotPanel({ fullName }: { fullName: string }) {
   const reading = useMemo(() => (fullName.trim() ? kabbalahReading(fullName) : null), [fullName]);
+
+  const pathTotalsColumns: Column<NonNullable<typeof reading>["pathTotals"][number]>[] = [
+    { header: "Name part", cell: (p) => p.name },
+    { header: "Total", cell: (p) => p.total, align: "right" },
+    { header: "Path", cell: (p) => p.pathIndex, align: "right" },
+    { header: "Card", cell: (p) => p.card, align: "right", className: "text-pearl" },
+  ];
+
   return (
     <div className="space-y-6">
       <GlassCard>
@@ -459,16 +502,18 @@ export function HebrewTarotPanel({ fullName }: { fullName: string }) {
               </span>
             ))}
           </div>
-          <Row k="Gematria total" v={reading.total} />
-          <Row k="Single digit" v={reading.root} />
-          <Row k="Ruling path" v={`${reading.rulingLetter.path} — ${reading.rulingLetter.name}`} />
-          <Row k="Ruling card" v={`${reading.rulingLetter.cardNumber} ${reading.rulingCard}`} />
-          <Row k="Strongest attributions" v={reading.dominantElements.map((d) => `${d.element} × ${d.count}`).join(", ")} />
+          <FieldValueTable
+            rows={[
+              { field: "Gematria total", value: reading.total },
+              { field: "Single digit", value: reading.root },
+              { field: "Ruling path", value: `${reading.rulingLetter.path} — ${reading.rulingLetter.name}` },
+              { field: "Ruling card", value: `${reading.rulingLetter.cardNumber} ${reading.rulingCard}` },
+              { field: "Strongest attributions", value: reading.dominantElements.map((d) => `${d.element} × ${d.count}`).join(", ") },
+            ]}
+          />
           <p className="mt-3 text-base text-pearl">{reading.summary}</p>
-          <div className="mt-3 space-y-1">
-            {reading.pathTotals.map((p) => (
-              <p key={p.name} className="text-base text-pearl">{p.name}: {p.total} → path {p.pathIndex}, card {p.card}</p>
-            ))}
+          <div className="mt-3">
+            <DataTable columns={pathTotalsColumns} rows={reading.pathTotals} rowKey={(p) => p.name} />
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
             Letters absent from your name point to lessons you meet through other people: {reading.missingLetters.slice(0, 8).join(", ")}.
@@ -515,6 +560,21 @@ export function ProfilesPanel({
   };
   const remove = (id: string) => { const next = list.filter((p) => p.id !== id); setList(next); saveProfiles(next); };
 
+  const columns: Column<SavedProfile>[] = [
+    { header: "Name", cell: (p: SavedProfile) => p.name, className: "text-pearl" },
+    { header: "Birth date", cell: (p: SavedProfile) => p.birthDate, className: "text-muted-foreground" },
+    {
+      header: "Actions",
+      align: "right",
+      cell: (p: SavedProfile) => (
+        <div className="flex justify-end gap-2">
+          <button onClick={() => onSelect(p)} className="min-h-[44px] rounded-full border border-white/10 px-4 text-base text-pearl">Open</button>
+          <button onClick={() => remove(p.id)} className="min-h-[44px] rounded-full border border-white/10 px-4 text-base text-muted-foreground">Delete</button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <GlassCard>
       <Head title="Saved profiles" note="Profiles stay on this device. Save as many as you need and reopen them without typing again." />
@@ -529,20 +589,8 @@ export function ProfilesPanel({
           className="min-h-[44px] flex-1 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl"
         />
       </div>
-      <div className="mt-4 space-y-2">
-        {shown.length === 0 && <p className="text-base text-muted-foreground">No saved profiles yet.</p>}
-        {shown.map((p) => (
-          <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 p-3">
-            <div>
-              <p className="text-base text-pearl">{p.name}</p>
-              <p className="text-sm text-muted-foreground">{p.birthDate}</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => onSelect(p)} className="min-h-[44px] rounded-full border border-white/10 px-4 text-base text-pearl">Open</button>
-              <button onClick={() => remove(p.id)} className="min-h-[44px] rounded-full border border-white/10 px-4 text-base text-muted-foreground">Delete</button>
-            </div>
-          </div>
-        ))}
+      <div className="mt-4">
+        <DataTable columns={columns} rows={shown} rowKey={(p: SavedProfile) => p.id} empty="No saved profiles yet." />
       </div>
     </GlassCard>
   );

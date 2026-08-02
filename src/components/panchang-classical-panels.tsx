@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { GlassCard } from "@/components/page-shell";
+import { DataTable, type Column } from "@/components/data-table";
 import { fmtTime, fmtRange, type Panchang } from "@/lib/panchang";
 import {
   chandramasa, samvatAndEpochs, rituAndAyana, dayMeasures, varjyamAndAmrit,
@@ -8,18 +9,23 @@ import {
 } from "@/lib/panchang-calendars";
 import { RASHIS } from "@/lib/vedic";
 
-const CELL = "rounded-xl bg-white/5 px-3 py-2";
 const KEY = "text-[11px] uppercase tracking-widest text-muted-foreground";
 const VAL = "text-sm text-pearl";
 
-function Pair({ k, v }: { k: string; v: string }) {
-  return (
-    <div className={CELL}>
-      <div className={KEY}>{k}</div>
-      <div className={VAL}>{v}</div>
-    </div>
-  );
+type FieldValue = { field: string; value: string };
+
+const FV_COLUMNS: Column<FieldValue>[] = [
+  { header: "Field", cell: (r: FieldValue) => r.field, className: "text-muted-foreground" },
+  { header: "Value", cell: (r: FieldValue) => r.value, className: "text-pearl" },
+];
+
+function FieldValueTable({ rows }: { rows: FieldValue[] }) {
+  return <DataTable columns={FV_COLUMNS} rows={rows} rowKey={(r) => r.field} />;
 }
+
+type MuhurtaRow = ReturnType<typeof extraMuhurtas>[number];
+
+type GowriRow = { name: string; from: Date; to: Date; good: boolean };
 
 /**
  * The classical almanac layers that sit on top of the five limbs: era counts,
@@ -56,19 +62,78 @@ export function PanchangClassicalPanels({
   const tara = birthNakshatra !== undefined ? taraBalam(birthNakshatra, panchang.nakshatra.index) : null;
   const chandra = birthMoonSign !== undefined ? chandraBalam(birthMoonSign, data.moonSign) : null;
 
+  const monthEraRows: FieldValue[] = [
+    { field: "Chandramasa (Amanta)", value: data.masa.amanta },
+    { field: "Chandramasa (Purnimanta)", value: data.masa.purnimanta },
+    { field: "Shaka Samvat", value: String(data.samvat.shaka) },
+    { field: "Vikram Samvat", value: String(data.samvat.vikram) },
+    { field: "Gujarati Samvat", value: String(data.samvat.gujarati) },
+    { field: "Kali Yuga year", value: String(data.samvat.kaliyuga) },
+    { field: "National Civil date", value: data.samvat.nationalCivil },
+    { field: "National Nirayana date", value: data.samvat.nationalNirayana },
+  ];
+
+  const seasonRows: FieldValue[] = [
+    { field: "Drik Ritu", value: data.seasons.drikRitu },
+    { field: "Vedic Ritu", value: data.seasons.vedicRitu },
+    { field: "Drik Ayana", value: data.seasons.drikAyana },
+    { field: "Vedic Ayana", value: data.seasons.vedicAyana },
+    { field: "Dinamana (day length)", value: data.measures.dinamana?.text ?? "Unavailable" },
+    { field: "Ratrimana (night length)", value: data.measures.ratrimana?.text ?? "Unavailable" },
+    { field: "Madhyahna (true noon)", value: fmtTime(data.measures.madhyahna) },
+    { field: "Surya Nakshatra", value: data.ravi.suryaNakshatra },
+    { field: "Surya Pada", value: String(data.ravi.suryaPada) },
+    { field: "Moon sign", value: RASHIS[data.moonSign] },
+    { field: "Nakshatra Pada", value: String(panchang.nakshatra.pada) },
+    { field: "Ayanamsa", value: `${data.samvat.ayanamsaDegrees.toFixed(4)} degrees` },
+  ];
+
+  const vasaRows: FieldValue[] = [
+    { field: "Agnivasa", value: data.vasa.agnivasa },
+    { field: "Homahuti", value: data.vasa.homahuti },
+    { field: "Shivavasa", value: data.vasa.shivaVasa },
+    { field: "Chandra Vasa", value: data.vasa.chandraVasa },
+    { field: "Rahu Vasa", value: data.vasa.rahuVasa },
+    { field: "Bhadravasa", value: data.vasa.bhadraVasa },
+    { field: "Disha Shool", value: data.vasa.dishaShool },
+    { field: "Kumbha Chakra", value: data.vasa.kumbhaChakra },
+  ];
+
+  const ghattaRows: FieldValue[] = [
+    { field: "Moon sign", value: data.ghatta.moonSign },
+    { field: "Month", value: data.ghatta.month },
+    { field: "Tithi", value: data.ghatta.tithi },
+    { field: "Vaar", value: data.ghatta.vaar },
+    { field: "Nakshatra", value: data.ghatta.nakshatra },
+    { field: "Yoga", value: data.ghatta.yoga },
+    { field: "Karana", value: data.ghatta.karana },
+  ];
+
+  const epochRows: FieldValue[] = [
+    { field: "Julian Day", value: data.samvat.julianDay.toFixed(5) },
+    { field: "Modified Julian Day", value: data.samvat.modifiedJulianDay.toFixed(5) },
+    { field: "Rata Die", value: String(data.samvat.rataDie) },
+    { field: "Kali Ahargana", value: String(data.samvat.kaliAhargana) },
+  ];
+
+  const muhurtaColumns: Column<MuhurtaRow>[] = [
+    { header: "Muhurta", cell: (m: MuhurtaRow) => m.name },
+    { header: "Window", cell: (m: MuhurtaRow) => fmtRange(m.range), align: "right", className: "font-mono text-xs" },
+    { header: "Note", cell: (m: MuhurtaRow) => m.note, className: "text-muted-foreground" },
+  ];
+
+  const gowriColumns: Column<GowriRow>[] = [
+    { header: "Segment", cell: (r: GowriRow) => r.name },
+    { header: "From", cell: (r: GowriRow) => fmtTime(r.from), align: "right", className: "font-mono text-xs" },
+    { header: "To", cell: (r: GowriRow) => fmtTime(r.to), align: "right", className: "font-mono text-xs" },
+  ];
+
+  const nallaNeramRows: GowriRow[] = data.gowri.nallaNeram.map((s) => ({ name: s.name, from: s.from, to: s.to, good: true }));
+
   return (
     <div className="mt-6 space-y-6">
       <GlassCard title="Lunar month and era counts" desc="The traditional calendar frame for this date.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <Pair k="Chandramasa (Amanta)" v={data.masa.amanta} />
-          <Pair k="Chandramasa (Purnimanta)" v={data.masa.purnimanta} />
-          <Pair k="Shaka Samvat" v={String(data.samvat.shaka)} />
-          <Pair k="Vikram Samvat" v={String(data.samvat.vikram)} />
-          <Pair k="Gujarati Samvat" v={String(data.samvat.gujarati)} />
-          <Pair k="Kali Yuga year" v={String(data.samvat.kaliyuga)} />
-          <Pair k="National Civil date" v={data.samvat.nationalCivil} />
-          <Pair k="National Nirayana date" v={data.samvat.nationalNirayana} />
-        </div>
+        <FieldValueTable rows={monthEraRows} />
         {data.masa.adhika && (
           <p className="mt-3 text-sm text-pearl/90">
             This lunation contains no solar ingress, so it counts as an Adhika Masa, the intercalary month inserted to keep the lunar and solar years aligned.
@@ -77,26 +142,16 @@ export function PanchangClassicalPanels({
       </GlassCard>
 
       <GlassCard title="Season, half-year and day measures" desc="Ritu and Ayana in both the observed and the traditional reckoning, with the length of day and night.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          <Pair k="Drik Ritu" v={data.seasons.drikRitu} />
-          <Pair k="Vedic Ritu" v={data.seasons.vedicRitu} />
-          <Pair k="Drik Ayana" v={data.seasons.drikAyana} />
-          <Pair k="Vedic Ayana" v={data.seasons.vedicAyana} />
-          <Pair k="Dinamana (day length)" v={data.measures.dinamana?.text ?? "Unavailable"} />
-          <Pair k="Ratrimana (night length)" v={data.measures.ratrimana?.text ?? "Unavailable"} />
-          <Pair k="Madhyahna (true noon)" v={fmtTime(data.measures.madhyahna)} />
-          <Pair k="Surya Nakshatra" v={data.ravi.suryaNakshatra} />
-          <Pair k="Surya Pada" v={String(data.ravi.suryaPada)} />
-          <Pair k="Moon sign" v={RASHIS[data.moonSign]} />
-          <Pair k="Nakshatra Pada" v={String(panchang.nakshatra.pada)} />
-          <Pair k="Ayanamsa" v={`${data.samvat.ayanamsaDegrees.toFixed(4)} degrees`} />
-        </div>
+        <FieldValueTable rows={seasonRows} />
       </GlassCard>
 
       <GlassCard title="Varjyam, Amrit Kalam and Ravi Yoga" desc="Windows read from the exact start and end of the current star.">
         {data.vj ? (
           <div className="space-y-2">
-            <Pair k="Current star runs" v={`${fmtTime(data.vj.nakshatraStart)} to ${fmtTime(data.vj.nakshatraEnd)}`} />
+            <div className="rounded-xl bg-white/5 px-3 py-2">
+              <div className={KEY}>Current star runs</div>
+              <div className={VAL}>{`${fmtTime(data.vj.nakshatraStart)} to ${fmtTime(data.vj.nakshatraEnd)}`}</div>
+            </div>
             <div className="rounded-xl border border-red-400/20 bg-red-500/5 px-3 py-2">
               <div className={KEY}>Varjyam (avoid)</div>
               <div className={VAL}>{fmtRange(data.vj.varjyam)}</div>
@@ -119,38 +174,21 @@ export function PanchangClassicalPanels({
       </GlassCard>
 
       <GlassCard title="Additional muhurta windows" desc="The junction hours, the eleventh muhurta and the weak muhurtas of this weekday.">
-        <div className="space-y-2">
-          {data.muhurtas.map((m) => (
-            <div
-              key={m.name}
-              className={`rounded-xl px-3 py-2 ${m.nature === "good" ? "border border-emerald-400/20 bg-emerald-500/5" : "border border-red-400/20 bg-red-500/5"}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm text-pearl">{m.name}</span>
-                <span className="font-mono text-xs text-muted-foreground">{fmtRange(m.range)}</span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{m.note}</p>
-            </div>
-          ))}
-          <div className="rounded-xl bg-white/5 px-3 py-2">
-            <div className={KEY}>Baana</div>
-            <div className={VAL}>{data.baana.name}</div>
-            <p className="mt-1 text-sm text-pearl/90">{data.baana.note}</p>
-          </div>
+        <DataTable
+          columns={muhurtaColumns}
+          rows={data.muhurtas}
+          rowKey={(m: MuhurtaRow) => m.name}
+          rowClassName={(m: MuhurtaRow) => (m.nature === "good" ? "bg-emerald-500/5" : "bg-red-500/5")}
+        />
+        <div className="mt-3 rounded-xl bg-white/5 px-3 py-2">
+          <div className={KEY}>Baana</div>
+          <div className={VAL}>{data.baana.name}</div>
+          <p className="mt-1 text-sm text-pearl/90">{data.baana.note}</p>
         </div>
       </GlassCard>
 
       <GlassCard title="Vasa and Shool" desc="Where fire, the Moon, Rahu and Shiva are said to reside today, and which direction is obstructed.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          <Pair k="Agnivasa" v={data.vasa.agnivasa} />
-          <Pair k="Homahuti" v={data.vasa.homahuti} />
-          <Pair k="Shivavasa" v={data.vasa.shivaVasa} />
-          <Pair k="Chandra Vasa" v={data.vasa.chandraVasa} />
-          <Pair k="Rahu Vasa" v={data.vasa.rahuVasa} />
-          <Pair k="Bhadravasa" v={data.vasa.bhadraVasa} />
-          <Pair k="Disha Shool" v={data.vasa.dishaShool} />
-          <Pair k="Kumbha Chakra" v={data.vasa.kumbhaChakra} />
-        </div>
+        <FieldValueTable rows={vasaRows} />
         <ul className="mt-3 space-y-1 text-sm text-pearl/90">
           <li>{data.vasa.agniNote}</li>
           <li>{data.vasa.shivaNote}</li>
@@ -160,29 +198,23 @@ export function PanchangClassicalPanels({
 
       <GlassCard title="Gowri Panchangam and Nalla Neram" desc="The eight-fold Tamil division of day and night, with the two clearly favourable stretches listed at the end.">
         <div className="grid gap-4 lg:grid-cols-2">
-          {[["Day", data.gowri.day], ["Night", data.gowri.night]].map(([label, list]) => (
-            <div key={label as string}>
-              <div className={`${KEY} mb-2`}>{label as string}</div>
-              <div className="space-y-1.5">
-                {(list as typeof data.gowri.day).map((s, i) => (
-                  <div key={i} className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${s.good ? "bg-emerald-500/5 text-pearl" : "bg-white/5 text-muted-foreground"}`}>
-                    <span>{s.name}</span>
-                    <span className="font-mono text-xs">{fmtTime(s.from)} to {fmtTime(s.to)}</span>
-                  </div>
-                ))}
-                {(list as typeof data.gowri.day).length === 0 && <div className="text-xs text-muted-foreground">Unavailable for this place.</div>}
-              </div>
+          {([["Day", data.gowri.day], ["Night", data.gowri.night]] as [string, typeof data.gowri.day][]).map(([label, list]) => (
+            <div key={label}>
+              <div className={`${KEY} mb-2`}>{label}</div>
+              <DataTable
+                columns={gowriColumns}
+                rows={list}
+                rowKey={(s: GowriRow, i: number) => `${label}-${i}`}
+                rowClassName={(s: GowriRow) => (s.good ? "bg-emerald-500/5" : "")}
+                empty="Unavailable for this place."
+              />
             </div>
           ))}
         </div>
-        {data.gowri.nallaNeram.length > 0 && (
+        {nallaNeramRows.length > 0 && (
           <div className="mt-4 rounded-xl border border-gold/20 bg-gold/5 px-3 py-2">
-            <div className={KEY}>Nalla Neram</div>
-            <div className="mt-1 space-y-1 text-sm text-pearl">
-              {data.gowri.nallaNeram.map((s, i) => (
-                <div key={i}>{s.name} — {fmtTime(s.from)} to {fmtTime(s.to)}</div>
-              ))}
-            </div>
+            <div className={`${KEY} mb-2`}>Nalla Neram</div>
+            <DataTable columns={gowriColumns} rows={nallaNeramRows} rowKey={(s: GowriRow, i: number) => i} />
           </div>
         )}
       </GlassCard>
@@ -209,25 +241,12 @@ export function PanchangClassicalPanels({
       )}
 
       <GlassCard title="Ghatta Chakra" desc="The traditional avoidance set for the Moon sign of this date.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <Pair k="Moon sign" v={data.ghatta.moonSign} />
-          <Pair k="Month" v={data.ghatta.month} />
-          <Pair k="Tithi" v={data.ghatta.tithi} />
-          <Pair k="Vaar" v={data.ghatta.vaar} />
-          <Pair k="Nakshatra" v={data.ghatta.nakshatra} />
-          <Pair k="Yoga" v={data.ghatta.yoga} />
-          <Pair k="Karana" v={data.ghatta.karana} />
-        </div>
+        <FieldValueTable rows={ghattaRows} />
         <p className="mt-3 text-sm text-pearl/90">{data.ghatta.note}</p>
       </GlassCard>
 
       <GlassCard title="Epoch day counts" desc="The same instant expressed in the day-count systems used for cross checking any almanac.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          <Pair k="Julian Day" v={data.samvat.julianDay.toFixed(5)} />
-          <Pair k="Modified Julian Day" v={data.samvat.modifiedJulianDay.toFixed(5)} />
-          <Pair k="Rata Die" v={String(data.samvat.rataDie)} />
-          <Pair k="Kali Ahargana" v={String(data.samvat.kaliAhargana)} />
-        </div>
+        <FieldValueTable rows={epochRows} />
       </GlassCard>
     </div>
   );
