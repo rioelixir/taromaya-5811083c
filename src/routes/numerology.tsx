@@ -335,10 +335,9 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
             <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
               className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
           </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
+          <div className="block">
             <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
-          </label>
+          </div>
         </div>
       </GlassCard>
       {analysis && (
@@ -796,10 +795,7 @@ function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate
   return (
     <>
       <GlassCard>
-        <label className="block max-w-xs">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
-        </label>
+        <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
       {grid && (
         <>
@@ -910,10 +906,7 @@ function NineStarKiTab({ birthDate, setBirthDate }: { birthDate: string; setBirt
   return (
     <>
       <GlassCard>
-        <label className="block max-w-xs">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
-        </label>
+        <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
       {ki && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
