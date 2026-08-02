@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { vargaSign } from "@/lib/vargas";
 import { NorthIndianChart, SouthIndianChart } from "@/components/rashi-chart";
 import { dashaNarrative, vargaNarrative } from "@/lib/vedic-narrative";
-import { computeVimshottari, type DashaTree, type MahaPeriod, type AntarPeriod, type DashaPeriod } from "@/lib/vedic-extended";
+import { computeVimshottari, computeAshtottari, computeYogini, type DashaTree, type MahaPeriod, type AntarPeriod, type DashaPeriod } from "@/lib/vedic-extended";
 
 type NP = {
   name: string;
