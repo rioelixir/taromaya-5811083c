@@ -612,8 +612,8 @@ function buildPdf(key: ReportKey, b: Birth) {
     drawP("An arudha is the visible shadow of a house — what other people see and speak about, as opposed to what is literally there.");
     drawTable(
       ["Pada", "Sign", "Meaning"],
-      computeArudhaPadas(lite).slice(0, 12).map((a: { label?: string; house?: number; rashi: number; meaning?: string }) =>
-        [a.label ?? `A${a.house ?? ""}`, RASHIS[a.rashi], a.meaning ?? ""]),
+      computeArudhaPadas(lite).map((a) =>
+        [`A${a.house}`, RASHIS[a.arudha], `Shadow of house ${a.house}, ruled by ${a.lord}`]),
       [80, 120, 250],
     );
 
@@ -623,7 +623,7 @@ function buildPdf(key: ReportKey, b: Birth) {
     const sb = computeShadbala(chart);
     drawTable(
       ["Planet", "Total (rupas)", "Required", "Ratio", "Verdict"],
-      sb.map((r) => [r.planet, r.totalRupas.toFixed(2), r.requiredRupas.toFixed(2), r.ratio.toFixed(2),
+      sb.map((r) => [r.planet, r.total.toFixed(2), r.required.toFixed(2), r.ratio.toFixed(2),
         r.ratio >= 1.2 ? "Strong" : r.ratio >= 1 ? "Adequate" : "Needs support"]),
       [90, 110, 90, 70, 120],
     );
@@ -632,8 +632,8 @@ function buildPdf(key: ReportKey, b: Birth) {
     try {
       const gem = recommendGemstones(chart, sb);
       drawKV([
-        ["Primary", `${gem.primary.stone ?? ""} for ${gem.primary.for}`],
-        ["Supporting", `${gem.supporting.stone ?? ""} for ${gem.supporting.for}`],
+        ["Primary", `${gem.primary.stone} for ${gem.primary.for} · ${gem.primary.metal} · ${gem.primary.finger} finger`],
+        ["Supporting", `${gem.supporting.stone} for ${gem.supporting.for} · ${gem.supporting.day}`],
         ["Rudraksha", `${gem.rudraksha.mukhi} for ${gem.rudraksha.for} — ${gem.rudraksha.benefit}`],
         ["Avoid", gem.avoid.join(", ") || "None flagged"],
         ["Notes", gem.notes],
@@ -921,7 +921,7 @@ function buildPdf(key: ReportKey, b: Birth) {
   }
 
   if (key === "numbers") {
-    drawSub("Using the compendium")
+    drawSub("Using the compendium");
     drawP(`Your Life Path ${num.lifePath} is the road; the Expression ${num.destiny} is the vehicle; the Soul Urge ${num.soulUrge} is the driver. When a decision feels wrong, one of the three is being ignored. Personal Year ${num.personalYear} sets this year's weather.`);
   }
 
