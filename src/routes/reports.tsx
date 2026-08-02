@@ -61,7 +61,8 @@ function pdfSafe(t: string): string {
   return t
     .replace(/\u2032/g, "'").replace(/\u2033/g, '"')
     .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
-    .replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...");
+    .replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...")
+    .replace(/\u2192/g, "to").replace(/[\u2094\u211E]/g, "R");
 }
 
 function todayIso() { return new Date().toISOString().slice(0, 10); }
@@ -390,7 +391,7 @@ export function buildPdf(key: ReportKey, b: Birth) {
   drawKV([
     ["Name", b.name],
     ["Date & Time", `${b.date} · ${b.time} (UTC${Number(b.tz) >= 0 ? "+" : ""}${b.tz})`],
-    ["Place", `${b.place}  (${b.lat}°, ${b.lon}°)`],
+    ["Place", b.place],
     ["Ascendant (Lagna)", `${RASHIS[chart.ascendant.rashi]} · ${formatDegree(chart.ascendant.degreeInRashi)}`],
     ["Moon Nakshatra", `${NAKSHATRAS[chart.moonNakshatra.index]} · pada ${chart.moonNakshatra.pada} · lord ${chart.moonNakshatra.lord}`],
     ["Life Path / Destiny / Soul", `${num.lifePath}  ·  ${num.destiny}  ·  ${num.soulUrge}`],
@@ -1036,7 +1037,7 @@ function drawSouthIndianChart(
       const px = cx + 4 + (i % 3) * (cell - 8) / 3;
       const py = cy + 22 + Math.floor(i / 3) * 11;
       const label = shortPlanet[p.name] ?? p.name.slice(0, 2);
-      pdf.text(p.retrograde ? `${label}\u2094` : label, px, py);
+      pdf.text(p.retrograde ? `${label} R` : label, px, py);
     });
   }
 
