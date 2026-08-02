@@ -56,6 +56,14 @@ const REPORT_META: Record<ReportKey, { title: string; desc: string; sections: st
   numbers: { title: "Numerology Compendium", desc: "The complete number book — Pythagorean, Chaldean, Vedic and Lo Shu in one volume.", sections: ["Core Numbers","Why & How Each Number Works","Lucky Set","Karmic Debts & Lessons","Cycles & Pinnacles","Lo Shu Grid","Year Outlook"] },
 };
 
+// jsPDF's built-in fonts use WinAnsi, which mangles prime/double-prime marks.
+function pdfSafe(t: string): string {
+  return t
+    .replace(/\u2032/g, "'").replace(/\u2033/g, '"')
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...");
+}
+
 function todayIso() { return new Date().toISOString().slice(0, 10); }
 
 function ReportsPage() {
@@ -272,7 +280,7 @@ export function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFontSize(size);
     pdf.setTextColor(230, 225, 210);
     // Plain numbers only — never Roman numerals in a report.
-    const lines = pdf.splitTextToSize(romanToArabicText(text), w - margin * 2) as string[];
+    const lines = pdf.splitTextToSize(pdfSafe(romanToArabicText(text)), w - margin * 2) as string[];
     for (const ln of lines) {
       ensureRoom(size + 12);
       pdf.text(ln, margin, y);
@@ -286,9 +294,9 @@ export function buildPdf(key: ReportKey, b: Birth) {
     for (const [k, v] of rows) {
       ensureRoom(24);
       pdf.setTextColor(...MUTED);
-      pdf.text(k, margin, y);
+      pdf.text(pdfSafe(k), margin, y);
       pdf.setTextColor(...PEARL);
-      const lines = pdf.splitTextToSize(v, w - margin * 2 - keyWidth) as string[];
+      const lines = pdf.splitTextToSize(pdfSafe(v), w - margin * 2 - keyWidth) as string[];
       lines.forEach((ln, i) => {
         if (i > 0) { ensureRoom(20); y += 14; }
         pdf.text(ln, margin + keyWidth, y);
@@ -321,7 +329,7 @@ export function buildPdf(key: ReportKey, b: Birth) {
       pdf.setTextColor(...PEARL);
       let cx = margin + 8;
       r.forEach((cell, ci) => {
-        const cellLines = pdf.splitTextToSize(cell ?? "", cols[ci] - 12) as string[];
+        const cellLines = pdf.splitTextToSize(pdfSafe(cell ?? ""), cols[ci] - 12) as string[];
         pdf.text(cellLines[0] ?? "", cx, y + 2);
         cx += cols[ci];
       });
