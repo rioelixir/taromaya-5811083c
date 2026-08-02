@@ -31,7 +31,7 @@ export const Route = createFileRoute("/horoscope")({
 
 type Period = "Daily" | "Weekly" | "Monthly" | "Yearly";
 const PERIODS: Period[] = ["Daily", "Weekly", "Monthly", "Yearly"];
-type Tab = "western" | "vedic" | "nakshatra" | "chinese";
+type Tab = "western" | "vedic" | "nakshatra" | "chinese" | "numeroscope";
 
 function seedFor(sign: string, period: Period, date: Date): number {
   const key = `${sign}-${period}-${date.getFullYear()}-${
