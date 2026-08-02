@@ -235,7 +235,7 @@ function RootComponent() {
       )}
       <div className="relative min-h-dvh">
         {!chromeHidden && <Sidebar />}
-        {!chromeHidden && <GlobalChrome showRail={!pathname.startsWith("/tarot")} />}
+        {!chromeHidden && <GlobalChrome showRail={!pathname.startsWith("/tarot")} showLanguage={!pathname.startsWith("/tarot")} />}
         {!chromeHidden && pathname !== "/" && <FloatingBackButton />}
         <main className={`relative min-h-dvh ${chromeHidden ? "" : "pb-24"}`}>
           <TourHighlighter />
