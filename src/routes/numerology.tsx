@@ -185,10 +185,10 @@ function NumerologyPage() {
           <div className="mt-6"><NameChartPanel fullName={fullName} birthDate={birthDate} /></div>
         </>
       )}
-      {tab === "dasha" && (
+      {DASHA_VIEW[tab] && (
         <>
           <GlassCard><NumBox birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
-          <div className="mt-6"><DashaPanel birthDate={birthDate} /></div>
+          <div className="mt-6"><DashaPanel birthDate={birthDate} view={DASHA_VIEW[tab]} /></div>
         </>
       )}
       {tab === "currentgrid" && (
