@@ -123,7 +123,10 @@ function CalculatorPage() {
             </VCard>
           </>
         ) : (
-          <VCard title="Add a profile to see your core numbers" />
+          <VCard title="Add a profile to see your core numbers">
+            <p className="text-sm text-vnavy-soft">Save a name and birth date on the Profile tab.</p>
+          </VCard>
+
         )
       ) : null}
 
