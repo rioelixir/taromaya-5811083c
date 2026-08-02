@@ -4,6 +4,7 @@
 import { useMemo, useState } from "react";
 import { vargaSign } from "@/lib/vargas";
 import { NorthIndianChart, SouthIndianChart } from "@/components/rashi-chart";
+import { dashaNarrative, vargaNarrative } from "@/lib/vedic-narrative";
 import { computeVimshottari, type DashaTree, type MahaPeriod, type AntarPeriod, type DashaPeriod } from "@/lib/vedic-extended";
 
 type NP = {
@@ -88,6 +89,11 @@ export function VargaExplorer({ chart }: { chart: Chart }) {
       ) : (
         <SouthIndianChart chart={varga} />
       )}
+      <div className="space-y-3 border-t border-border/20 pt-3 text-sm leading-relaxed">
+        {vargaNarrative(n, varga.ascendant.rashi, varga.planets).map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
+      </div>
     </div>
   );
 }
@@ -173,6 +179,16 @@ export function DashaTimeline({
         <span className="font-mono text-[11px] text-muted-foreground">
           {tree.currentMaha.lord} · {tree.currentAntar.lord} · {tree.currentPratyantar.lord}
         </span>
+      </div>
+      <div className="space-y-3 text-sm leading-relaxed">
+        {dashaNarrative(
+          tree.currentMaha.lord,
+          tree.currentAntar.lord,
+          tree.currentPratyantar.lord,
+          tree.currentAntar.end,
+        ).map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
       </div>
       <div className="space-y-2">
         {tree.maha.map((m) => (
