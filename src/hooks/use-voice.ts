@@ -258,12 +258,20 @@ export function useVoice(onText: (text: string) => void) {
       return;
     }
     const hadRec = !!recRef.current;
-    const spoken = (finalRef.current || heard).trim();
+    // Everything settled, plus the tail still being heard, plus whatever the
+    // box was already showing — so no words are dropped on the last tap.
+    const spoken = [finalRef.current, interimRef.current]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim() || heard.trim();
     const m = teardown();
     finalRef.current = "";
+    interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
     setHeard("");
+
 
     if (hadRec) {
       setState("idle");
