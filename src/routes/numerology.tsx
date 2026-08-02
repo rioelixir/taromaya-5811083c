@@ -19,6 +19,7 @@ import {
 } from "@/lib/name-spelling";
 import { aiReading } from "@/lib/ai-cache";
 import { NumerologyFullReport } from "@/components/numerology-report";
+import { MobileRemedyPanel, NameRemedyPanel } from "@/components/numerology-remedies-panel";
 import {
   NameChartPanel, DashaPanel, CurrentGridPanel, GuidancePanel,
   HebrewTarotPanel, ProfilesPanel, type SavedProfile,
@@ -463,6 +464,8 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
           </GlassCard>
         </div>
       )}
+
+      <MobileRemedyPanel mobile={num} birthDate={birthDate} />
     </>
   );
 }
