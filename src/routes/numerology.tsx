@@ -158,6 +158,44 @@ function NumerologyPage() {
       {tab === "name" && <NameAnalysisTab fullName={fullName} setFullName={setFullName} birthDate={birthDate} />}
       {tab === "mobile" && <MobileNumerology birthDate={birthDate} setBirthDate={setBirthDate} />}
       {tab === "compat" && <KundliMatchingNumerology />}
+      {tab === "namechart" && (
+        <>
+          <GlassCard><NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
+          <div className="mt-6"><NameChartPanel fullName={fullName} birthDate={birthDate} /></div>
+        </>
+      )}
+      {tab === "dasha" && (
+        <>
+          <GlassCard><NumBox birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
+          <div className="mt-6"><DashaPanel birthDate={birthDate} /></div>
+        </>
+      )}
+      {tab === "currentgrid" && (
+        <>
+          <GlassCard><NumBox birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
+          <div className="mt-6"><CurrentGridPanel birthDate={birthDate} /></div>
+        </>
+      )}
+      {tab === "guidance" && (
+        <>
+          <GlassCard><NumBox birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
+          <div className="mt-6"><GuidancePanel birthDate={birthDate} /></div>
+        </>
+      )}
+      {tab === "hebrew" && (
+        <>
+          <GlassCard><NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} /></GlassCard>
+          <div className="mt-6"><HebrewTarotPanel fullName={fullName} /></div>
+        </>
+      )}
+      {tab === "profiles" && (
+        <ProfilesPanel
+          fullName={fullName}
+          birthDate={birthDate}
+          onSelect={(p) => { setFullName(p.name); setBirthDate(p.birthDate); setTab("report"); }}
+        />
+      )}
+
 
       <ConfidenceNote noteKey="numerology" className="mt-6" />
     </PageShell>
