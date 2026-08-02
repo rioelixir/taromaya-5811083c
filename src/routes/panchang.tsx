@@ -143,6 +143,7 @@ function PanchangPage() {
             <MuhurtaRow term="abhijit" label="Abhijit" range={p.abhijitMuhurat} good />
             <MuhurtaRow label="Brahma" range={p.brahmaMuhurat} good />
             <MuhurtaRow label="Godhuli" range={p.godhuliMuhurat} good />
+            <MuhurtaRow label="Nishita" range={p.nishitaKaal} good />
             <div className="pt-2 border-t border-white/5" />
             <MuhurtaRow term="rahu-kaal" label="Rahu Kaal" range={p.rahuKaal} />
             <MuhurtaRow label="Yamaganda" range={p.yamaganda} />

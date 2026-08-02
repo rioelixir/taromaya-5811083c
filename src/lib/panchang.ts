@@ -71,6 +71,7 @@ export type Panchang = {
   abhijitMuhurat: [Date, Date] | null;
   brahmaMuhurat: [Date, Date] | null;
   godhuliMuhurat: [Date, Date] | null;
+  nishitaKaal: [Date, Date] | null;
   chaughadiyaDay: { name: string; nature: string; from: Date; to: Date }[];
   chaughadiyaNight: { name: string; nature: string; from: Date; to: Date }[];
   chandrashtama: string[];
@@ -230,6 +231,15 @@ export function computePanchang(input: PanchangInput): Panchang {
   })();
   const chaughadiyaNight = chaughadiya(CHAUGHADIYA_NIGHT_START, nightParts);
 
+  // Nishita Kaal — the muhurta straddling true midnight (mid-point of the
+  // night, i.e. halfway between sunset and the next sunrise), 48 minutes wide.
+  const nishita: [Date, Date] | null = nightParts.length === 8
+    ? [
+        new Date(nightParts[4][0].getTime() - 24 * 60000),
+        new Date(nightParts[4][0].getTime() + 24 * 60000),
+      ]
+    : null;
+
   // Chandrashtama: 8th, 17th, 22nd nakshatras from current
   const chandrashtama = [7, 16, 21].map((offset) => NAKSHATRAS[(nakIndex + offset) % 27]);
 
@@ -250,6 +260,7 @@ export function computePanchang(input: PanchangInput): Panchang {
     abhijitMuhurat: abhijit,
     brahmaMuhurat: brahma,
     godhuliMuhurat: godhuli,
+    nishitaKaal: nishita,
     chaughadiyaDay,
     chaughadiyaNight,
     chandrashtama,

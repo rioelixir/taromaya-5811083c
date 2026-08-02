@@ -3,7 +3,9 @@ import { useMemo, useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { BirthInputForm } from "@/components/birth-input-form";
 import { Card } from "@/components/ui/card";
-import { NorthIndianChart, SouthIndianChart, toNavamsha } from "@/components/rashi-chart";
+import { NorthIndianChart, SouthIndianChart, EastIndianChart, toNavamsha } from "@/components/rashi-chart";
+import { ChartExport } from "@/components/chart-export";
+import { CHART_VARIANTS, toVariant, type ChartVariant } from "@/lib/chart-variants";
 import { VargaExplorer, DashaTimeline } from "@/components/vargas-dasha";
 import { StrengthsPanel } from "@/components/strengths-panel";
 import { YogasDoshasPanel } from "@/components/yogas-doshas-panel";
@@ -33,9 +35,15 @@ const RASHIS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpi
 function NewKundliPage() {
   const [chart, setChart] = useState<ChartLite | null>(null);
   const [birth, setBirth] = useState<{ year: number; month: number; day: number; hour: number; minute: number; seconds?: number; tzOffsetHours: number; latitude: number; longitude: number } | null>(null);
-  const [style, setStyle] = useState<"north" | "south">("north");
+  const [style, setStyle] = useState<"north" | "south" | "east">("north");
+  const [variant, setVariant] = useState<ChartVariant>("lagna");
 
+  const baseChart = useMemo(
+    () => (chart ? (toVariant(chart, variant) as unknown as ChartLite) : null),
+    [chart, variant],
+  );
   const navChart = useMemo(() => (chart ? toNavamsha(chart) : null), [chart]);
+  const variantMeta = CHART_VARIANTS.find((v) => v.key === variant)!;
 
   const panchang = useMemo(() => {
     if (!birth) return null;
@@ -56,21 +64,57 @@ function NewKundliPage() {
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-serif text-lg">Charts</h3>
               <div className="inline-flex overflow-hidden rounded-full border border-border/50 bg-background/40 text-xs">
-                <button onClick={() => setStyle("north")} className={`px-3 py-1.5 ${style === "north" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}>North</button>
-                <button onClick={() => setStyle("south")} className={`px-3 py-1.5 ${style === "south" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}>South</button>
+                {(["north", "south", "east"] as const).map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => setStyle(k)}
+                    className={`min-h-11 px-4 py-2 capitalize ${style === k ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}
+                  >
+                    {k}
+                  </button>
+                ))}
               </div>
             </div>
 
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-1.5">
+                {CHART_VARIANTS.map((v) => (
+                  <button
+                    key={v.key}
+                    onClick={() => setVariant(v.key)}
+                    className={`min-h-11 rounded-full border px-4 py-2 text-xs transition ${
+                      variant === v.key
+                        ? "border-primary/60 bg-primary/20 text-primary"
+                        : "border-border/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs leading-relaxed text-muted-foreground">{variantMeta.note}</p>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
-              {style === "north" ? (
-                <NorthIndianChart chart={chart} title="D1 · Rashi" />
-              ) : (
-                <SouthIndianChart chart={chart} title="D1 · Rashi" />
-              )}
+              <ChartExport filename={`taromaya-${variant}-chart`}>
+                {style === "north" ? (
+                  <NorthIndianChart chart={baseChart ?? chart} title={`D1 · ${variantMeta.label}`} />
+                ) : style === "south" ? (
+                  <SouthIndianChart chart={baseChart ?? chart} title={`D1 · ${variantMeta.label}`} />
+                ) : (
+                  <EastIndianChart chart={baseChart ?? chart} title={`D1 · ${variantMeta.label}`} />
+                )}
+              </ChartExport>
               {navChart && (
-                style === "north"
-                  ? <NorthIndianChart chart={navChart} title="D9 · Navamsha" />
-                  : <SouthIndianChart chart={navChart} title="D9 · Navamsha" />
+                <ChartExport filename="taromaya-navamsha-chart">
+                  {style === "north" ? (
+                    <NorthIndianChart chart={navChart} title="D9 · Navamsha" />
+                  ) : style === "south" ? (
+                    <SouthIndianChart chart={navChart} title="D9 · Navamsha" />
+                  ) : (
+                    <EastIndianChart chart={navChart} title="D9 · Navamsha" />
+                  )}
+                </ChartExport>
               )}
             </div>
 
