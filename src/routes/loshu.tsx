@@ -316,10 +316,11 @@ function ReportView({ analysis, onSave, saving }: { analysis: LoShuAnalysis; onS
       <GlassCard title="Career analysis" desc="Ranked by the strength of the numbers in your grid.">
         <DataTable
           columns={[
-            { header: "Field", cell: (r: { field: string }) => r.field },
-            { header: "Scope", cell: (r: { detail: string }) => r.detail },
-            { header: "Fit", cell: (r: { weight: number }) => <span className="text-gold">{r.weight}</span>, align: "right" },
+            { header: "Field", cell: (r: { field: string; detail: string; weight: number }) => r.field },
+            { header: "Scope", cell: (r: { field: string; detail: string; weight: number }) => r.detail },
+            { header: "Fit", cell: (r: { field: string; detail: string; weight: number }) => <span className="text-gold">{r.weight}</span>, align: "right" },
           ]}
+
           rows={careerAnalysis(a)}
           rowKey={(r) => r.field}
         />
