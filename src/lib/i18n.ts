@@ -240,6 +240,21 @@ export function t(key: string, lang: Lang): string {
   return (entry as Record<string, string | undefined>)[lang] ?? entry.en;
 }
 
+/**
+ * Reviewed English -> target-language strings, used to seed the live
+ * translator so hand-checked wording always wins over machine output.
+ */
+export function reviewedTerms(lang: Lang): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (lang === "en") return out;
+  for (const entry of Object.values(DICT)) {
+    const value = (entry as Record<string, string | undefined>)[lang];
+    if (entry.en && value && value !== entry.en) out[entry.en] = value;
+  }
+  return out;
+}
+
+
 
 /** React hook returning a bound translator. */
 export function useT() {

@@ -112,6 +112,39 @@ function toLatin(src: string): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
+/** Split a long paragraph on sentence boundaries so no request is too long. */
+function chunkText(text: string, max = 600): string[] {
+  if (text.length <= max) return [text];
+  const parts: string[] = [];
+  let cur = "";
+  for (const piece of text.split(/(?<=[.!?।;])\s+/)) {
+    if ((cur + " " + piece).trim().length > max && cur) {
+      parts.push(cur.trim());
+      cur = piece;
+    } else {
+      cur = cur ? `${cur} ${piece}` : piece;
+    }
+  }
+  if (cur.trim()) parts.push(cur.trim());
+  return parts;
+}
+
+/** Translate any length of text, retrying once before giving up. */
+async function translate(
+  lang: string,
+  text: string,
+  wantRoman = false,
+): Promise<{ text: string; roman: string | null } | null> {
+  const chunks = chunkText(text);
+  const outs = await Promise.all(
+    chunks.map(async (c) => (await gtx(lang, c, wantRoman)) ?? (await gtx(lang, c, wantRoman))),
+  );
+  if (outs.some((o) => o == null)) return null;
+  const joined = outs.map((o) => o!.text.trim()).join(" ");
+  const roman = outs.every((o) => o!.roman) ? outs.map((o) => o!.roman!.trim()).join(" ") : null;
+  return { text: joined, roman };
+}
+
 
 export const Route = createFileRoute("/api/public/translate")({
   server: {
@@ -130,8 +163,9 @@ export const Route = createFileRoute("/api/public/translate")({
         }
         const lang = typeof body.lang === "string" ? body.lang : "";
         const strings = Array.isArray(body.strings)
-          ? body.strings.filter((s) => typeof s === "string" && s.length <= 900).slice(0, 60)
+          ? body.strings.filter((s) => typeof s === "string" && s.length <= 2000).slice(0, 60)
           : [];
+
 
         const known = LANGUAGE_LIST.some((l) => l.code === lang);
         if (!lang || !known || lang === "en" || strings.length === 0) {
@@ -153,7 +187,7 @@ export const Route = createFileRoute("/api/public/translate")({
               resolved.set(s, cached);
               return;
             }
-            const hit = await gtx(target, s, hinglish);
+            const hit = await translate(target, s, hinglish);
             if (!hit) {
               resolved.set(s, s);
               return;
@@ -162,6 +196,7 @@ export const Route = createFileRoute("/api/public/translate")({
             const out = hinglish ? (hit.roman ?? toLatin(hit.text)) : hit.text;
             memoSet(key, out);
             resolved.set(s, out);
+
           }),
         );
         const results = strings.map((s) => resolved.get(s) ?? s);

@@ -19,12 +19,12 @@ export function PlainAIText({
   const lines = parsePlainLines(gate.text);
   return (
     <div
-      data-no-translate
       aria-live="polite"
       aria-busy={busy}
       aria-label={label}
       className="space-y-2 text-foreground leading-relaxed"
     >
+
       {lines.map((l, i) =>
         l.kind === "heading" ? (
           <h3 key={i} className="mt-4 font-display text-lg text-primary first:mt-0">

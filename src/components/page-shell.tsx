@@ -50,7 +50,7 @@ function PageNav({
     <div className="mb-4 flex items-center justify-between gap-2">
       <BackButton />
 
-      <div className="flex items-center gap-2 flex-wrap justify-end" data-no-translate>
+      <div className="flex items-center gap-2 flex-wrap justify-end">
         <BirthStatusChip />
         <LanguageSwitcher compact />
         <button

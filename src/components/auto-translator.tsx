@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { RTL_LANGS, useLang, type Lang } from "@/lib/i18n";
+import { RTL_LANGS, reviewedTerms, useLang, type Lang } from "@/lib/i18n";
 
-const CACHE_KEY = (lang: Lang) => `taromaya.translations.v2.${lang}`;
+const CACHE_KEY = (lang: Lang) => `taromaya.translations.v3.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
 const ATTR_ORIG = "data-i18n-orig";
-const MAX_LEN = 900;
+const MAX_LEN = 2000;
 const ATTRS = ["placeholder", "aria-label", "title", "alt", "label", "value"] as const;
+
 
 /** What we last wrote into a text node, so re-renders get re-translated. */
 const doneText = new WeakMap<Text, { src: string; out: string }>();
@@ -20,15 +21,20 @@ const memCache: Partial<Record<Lang, Record<string, string>>> = {};
 
 function loadCache(lang: Lang): Record<string, string> {
   if (memCache[lang]) return memCache[lang]!;
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(CACHE_KEY(lang));
-    memCache[lang] = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-  } catch {
-    memCache[lang] = {};
+  let stored: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = window.localStorage.getItem(CACHE_KEY(lang));
+      stored = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    } catch {
+      stored = {};
+    }
   }
+  // Hand-reviewed wording always wins over machine output.
+  memCache[lang] = { ...stored, ...reviewedTerms(lang) };
   return memCache[lang]!;
 }
+
 
 let saveTimer = 0;
 function saveCache(lang: Lang, cache: Record<string, string>) {
@@ -139,33 +145,40 @@ function restoreEnglish() {
 async function fetchTranslations(lang: Lang, strings: string[]): Promise<Record<string, string>> {
   if (strings.length === 0) return {};
   const map: Record<string, string> = {};
-  const CHUNK = 50;
+  // Long paragraphs (AI readings) go in smaller batches so nothing is dropped.
+  const short = strings.filter((s) => s.length <= 200);
+  const long = strings.filter((s) => s.length > 200);
   const batches: string[][] = [];
-  for (let i = 0; i < strings.length; i += CHUNK) batches.push(strings.slice(i, i + CHUNK));
+  for (let i = 0; i < short.length; i += 40) batches.push(short.slice(i, i + 40));
+  for (let i = 0; i < long.length; i += 8) batches.push(long.slice(i, i + 8));
+
+  const send = async (batch: string[], attempt = 0): Promise<void> => {
+    try {
+      const res = await fetch("/api/public/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang, strings: batch }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const { translations } = (await res.json()) as { translations: string[] };
+      if (!Array.isArray(translations)) return;
+      translations.forEach((t, idx) => {
+        const src = batch[idx];
+        if (src && t && typeof t === "string") map[src] = t;
+      });
+    } catch {
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 350 * (attempt + 1)));
+        await send(batch, attempt + 1);
+      }
+    }
+  };
 
   // Fire every batch at once so the page finishes translating in one round trip window.
-  await Promise.all(
-    batches.map(async (batch) => {
-      try {
-        const res = await fetch("/api/public/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang, strings: batch }),
-        });
-        if (!res.ok) return;
-        const { translations } = (await res.json()) as { translations: string[] };
-        if (!Array.isArray(translations)) return;
-        translations.forEach((t, idx) => {
-          const src = batch[idx];
-          if (src && t && typeof t === "string") map[src] = t;
-        });
-      } catch {
-        /* skip batch */
-      }
-    }),
-  );
+  await Promise.all(batches.map((b) => send(b)));
   return map;
 }
+
 
 function applyText(nodes: Text[], cache: Record<string, string>) {
   nodes.forEach((n) => {
