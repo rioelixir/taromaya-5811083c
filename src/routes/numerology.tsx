@@ -42,13 +42,18 @@ export const Route = createFileRoute("/numerology")({
 });
 
 
-type Tab = "report" | "personal" | "vedic" | "namechart" | "dasha" | "currentgrid" | "guidance" | "hebrew" | "profiles" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
+type Tab = "report" | "personal" | "vedic" | "namechart" | "maha" | "antar" | "pratyantar" | "personalyear" | "anydate" | "forecast" | "currentgrid" | "guidance" | "hebrew" | "profiles" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   report: "Full Report",
   personal: "Personal",
   vedic: "Vedic",
   namechart: "Name chart",
-  dasha: "Periods",
+  maha: "Mahadasha",
+  antar: "Antardasha",
+  pratyantar: "Pratyantar Dasha",
+  personalyear: "Personal year",
+  anydate: "Any date",
+  forecast: "Forecast",
   currentgrid: "Current grid",
   guidance: "Decisions",
   hebrew: "Hebrew and tarot",
@@ -62,6 +67,16 @@ const TAB_LABEL: Record<Tab, string> = {
   mobile: "Mobile",
   compat: "Kundli Matching",
 };
+
+const DASHA_VIEW: Partial<Record<Tab, DashaTab>> = {
+  maha: "maha",
+  antar: "antar",
+  pratyantar: "pratyantar",
+  personalyear: "personal",
+  anydate: "date",
+  forecast: "forecast",
+};
+
 
 
 
