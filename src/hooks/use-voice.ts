@@ -41,6 +41,10 @@ export function useVoice(onText: (text: string) => void) {
   const slotsRef = useRef<string[]>([]);
   /** Words settled before the listener restarted itself. */
   const committedRef = useRef("");
+  /** Written-down pieces of a long talk, in the order they were spoken. */
+  const segmentsRef = useRef<string[]>([]);
+  /** One line for writing pieces down, so they never overtake each other. */
+  const queueRef = useRef<Promise<void>>(Promise.resolve());
   /** The half-heard tail that has not been marked final yet — it must not be lost
    *  when the user taps stop mid-sentence. */
   const interimRef = useRef("");
@@ -150,14 +154,20 @@ export function useVoice(onText: (text: string) => void) {
     return null;
   }, []);
 
-  /** Turn whatever has been recorded so far into words, keeping earlier pieces. */
+  /** Turn whatever has been recorded so far into words, keeping earlier pieces.
+   *  Each piece keeps its own place in line, so a slow piece can never jump ahead
+   *  of a later one. */
   const flushSegment = useCallback(async (final: boolean) => {
     const m = mediaRef.current;
     if (!m) return;
     const chunks = m.chunks.splice(0, m.chunks.length);
-    if (chunks.length === 0) return;
+    if (chunks.length === 0) {
+      if (final) await queueRef.current;
+      return;
+    }
     const blob = encodeWav(chunks, m.ctx.sampleRate);
     if (blob.size < 2048) {
+      if (final) await queueRef.current;
       if (final && !committedRef.current) {
         setState("idle");
         setMessage("That was too quiet. Tap and speak again.");
@@ -165,14 +175,24 @@ export function useVoice(onText: (text: string) => void) {
       return;
     }
     if (final) setState("working");
-    const text = await send(blob);
-    if (text === null) {
-      setMessage("One part of your talk could not be written down. The rest is kept.");
-      return;
-    }
-    committedRef.current = dedupeRepeats(`${committedRef.current} ${text}`.trim());
-    setHeard(tidy(committedRef.current));
+    const slot = segmentsRef.current.length;
+    segmentsRef.current.push("");
+    const job = (async () => {
+      const text = await send(blob);
+      if (text === null) {
+        setMessage("One part of your talk could not be written down. The rest is kept.");
+        return;
+      }
+      segmentsRef.current[slot] = text;
+      committedRef.current = dedupeRepeats(
+        segmentsRef.current.filter(Boolean).join(" ").trim(),
+      );
+      setHeard(tidy(committedRef.current));
+    })();
+    queueRef.current = queueRef.current.then(() => job).catch(() => {});
+    await queueRef.current;
   }, [send, tidy]);
+
 
 
   /* ---------- controls ---------- */
@@ -185,6 +205,8 @@ export function useVoice(onText: (text: string) => void) {
     interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
+    segmentsRef.current = [];
+    queueRef.current = Promise.resolve();
     setHeard("");
     setMessage(null);
 
@@ -348,6 +370,8 @@ export function useVoice(onText: (text: string) => void) {
       interimRef.current = "";
       slotsRef.current = [];
       committedRef.current = "";
+      segmentsRef.current = [];
+      queueRef.current = Promise.resolve();
       setHeard("");
       if (!all) {
         setState("idle");
@@ -370,6 +394,8 @@ export function useVoice(onText: (text: string) => void) {
   const clear = useCallback(() => {
     slotsRef.current = [];
     committedRef.current = "";
+    segmentsRef.current = [];
+    queueRef.current = Promise.resolve();
     const m = teardown();
     mediaRef.current = null;
     if (m) {
