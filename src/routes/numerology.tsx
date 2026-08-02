@@ -19,6 +19,11 @@ import {
 } from "@/lib/name-spelling";
 import { aiReading } from "@/lib/ai-cache";
 import { NumerologyFullReport } from "@/components/numerology-report";
+import {
+  NameChartPanel, DashaPanel, CurrentGridPanel, GuidancePanel,
+  HebrewTarotPanel, ProfilesPanel, type SavedProfile,
+} from "@/components/numerology-pro-panels";
+
 import { Loader2, Sparkles } from "lucide-react";
 
 
