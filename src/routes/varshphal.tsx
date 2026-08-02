@@ -9,7 +9,11 @@ import {
   computeTajikaAspects, detectTajikaYogas, detectKambool, munthaVarsheshLink,
   computeHarshaBala,
 } from "@/lib/varshphal-deep";
-import { Sparkles, Loader2, CalendarClock, Crown, Sun, ArrowRight, Zap, CheckCircle2, XCircle } from "lucide-react";
+import {
+  computePanchavargeeyaBala, computePatyayiniDasha, computeMuddaDasha,
+  currentPeriod, summariseYear, type AnnualPeriod,
+} from "@/lib/varshphal-tajika";
+import { Sparkles, Loader2, CalendarClock, Crown, Sun, ArrowRight, Zap, CheckCircle2, XCircle, Gauge, Timer } from "lucide-react";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";
 
 
