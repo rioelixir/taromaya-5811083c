@@ -36,33 +36,43 @@ export function CrossCheckPanel({ input, className }: { input: CrossCheckInput; 
 
       {open && (
         <div className="mt-3 space-y-2">
-          {report.items.map((it) => (
-            <div
-              key={it.key}
-              className={`rounded-xl border p-3 ${it.ok ? "border-white/10 bg-white/5" : "border-amber-400/30 bg-amber-500/10"}`}
-            >
-              <div className="flex items-start gap-2">
-                {it.ok
-                  ? <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" />
-                  : <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />}
-                <div className="min-w-0">
-                  <div className="text-sm text-pearl">{it.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{it.detail}</div>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+          <DataTable
+            columns={[
+              {
+                header: "Check",
+                cell: (it) => (
+                  <span className="flex items-start gap-2">
+                    {it.ok
+                      ? <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" />
+                      : <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />}
+                    <span className="text-pearl">{it.label}</span>
+                  </span>
+                ),
+              },
+              { header: "Detail", className: "text-muted-foreground", cell: (it) => it.detail },
+              {
+                header: "Values",
+                cell: (it) => (
+                  <span className="flex flex-wrap gap-1.5">
                     {Object.entries(it.values).map(([k, v]) => (
                       <span key={k} className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-muted-foreground">
                         {k}: <span className="text-pearl">{v}</span>
                       </span>
                     ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </span>
+                ),
+              },
+              { header: "Result", cell: (it) => (it.ok ? <span className="text-emerald-300">Agrees</span> : <span className="text-amber-300">Differs</span>) },
+            ]}
+            rows={report.items}
+            rowKey={(it) => it.key}
+            rowClassName={(it) => (it.ok ? "" : "bg-amber-500/10")}
+          />
           <div className="text-[10px] text-muted-foreground">
             Checked pages: Kundli, Panchang, Transits, Horoscope.
           </div>
         </div>
+
       )}
     </GlassCard>
   );
