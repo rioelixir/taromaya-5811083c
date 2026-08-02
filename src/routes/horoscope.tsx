@@ -428,6 +428,17 @@ function ChineseTab({ today, onSelect }: { today: Date; onSelect: (animal: strin
         </div>
       </GlassCard>
 
+      <ChineseDomainPanel
+        personAnimal={personSign.animal}
+        personElement={personSign.element}
+        yearAnimal={forecast.yearAnimal}
+        yearElement={forecast.yearElement}
+        relation={relation}
+        year={currentYear}
+      />
+
+
+
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
         {CHINESE_ANIMALS.map((animal) => {
           const sampleYear = currentYear - ((currentYear - 4 - CHINESE_ANIMALS.indexOf(animal)) % 12 + 12) % 12;
