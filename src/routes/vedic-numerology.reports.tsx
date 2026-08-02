@@ -70,7 +70,7 @@ function ReportsPage() {
                   <tr key={row.year} className="border-t border-vline align-top">
                     <td className="py-3 pr-4 font-semibold text-vnavy">{row.year}</td>
                     <td className="py-3 pr-4 text-vgold-deep">{row.personalYear}</td>
-                    <td className="py-3 text-vnavy-soft">{row.theme}</td>
+                    <td className="py-3 text-vnavy-soft">{row.headline}</td>
                   </tr>
                 ))}
               </tbody>
