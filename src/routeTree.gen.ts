@@ -33,6 +33,7 @@ import { Route as NadiRouteImport } from './routes/nadi'
 import { Route as MuhuratRouteImport } from './routes/muhurat'
 import { Route as MoonCalendarRouteImport } from './routes/moon-calendar'
 import { Route as MangalDoshaRouteImport } from './routes/mangal-dosha'
+import { Route as LoshuRouteImport } from './routes/loshu'
 import { Route as LifeDashboardRouteImport } from './routes/life-dashboard'
 import { Route as KundliRouteImport } from './routes/kundli'
 import { Route as KarmaRouteImport } from './routes/karma'
@@ -201,6 +202,11 @@ const MoonCalendarRoute = MoonCalendarRouteImport.update({
 const MangalDoshaRoute = MangalDoshaRouteImport.update({
   id: '/mangal-dosha',
   path: '/mangal-dosha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoshuRoute = LoshuRouteImport.update({
+  id: '/loshu',
+  path: '/loshu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LifeDashboardRoute = LifeDashboardRouteImport.update({
@@ -481,6 +487,7 @@ export interface FileRoutesByFullPath {
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/life-dashboard': typeof LifeDashboardRoute
+  '/loshu': typeof LoshuRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
@@ -555,6 +562,7 @@ export interface FileRoutesByTo {
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/life-dashboard': typeof LifeDashboardRoute
+  '/loshu': typeof LoshuRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
@@ -631,6 +639,7 @@ export interface FileRoutesById {
   '/karma': typeof KarmaRoute
   '/kundli': typeof KundliRoute
   '/life-dashboard': typeof LifeDashboardRoute
+  '/loshu': typeof LoshuRoute
   '/mangal-dosha': typeof MangalDoshaRoute
   '/moon-calendar': typeof MoonCalendarRoute
   '/muhurat': typeof MuhuratRoute
@@ -707,6 +716,7 @@ export interface FileRouteTypes {
     | '/karma'
     | '/kundli'
     | '/life-dashboard'
+    | '/loshu'
     | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
@@ -781,6 +791,7 @@ export interface FileRouteTypes {
     | '/karma'
     | '/kundli'
     | '/life-dashboard'
+    | '/loshu'
     | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
@@ -856,6 +867,7 @@ export interface FileRouteTypes {
     | '/karma'
     | '/kundli'
     | '/life-dashboard'
+    | '/loshu'
     | '/mangal-dosha'
     | '/moon-calendar'
     | '/muhurat'
@@ -932,6 +944,7 @@ export interface RootRouteChildren {
   KarmaRoute: typeof KarmaRoute
   KundliRoute: typeof KundliRoute
   LifeDashboardRoute: typeof LifeDashboardRoute
+  LoshuRoute: typeof LoshuRoute
   MangalDoshaRoute: typeof MangalDoshaRoute
   MoonCalendarRoute: typeof MoonCalendarRoute
   MuhuratRoute: typeof MuhuratRoute
@@ -1136,6 +1149,13 @@ declare module '@tanstack/react-router' {
       path: '/mangal-dosha'
       fullPath: '/mangal-dosha'
       preLoaderRoute: typeof MangalDoshaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loshu': {
+      id: '/loshu'
+      path: '/loshu'
+      fullPath: '/loshu'
+      preLoaderRoute: typeof LoshuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/life-dashboard': {
@@ -1551,6 +1571,7 @@ const rootRouteChildren: RootRouteChildren = {
   KarmaRoute: KarmaRoute,
   KundliRoute: KundliRoute,
   LifeDashboardRoute: LifeDashboardRoute,
+  LoshuRoute: LoshuRoute,
   MangalDoshaRoute: MangalDoshaRoute,
   MoonCalendarRoute: MoonCalendarRoute,
   MuhuratRoute: MuhuratRoute,
@@ -1589,13 +1610,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
