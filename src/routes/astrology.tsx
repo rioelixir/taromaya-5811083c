@@ -14,6 +14,7 @@ import { formatDegree, PLANET_GLYPHS } from "@/lib/vedic";
 import { aiReading } from "@/lib/ai-cache";
 import { useAutofillBirth } from "@/hooks/use-birth-profile";
 import { Loader2, Sparkles } from "lucide-react";
+import { WesternDeepPanels } from "@/components/western-deep-panels";
 
 export const Route = createFileRoute("/astrology")({
   component: () => (<PremiumGate featureName="Astrology"><AstrologyPage /></PremiumGate>),
@@ -268,6 +269,10 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
             )}
           </GlassCard>
         </div>
+      )}
+
+      {chart && (
+        <WesternDeepPanels chart={chart} latitude={Number(form.lat)} longitude={Number(form.lon)} />
       )}
 
       {chart && (

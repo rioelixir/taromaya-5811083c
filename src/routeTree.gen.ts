@@ -48,6 +48,7 @@ import { Route as DharmaRouteImport } from './routes/dharma'
 import { Route as CompatibilityRouteImport } from './routes/compatibility'
 import { Route as ChakraRouteImport } from './routes/chakra'
 import { Route as CareerRouteImport } from './routes/career'
+import { Route as CalculatorsRouteImport } from './routes/calculators'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BabyNamesRouteImport } from './routes/baby-names'
@@ -275,6 +276,11 @@ const CareerRoute = CareerRouteImport.update({
   path: '/career',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalculatorsRoute = CalculatorsRouteImport.update({
+  id: '/calculators',
+  path: '/calculators',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookmarksRoute = BookmarksRouteImport.update({
   id: '/bookmarks',
   path: '/bookmarks',
@@ -445,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/baby-names': typeof BabyNamesRoute
   '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
+  '/calculators': typeof CalculatorsRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
@@ -516,6 +523,7 @@ export interface FileRoutesByTo {
   '/baby-names': typeof BabyNamesRoute
   '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
+  '/calculators': typeof CalculatorsRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
@@ -589,6 +597,7 @@ export interface FileRoutesById {
   '/baby-names': typeof BabyNamesRoute
   '/blog': typeof BlogRouteWithChildren
   '/bookmarks': typeof BookmarksRoute
+  '/calculators': typeof CalculatorsRoute
   '/career': typeof CareerRoute
   '/chakra': typeof ChakraRoute
   '/compatibility': typeof CompatibilityRoute
@@ -662,6 +671,7 @@ export interface FileRouteTypes {
     | '/baby-names'
     | '/blog'
     | '/bookmarks'
+    | '/calculators'
     | '/career'
     | '/chakra'
     | '/compatibility'
@@ -733,6 +743,7 @@ export interface FileRouteTypes {
     | '/baby-names'
     | '/blog'
     | '/bookmarks'
+    | '/calculators'
     | '/career'
     | '/chakra'
     | '/compatibility'
@@ -805,6 +816,7 @@ export interface FileRouteTypes {
     | '/baby-names'
     | '/blog'
     | '/bookmarks'
+    | '/calculators'
     | '/career'
     | '/chakra'
     | '/compatibility'
@@ -878,6 +890,7 @@ export interface RootRouteChildren {
   BabyNamesRoute: typeof BabyNamesRoute
   BlogRoute: typeof BlogRouteWithChildren
   BookmarksRoute: typeof BookmarksRoute
+  CalculatorsRoute: typeof CalculatorsRoute
   CareerRoute: typeof CareerRoute
   ChakraRoute: typeof ChakraRoute
   CompatibilityRoute: typeof CompatibilityRoute
@@ -1204,6 +1217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calculators': {
+      id: '/calculators'
+      path: '/calculators'
+      fullPath: '/calculators'
+      preLoaderRoute: typeof CalculatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bookmarks': {
       id: '/bookmarks'
       path: '/bookmarks'
@@ -1473,6 +1493,7 @@ const rootRouteChildren: RootRouteChildren = {
   BabyNamesRoute: BabyNamesRoute,
   BlogRoute: BlogRouteWithChildren,
   BookmarksRoute: BookmarksRoute,
+  CalculatorsRoute: CalculatorsRoute,
   CareerRoute: CareerRoute,
   ChakraRoute: ChakraRoute,
   CompatibilityRoute: CompatibilityRoute,
