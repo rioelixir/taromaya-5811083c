@@ -22,7 +22,7 @@ import { NumerologyFullReport } from "@/components/numerology-report";
 import { MobileRemedyPanel, NameRemedyPanel } from "@/components/numerology-remedies-panel";
 import {
   NameChartPanel, DashaPanel, CurrentGridPanel, GuidancePanel,
-  HebrewTarotPanel, ProfilesPanel, type SavedProfile,
+  HebrewTarotPanel, ProfilesPanel, type SavedProfile, type DashaTab,
 } from "@/components/numerology-pro-panels";
 
 import { Loader2, Sparkles } from "lucide-react";
