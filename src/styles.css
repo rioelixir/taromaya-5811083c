@@ -467,3 +467,60 @@
 html.has-pageshell-back [data-global-back] {
   display: none;
 }
+
+/* ------------------------------------------------------------------ *
+ * Vedic Numerology (premium white / gold / deep navy) and
+ * Kabbalah Numerology (light ivory / gold / charcoal) product themes.
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-vnavy: oklch(0.30 0.075 258);
+  --color-vnavy-deep: oklch(0.21 0.06 258);
+  --color-vnavy-soft: oklch(0.46 0.06 258);
+  --color-vgold: oklch(0.70 0.125 82);
+  --color-vgold-deep: oklch(0.60 0.125 78);
+  --color-vsurface: oklch(1 0 0);
+  --color-vmist: oklch(0.965 0.008 258);
+  --color-vline: oklch(0.88 0.015 258);
+
+  --color-kabivory: oklch(0.973 0.008 85);
+  --color-kabwhite: oklch(1 0 0);
+  --color-kabgold: oklch(0.755 0.115 85);
+  --color-kabgold-deep: oklch(0.62 0.115 82);
+  --color-kabink: oklch(0.245 0 0);
+  --color-kabink-soft: oklch(0.48 0.005 85);
+  --color-kabline: oklch(0.90 0.014 85);
+}
+
+/* Premium glass card used across the Vedic Numerology product. */
+@utility vglass {
+  background: color-mix(in oklab, var(--color-vsurface) 78%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-vgold) 22%, transparent);
+  border-radius: 26px;
+  box-shadow: 0 18px 44px -28px oklch(0.21 0.06 258 / 0.45);
+}
+
+/* Soft luxury card used across the Kabbalah product. */
+@utility kabcard {
+  background: var(--color-kabwhite);
+  border: 1px solid var(--color-kabline);
+  border-radius: 26px;
+  box-shadow: 0 16px 40px -30px oklch(0.4 0.02 85 / 0.55);
+}
+
+/* Sacred geometry wash, 4% opacity. */
+@utility sacred-wash {
+  background-image:
+    radial-gradient(circle at 50% 12%, color-mix(in oklab, var(--color-kabgold) 12%, transparent) 0 1px, transparent 1px),
+    repeating-linear-gradient(60deg, color-mix(in oklab, var(--color-kabgold) 5%, transparent) 0 1px, transparent 1px 42px),
+    repeating-linear-gradient(-60deg, color-mix(in oklab, var(--color-kabgold) 5%, transparent) 0 1px, transparent 1px 42px);
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@utility rise-in {
+  animation: rise-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
