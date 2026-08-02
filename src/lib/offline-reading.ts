@@ -13,6 +13,7 @@ import {
   section,
   LIFE_AREAS,
   areaById,
+  practicesFor,
   type LifeArea,
   type LifeAreaId,
 } from "./reading-frame";
@@ -396,17 +397,34 @@ export function offlineReading(input: ReadingRequest): string {
     );
   }
 
-  // 6. Timing, without promising dates.
-  const timing =
+  // 6. Timing: how long, when it strengthens, and the better window to act.
+  const timingLines: string[] = [];
+  timingLines.push(
     topic === "timing"
       ? "Use the calm windows listed above for anything that matters, and keep the noisy windows for ordinary jobs."
       : topic === "period"
-        ? "This season moves slowly. Judge it by the month, not by one hard day."
+        ? "This season moves slowly and is best judged by the month rather than by one difficult day."
         : topic === "transit"
-          ? "This mood is short. Give it a few days before you decide anything big."
+          ? "This influence is short-lived. Allow a few days before committing to anything significant."
           : person.maha
-            ? "The big pattern is a slow season, and today's sky is only a passing mood on top of it."
-            : "For picking a good day or hour, use the Muhurat section rather than guessing.";
+            ? "The larger pattern is a slow season, and today's sky is a passing mood layered on top of it."
+            : "For choosing a favourable day or hour, use the Muhurat section rather than estimating.",
+  );
+  if (person.testing.length) {
+    timingLines.push(
+      `The pressure is strongest while ${person.testing.map((t) => t.planet).join(" and ")} ${person.testing.length > 1 ? "remain" : "remains"} in this position, and it eases as that contact moves on; act on essentials in the quieter stretch rather than at the peak.`,
+    );
+  } else if (person.helpful.length) {
+    timingLines.push(
+      `Support from ${person.helpful.map((h) => h.planet).join(" and ")} makes the earlier part of this phase the better window for beginnings, follow-ups and honest conversations.`,
+    );
+  }
+  if (person.sadeSati) {
+    timingLines.push(
+      "The long Saturn stretch runs in three uneven parts; the middle part asks the most, and progress made steadily through it holds afterwards.",
+    );
+  }
+
 
   // 7. Small, clear actions.
   const actions = meanings
@@ -436,7 +454,12 @@ export function offlineReading(input: ReadingRequest): string {
     section("opportunities", twoOf(OPPORTUNITY_LINES, n)),
     section("challenges", twoOf(CHALLENGE_LINES, n >> 2)),
 
-    section("timing", [timing]),
+    section("timing", timingLines),
+    section(
+      "practices",
+      practicesFor(areas, n).map((p) => `• ${p}.`),
+    ),
+
 
     section(
       "steps",
