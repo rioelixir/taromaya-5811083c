@@ -117,31 +117,60 @@ export function useVoice(onText: (text: string) => void) {
     return new Blob([buf], { type: "audio/wav" });
   };
 
-  const send = useCallback(async (blob: Blob) => {
-    setState("working");
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token;
-      const form = new FormData();
-      form.append("file", blob, "recording.wav");
-      const hint = serverLangHint(getVoiceLang());
-      if (hint) form.append("language", hint);
-      const res = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        body: form,
-      });
-      if (!res.ok) throw new Error("failed");
-      const out = (await res.json()) as { text?: string };
-      emit(out.text ?? "");
-      setState("idle");
-      setMessage(null);
-    } catch {
-      setState("error");
-      setMessage("Voice is not working right now. Please type instead.");
+  const send = useCallback(async (blob: Blob): Promise<string | null> => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    const hint = serverLangHint(getVoiceLang());
+
+    // A shaky connection must never lose a piece of the recording: try a few
+    // times, waiting a little longer each time.
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const form = new FormData();
+        form.append("file", blob, "recording.wav");
+        if (hint) form.append("language", hint);
+        const res = await fetch("/api/transcribe", {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          body: form,
+        });
+        if (res.status >= 400 && res.status < 500) return null;
+        if (!res.ok) throw new Error(String(res.status));
+        const out = (await res.json()) as { text?: string };
+        return out.text ?? "";
+      } catch {
+        if (attempt === 3) return null;
+        await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
+      }
     }
-  }, [emit]);
+    return null;
+  }, []);
+
+  /** Turn whatever has been recorded so far into words, keeping earlier pieces. */
+  const flushSegment = useCallback(async (final: boolean) => {
+    const m = mediaRef.current;
+    if (!m) return;
+    const chunks = m.chunks.splice(0, m.chunks.length);
+    if (chunks.length === 0) return;
+    const blob = encodeWav(chunks, m.ctx.sampleRate);
+    if (blob.size < 2048) {
+      if (final && !committedRef.current) {
+        setState("idle");
+        setMessage("That was too quiet. Tap and speak again.");
+      }
+      return;
+    }
+    if (final) setState("working");
+    const text = await send(blob);
+    if (text === null) {
+      setMessage("One part of your talk could not be written down. The rest is kept.");
+      return;
+    }
+    committedRef.current = dedupeRepeats(`${committedRef.current} ${text}`.trim());
+    setHeard(tidy(committedRef.current));
+  }, [send, tidy]);
+
 
   /* ---------- controls ---------- */
 
