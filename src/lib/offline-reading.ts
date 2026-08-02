@@ -427,7 +427,16 @@ export function offlineReading(input: ReadingRequest): string {
     section("meaning", story.length ? story : meanings.map((m) => `• ${cap(m.is)}, so ${m.feels}.`)),
     section("areas", areaLines),
     section("why", why),
+    section("opportunities", [
+      `• ${pick(OPPORTUNITY_LINES, n)}`,
+      `• ${pick(OPPORTUNITY_LINES, n >> 2)}`,
+    ]),
+    section("challenges", [
+      `• ${pick(CHALLENGE_LINES, n >> 1)}`,
+      `• ${pick(CHALLENGE_LINES, n >> 3)}`,
+    ]),
     section("timing", [timing]),
+
     section(
       "steps",
       actions
