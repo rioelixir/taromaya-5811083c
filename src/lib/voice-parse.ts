@@ -133,24 +133,51 @@ export function extractTime(raw: string): string | undefined {
 const PLACE_CUES =
   /(?:born (?:in|at)|birth\s*place(?:\s*is)?|place of birth(?:\s*is)?|place(?:\s*is)?|city(?:\s*is)?|in the city of|from)\s+([a-z\u0900-\u097F][a-z\u0900-\u097F .'-]{1,40})/i;
 
+/** Words that are never a place, so "in the evening" is not read as a city. */
+const NOT_A_PLACE = new Set([
+  ...MONTHS, ...MONTH_SHORT,
+  "the", "morning", "forenoon", "afternoon", "evening", "night", "midnight", "noon", "midday",
+  "am", "pm", "day", "days", "month", "months", "year", "years", "week", "weeks",
+  "hour", "hours", "minute", "minutes", "oclock", "o'clock", "time", "date", "future",
+  "love", "work", "money", "health", "life", "hospital", "home", "house", "india",
+]);
+
 const STOP_AFTER =
   /\b(and|my|time|date|born|at|on|is|was|hai|ka|ke|ko|please|thanks|thank)\b/i;
 
-export function extractPlace(raw: string): string | undefined {
-  const m = PLACE_CUES.exec(raw);
-  if (!m) return undefined;
-  const words = m[1].trim().split(/\s+/);
+function tidyPlace(chunk: string): string | undefined {
+  const words = chunk.trim().split(/\s+/);
   const kept: string[] = [];
   for (const w of words) {
     if (STOP_AFTER.test(w) && kept.length) break;
     if (/\d/.test(w)) break;
-    kept.push(w.replace(/[.,]$/, ""));
+    const clean = w.replace(/[.,]$/, "");
+    if (!kept.length && NOT_A_PLACE.has(clean.toLowerCase())) continue;
+    if (kept.length && NOT_A_PLACE.has(clean.toLowerCase())) break;
+    kept.push(clean);
     if (kept.length === 3) break;
   }
   const place = kept.join(" ").trim();
   if (place.length < 2) return undefined;
   return place.replace(/\b[a-z]/g, (c) => c.toUpperCase());
 }
+
+export function extractPlace(raw: string): string | undefined {
+  const m = PLACE_CUES.exec(raw);
+  const cued = m ? tidyPlace(m[1]) : undefined;
+  if (cued) return cued;
+
+  // Plain speech like "at 4:35 in the evening in Mumbai" — take the last
+  // "in / at <somewhere>" that is not a time or a date word.
+  const re = /\b(?:in|at|near)\s+([a-z\u0900-\u097F][a-z\u0900-\u097F .'-]{1,40})/gi;
+  let best: string | undefined;
+  for (let hit = re.exec(raw); hit; hit = re.exec(raw)) {
+    const cand = tidyPlace(hit[1]);
+    if (cand) best = cand;
+  }
+  return best;
+}
+
 
 /* ------------------------------ name ------------------------------ */
 
