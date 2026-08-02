@@ -41,6 +41,10 @@ export function useVoice(onText: (text: string) => void) {
   const slotsRef = useRef<string[]>([]);
   /** Words settled before the listener restarted itself. */
   const committedRef = useRef("");
+  /** Written-down pieces of a long talk, in the order they were spoken. */
+  const segmentsRef = useRef<string[]>([]);
+  /** One line for writing pieces down, so they never overtake each other. */
+  const queueRef = useRef<Promise<void>>(Promise.resolve());
   /** The half-heard tail that has not been marked final yet — it must not be lost
    *  when the user taps stop mid-sentence. */
   const interimRef = useRef("");
