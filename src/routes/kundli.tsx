@@ -1,7 +1,7 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { Explain } from "@/components/explain";
 import { ConfidenceNote } from "@/components/confidence-note";
 import { CrossCheckPanel } from "@/components/cross-check-panel";
@@ -326,7 +326,7 @@ function BirthForm({
   form, setForm, canSubmit, onCompute, error,
 }: {
   form: FormState;
-  setForm: (f: FormState) => void;
+  setForm: Dispatch<SetStateAction<FormState>>;
   canSubmit: boolean;
   onCompute: () => void;
   error: string | null;
