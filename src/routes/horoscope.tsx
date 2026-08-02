@@ -176,6 +176,8 @@ About 380 words.`,
       )}
       {tab === "nakshatra" && <NakshatraTab today={today} />}
       {tab === "chinese" && <ChineseTab today={today} onSelect={(a) => { setTab("western"); generateReading(a, "western"); }} />}
+      {tab === "numeroscope" && <NumeroscopePanel now={today} />}
+
 
       {sign && (tab === "western" || tab === "vedic") && (
         <div className="mt-8 space-y-4">
