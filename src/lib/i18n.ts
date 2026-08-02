@@ -37,6 +37,7 @@ function subscribe(cb: () => void) {
 
 export function setLang(next: Lang) {
   if (typeof window === "undefined") return;
+  markLangChosen();
   const prev = readLang();
   if (prev === next) return;
   window.localStorage.setItem(STORAGE_KEY, next);
@@ -44,6 +45,28 @@ export function setLang(next: Lang) {
   // No reload: the translator restores English text and re-translates in place.
   window.dispatchEvent(new CustomEvent("taromaya:lang", { detail: next }));
 }
+
+const SESSION_CHOSEN_KEY = "taromaya.lang.chosen";
+
+/** True once the reader has picked a language in this browser session. */
+export function hasChosenLang(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    return window.sessionStorage.getItem(SESSION_CHOSEN_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+/** Remember that the reader picked a language for this session. */
+export function markLangChosen() {
+  try {
+    window.sessionStorage.setItem(SESSION_CHOSEN_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
 
 
 export function useLang(): Lang {
