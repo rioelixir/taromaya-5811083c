@@ -175,26 +175,33 @@ About 380 words.`,
       {tab === "chinese" && <ChineseTab today={today} onSelect={(a) => { setTab("western"); generateReading(a, "western"); }} />}
 
       {sign && (tab === "western" || tab === "vedic") && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-4">
+          <SignDomainPanel
+            signIndex={(tab === "vedic" ? RASHIS : SIGN_NAMES).indexOf(sign)}
+            system={tab === "vedic" ? "vedic" : "western"}
+            period={period}
+            now={today}
+          />
           <GlassCard>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3 gap-3">
               <div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">{period} · {tab === "vedic" ? "Rashiphal" : "Sun-sign"}</div>
-                <div className="font-display text-3xl gold-text">{sign}</div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">Extended narrative · {period}</div>
+                <div className="font-display text-2xl gold-text">{sign}</div>
               </div>
               <Sparkles className="w-5 h-5 text-gold" />
             </div>
             {loading && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" /> Aligning the stars…
+                <Loader2 className="w-4 h-4 animate-spin" /> Preparing the detailed reading…
               </div>
             )}
             {currentReading && (
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">{currentReading}</div>
+              <div className="text-[15px] leading-relaxed text-pearl/90 whitespace-pre-wrap">{currentReading}</div>
             )}
           </GlassCard>
         </div>
       )}
+
 
       <ConfidenceNote noteKey="horoscope" className="mt-6" />
     </PageShell>
