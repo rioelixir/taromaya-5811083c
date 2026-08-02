@@ -3,6 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ChevronUp, Flame, Gem, Coins, Sparkles, ShieldAlert } from "lucide-react";
 import { useBirthProfile, birthProfileToKundliInput } from "@/hooks/use-birth-profile";
 import { computeKundli, type KundliChart } from "@/lib/vedic";
+import { DataTable } from "@/components/data-table";
 import { moduleRemedyPlan, type PlanetRemedyBlock } from "@/lib/module-remedies";
 
 const TONE: Record<PlanetRemedyBlock["priority"], { label: string; cls: string }> = {
@@ -153,26 +154,27 @@ export function ModuleRemedies() {
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-gold">
                 <Sparkles className="h-4 w-4" /> Your forty-day sequence
               </div>
-              <ol className="mt-2 space-y-2">
-                {plan.sequence.map((s, i) => (
-                  <li key={i} className="flex gap-2 text-base leading-relaxed text-pearl">
-                    <span className="mt-0.5 text-gold">{i + 1}.</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ol>
+              <div className="mt-2">
+                <DataTable
+                  columns={[
+                    { header: "Step", align: "right", className: "w-12 text-gold", cell: (_s: string, i: number) => i + 1 },
+                    { header: "What to do", className: "text-pearl", cell: (s: string) => s },
+                  ]}
+                  rows={plan.sequence}
+                />
+              </div>
             </div>
             <div className="rounded-2xl border border-amber-400/20 bg-amber-500/[0.06] p-4">
               <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-amber-200">
                 <ShieldAlert className="h-4 w-4" /> Before you act
               </div>
-              <ul className="mt-2 space-y-2">
-                {plan.cautions.map((c) => (
-                  <li key={c} className="text-base leading-relaxed text-amber-100/90">
-                    {c}
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-2">
+                <DataTable
+                  columns={[{ header: "Caution", className: "text-amber-100/90", cell: (c: string) => c }]}
+                  rows={plan.cautions}
+                  rowKey={(c) => c}
+                />
+              </div>
             </div>
           </div>
         </>
