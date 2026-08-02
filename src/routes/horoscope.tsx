@@ -17,6 +17,7 @@ import {
 } from "@/lib/horoscope";
 import { RASHIS, NAKSHATRAS } from "@/lib/vedic";
 import { SignDomainPanel, ChineseDomainPanel, NumeroscopePanel } from "@/components/horoscope-domains-panel";
+import { buildSignReading } from "@/lib/horoscope-domains";
 
 
 export const Route = createFileRoute("/horoscope")({
@@ -169,7 +170,7 @@ About 380 words.`,
       )}
 
       {tab === "western" && (
-        <WesternGrid onSelect={(s) => generateReading(s, "western")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
+        <WesternGrid today={today} onSelect={(s) => generateReading(s, "western")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
       )}
       {tab === "vedic" && (
         <VedicGrid today={today} onSelect={(s) => generateReading(s, "vedic", "Include Vedic Moon influence.")} luck={luck} readings={readings} cacheKey={cacheKey} period={period} />
