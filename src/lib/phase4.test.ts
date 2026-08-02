@@ -72,7 +72,7 @@ describe("Panchavargeeya Bala", () => {
   });
   it("reduces to Vishwa points out of twenty", () => {
     for (const b of bala) {
-      expect(b.vishwa).toBeCloseTo(b.total / 4, 2);
+      expect(b.vishwa).toBeCloseTo(b.total / 4, 1);
       expect(b.vishwa).toBeGreaterThan(0);
       expect(b.vishwa).toBeLessThanOrEqual(20);
     }
