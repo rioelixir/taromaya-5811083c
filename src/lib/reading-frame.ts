@@ -76,47 +76,48 @@ export type LifeArea = {
 export const LIFE_AREAS: LifeArea[] = [
   {
     id: "mood",
-    label: "Mood and mind",
+    label: "Emotional wellbeing",
     emoji: "🌙",
     test: /moon|mercury|nakshatra|tithi|phase|mind|mood|sleep/i,
-    base: "Your feelings lead the way just now, so treat rest and quiet time as real work.",
+    base: "Emotional pacing matters more than output in this period; protected rest and a consistent sleep window will noticeably steady your judgement.",
   },
   {
     id: "work",
-    label: "Work and study",
+    label: "Career and study",
     emoji: "💼",
     test: /saturn|sun|mars|mercury|area 10|house 10|career|job|work|study|exam|business/i,
-    base: "Steady effort counts more than speed. Finish one thing fully before starting the next.",
+    base: "Sustained, methodical effort is rewarded here, while abrupt moves are not; consolidate one commitment fully before opening the next.",
   },
   {
     id: "money",
-    label: "Money",
+    label: "Finances",
     emoji: "💰",
     test: /venus|jupiter|area 2|area 11|house 2|house 11|money|finance|income|salary/i,
-    base: "Keep money simple: know what comes in, know what goes out, and delay one big spend.",
+    base: "Favour clarity over expansion: review recurring outflows, keep a reserve intact, and defer any single large commitment until the current phase settles.",
   },
   {
     id: "love",
-    label: "Love and family",
+    label: "Relationships and family",
     emoji: "❤️",
     test: /venus|moon|area 7|area 4|house 7|house 4|love|partner|marriage|family|match/i,
-    base: "Say the plain, kind thing instead of the clever thing. It saves a week of guessing.",
+    base: "Direct, considerate communication resolves far more here than strategy does; state expectations plainly rather than testing them.",
   },
   {
     id: "health",
-    label: "Body and energy",
+    label: "Health and vitality",
     emoji: "🌿",
     test: /mars|saturn|area 6|house 6|health|body|ayurved|dosha|energy/i,
-    base: "Sleep, water and a short walk fix more than you expect. Start there before anything bigger.",
+    base: "Foundations first: hydration, sleep and daily movement address most of what this period raises. Seek qualified medical advice for anything persistent.",
   },
   {
     id: "purpose",
     label: "Purpose and growth",
     emoji: "🧭",
     test: /jupiter|ketu|rahu|area 9|area 12|house 9|house 12|dharma|karma|purpose|spiritual|dasha/i,
-    base: "Pick one thing that matters to you and give it a small slot every week. Growth is a habit, not a jump.",
+    base: "Long-term development responds to regular practice rather than intensity; commit a fixed weekly slot to the pursuit that matters most.",
   },
 ];
+
 
 export function areaById(id: string): LifeArea | undefined {
   return LIFE_AREAS.find((a) => a.id === id);
