@@ -118,7 +118,7 @@ About 380 words.`,
 
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {(["western","vedic","nakshatra","chinese"] as Tab[]).map((t) => (
+        {(["western","vedic","nakshatra","chinese","numeroscope"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -126,9 +126,10 @@ About 380 words.`,
               tab === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground hover:text-pearl"
             }`}
           >
-            {t === "western" ? "Western" : t === "vedic" ? "Vedic Rashiphal" : t === "nakshatra" ? "Nakshatra" : "Chinese"}
+            {t === "western" ? "Western" : t === "vedic" ? "Vedic Rashiphal" : t === "nakshatra" ? "Nakshatra" : t === "chinese" ? "Chinese" : "Numeroscope"}
           </button>
         ))}
+
       </div>
 
       {(tab === "western" || tab === "vedic") && (
