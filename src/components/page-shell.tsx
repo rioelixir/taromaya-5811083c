@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, ChevronUp, ChevronDown, Check, Sparkles, LayoutGrid } from "lucide-react";
+import { Home, ChevronUp, ChevronDown, Check, Sparkles } from "lucide-react";
 import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
@@ -9,7 +9,6 @@ import { ModuleRemedies } from "@/components/module-remedies";
 
 
 
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { useBirthProfile } from "@/hooks/use-birth-profile";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -52,7 +51,6 @@ function PageNav({
 
       <div className="flex items-center gap-2 flex-wrap justify-end">
         <BirthStatusChip />
-        <LanguageSwitcher compact />
         <button
           onClick={onToggle}
           className="inline-flex min-h-11 items-center gap-1.5 rounded-xl glass gold-border px-3 text-sm text-pearl hover:bg-white/10 transition"
@@ -60,13 +58,6 @@ function PageNav({
         >
           {collapsed ? <ChevronDown className="h-5 w-5 text-gold" /> : <ChevronUp className="h-5 w-5 text-gold" />}
           <span className="hidden sm:inline">{collapsed ? "Show" : "Focus"}</span>
-        </button>
-        <button
-          onClick={() => window.dispatchEvent(new Event("taromaya:open-menu"))}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-xl glass gold-border px-3 text-sm text-pearl hover:bg-white/10 transition"
-          aria-label="See everything"
-        >
-          <LayoutGrid className="h-5 w-5 text-gold" /> <span className="hidden sm:inline">All</span>
         </button>
         <Link
           to="/"
