@@ -59,6 +59,9 @@ function AiPage() {
     [kundlis, selectedId],
   );
 
+  const langRef = useRef(lang);
+  useEffect(() => { langRef.current = lang; }, [lang]);
+
   const transport = useMemo(() => new DefaultChatTransport({
     api: "/api/chat",
     headers: async (): Promise<Record<string, string>> => {
@@ -69,7 +72,7 @@ function AiPage() {
 
     body: () => ({
       context: buildGuideContext(selectedRow),
-      system: GUIDE_SYSTEM_PROMPT,
+      system: `${GUIDE_SYSTEM_PROMPT}\n\n${aiLanguageRule(langRef.current)}`,
     }),
   }), [selectedRow]);
 
