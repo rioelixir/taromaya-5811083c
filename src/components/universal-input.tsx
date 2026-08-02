@@ -370,6 +370,38 @@ export function UniversalInput({ module, children }: { module: string; children:
     await askAI(line);
   }, [text, listening, voice, fill, askAI]);
 
+  // Instant reading: as soon as the mic stops, the reading starts on its own.
+  const generateRef = useRef(generate);
+  generateRef.current = generate;
+  const prevVoiceState = useRef(voice.state);
+  const autoRef = useRef(false);
+  const textRef = useRef(text);
+  textRef.current = text;
+
+  useEffect(() => {
+    const was = prevVoiceState.current;
+    prevVoiceState.current = voice.state;
+    const wasBusy = was === "listening" || was === "working";
+    const nowBusy = voice.state === "listening" || voice.state === "working";
+    if (!wasBusy || nowBusy) return;
+    autoRef.current = true;
+    // Words sometimes land a moment after the mic closes, so allow a short grace.
+    const t = setTimeout(() => {
+      if (!autoRef.current) return;
+      autoRef.current = false;
+      if (textRef.current.trim()) void generateRef.current();
+    }, 500);
+    return () => clearTimeout(t);
+  }, [voice.state]);
+
+  useEffect(() => {
+    if (!autoRef.current || !text.trim()) return;
+    autoRef.current = false;
+    void generateRef.current();
+  }, [text]);
+
+
+
 
   const ctxValue = useMemo<Ctx>(
     () => ({ register, unregister, note, busy: lookup }),
