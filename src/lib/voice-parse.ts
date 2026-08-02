@@ -140,6 +140,7 @@ const NOT_A_PLACE = new Set([
   "am", "pm", "day", "days", "month", "months", "year", "years", "week", "weeks",
   "hour", "hours", "minute", "minutes", "oclock", "o'clock", "time", "date", "future",
   "love", "work", "money", "health", "life", "hospital", "home", "house", "india",
+  "in", "at", "on", "of", "near", "a", "an", "my", "me", "was", "born", "is",
 ]);
 
 const STOP_AFTER =
