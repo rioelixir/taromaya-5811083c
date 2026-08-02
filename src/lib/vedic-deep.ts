@@ -194,7 +194,7 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
       Math.abs(houseNo - DIG_HOUSE[name]),
       12 - Math.abs(houseNo - DIG_HOUSE[name]),
     );
-    const dig = (1 - digArc / 6) * 0.6;
+    const dig = (1 - digArc / 6) * 1.0; // 0..1 rupa
 
     // Kala bala — a light proxy: benefics stronger at night, malefics by day.
     // Without exact sunrise we approximate from the Sun's house: houses 7-12
@@ -204,10 +204,10 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     const sunHouse = norm12(sun.rashi - ascRashi) + 1;
     const isDayChart = sunHouse >= 7;
     const isBenefic = name === "Jupiter" || name === "Venus" || name === "Moon" || name === "Mercury";
-    const kala = (isDayChart === isBenefic ? 0.3 : 0.5);
+    const kala = (isDayChart === isBenefic ? 0.7 : 1.2); // 0..1.5 rupas
 
     // Chesta bala — retrograde planets get full chesta.
-    const chesta = p.retrograde ? 0.5 : (name === "Sun" || name === "Moon" ? 0.4 : 0.25);
+    const chesta = p.retrograde ? 1.0 : (name === "Sun" || name === "Moon" ? 0.8 : 0.5); // 0..1 rupa
 
     // Naisargika — classical.
     const naisargika = NAISARGIKA[name];
@@ -216,7 +216,7 @@ export function computeShadbala(chart: KundliChart): ShadbalaRow[] {
     // Every planet casts a 7th-house (opposition) aspect; Mars also casts
     // special aspects to houses 4 and 8, Jupiter to 5 and 9, Saturn to 3 and 10
     // (the classical Parashari special-aspect rule).
-    let drig = 0.2;
+    let drig = 0.5; // 0..1 rupa
     chart.planets.forEach((q) => {
       if (q.name === name) return;
       const diff = norm12(q.rashi - p.rashi) + 1;
