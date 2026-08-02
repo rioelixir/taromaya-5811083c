@@ -248,7 +248,10 @@ export function buildPdf(key: ReportKey, b: Birth) {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
     pdf.text("TAROMAYA", margin, 30, { charSpace: 3 });
-    pdf.text(meta.title.toUpperCase(), w - margin, 30, { align: "right", charSpace: 3 });
+    const runTitle = pdfSafe(meta.title.toUpperCase());
+    const runSpace = pdf.getTextWidth(runTitle) + runTitle.length * 3 > w - margin * 2 - 140 ? 0.8 : 3;
+    pdf.setFontSize(runSpace === 3 ? 9 : 8);
+    pdf.text(runTitle, w - margin, 30, { align: "right", charSpace: runSpace });
     pdf.setDrawColor(...LINE);
     pdf.setLineWidth(0.3);
     pdf.line(margin, 40, w - margin, 40);
@@ -357,14 +360,21 @@ export function buildPdf(key: ReportKey, b: Birth) {
   pdf.text("TAROMAYA · COSMIC INTELLIGENCE", margin, 96, { charSpace: 4 });
 
   pdf.setTextColor(...PEARL);
-  pdf.setFontSize(40);
   pdf.setFont("helvetica", "bold");
-  pdf.text(meta.title, margin, 220);
+  // Shrink long titles so they never run under the star ornament.
+  const titleMax = w - margin * 2 - 90;
+  let titleSize = 40;
+  pdf.setFontSize(titleSize);
+  while (pdf.getTextWidth(meta.title) > titleMax && titleSize > 22) {
+    titleSize -= 1;
+    pdf.setFontSize(titleSize);
+  }
+  pdf.text(pdfSafe(meta.title), margin, 220);
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(13);
   pdf.setTextColor(200, 195, 180);
-  pdf.text(meta.desc, margin, 252, { maxWidth: w - margin * 2 });
+  pdf.text(pdfSafe(meta.desc), margin, 252, { maxWidth: w - margin * 2 });
 
   // ornament star
   drawStar(pdf, w - margin - 40, 190, 24);
