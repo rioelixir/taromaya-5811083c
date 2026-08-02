@@ -4,7 +4,7 @@ import { Home, ChevronUp, ChevronDown, Check, Sparkles, LayoutGrid } from "lucid
 import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
-import { AskBox } from "@/components/ask-box";
+import { UniversalInput } from "@/components/universal-input";
 
 
 
@@ -141,8 +141,11 @@ export function PageShell({
           </header>
         )}
         
-        {!hideVoice && <AskBox module={aiModule ?? title} />}
-        {children}
+        {hideVoice ? (
+          children
+        ) : (
+          <UniversalInput module={aiModule ?? title}>{children}</UniversalInput>
+        )}
 
         {!hideAI && (
           <AIInterpretation
