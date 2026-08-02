@@ -41,6 +41,9 @@ export function useVoice(onText: (text: string) => void) {
   const slotsRef = useRef<string[]>([]);
   /** Words settled before the listener restarted itself. */
   const committedRef = useRef("");
+  /** The half-heard tail that has not been marked final yet — it must not be lost
+   *  when the user taps stop mid-sentence. */
+  const interimRef = useRef("");
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
   const mediaRef = useRef<{
