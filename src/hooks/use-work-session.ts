@@ -8,7 +8,7 @@ import {
 } from "@/lib/employee.functions";
 
 const KEY = "taromaya_work_session";
-const BEAT_MS = 3 * 60 * 1000; // keep-alive well inside the 15 minute window
+const BEAT_MS = 60 * 1000; // re-checks taromaya.com every minute
 
 export type AccessStatus = {
   isEmployee: boolean;
