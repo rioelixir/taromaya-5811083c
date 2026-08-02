@@ -5,6 +5,7 @@ import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
 import { UniversalInput } from "@/components/universal-input";
+import { ModuleRemedies } from "@/components/module-remedies";
 
 
 
@@ -90,6 +91,7 @@ export function PageShell({
   aiIntent,
   hideAI,
   hideVoice,
+  hideRemedies,
 }: {
 
 
@@ -107,6 +109,8 @@ export function PageShell({
   hideAI?: boolean;
   /** Set to true to hide the speak-first panel (auth, terms, admin). */
   hideVoice?: boolean;
+  /** Set to true on utility pages to hide the planetary remedies panel. */
+  hideRemedies?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   // This page already shows its own Back button, so hide the global floating one.
@@ -154,6 +158,8 @@ export function PageShell({
             intent={aiIntent}
           />
         )}
+
+        {!(hideRemedies ?? hideAI) && <ModuleRemedies />}
       </div>
     </div>
   );
