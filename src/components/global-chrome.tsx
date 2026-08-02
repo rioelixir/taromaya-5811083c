@@ -5,7 +5,13 @@ import { LanguageSwitcher } from "@/components/language-switcher";
  * Always-available app chrome: a left-edge rail button that opens the full
  * module list, and a language picker in the top-right corner of every page.
  */
-export function GlobalChrome({ showRail = true }: { showRail?: boolean }) {
+export function GlobalChrome({
+  showRail = true,
+  showLanguage = true,
+}: {
+  showRail?: boolean;
+  showLanguage?: boolean;
+}) {
   return (
     <>
       {showRail && (
