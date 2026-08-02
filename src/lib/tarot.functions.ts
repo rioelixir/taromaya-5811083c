@@ -7,6 +7,7 @@ import { withSupremeSystem } from "./ai-system";
 import { MODEL_DEEP } from "@/lib/ai-models";
 import { offlineTarotReading } from "./offline-tarot";
 import { AI_OFFLINE } from "./offline-mode";
+import { aiLanguageRule } from "./ai-language";
 
 const DrawSchema = z.object({
   spreadLabel: z.string(),
@@ -29,6 +30,8 @@ const DrawSchema = z.object({
   placeNakshatra: z.string().max(200).optional(),
   placeName: z.string().max(200).optional(),
   nakshatraCard: z.string().max(200).optional(),
+  /** Reader's chosen language: en, hi (Devanagari) or hr (Hinglish). */
+  lang: z.enum(["en", "hi", "hr"]).optional().default("en"),
 });
 
 
@@ -114,7 +117,7 @@ ${cardList}${starLines.length ? `\nExtra energy to blend in silently:\n${starLin
     const { text } = images.length
       ? await generateText({
           model: gateway(modelId),
-          system: `${withSupremeSystem(system)}\n\n${NO_LABELS}\n`,
+          system: `${withSupremeSystem(system)}\n\n${NO_LABELS}\n${aiLanguageRule(data.lang)}\n`,
           messages: [
             {
               role: "user",
@@ -127,7 +130,7 @@ ${cardList}${starLines.length ? `\nExtra energy to blend in silently:\n${starLin
         })
       : await generateText({
           model: gateway(modelId),
-          system: `${withSupremeSystem(system)}\n\n${NO_LABELS}\n`,
+          system: `${withSupremeSystem(system)}\n\n${NO_LABELS}\n${aiLanguageRule(data.lang)}\n`,
           prompt: user,
         });
 
