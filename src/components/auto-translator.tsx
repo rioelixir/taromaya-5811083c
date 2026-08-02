@@ -223,6 +223,8 @@ let queued = false;
 async function translatePage(lang: Lang) {
   if (typeof window === "undefined") return;
   if (lang === "en") return;
+  // The tarot board stays in English — the reading surface is never translated.
+  if (window.location.pathname.startsWith("/tarot")) return;
   if (running) {
     queued = true;
     return;
