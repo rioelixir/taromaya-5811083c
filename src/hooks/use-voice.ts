@@ -41,6 +41,9 @@ export function useVoice(onText: (text: string) => void) {
   const slotsRef = useRef<string[]>([]);
   /** Words settled before the listener restarted itself. */
   const committedRef = useRef("");
+  /** The half-heard tail that has not been marked final yet — it must not be lost
+   *  when the user taps stop mid-sentence. */
+  const interimRef = useRef("");
   const activeRef = useRef(false);
   const pausedRef = useRef(false);
   const mediaRef = useRef<{
@@ -147,6 +150,7 @@ export function useVoice(onText: (text: string) => void) {
     activeRef.current = true;
     pausedRef.current = false;
     finalRef.current = "";
+    interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
     setHeard("");
@@ -172,12 +176,14 @@ export function useVoice(onText: (text: string) => void) {
               interim += r[0].transcript;
             }
           }
-          finalRef.current = dedupeRepeats(
-            `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
-          );
-          setHeard(tidy(`${finalRef.current} ${interim}`.trim()));
+          interimRef.current = interim.trim();
+          finalRef.current = `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`
+            .replace(/\s+/g, " ")
+            .trim();
+          setHeard(tidy(`${finalRef.current} ${interimRef.current}`.trim()));
           waitForQuiet();
         };
+
 
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
@@ -253,12 +259,20 @@ export function useVoice(onText: (text: string) => void) {
       return;
     }
     const hadRec = !!recRef.current;
-    const spoken = (finalRef.current || heard).trim();
+    // Everything settled, plus the tail still being heard, plus whatever the
+    // box was already showing — so no words are dropped on the last tap.
+    const spoken = [finalRef.current, interimRef.current]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim() || heard.trim();
     const m = teardown();
     finalRef.current = "";
+    interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
     setHeard("");
+
 
     if (hadRec) {
       setState("idle");
@@ -295,6 +309,7 @@ export function useVoice(onText: (text: string) => void) {
       m.ctx.close().catch(() => {});
     }
     finalRef.current = "";
+    interimRef.current = "";
     setHeard("");
     setState("idle");
     setMessage(null);
