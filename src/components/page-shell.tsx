@@ -90,6 +90,8 @@ export function PageShell({
   aiIntent,
   hideAI,
   hideVoice,
+}: {
+
 
   eyebrow?: string;
   title: string;
