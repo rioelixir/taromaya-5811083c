@@ -48,7 +48,7 @@ const CORE: Tile[] = [
 
 const NUMBERS: Tile[] = [
   { to: "/numerology", label: "Western numerology", icon: Hash, search: { tab: "report" } },
-  { to: "/numerology", label: "Lo Shu grid", icon: Grid3X3, search: { tab: "loshu" } },
+  { to: "/loshu", label: "Lo Shu grid", icon: Grid3X3 },
   { to: "/numerology", label: "Vedic numerology", icon: Sigma, search: { tab: "vedic" } },
   { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Star },
 ];

@@ -525,6 +525,45 @@ export type Database = {
         }
         Relationships: []
       }
+      loshu_reports: {
+        Row: {
+          birth_date: string
+          created_at: string
+          full_name: string
+          gender: string | null
+          id: string
+          is_favourite: boolean
+          notes: string | null
+          snapshot: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          full_name: string
+          gender?: string | null
+          id?: string
+          is_favourite?: boolean
+          notes?: string | null
+          snapshot?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          is_favourite?: boolean
+          notes?: string | null
+          snapshot?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       meditation_presets: {
         Row: {
           ambient: string
