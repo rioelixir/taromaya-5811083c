@@ -355,17 +355,19 @@ export function UniversalInput({ module, children }: { module: string; children:
     if (listening) await voice.stop();
 
     const usedForFields = await fill(line);
-    const list = [...consumers.current.values()];
 
     if (usedForFields) {
-      // Let the module run itself if it asked us to.
-      for (const c of list) c.onGenerate?.();
-      const ready = list.every(isComplete);
-      if (ready) return;
+      // Let the page redraw with the new details first, so the module runs
+      // itself with the freshly filled date, time and place.
+      await new Promise((r) => setTimeout(r, 120));
+      const fresh = [...consumers.current.values()];
+      for (const c of fresh) c.onGenerate?.();
+      if (fresh.every(isComplete)) return;
       // Something is still missing, so also answer what they said.
     }
     await askAI(line);
   }, [text, listening, voice, fill, askAI]);
+
 
   const ctxValue = useMemo<Ctx>(
     () => ({ register, unregister, note, busy: lookup }),
