@@ -1,7 +1,7 @@
 import { parsePlainLines } from "@/lib/ai-format";
 
 /**
- * Renders AI output as clean, symbol-free ELI10 text with picture-emoji
+ * Renders AI output as clean, symbol-free professional text with picture-emoji
  * section headings. No markdown is ever shown to the user.
  */
 export function PlainAIText({

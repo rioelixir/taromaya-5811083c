@@ -7,7 +7,7 @@
  *
  * All wording is original TAROMAYA content written in two registers:
  *  - `expert`  — professional interpretation
- *  - `eli10`   — the same idea explained to a bright 10-year-old
+ *  - `eli10`   — the same idea in concise, plain professional language
  */
 
 import { computeNumerology, type NumerologyReport, parseBirthDate, reduce } from "@/lib/numerology";
@@ -80,7 +80,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Start the day early, with sunlight on the face", "Keep one promise to yourself daily", "Give credit publicly to someone else once a week"],
     direction: "East", metal: "Gold", gem: "Ruby",
     colors: ["Gold", "Orange", "Deep Yellow"], days: ["Sunday", "Monday"], dates: [1, 10, 19, 28],
-    eli10: "You are the one who says: let's go, right now. You like being first and you like being in charge. Your job is to also let other people speak.",
+    eli10: "A natural initiator who is most effective when leading from the front. Decisive and self-directed; the developmental task is to make genuine room for other voices.",
   },
   2: {
     planet: "Moon", element: "Water", keyword: "The Peacemaker",
@@ -106,7 +106,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Keep a fixed sleep time", "Write the decision down before discussing it", "Spend ten minutes alone daily in silence"],
     direction: "North-West", metal: "Silver", gem: "Pearl",
     colors: ["White", "Silver", "Pale Green"], days: ["Monday", "Friday"], dates: [2, 11, 20, 29],
-    eli10: "You are the friend everyone tells their secrets to. You like peace and teamwork. Your job is to remember that your feelings count too.",
+    eli10: "Diplomatic and highly perceptive, valued as a confidant and a partner. Works best in cooperation; the developmental task is to weigh your own needs as seriously as everyone else's.",
   },
   3: {
     planet: "Jupiter", element: "Ether", keyword: "The Expresser",
@@ -132,7 +132,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Finish one unfinished task each week", "Keep a written monthly budget", "Teach someone what you learned"],
     direction: "North-East", metal: "Brass/Gold", gem: "Yellow Sapphire",
     colors: ["Yellow", "Golden", "Violet"], days: ["Thursday"], dates: [3, 12, 21, 30],
-    eli10: "You are the one with a hundred ideas and a big smile. Words are your superpower. Your job is to finish what you start.",
+    eli10: "Expressive, socially fluent and creatively prolific. Communication is the core strength; the developmental task is completion rather than continual new starts.",
   },
   4: {
     planet: "Rahu (and the discipline of Uranus-like change)", element: "Earth", keyword: "The Builder",
@@ -158,7 +158,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Keep a written plan and cross items off", "Do one thing differently each week", "Avoid loans taken in a rush"],
     direction: "South-West", metal: "Iron/Steel", gem: "Hessonite",
     colors: ["Grey", "Blue", "Khaki"], days: ["Saturday", "Sunday"], dates: [4, 13, 22, 31],
-    eli10: "You are the one who actually builds the thing, brick by brick. You like rules that work. Your job is to allow surprises sometimes.",
+    eli10: "Methodical and dependable, with a talent for building durable structures and systems. The developmental task is allowing flexibility when circumstances change.",
   },
   5: {
     planet: "Mercury", element: "Air", keyword: "The Explorer",
@@ -184,7 +184,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Ten minutes of silence daily", "Automate savings on payday", "Say no to one new opportunity each month"],
     direction: "North", metal: "Bronze", gem: "Emerald",
     colors: ["Green", "Light Grey", "Turquoise"], days: ["Wednesday", "Friday"], dates: [5, 14, 23],
-    eli10: "You are the explorer who wants to see what is around the corner. You get bored fast. Your job is to stay long enough to win.",
+    eli10: "Adaptable, curious and quick to seize opportunity, with a strong need for variety. The developmental task is remaining with a commitment long enough to realise its return.",
   },
   6: {
     planet: "Venus", element: "Earth/Water", keyword: "The Caregiver",
@@ -210,7 +210,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Fix one weekly hour that is only yours", "Say what you need out loud", "Keep the home tidy and fragrant — it steadies this number"],
     direction: "South-East", metal: "Silver/Copper", gem: "Diamond or White Sapphire",
     colors: ["Pink", "Cream", "Pastel Blue"], days: ["Friday", "Wednesday"], dates: [6, 15, 24],
-    eli10: "You are the one who looks after everybody and makes places pretty. Your job is to look after yourself too.",
+    eli10: "Responsible and aesthetically attuned, naturally relied upon for care and harmony. The developmental task is sustaining your own wellbeing alongside everyone else's.",
   },
   7: {
     planet: "Ketu", element: "Water/Ether", keyword: "The Seeker",
@@ -236,7 +236,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Daily meditation, even five minutes", "Write down worries to stop the loop", "Spend time near water or trees"],
     direction: "South-West", metal: "Iron", gem: "Cat's Eye",
     colors: ["Sea Green", "Grey", "Smoky White"], days: ["Sunday", "Monday"], dates: [7, 16, 25],
-    eli10: "You are the detective who wants to know how everything really works. You like quiet. Your job is to let people in.",
+    eli10: "Analytical and research-minded, drawn to depth and solitude. The developmental task is permitting trusted people close enough to share the thinking.",
   },
   8: {
     planet: "Saturn", element: "Earth", keyword: "The Achiever",
@@ -262,7 +262,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Give service or charity every month, quietly", "Keep debt low and documented", "Protect one full rest day each week"],
     direction: "West", metal: "Iron", gem: "Blue Sapphire (test carefully)",
     colors: ["Deep Blue", "Black", "Dark Grey"], days: ["Saturday"], dates: [8, 17, 26],
-    eli10: "You are the one who keeps going when everyone else quits. Your rewards come late but they stay. Your job is to enjoy the journey too.",
+    eli10: "Persistent and resilient, with results that arrive later but hold. The developmental task is valuing the process rather than only the eventual outcome.",
   },
   9: {
     planet: "Mars", element: "Fire", keyword: "The Warrior",
@@ -288,7 +288,7 @@ export const TRAITS: Record<Digit, NumberTraits> = {
     remedies: ["Daily physical exercise", "Never send a message written in anger", "Give time to a cause you believe in"],
     direction: "South", metal: "Copper", gem: "Red Coral",
     colors: ["Red", "Maroon", "Coral"], days: ["Tuesday"], dates: [9, 18, 27],
-    eli10: "You are brave and full of fire, and you stand up for people. Your job is to count to six before you shout.",
+    eli10: "Courageous and protective, willing to act on principle. The developmental task is deliberate pacing before reacting.",
   },
 };
 
@@ -538,19 +538,19 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "strengths", title: "Strengths",
-      eli10: "These are the things you can do without trying very hard.",
+      eli10: "Capabilities that come to you naturally and can be relied upon under pressure.",
       expert: `Core strengths follow from Life Path ${base.lifePath} and Birth Number ${vedic.mulank}.`,
       bullets: Array.from(new Set([...lpT.positives, ...TRAITS[root(vedic.mulank)].positives])),
     },
     {
       id: "challenges", title: "Challenges",
-      eli10: "These are the things that trip you up. Knowing them is already half the fix.",
+      eli10: "Recurring difficulties worth managing consciously; recognising them is most of the remedy.",
       expert: `Recurring friction points across the chart. Numbers ${missingNumbers.join(", ") || "—"} are absent from the Lo Shu grid, which usually shows where effort has to be conscious rather than natural.`,
       bullets: Array.from(new Set([...lpT.negatives, ...TRAITS[root(vedic.mulank)].negatives])),
     },
     {
       id: "hidden", title: "Hidden Gifts",
-      eli10: "Secret powers most people never notice about you.",
+      eli10: "Less visible strengths that others tend to overlook.",
       expert: `Repeated grid numbers (${hiddenStrengths.join(", ") || "none"}) mark reinforced abilities. Karmic lessons (${karmicLessons.join(", ") || "none"}) are missing name-values — skills that must be learned deliberately in this life.`,
       bullets: [...lpT.hidden, ...TRAITS[root(vedic.bhagyank)].hidden],
     },
@@ -562,13 +562,13 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "money", title: "Money",
-      eli10: "How money likes to come to you, and how it likes to leave.",
+      eli10: "Your characteristic patterns of earning, spending and saving.",
       expert: `${lpT.money} Saturn-ruled 8 energy in the chart (${[base.lifePath, vedic.mulank, vedic.bhagyank].filter((n) => root(n) === 8).length > 0 ? "present" : "absent"}) affects how slowly wealth consolidates.`,
       bullets: [`Financial tendency: ${lpT.money}`, `Lucky days for money decisions: ${lpT.days.join(", ")}`],
     },
     {
       id: "relationships", title: "Relationships",
-      eli10: "How you love, and what you need from people.",
+      eli10: "How you form attachments and what you require from close relationships.",
       expert: `${lpT.love} Emotional nature: ${lpT.emotion} Communication: ${lpT.communication}`,
       bullets: [`Friendly numbers: ${rel.friends.join(", ")}`, `Neutral numbers: ${rel.neutral.join(", ")}`, `Challenging numbers: ${rel.enemies.join(", ")}`],
     },
@@ -579,7 +579,7 @@ export function buildNumerologyReport(input: {
     { id: "education", title: "Education", eli10: "How you learn best.", expert: lpT.education },
     {
       id: "health", title: "Health Guidance",
-      eli10: "Habits that keep your energy steady. This is not medical advice — see a doctor for anything real.",
+      eli10: "Habits that support steady energy. This is general guidance, not medical advice; consult a qualified doctor for any health concern.",
       expert: `${lpT.health} Missing grid numbers ${missingNumbers.join(", ") || "none"} often correlate with the areas that need conscious routine.`,
     },
     { id: "spiritual", title: "Spiritual Path", eli10: "The quiet part of your growth.", expert: `${lpT.spiritual} Suggested practices: ${vedic.mantras.join(", ")}.` },
@@ -597,7 +597,7 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "remedies", title: "Remedies",
-      eli10: "Small everyday things that make life smoother. Nothing scary, nothing expensive.",
+      eli10: "Practical, low-cost adjustments that reduce friction in daily life.",
       expert: "Practical, behaviour-first remedies derived from the weak points of the chart, with the traditional Vedic supports listed after them.",
       bullets: [
         ...lpT.remedies,
@@ -607,7 +607,7 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "action", title: "Action Plan",
-      eli10: "Three things to actually do this month.",
+      eli10: "Three concrete actions to take this month.",
       expert: "A short, deterministic plan built from the weakest points of the chart.",
       bullets: [
         `This week: ${lpT.remedies[0]}`,
@@ -617,7 +617,7 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "daily", title: "Daily Tips",
-      eli10: "Tiny habits for every day.",
+      eli10: "Small daily practices worth sustaining.",
       expert: `Daily rhythm suited to ${lpT.planet}.`,
       bullets: [
         `Best days: ${lpT.days.join(", ")}; best dates: ${lpT.dates.join(", ")}`,
@@ -627,7 +627,7 @@ export function buildNumerologyReport(input: {
     },
     {
       id: "monthly", title: "Monthly Tips",
-      eli10: "What to focus on this month.",
+      eli10: "Where to concentrate your attention this month.",
       expert: `Personal Month ${base.personalMonth} inside Personal Year ${y}: ${yearMeaning[base.personalMonth] ?? ""}.`,
     },
     {
