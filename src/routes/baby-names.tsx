@@ -1,5 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -202,9 +202,16 @@ function BabyNamesPage() {
             </div>
           </Field>
 
-          <Field label="Child birth date (for numerology, optional)">
-            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-          </Field>
+          <div className="md:col-span-2">
+            <BirthOneBox
+              value={{ name: "", date: birthDate, time: "", tz: "", lat: "", lon: "" }}
+              onChange={(patch) => { if (patch.date) setBirthDate(patch.date); }}
+              title="Child birth date — one box"
+              subtitle="Tap the mic, then say the birth date."
+              example="Example: 15 June 1995"
+              need={["date"]}
+            />
+          </div>
 
           <Field label={`Count: ${count}`}>
             <input
