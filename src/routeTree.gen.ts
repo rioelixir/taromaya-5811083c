@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as YantraRouteImport } from './routes/yantra'
 import { Route as VedicTransitsRouteImport } from './routes/vedic-transits'
+import { Route as VedicNumerologyRouteImport } from './routes/vedic-numerology'
 import { Route as VastuRouteImport } from './routes/vastu'
 import { Route as VarshphalRouteImport } from './routes/varshphal'
 import { Route as TransitsRouteImport } from './routes/transits'
@@ -92,6 +93,11 @@ const YantraRoute = YantraRouteImport.update({
 const VedicTransitsRoute = VedicTransitsRouteImport.update({
   id: '/vedic-transits',
   path: '/vedic-transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VedicNumerologyRoute = VedicNumerologyRouteImport.update({
+  id: '/vedic-numerology',
+  path: '/vedic-numerology',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VastuRoute = VastuRouteImport.update({
@@ -510,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
+  '/vedic-numerology': typeof VedicNumerologyRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -585,6 +592,7 @@ export interface FileRoutesByTo {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
+  '/vedic-numerology': typeof VedicNumerologyRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -662,6 +670,7 @@ export interface FileRoutesById {
   '/transits': typeof TransitsRoute
   '/varshphal': typeof VarshphalRoute
   '/vastu': typeof VastuRoute
+  '/vedic-numerology': typeof VedicNumerologyRoute
   '/vedic-transits': typeof VedicTransitsRoute
   '/yantra': typeof YantraRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -739,6 +748,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/vastu'
+    | '/vedic-numerology'
     | '/vedic-transits'
     | '/yantra'
     | '/admin'
@@ -814,6 +824,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/vastu'
+    | '/vedic-numerology'
     | '/vedic-transits'
     | '/yantra'
     | '/admin'
@@ -890,6 +901,7 @@ export interface FileRouteTypes {
     | '/transits'
     | '/varshphal'
     | '/vastu'
+    | '/vedic-numerology'
     | '/vedic-transits'
     | '/yantra'
     | '/_authenticated/admin'
@@ -967,6 +979,7 @@ export interface RootRouteChildren {
   TransitsRoute: typeof TransitsRoute
   VarshphalRoute: typeof VarshphalRoute
   VastuRoute: typeof VastuRoute
+  VedicNumerologyRoute: typeof VedicNumerologyRoute
   VedicTransitsRoute: typeof VedicTransitsRoute
   YantraRoute: typeof YantraRoute
   ApiAiReadingRoute: typeof ApiAiReadingRoute
@@ -995,6 +1008,13 @@ declare module '@tanstack/react-router' {
       path: '/vedic-transits'
       fullPath: '/vedic-transits'
       preLoaderRoute: typeof VedicTransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vedic-numerology': {
+      id: '/vedic-numerology'
+      path: '/vedic-numerology'
+      fullPath: '/vedic-numerology'
+      preLoaderRoute: typeof VedicNumerologyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vastu': {
@@ -1594,6 +1614,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransitsRoute: TransitsRoute,
   VarshphalRoute: VarshphalRoute,
   VastuRoute: VastuRoute,
+  VedicNumerologyRoute: VedicNumerologyRoute,
   VedicTransitsRoute: VedicTransitsRoute,
   YantraRoute: YantraRoute,
   ApiAiReadingRoute: ApiAiReadingRoute,
