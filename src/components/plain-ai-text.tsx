@@ -1,8 +1,10 @@
 import { parsePlainLines } from "@/lib/ai-format";
+import { qualityGate } from "@/lib/report-quality";
 
 /**
  * Renders AI output as clean, symbol-free professional text with picture-emoji
- * section headings. No markdown is ever shown to the user.
+ * section headings. Every reading passes the final quality gate first, so no
+ * markdown, assistant boilerplate or absolute-certainty claim reaches the user.
  */
 export function PlainAIText({
   text,
@@ -13,7 +15,8 @@ export function PlainAIText({
   label?: string;
   busy?: boolean;
 }) {
-  const lines = parsePlainLines(text);
+  const gate = qualityGate(text);
+  const lines = parsePlainLines(gate.text);
   return (
     <div
       data-no-translate
@@ -39,6 +42,12 @@ export function PlainAIText({
             {l.text}
           </p>
         ),
+      )}
+
+      {gate.confidence === "sensitive" && (
+        <p className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          This reading looks incomplete. Please add the missing birth details and generate it again.
+        </p>
       )}
     </div>
   );
