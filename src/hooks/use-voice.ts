@@ -175,12 +175,14 @@ export function useVoice(onText: (text: string) => void) {
               interim += r[0].transcript;
             }
           }
-          finalRef.current = dedupeRepeats(
-            `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
-          );
-          setHeard(tidy(`${finalRef.current} ${interim}`.trim()));
+          interimRef.current = interim.trim();
+          finalRef.current = `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`
+            .replace(/\s+/g, " ")
+            .trim();
+          setHeard(tidy(`${finalRef.current} ${interimRef.current}`.trim()));
           waitForQuiet();
         };
+
 
         rec.onerror = (e: any) => {
           const err = String(e?.error || "");
