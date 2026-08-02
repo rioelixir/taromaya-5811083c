@@ -394,6 +394,8 @@ export function useVoice(onText: (text: string) => void) {
   const clear = useCallback(() => {
     slotsRef.current = [];
     committedRef.current = "";
+    segmentsRef.current = [];
+    queueRef.current = Promise.resolve();
     const m = teardown();
     mediaRef.current = null;
     if (m) {
