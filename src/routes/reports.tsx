@@ -62,7 +62,8 @@ function pdfSafe(t: string): string {
     .replace(/\u2032/g, "'").replace(/\u2033/g, '"')
     .replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"')
     .replace(/[\u2013\u2014]/g, "-").replace(/\u2026/g, "...")
-    .replace(/\u2192/g, "to").replace(/[\u2094\u211E]/g, "R");
+    .replace(/\u2192/g, "to").replace(/\u2194/g, "and")
+    .replace(/[\u2190-\u21FF]/g, "-").replace(/[\u2094\u211E]/g, "R");
 }
 
 function todayIso() { return new Date().toISOString().slice(0, 10); }
