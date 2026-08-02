@@ -247,6 +247,94 @@ function SouthIndianChartInner({
 }
 
 
+/**
+ * East Indian (Bengali / Oriya) chart — fixed-sign square, signs running
+ * anticlockwise from Aries in the upper-left triangle, corner cells split
+ * diagonally so the frame holds twelve compartments.
+ */
+export function EastIndianChart(props: { chart: Chart; title?: string; size?: number }) {
+  return <ChartZoom label={props.title ?? "East Indian Chart"}><EastIndianChartInner {...props} /></ChartZoom>;
+}
+function EastIndianChartInner({
+  chart, title, size = 320,
+}: { chart: Chart; title?: string; size?: number }) {
+  const S = size;
+  const c = S / 3;
+  const asc = chart.ascendant.rashi;
+  const bySign: Record<number, NP[]> = {};
+  for (let s = 0; s < 12; s++) bySign[s] = [];
+  for (const p of chart.planets) bySign[p.rashi].push(p);
+
+  // [cx, cy] anchors, sign index → position. Anticlockwise from Aries at the
+  // top-left upper triangle.
+  const A: Record<number, [number, number]> = {
+    0:  [c * 0.55, c * 0.32],
+    11: [c * 0.32, c * 0.72],
+    10: [c * 0.5,  c * 1.5],
+    9:  [c * 0.32, c * 2.3],
+    8:  [c * 0.55, c * 2.7],
+    7:  [c * 1.5,  c * 2.5],
+    6:  [c * 2.45, c * 2.7],
+    5:  [c * 2.68, c * 2.3],
+    4:  [c * 2.5,  c * 1.5],
+    3:  [c * 2.68, c * 0.72],
+    2:  [c * 2.45, c * 0.32],
+    1:  [c * 1.5,  c * 0.5],
+  };
+  const RASHI_FULL_E = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+
+  return (
+    <div className="glass-card p-3">
+      {title && <div className="mb-2 text-center font-serif text-sm text-primary">{title}</div>}
+      <svg
+        viewBox={`0 0 ${S} ${S}`}
+        className="w-full"
+        role="img"
+        aria-label={`${title ?? "East Indian chart"} — Ascendant in ${RASHI_FULL_E[asc]}, ${chart.planets.length} planets`}
+      >
+        <rect x={0} y={0} width={S} height={S} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+        <rect x={c} y={c} width={c} height={c} fill="none" stroke="currentColor" strokeOpacity={0.35} />
+        <g aria-hidden="true" stroke="currentColor" strokeOpacity={0.35}>
+          <line x1={c} y1={0} x2={c} y2={c} />
+          <line x1={2 * c} y1={0} x2={2 * c} y2={c} />
+          <line x1={c} y1={2 * c} x2={c} y2={S} />
+          <line x1={2 * c} y1={2 * c} x2={2 * c} y2={S} />
+          <line x1={0} y1={c} x2={c} y2={c} />
+          <line x1={0} y1={2 * c} x2={c} y2={2 * c} />
+          <line x1={2 * c} y1={c} x2={S} y2={c} />
+          <line x1={2 * c} y1={2 * c} x2={S} y2={2 * c} />
+          {/* corner diagonals split each corner cell in two */}
+          <line x1={0} y1={0} x2={c} y2={c} />
+          <line x1={S} y1={0} x2={2 * c} y2={c} />
+          <line x1={0} y1={S} x2={c} y2={2 * c} />
+          <line x1={S} y1={S} x2={2 * c} y2={2 * c} />
+        </g>
+        {Array.from({ length: 12 }, (_, s) => s).map((s) => {
+          const [cx, cy] = A[s];
+          const planets = bySign[s] ?? [];
+          const isLagna = s === asc;
+          const label = `${RASHI_FULL_E[s]}${isLagna ? " (Ascendant)" : ""}: ${planets.map((p) => p.name).join(", ") || "empty"}`;
+          return (
+            <g key={s} role="button" tabIndex={0} aria-label={label} className="chart-hit" data-chart-hit>
+              <title>{label}</title>
+              <circle cx={cx} cy={cy} r={S * 0.07} fill="transparent" />
+              <text x={cx} y={cy - S * 0.045} textAnchor="middle" fontSize={S * 0.028} className="fill-primary/80" fontFamily="serif">
+                {RASHIS_SHORT[s]}{isLagna ? " · Asc" : ""}
+              </text>
+              {planets.map((p, idx) => (
+                <text key={p.name} x={cx} y={cy + idx * S * 0.034} textAnchor="middle" fontSize={S * 0.03} className="fill-foreground">
+                  {planetLabel(p)}
+                </text>
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+
 /** Compute a D9 Navamsha chart from the D1 normalized chart. */
 export function toNavamsha(chart: Chart): Chart {
   const ascD9 = navamshaSign(chart.ascendant.rashi * 30 + chart.ascendant.degreeInRashi);
