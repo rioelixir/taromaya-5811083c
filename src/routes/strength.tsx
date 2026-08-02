@@ -167,10 +167,13 @@ function StrengthPage() {
                   </tbody>
                 </table>
               </div>
-              <p className="mt-3 text-[10px] text-muted-foreground">
-                Bindus per rashi across all seven planets form the <span className="text-primary">Sarva Ashtakavarga</span>. Signs with ≥ 30 bindus are auspicious houses of gain; ≤ 25 indicate reduced yield.
-              </p>
+              <div className="mt-4 space-y-3 border-t border-border/20 pt-3 text-sm leading-relaxed">
+                {ashtakavargaNarrative(av).map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
             </GlassCard>
+
 
             <GlassCard>
               <h3 className="mb-2 font-serif text-lg">Reading the report</h3>
