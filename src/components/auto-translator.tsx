@@ -21,15 +21,20 @@ const memCache: Partial<Record<Lang, Record<string, string>>> = {};
 
 function loadCache(lang: Lang): Record<string, string> {
   if (memCache[lang]) return memCache[lang]!;
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(CACHE_KEY(lang));
-    memCache[lang] = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-  } catch {
-    memCache[lang] = {};
+  let stored: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = window.localStorage.getItem(CACHE_KEY(lang));
+      stored = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    } catch {
+      stored = {};
+    }
   }
+  // Hand-reviewed wording always wins over machine output.
+  memCache[lang] = { ...stored, ...reviewedTerms(lang) };
   return memCache[lang]!;
 }
+
 
 let saveTimer = 0;
 function saveCache(lang: Lang, cache: Record<string, string>) {
