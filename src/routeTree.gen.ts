@@ -65,6 +65,7 @@ import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VedicNumerologyIndexRouteImport } from './routes/vedic-numerology.index'
+import { Route as VedicNumerologyCalculatorRouteImport } from './routes/vedic-numerology.calculator'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
@@ -365,6 +366,12 @@ const VedicNumerologyIndexRoute = VedicNumerologyIndexRouteImport.update({
   path: '/',
   getParentRoute: () => VedicNumerologyRoute,
 } as any)
+const VedicNumerologyCalculatorRoute =
+  VedicNumerologyCalculatorRouteImport.update({
+    id: '/calculator',
+    path: '/calculator',
+    getParentRoute: () => VedicNumerologyRoute,
+  } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
@@ -540,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -616,6 +624,7 @@ export interface FileRoutesByTo {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
   '/vedic-numerology': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -695,6 +704,7 @@ export interface FileRoutesById {
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
+  '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -774,6 +784,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology/calculator'
     | '/vedic-numerology/'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -850,6 +861,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology/calculator'
     | '/vedic-numerology'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -928,6 +940,7 @@ export interface FileRouteTypes {
     | '/invite/$code'
     | '/pages/$slug'
     | '/share/$token'
+    | '/vedic-numerology/calculator'
     | '/vedic-numerology/'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -1398,6 +1411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VedicNumerologyIndexRouteImport
       parentRoute: typeof VedicNumerologyRoute
     }
+    '/vedic-numerology/calculator': {
+      id: '/vedic-numerology/calculator'
+      path: '/calculator'
+      fullPath: '/vedic-numerology/calculator'
+      preLoaderRoute: typeof VedicNumerologyCalculatorRouteImport
+      parentRoute: typeof VedicNumerologyRoute
+    }
     '/share/$token': {
       id: '/share/$token'
       path: '/share/$token'
@@ -1579,10 +1599,12 @@ const BlogRouteChildren: BlogRouteChildren = {
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface VedicNumerologyRouteChildren {
+  VedicNumerologyCalculatorRoute: typeof VedicNumerologyCalculatorRoute
   VedicNumerologyIndexRoute: typeof VedicNumerologyIndexRoute
 }
 
 const VedicNumerologyRouteChildren: VedicNumerologyRouteChildren = {
+  VedicNumerologyCalculatorRoute: VedicNumerologyCalculatorRoute,
   VedicNumerologyIndexRoute: VedicNumerologyIndexRoute,
 }
 
