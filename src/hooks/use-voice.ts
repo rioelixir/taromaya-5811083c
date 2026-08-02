@@ -205,6 +205,8 @@ export function useVoice(onText: (text: string) => void) {
     interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
+    segmentsRef.current = [];
+    queueRef.current = Promise.resolve();
     setHeard("");
     setMessage(null);
 
