@@ -16,6 +16,8 @@ import {
   chineseYearForecast, rashiLord, SIGN_ELEMENT, SIGN_MODALITY, SIGN_RULER,
 } from "@/lib/horoscope";
 import { RASHIS, NAKSHATRAS } from "@/lib/vedic";
+import { SignDomainPanel, ChineseDomainPanel, NumeroscopePanel } from "@/components/horoscope-domains-panel";
+
 
 export const Route = createFileRoute("/horoscope")({
   component: () => (<PremiumGate featureName="Horoscope"><HoroscopePage /></PremiumGate>),
