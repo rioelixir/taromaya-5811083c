@@ -136,8 +136,9 @@ function CalculatorPage() {
             {vedic ? (
               <div className="grid gap-3 sm:grid-cols-3">
                 <StatTile accent label="Name number (Chaldean)" value={vedic.namank ?? "—"} />
-                <StatTile label="Driver harmony" value={vedic.mulankNamank ?? "—"} />
-                <StatTile label="Conductor harmony" value={vedic.bhagyankNamank ?? "—"} />
+                <StatTile label="Driver harmony" value={vedic.harmony.mulankNamank ?? "—"} />
+                <StatTile label="Conductor harmony" value={vedic.harmony.bhagyankNamank ?? "—"} />
+
               </div>
             ) : (
               <p className="text-sm text-vnavy-soft">Save a profile with a name to see this.</p>
