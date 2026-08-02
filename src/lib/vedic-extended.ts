@@ -13,7 +13,7 @@ import { RASHIS } from "./vedic";
 const norm12 = (n: number) => ((n % 12) + 12) % 12;
 
 export type VargaCode =
-  | "D1" | "D2" | "D3" | "D4" | "D7" | "D9" | "D10" | "D12"
+  | "D1" | "D2" | "D3" | "D4" | "D5" | "D6" | "D7" | "D8" | "D9" | "D10" | "D11" | "D12"
   | "D16" | "D20" | "D24" | "D27" | "D30" | "D40" | "D45" | "D60";
 
 export const VARGA_LABELS: Record<VargaCode, { name: string; theme: string }> = {
@@ -21,9 +21,13 @@ export const VARGA_LABELS: Record<VargaCode, { name: string; theme: string }> = 
   D2:  { name: "Hora",          theme: "Wealth · assets" },
   D3:  { name: "Drekkana",      theme: "Siblings · courage" },
   D4:  { name: "Chaturthamsha", theme: "Home · fortune · property" },
+  D5:  { name: "Panchamsha",    theme: "Fame · authority · merit" },
+  D6:  { name: "Shashtamsha",   theme: "Health · illness · adversity" },
   D7:  { name: "Saptamsha",     theme: "Children · progeny" },
+  D8:  { name: "Ashtamsha",     theme: "Sudden events · longevity · hidden risk" },
   D9:  { name: "Navamsa",       theme: "Marriage · dharma · fortune" },
   D10: { name: "Dashamsha",     theme: "Career · profession · fame" },
+  D11: { name: "Rudramsha",     theme: "Gains · income · fulfilment of desires" },
   D12: { name: "Dwadashamsha",  theme: "Parents · ancestry" },
   D16: { name: "Shodashamsha",  theme: "Vehicles · comforts · pleasures" },
   D20: { name: "Vimshamsha",    theme: "Spiritual life · sadhana" },
@@ -148,13 +152,25 @@ function d60(r: number, d: number): number {
   return norm12(r + Math.floor(d * 2));
 }
 
+// D5 Panchamsha, D6 Shashtamsha, D8 Ashtamsha, D11 Rudramsha — equal
+// divisions counted onward from the sign itself (Parashari cyclical rule).
+function cyclic(r: number, d: number, div: number): number {
+  return norm12(r + Math.floor(d / (30 / div)));
+}
+function d5(r: number, d: number): number { return cyclic(r, d, 5); }
+function d6(r: number, d: number): number { return cyclic(r, d, 6); }
+function d8(r: number, d: number): number { return cyclic(r, d, 8); }
+function d11(r: number, d: number): number { return cyclic(r, d, 11); }
+
 const VARGA_FNS: Record<VargaCode, (r: number, d: number) => number> = {
-  D1: d1, D2: d2, D3: d3, D4: d4, D7: d7, D9: d9, D10: d10, D12: d12,
+  D1: d1, D2: d2, D3: d3, D4: d4, D5: d5, D6: d6, D7: d7, D8: d8,
+  D9: d9, D10: d10, D11: d11, D12: d12,
   D16: d16, D20: d20, D24: d24, D27: d27, D30: d30, D40: d40, D45: d45, D60: d60,
 };
 
 export const VARGA_ORDER: VargaCode[] = [
-  "D1","D2","D3","D4","D7","D9","D10","D12","D16","D20","D24","D27","D30","D40","D45","D60",
+  "D1","D2","D3","D4","D5","D6","D7","D8","D9","D10","D11","D12",
+  "D16","D20","D24","D27","D30","D40","D45","D60",
 ];
 
 export type VargaChart = {
