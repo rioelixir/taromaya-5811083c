@@ -1,6 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli } from "@/lib/vedic";
@@ -55,27 +55,7 @@ function LifeDashboardPage() {
       subtitle="Career, health, wealth and Mangal Dosha in one panoramic view — each score is drawn from your chart in real-time."
     >
       <GlassCard title="Birth data">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {[
-            { k:"date", label:"Date", type:"date" },
-            { k:"time", label:"Time", type:"time" },
-            ].map((f) => (
-            <label key={f.k} className="text-xs uppercase tracking-widest text-muted-foreground">
-              {f.label}
-              <input type={f.type} value={(form as Record<string,string>)[f.k]}
-                onChange={(e)=>setForm({...form,[f.k]:e.target.value})}
-                className="mt-1 w-full glass rounded-xl px-3 py-2 text-sm text-pearl outline-none focus:ring-1 focus:ring-gold/60" />
-            </label>
-          ))}
-        </div>
-        <div className="mt-3">
-          <PlacePicker
-            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
-            onChange={(p) => setForm((f) => ({ ...f, place: p.place, lat: p.lat, lon: p.lon, tz: p.tz }))}
-            forDate={form.date}
-            forTime={form.time}
-          />
-        </div>
+        <BirthVoiceBox value={form} onChange={(p) => setForm((prev) => ({ ...prev, ...p }))} />
       </GlassCard>
 
       {data && (

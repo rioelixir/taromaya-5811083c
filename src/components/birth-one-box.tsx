@@ -25,12 +25,26 @@ export type BirthOneBoxValue = {
  * the birth time and the place (with its map spot and clock) on its own.
  * While you talk, the words show up live inside the same box.
  */
+export type OneBoxField = "name" | "date" | "time" | "place";
+
 export function BirthOneBox({
   value,
   onChange,
+  title = "Your birth details — one box",
+  subtitle = "Tap the mic, then say your name, birth date, birth time and birth place.",
+  example = "Example: Riaa, born 15 June 1995 at 7:45 in the morning in New Delhi",
+  need = ["name", "date", "time", "place"],
 }: {
   value: BirthOneBoxValue;
   onChange: (patch: BirthOneBoxValue) => void;
+  /** Heading shown above the box. */
+  title?: string;
+  /** One plain line telling people what to say. */
+  subtitle?: string;
+  /** Placeholder example line. */
+  example?: string;
+  /** Which details this page actually needs. */
+  need?: OneBoxField[];
 }) {
   const search = useServerFn(searchPlaces);
   const [text, setText] = useState("");
@@ -46,7 +60,7 @@ export function BirthOneBox({
       }
       const d = parseSpokenDetails(line);
       if (!hasDetails(d)) {
-        setNote("I could not find any details in that. Try it like the line above.");
+        setNote("I could not find any details in that. Try it like the example line.");
         return;
       }
       const patch: BirthOneBoxValue = {};
@@ -57,10 +71,11 @@ export function BirthOneBox({
 
       // Ask only for what is still missing, and never wipe what we already have.
       const missing: string[] = [];
-      if (!(d.name || value.name)) missing.push("your name");
-      if (!(d.date || value.date)) missing.push("your birth date");
-      if (!(d.time || value.time)) missing.push("your birth time");
-      if (!(d.place || value.place)) missing.push("your birth place");
+      const wants = (f: OneBoxField) => need.includes(f);
+      if (wants("name") && !(d.name || value.name)) missing.push("the name");
+      if (wants("date") && !(d.date || value.date)) missing.push("the date");
+      if (wants("time") && !(d.time || value.time)) missing.push("the time");
+      if (wants("place") && !(d.place || value.place)) missing.push("the place");
       setNote(
         missing.length === 0
           ? "Got it. Check the details below."
@@ -96,7 +111,7 @@ export function BirthOneBox({
         })();
       }
     },
-    [onChange, search, value.name, value.date, value.time, value.place],
+    [onChange, search, need, value.name, value.date, value.time, value.place],
   );
 
   const handleVoice = useCallback(
@@ -119,10 +134,10 @@ export function BirthOneBox({
   }, [listening, voice.heard]);
 
   const chips = [
-    value.name ? { label: "Name", value: value.name } : null,
-    value.date ? { label: "Birth date", value: prettyDate(value.date) } : null,
-    value.time ? { label: "Birth time", value: value.time } : null,
-    value.place ? { label: "Place", value: value.place } : null,
+    need.includes("name") && value.name ? { label: "Name", value: value.name } : null,
+    need.includes("date") && value.date ? { label: "Date", value: prettyDate(value.date) } : null,
+    need.includes("time") && value.time ? { label: "Time", value: value.time } : null,
+    need.includes("place") && value.place ? { label: "Place", value: value.place } : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
   const status: { key: string; label: string; hint: string; tone: string } = listening
@@ -136,12 +151,8 @@ export function BirthOneBox({
   return (
     <div className="space-y-3" data-no-voice>
       <div>
-        <div className="text-xs uppercase tracking-widest text-gold/80">
-          Your birth details — one box
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Tap the mic, then say your name, birth date, birth time and birth place.
-        </p>
+        <div className="text-xs uppercase tracking-widest text-gold/80">{title}</div>
+        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
       </div>
 
       {/* The mic sits above the box so it is the first thing everyone sees. */}
@@ -200,11 +211,11 @@ export function BirthOneBox({
               apply(text);
             }
           }}
-          aria-label="Birth details in one box"
+          aria-label={title}
           placeholder={
             listening
               ? "Listening… your words appear here"
-              : "Example: Riaa, born 15 June 1995 at 7:45 in the morning in New Delhi"
+              : example
           }
           className="min-h-[4.5rem] w-full resize-none bg-transparent px-2 py-1 text-base leading-relaxed text-pearl outline-none placeholder:text-muted-foreground"
         />

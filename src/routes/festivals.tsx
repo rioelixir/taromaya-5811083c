@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -56,21 +55,24 @@ function FestivalsPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
         <GlassCard title="Window">
           <div className="grid gap-3">
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">
-              Start date
-              <DateSelect label="" value={startDate} onChange={(v) => setStartDate(v)} />
-            </label>
+            <BirthOneBox
+              value={{ name: "", date: startDate, time: "", tz: "", lat, lon, place }}
+              onChange={(patch) => {
+                if (patch.date) setStartDate(patch.date);
+                if (patch.place !== undefined) setPlace(patch.place);
+                if (patch.lat) setLat(patch.lat);
+                if (patch.lon) setLon(patch.lon);
+              }}
+              title="Date and place — one box"
+              subtitle="Tap the mic, then say the date and the place."
+              example="Example: 15 June 1995 in New Delhi"
+              need={["date", "place"]}
+            />
             <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Days ahead ({days})
               <input type="range" min={7} max={120} value={days} onChange={(e) => setDays(Number(e.target.value))}
                 className="mt-2 block w-full accent-gold" />
             </label>
-            <PlacePicker
-              label="Which place?"
-              value={{ place, lat, lon, tz: "0" }}
-              onChange={(p) => { setPlace(p.place); setLat(p.lat); setLon(p.lon); }}
-              forDate={startDate}
-            />
 
             <div className="mt-2 pt-3 border-t border-white/10">
               <div className="text-[10px] uppercase tracking-[0.3em] text-gold/80 mb-2">Filter</div>

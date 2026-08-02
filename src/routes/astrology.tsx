@@ -1,6 +1,6 @@
 import { PremiumGate } from "@/components/premium-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { PlacePicker } from "@/components/place-picker";
+import { BirthVoiceBox } from "@/components/birth-voice-box";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -106,23 +106,8 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
       subtitle="Tropical chart with aspects, patterns, dominants, Arabic Lots, and fixed stars."
     >
       <GlassCard title="Birth details">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Name", "name", "text", ""],
-            ["Date", "date", "date", ""],
-            ["Time", "time", "time", ""],
-            ].map(([label, key, type, ph]) => (
-            <label key={key} className="block">
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
-              <input
-                type={type}
-                placeholder={ph}
-                value={(form as Record<string, string>)[key]}
-                onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50"
-              />
-            </label>
-          ))}
+        <BirthVoiceBox value={form} onChange={(p) => setForm((prev) => ({ ...prev, ...p }))} />
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">House system</span>
             <select
@@ -169,14 +154,6 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
                         <div key={e.name} className="flex justify-between"><span>{e.name}</span><span className="gold-text">{e.count}</span></div>
                       ))}
                     </div>
-        <div className="mt-3">
-          <PlacePicker
-            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
-            onChange={(pl) => setForm((f) => ({ ...f, place: pl.place, lat: pl.lat, lon: pl.lon, tz: pl.tz }))}
-            forDate={form.date}
-            forTime={form.time}
-          />
-        </div>
                     <div>
                       <div className="text-muted-foreground mb-1">Modes</div>
                       {dominants.modes.map((m) => (

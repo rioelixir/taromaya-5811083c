@@ -1,6 +1,5 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
@@ -79,18 +78,19 @@ function PanchangPage() {
       subtitle="Today's cosmic almanac — auspicious timings, planetary hours, and Vedic calendar."
     >
       <GlassCard>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date</span>
-            <DateSelect label="" value={date} onChange={(v) => setDate(v)} />
-          </label>
-          <PlacePicker
-            label="Which place?"
-            value={{ place, lat, lon, tz: "0" }}
-            onChange={(p2) => { setPlace(p2.place); setLat(p2.lat); setLon(p2.lon); }}
-            forDate={date}
-          />
-        </div>
+        <BirthOneBox
+          value={{ name: "", date: date, time: "", tz: "", lat, lon, place }}
+          onChange={(patch) => {
+            if (patch.date) setDate(patch.date);
+            if (patch.place !== undefined) setPlace(patch.place);
+            if (patch.lat) setLat(patch.lat);
+            if (patch.lon) setLon(patch.lon);
+          }}
+          title="Date and place — one box"
+          subtitle="Tap the mic, then say the date and the place."
+          example="Example: 15 June 1995 in New Delhi"
+          need={["date", "place"]}
+        />
       </GlassCard>
 
       <GlassCard className="mt-6">

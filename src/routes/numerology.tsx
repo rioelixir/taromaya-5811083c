@@ -1,5 +1,5 @@
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Explain } from "@/components/explain";
@@ -61,22 +61,35 @@ function FullReportTab({
   return (
     <>
       <GlassCard>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Your full name (as you use it)</span>
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Aryan Sharma"
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-          </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-          </label>
-        </div>
+        <NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
       <div className="mt-6">
         <NumerologyFullReport fullName={fullName} birthDate={birthDate} />
       </div>
     </>
+  );
+}
+
+/** One spoken/typed box for the numbers pages. */
+function NumBox({
+  fullName, setFullName, birthDate, setBirthDate,
+}: {
+  fullName?: string; setFullName?: (s: string) => void;
+  birthDate: string; setBirthDate: (s: string) => void;
+}) {
+  const wantsName = !!setFullName;
+  return (
+    <BirthOneBox
+      value={{ name: fullName ?? "", date: birthDate, time: "", tz: "", lat: "", lon: "" }}
+      onChange={(patch) => {
+        if (patch.name !== undefined && setFullName) setFullName(patch.name);
+        if (patch.date) setBirthDate(patch.date);
+      }}
+      title={wantsName ? "Your name and birth date — one box" : "Your birth date — one box"}
+      subtitle={wantsName ? "Tap the mic, then say your full name and your birth date." : "Tap the mic, then say your birth date."}
+      example={wantsName ? "Example: Aryan Sharma, born 15 June 1995" : "Example: born 15 June 1995"}
+      need={wantsName ? ["name", "date"] : ["date"]}
+    />
   );
 }
 
@@ -180,16 +193,8 @@ Structure: Core Signature, Life Path & Destiny, Inner Self (Soul Urge & Personal
   return (
     <>
       <GlassCard>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="block sm:col-span-2">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Full name (as used)</span>
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g. Aryan Sharma"
-              className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
-          </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-          </label>
+        <NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} />
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block">
             <span className="text-[10px] uppercase tracking-widest text-muted-foreground">System</span>
             <select value={system} onChange={(e) => setSystem(e.target.value as "Pythagorean" | "Chaldean")}
@@ -329,10 +334,9 @@ function MobileNumerology({ birthDate, setBirthDate }: { birthDate: string; setB
             <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="e.g. 9876543210"
               className="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl outline-none focus:border-gold/50" />
           </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-          </label>
+          <div className="block">
+            <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
+          </div>
         </div>
       </GlassCard>
       {analysis && (
@@ -425,14 +429,23 @@ function KundliMatchingNumerology() {
     <>
       <div className="grid gap-4 md:grid-cols-2">
         <GlassCard title="Person A">
-          <input value={a.name} onChange={(e) => setA({ ...a, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <DateSelect label="" value={a.date} onChange={(v) => setA({ ...a, date: v })} />
+          <NumBox
+            fullName={a.name}
+            setFullName={(n) => setA((p) => ({ ...p, name: n }))}
+            birthDate={a.date}
+            setBirthDate={(d) => setA((p) => ({ ...p, date: d }))}
+          />
         </GlassCard>
         <GlassCard title="Person B">
-          <input value={b.name} onChange={(e) => setB({ ...b, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <DateSelect label="" value={b.date} onChange={(v) => setB({ ...b, date: v })} />
+          <NumBox
+            fullName={b.name}
+            setFullName={(n) => setB((p) => ({ ...p, name: n }))}
+            birthDate={b.date}
+            setBirthDate={(d) => setB((p) => ({ ...p, date: d }))}
+          />
         </GlassCard>
       </div>
+
 
       {rA && rB && compat && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
@@ -649,21 +662,7 @@ function VedicTab({
   return (
     <>
       <GlassCard>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Full name</span>
-            <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Your name as you use it"
-              className="mt-1 w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm text-pearl focus:outline-none focus:border-gold/50"
-            />
-          </label>
-          <label className="block">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-            <DateSelect label="" value={birthDate} onChange={(val) => setBirthDate(val)} />
-          </label>
-        </div>
+        <NumBox fullName={fullName} setFullName={setFullName} birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
 
       {v && (
@@ -804,10 +803,7 @@ function LoShuTab({ birthDate, setBirthDate }: { birthDate: string; setBirthDate
   return (
     <>
       <GlassCard>
-        <label className="block max-w-xs">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-        </label>
+        <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
       {grid && (
         <>
@@ -918,10 +914,7 @@ function NineStarKiTab({ birthDate, setBirthDate }: { birthDate: string; setBirt
   return (
     <>
       <GlassCard>
-        <label className="block max-w-xs">
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Date of birth</span>
-          <DateSelect label="" value={birthDate} onChange={(v) => setBirthDate(v)} />
-        </label>
+        <NumBox birthDate={birthDate} setBirthDate={setBirthDate} />
       </GlassCard>
       {ki && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">

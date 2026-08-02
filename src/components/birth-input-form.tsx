@@ -1,4 +1,4 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { calculateAstroChart } from "@/lib/astro-calc.functions";
@@ -83,10 +83,42 @@ export function BirthInputForm({
       <Card className="glass-card space-y-5 p-6">
         <h2 className="text-2xl font-serif tracking-tight">Birth details</h2>
 
+        <BirthOneBox
+          value={{
+            name: form.name,
+            date: `${form.year}-${String(form.month).padStart(2, "0")}-${String(form.day).padStart(2, "0")}`,
+            time: `${String(form.hour).padStart(2, "0")}:${String(form.minute).padStart(2, "0")}`,
+            place: form.place,
+            lat: String(form.latitude),
+            lon: String(form.longitude),
+            tz: String(form.tzOffsetHours),
+          }}
+          onChange={(patch) =>
+            setForm((f) => {
+              const next = { ...f };
+              if (patch.name !== undefined) next.name = patch.name;
+              if (patch.date) {
+                const [y, mo, d] = patch.date.split("-").map(Number);
+                if (y) next.year = y;
+                if (mo) next.month = mo;
+                if (d) next.day = d;
+              }
+              if (patch.time) {
+                const [hh, mi] = patch.time.split(":").map(Number);
+                next.hour = hh || 0;
+                next.minute = mi || 0;
+                next.seconds = 0;
+              }
+              if (patch.place !== undefined) next.place = patch.place;
+              if (patch.lat) next.latitude = parseFloat(patch.lat) || next.latitude;
+              if (patch.lon) next.longitude = parseFloat(patch.lon) || next.longitude;
+              if (patch.tz) next.tzOffsetHours = parseFloat(patch.tz) || 0;
+              return next;
+            })
+          }
+        />
+
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Full name">
-            <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Optional" />
-          </Field>
           <Field label="Gender / identity">
             <Select value={form.gender} onValueChange={(v) => set("gender", v as never)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -99,35 +131,8 @@ export function BirthInputForm({
               </SelectContent>
             </Select>
           </Field>
-
-          <div className="md:col-span-2">
-            <PlacePicker
-              value={{ place: form.place, lat: String(form.latitude), lon: String(form.longitude), tz: String(form.tzOffsetHours) }}
-              onChange={(p) => {
-                setForm((f) => ({
-                  ...f,
-                  place: p.place,
-                  latitude: parseFloat(p.lat) || 0,
-                  longitude: parseFloat(p.lon) || 0,
-                  tzOffsetHours: parseFloat(p.tz) || 0,
-                }));
-              }}
-              forDate={`${form.year}-${String(form.month).padStart(2, "0")}-${String(form.day).padStart(2, "0")}`}
-              forTime={`${String(form.hour).padStart(2, "0")}:${String(form.minute).padStart(2, "0")}`}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 md:col-span-2">
-            <Field label="Year"><Input type="number" value={form.year} onChange={(e) => set("year", parseInt(e.target.value) || 0)} /></Field>
-            <Field label="Month"><Input type="number" min={1} max={12} value={form.month} onChange={(e) => set("month", parseInt(e.target.value) || 1)} /></Field>
-            <Field label="Day"><Input type="number" min={1} max={31} value={form.day} onChange={(e) => set("day", parseInt(e.target.value) || 1)} /></Field>
-          </div>
-          <div className="grid grid-cols-3 gap-2 md:col-span-2">
-            <Field label="Hour (0-23)"><Input type="number" min={0} max={23} value={form.hour} onChange={(e) => set("hour", parseInt(e.target.value) || 0)} /></Field>
-            <Field label="Minute"><Input type="number" min={0} max={59} value={form.minute} onChange={(e) => set("minute", parseInt(e.target.value) || 0)} /></Field>
-            <Field label="Second"><Input type="number" min={0} max={59} value={form.seconds} onChange={(e) => set("seconds", parseInt(e.target.value) || 0)} /></Field>
-          </div>
         </div>
+
 
         <div className="grid gap-4 border-t border-white/10 pt-4 md:grid-cols-3">
 
