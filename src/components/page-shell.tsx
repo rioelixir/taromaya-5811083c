@@ -136,7 +136,9 @@ export function PageShell({
           </header>
         )}
         
+        {!hideVoice && <AskBox module={aiModule ?? title} />}
         {children}
+
         {!hideAI && (
           <AIInterpretation
             module={aiModule ?? title}
