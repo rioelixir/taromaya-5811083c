@@ -58,6 +58,9 @@ export function useVoice(onText: (text: string) => void) {
   /** No clocks: listening starts on a tap and only ends on the next tap. */
   const stopRef = useRef<() => void>(() => {});
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Ticker that writes down long talks piece by piece. */
+  const flushRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const clearSilence = useCallback(() => {
     if (silenceRef.current) clearTimeout(silenceRef.current);
     silenceRef.current = null;
