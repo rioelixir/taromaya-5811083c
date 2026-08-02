@@ -373,6 +373,16 @@ function ChineseTab({ today, onSelect }: { today: Date; onSelect: (animal: strin
     return chineseYearForecast(person, currentYear);
   }, [birthYear, currentYear]);
   const personSign = chineseSign(birthYear);
+  const CLASH: Record<string, string> = {
+    Rat: "Horse", Ox: "Goat", Tiger: "Monkey", Rabbit: "Rooster", Dragon: "Dog", Snake: "Pig",
+    Horse: "Rat", Goat: "Ox", Monkey: "Tiger", Rooster: "Rabbit", Dog: "Dragon", Pig: "Snake",
+  };
+  const relation: "harmony" | "clash" | "self" | "neutral" =
+    personSign.animal === forecast.yearAnimal ? "self"
+    : CLASH[personSign.animal] === forecast.yearAnimal ? "clash"
+    : (CHINESE_COMPATIBLE[personSign.animal] as readonly string[]).includes(forecast.yearAnimal) ? "harmony"
+    : "neutral";
+
 
   return (
     <div className="space-y-4">
