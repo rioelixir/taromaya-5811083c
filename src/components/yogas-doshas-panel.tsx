@@ -1,6 +1,8 @@
 // Yogas & Doshas scanner with live Sade Sati window projection.
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { DataTable } from "@/components/data-table";
+
 import { detectYogas, detectDoshas, type Yoga, type Dosha } from "@/lib/vedic-extended";
 import { analyseSadeSati } from "@/lib/dosha-windows";
 import type { KundliChart } from "@/lib/vedic";
