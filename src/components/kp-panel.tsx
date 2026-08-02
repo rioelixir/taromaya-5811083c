@@ -135,8 +135,8 @@ export function KPPanel({ chart }: Props) {
           <div className="space-y-3">
             <DataTable
               columns={[
-                { header: "Ruling factor", cell: (r: { label: string }) => r.label },
-                { header: "Planet", align: "right", className: "font-mono text-primary", cell: (r: { value: string }) => r.value },
+                { header: "Ruling factor", cell: (r: { label: string; value: string }) => r.label },
+                { header: "Planet", align: "right", className: "font-mono text-primary", cell: (r: { label: string; value: string }) => r.value },
               ]}
               rows={rulingRows}
               rowKey={(r) => r.label}
