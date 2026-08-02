@@ -370,6 +370,38 @@ export function UniversalInput({ module, children }: { module: string; children:
     await askAI(line);
   }, [text, listening, voice, fill, askAI]);
 
+  // Instant reading: as soon as the mic stops, the reading starts on its own.
+  const generateRef = useRef(generate);
+  generateRef.current = generate;
+  const prevVoiceState = useRef(voice.state);
+  const autoRef = useRef(false);
+  const textRef = useRef(text);
+  textRef.current = text;
+
+  useEffect(() => {
+    const was = prevVoiceState.current;
+    prevVoiceState.current = voice.state;
+    const wasBusy = was === "listening" || was === "working";
+    const nowBusy = voice.state === "listening" || voice.state === "working";
+    if (!wasBusy || nowBusy) return;
+    autoRef.current = true;
+    // Words sometimes land a moment after the mic closes, so allow a short grace.
+    const t = setTimeout(() => {
+      if (!autoRef.current) return;
+      autoRef.current = false;
+      if (textRef.current.trim()) void generateRef.current();
+    }, 500);
+    return () => clearTimeout(t);
+  }, [voice.state]);
+
+  useEffect(() => {
+    if (!autoRef.current || !text.trim()) return;
+    autoRef.current = false;
+    void generateRef.current();
+  }, [text]);
+
+
+
 
   const ctxValue = useMemo<Ctx>(
     () => ({ register, unregister, note, busy: lookup }),
@@ -377,13 +409,13 @@ export function UniversalInput({ module, children }: { module: string; children:
   );
 
   const status = listening
-    ? { key: "listening", label: "Listening", hint: "Keep talking — your words fill the box below.", tone: "text-red-200 border-red-400/40 bg-red-500/10" }
+    ? { key: "listening", label: "Listening", hint: "Keep talking. Stop the mic and the reading begins at once.", tone: "text-red-200 border-red-400/40 bg-red-500/10" }
     : working || lookup
       ? { key: "working", label: "Processing", hint: "Writing down what you said…", tone: "text-amber-200 border-amber-400/40 bg-amber-500/10" }
       : voice.state === "error"
         ? { key: "error", label: "Try again", hint: voice.message ?? "We could not hear that.", tone: "text-rose-200 border-rose-400/40 bg-rose-500/10" }
         : text.trim()
-          ? { key: "ready", label: "Ready", hint: "Tap Generate when you are done.", tone: "text-emerald-200 border-emerald-400/40 bg-emerald-500/10" }
+          ? { key: "ready", label: "Ready", hint: "Press Enter, or tap Generate. Spoken words start the reading on their own.", tone: "text-emerald-200 border-emerald-400/40 bg-emerald-500/10" }
           : { key: "idle", label: "Ready", hint: "Tap the big mic and say anything.", tone: "text-gold border-gold/40 bg-gold/10" };
 
   return (
@@ -445,6 +477,12 @@ export function UniversalInput({ module, children }: { module: string; children:
             rows={4}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (!asking) void generate();
+              }
+            }}
             aria-label="Say or type anything"
             placeholder={
               listening
