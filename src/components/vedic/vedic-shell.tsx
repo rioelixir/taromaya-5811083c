@@ -5,7 +5,15 @@ import { UniversalInput } from "@/components/universal-input";
 import { greeting } from "@/lib/vedic-num/dashboard";
 import { cn } from "@/lib/utils";
 
-const NAV: { to: string; label: string; icon: typeof Home; exact?: boolean }[] = [
+type NavTo =
+  | "/vedic-numerology"
+  | "/vedic-numerology/calculator"
+  | "/vedic-numerology/reports"
+  | "/vedic-numerology/remedies"
+  | "/vedic-numerology/profile";
+
+const NAV: { to: NavTo; label: string; icon: typeof Home; exact?: boolean }[] = [
+
   { to: "/vedic-numerology", label: "Home", icon: Home, exact: true },
   { to: "/vedic-numerology/calculator", label: "Calculator", icon: Calculator },
   { to: "/vedic-numerology/reports", label: "Reports", icon: FileText },
