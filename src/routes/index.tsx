@@ -108,7 +108,7 @@ function Home() {
             <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary shrink-0">
               <Hash className="h-6 w-6" />
             </div>
-            <div className="min-w-0 text-base font-medium text-foreground">My numbers</div>
+            <div className="min-w-0 text-base font-medium text-foreground">Numerology</div>
           </Link>
           <Link
             to="/numerology"
