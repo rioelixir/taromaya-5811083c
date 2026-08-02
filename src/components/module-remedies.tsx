@@ -11,17 +11,54 @@ const TONE: Record<PlanetRemedyBlock["priority"], { label: string; cls: string }
   steady: { label: "Steady", cls: "border-emerald-400/30 bg-emerald-500/10 text-emerald-200" },
 };
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl bg-white/5 p-3">
-      <div className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</div>
-      <div className="mt-1 text-base leading-relaxed text-pearl">{children}</div>
-    </div>
-  );
-}
+type RemedyRow = { label: string; value: React.ReactNode };
 
 function PlanetBlock({ b }: { b: PlanetRemedyBlock }) {
   const tone = TONE[b.priority];
+  const rows: RemedyRow[] = [
+    {
+      label: "Daily practice",
+      value: (
+        <span className="flex items-start gap-2">
+          <Flame className="mt-1 h-4 w-4 shrink-0 text-gold" />
+          <span>
+            {b.mantra} — {b.japa.dailyMalas} mala ({b.japa.dailyJapa} repetitions), about {b.japa.minutesPerDay} minutes,
+            at {b.japa.bestTime.toLowerCase()}. Full count {b.japa.totalJapa} over {b.japa.daysToComplete} days.
+          </span>
+        </span>
+      ),
+    },
+    {
+      label: "Weekly anchor",
+      value: `${b.day} · wear ${b.colour.toLowerCase()} · ${b.fast.toLowerCase()} · ${b.temple.toLowerCase()}`,
+    },
+    {
+      label: "Charity and giving",
+      value: (
+        <span className="flex items-start gap-2">
+          <Coins className="mt-1 h-4 w-4 shrink-0 text-gold" />
+          <span>{[...b.charity, ...b.donation].join(", ")}</span>
+        </span>
+      ),
+    },
+    { label: "Conduct changes", value: `${b.conduct.join(". ")}.` },
+    { label: "Diet support", value: `${b.food.join(". ")}.` },
+    { label: "Instrument", value: `${b.yantra} · Rudraksha: ${b.rudraksha}` },
+    {
+      label: "Gemstone (only under guidance)",
+      value: (
+        <span className="flex items-start gap-2">
+          <Gem className="mt-1 h-4 w-4 shrink-0 text-gold" />
+          <span>
+            {b.gem.gem} in {b.gem.metal.toLowerCase()}, {b.gem.ratti} ratti ({b.gem.grams.toFixed(2)} g), {b.gem.finger.toLowerCase()} finger,
+            worn on {b.gem.day} at {b.gem.time.toLowerCase()}. Accepted range {b.gem.minRatti} to {b.gem.maxRatti} ratti.
+          </span>
+        </span>
+      ),
+    },
+    { label: "How long", value: b.duration },
+  ];
+
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -42,44 +79,20 @@ function PlanetBlock({ b }: { b: PlanetRemedyBlock }) {
         </div>
       )}
 
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <Row label="Daily practice">
-          <span className="flex items-start gap-2">
-            <Flame className="mt-1 h-4 w-4 shrink-0 text-gold" />
-            <span>
-              {b.mantra} — {b.japa.dailyMalas} mala ({b.japa.dailyJapa} repetitions), about {b.japa.minutesPerDay} minutes,
-              at {b.japa.bestTime.toLowerCase()}. Full count {b.japa.totalJapa} over {b.japa.daysToComplete} days.
-            </span>
-          </span>
-        </Row>
-        <Row label="Weekly anchor">
-          {b.day} · wear {b.colour.toLowerCase()} · {b.fast.toLowerCase()} · {b.temple.toLowerCase()}
-        </Row>
-        <Row label="Charity and giving">
-          <span className="flex items-start gap-2">
-            <Coins className="mt-1 h-4 w-4 shrink-0 text-gold" />
-            <span>{[...b.charity, ...b.donation].join(", ")}</span>
-          </span>
-        </Row>
-        <Row label="Conduct changes">{b.conduct.join(". ")}.</Row>
-        <Row label="Diet support">{b.food.join(". ")}.</Row>
-        <Row label="Instrument">
-          {b.yantra} · Rudraksha: {b.rudraksha}
-        </Row>
-        <Row label="Gemstone (only under guidance)">
-          <span className="flex items-start gap-2">
-            <Gem className="mt-1 h-4 w-4 shrink-0 text-gold" />
-            <span>
-              {b.gem.gem} in {b.gem.metal.toLowerCase()}, {b.gem.ratti} ratti ({b.gem.grams.toFixed(2)} g), {b.gem.finger.toLowerCase()} finger,
-              worn on {b.gem.day} at {b.gem.time.toLowerCase()}. Accepted range {b.gem.minRatti} to {b.gem.maxRatti} ratti.
-            </span>
-          </span>
-        </Row>
-        <Row label="How long">{b.duration}</Row>
+      <div className="mt-3">
+        <DataTable
+          columns={[
+            { header: "Remedy area", className: "whitespace-nowrap text-muted-foreground", cell: (r: RemedyRow) => r.label },
+            { header: "What to do", className: "text-pearl", cell: (r: RemedyRow) => r.value },
+          ]}
+          rows={rows}
+          rowKey={(r) => r.label}
+        />
       </div>
     </div>
   );
 }
+
 
 /**
  * Planet-linked remedies and suggested changes for the current module.
