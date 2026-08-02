@@ -336,8 +336,10 @@ function BirthForm({
       <div className="grid gap-3">
         <BirthOneBox
           value={{ name: form.name, date: form.date, time: form.time, place: form.place, lat: form.lat, lon: form.lon, tz: form.tz }}
-          onChange={(patch: Record<string, string>) => setForm({ ...form, ...patch, unknownTime: false } as FormState)}
+          onChange={(patch: Record<string, string>) => setForm((prev) => ({ ...prev, ...patch, unknownTime: false }) as FormState)}
+          onGenerate={canSubmit ? onCompute : undefined}
         />
+
         <button
           disabled={!canSubmit} onClick={onCompute}
           className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-gold to-gold-soft text-cosmic font-medium py-3 disabled:opacity-40 hover:brightness-110 transition"

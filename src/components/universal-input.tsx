@@ -11,7 +11,7 @@ import {
 import { Mic, Square, Loader2, Sparkles, Check, AlertTriangle, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useVoice } from "@/hooks/use-voice";
-import { useBirthProfile } from "@/hooks/use-birth-profile";
+import { markBirthGiven, useBirthProfile } from "@/hooks/use-birth-profile";
 import { searchPlaces } from "@/lib/geo.functions";
 import { offsetForLocalTime } from "@/lib/timezone";
 import { announceDetails, hasDetails, parseSpokenDetails } from "@/lib/voice-parse";
@@ -212,6 +212,7 @@ export function UniversalInput({ module, children }: { module: string; children:
       if (d.date) patch.date = d.date;
       if (d.time) patch.time = d.time;
       if (Object.keys(patch).length > 0) {
+        markBirthGiven(Object.keys(patch));
         target.onChange(patch);
         Object.assign(sessionMemory, patch);
       }
@@ -242,6 +243,7 @@ export function UniversalInput({ module, children }: { module: string; children:
               lon: best.longitude.toFixed(4),
               tz: String(off),
             };
+            markBirthGiven(Object.keys(placePatch));
             target.onChange(placePatch);
             Object.assign(sessionMemory, placePatch);
           } else {
@@ -355,17 +357,19 @@ export function UniversalInput({ module, children }: { module: string; children:
     if (listening) await voice.stop();
 
     const usedForFields = await fill(line);
-    const list = [...consumers.current.values()];
 
     if (usedForFields) {
-      // Let the module run itself if it asked us to.
-      for (const c of list) c.onGenerate?.();
-      const ready = list.every(isComplete);
-      if (ready) return;
+      // Let the page redraw with the new details first, so the module runs
+      // itself with the freshly filled date, time and place.
+      await new Promise((r) => setTimeout(r, 120));
+      const fresh = [...consumers.current.values()];
+      for (const c of fresh) c.onGenerate?.();
+      if (fresh.every(isComplete)) return;
       // Something is still missing, so also answer what they said.
     }
     await askAI(line);
   }, [text, listening, voice, fill, askAI]);
+
 
   const ctxValue = useMemo<Ctx>(
     () => ({ register, unregister, note, busy: lookup }),

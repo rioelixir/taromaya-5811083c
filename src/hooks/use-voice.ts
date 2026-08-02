@@ -58,6 +58,9 @@ export function useVoice(onText: (text: string) => void) {
   /** No clocks: listening starts on a tap and only ends on the next tap. */
   const stopRef = useRef<() => void>(() => {});
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Ticker that writes down long talks piece by piece. */
+  const flushRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const clearSilence = useCallback(() => {
     if (silenceRef.current) clearTimeout(silenceRef.current);
     silenceRef.current = null;
@@ -117,31 +120,60 @@ export function useVoice(onText: (text: string) => void) {
     return new Blob([buf], { type: "audio/wav" });
   };
 
-  const send = useCallback(async (blob: Blob) => {
-    setState("working");
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token;
-      const form = new FormData();
-      form.append("file", blob, "recording.wav");
-      const hint = serverLangHint(getVoiceLang());
-      if (hint) form.append("language", hint);
-      const res = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        body: form,
-      });
-      if (!res.ok) throw new Error("failed");
-      const out = (await res.json()) as { text?: string };
-      emit(out.text ?? "");
-      setState("idle");
-      setMessage(null);
-    } catch {
-      setState("error");
-      setMessage("Voice is not working right now. Please type instead.");
+  const send = useCallback(async (blob: Blob): Promise<string | null> => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    const hint = serverLangHint(getVoiceLang());
+
+    // A shaky connection must never lose a piece of the recording: try a few
+    // times, waiting a little longer each time.
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const form = new FormData();
+        form.append("file", blob, "recording.wav");
+        if (hint) form.append("language", hint);
+        const res = await fetch("/api/transcribe", {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          body: form,
+        });
+        if (res.status >= 400 && res.status < 500) return null;
+        if (!res.ok) throw new Error(String(res.status));
+        const out = (await res.json()) as { text?: string };
+        return out.text ?? "";
+      } catch {
+        if (attempt === 3) return null;
+        await new Promise((r) => setTimeout(r, 700 * (attempt + 1)));
+      }
     }
-  }, [emit]);
+    return null;
+  }, []);
+
+  /** Turn whatever has been recorded so far into words, keeping earlier pieces. */
+  const flushSegment = useCallback(async (final: boolean) => {
+    const m = mediaRef.current;
+    if (!m) return;
+    const chunks = m.chunks.splice(0, m.chunks.length);
+    if (chunks.length === 0) return;
+    const blob = encodeWav(chunks, m.ctx.sampleRate);
+    if (blob.size < 2048) {
+      if (final && !committedRef.current) {
+        setState("idle");
+        setMessage("That was too quiet. Tap and speak again.");
+      }
+      return;
+    }
+    if (final) setState("working");
+    const text = await send(blob);
+    if (text === null) {
+      setMessage("One part of your talk could not be written down. The rest is kept.");
+      return;
+    }
+    committedRef.current = dedupeRepeats(`${committedRef.current} ${text}`.trim());
+    setHeard(tidy(committedRef.current));
+  }, [send, tidy]);
+
 
   /* ---------- controls ---------- */
 
@@ -191,6 +223,12 @@ export function useVoice(onText: (text: string) => void) {
             activeRef.current = false;
             setState("error");
             setMessage("Please allow the microphone so we can hear you.");
+            return;
+          }
+          // A dropped connection or a quiet moment must not end a long talk:
+          // keep every word heard so far and let onend start us again.
+          if (err === "network") {
+            setMessage("The connection wobbled. Your words so far are safe — keep talking.");
           }
         };
         rec.onend = () => {
@@ -199,9 +237,17 @@ export function useVoice(onText: (text: string) => void) {
             `${committedRef.current} ${slotsRef.current.filter(Boolean).join(" ")}`.trim(),
           );
           slotsRef.current = [];
-          if (activeRef.current) {
-            try { rec.start(); } catch { /* restart race */ }
-          }
+          finalRef.current = committedRef.current;
+          if (!activeRef.current) return;
+          const restart = (tries: number) => {
+            if (!activeRef.current) return;
+            try {
+              rec.start();
+            } catch {
+              if (tries < 8) setTimeout(() => restart(tries + 1), 300 * (tries + 1));
+            }
+          };
+          restart(0);
         };
         recRef.current = rec;
         rec.start();
@@ -231,6 +277,13 @@ export function useVoice(onText: (text: string) => void) {
       source.connect(node);
       node.connect(ctxAudio.destination);
       mediaRef.current = { stream, ctx: ctxAudio, node, source, chunks };
+      // Long talks are written down piece by piece, so a phone that runs out of
+      // room — or a connection that drops — never loses the earlier minutes.
+      if (flushRef.current) clearInterval(flushRef.current);
+      flushRef.current = setInterval(() => {
+        if (!activeRef.current || pausedRef.current) return;
+        void flushSegment(false);
+      }, 20000);
       setState("listening");
       waitForQuiet(12000);
     } catch {
@@ -238,17 +291,19 @@ export function useVoice(onText: (text: string) => void) {
       setState("error");
       setMessage("Please allow the microphone so we can hear you.");
     }
-  }, [waitForQuiet, tidy]);
+  }, [waitForQuiet, tidy, flushSegment]);
+
 
   const teardown = useCallback(() => {
     activeRef.current = false;
     pausedRef.current = false;
     clearSilence();
+    if (flushRef.current) clearInterval(flushRef.current);
+    flushRef.current = null;
     const rec = recRef.current;
     recRef.current = null;
     if (rec) { try { rec.stop(); rec.abort(); } catch { /* already stopped */ } }
     const m = mediaRef.current;
-    mediaRef.current = null;
     return m;
   }, [clearSilence]);
 
@@ -267,32 +322,46 @@ export function useVoice(onText: (text: string) => void) {
       .replace(/\s+/g, " ")
       .trim() || heard.trim();
     const m = teardown();
-    finalRef.current = "";
-    interimRef.current = "";
-    slotsRef.current = [];
-    committedRef.current = "";
-    setHeard("");
-
 
     if (hadRec) {
+      mediaRef.current = null;
+      finalRef.current = "";
+      interimRef.current = "";
+      slotsRef.current = [];
+      committedRef.current = "";
+      setHeard("");
       setState("idle");
       emit(spoken);
       return;
     }
     if (m) {
+      // Stop the mic but keep the recorded tail, then write down the last piece
+      // and hand over every piece from the whole talk.
       m.stream.getTracks().forEach((t) => t.stop());
       m.node.disconnect();
       m.source.disconnect();
-      const blob = encodeWav(m.chunks, m.ctx.sampleRate);
+      await flushSegment(true);
+      mediaRef.current = null;
       await m.ctx.close().catch(() => {});
-      if (blob.size < 2048) {
+      const all = committedRef.current.trim();
+      finalRef.current = "";
+      interimRef.current = "";
+      slotsRef.current = [];
+      committedRef.current = "";
+      setHeard("");
+      if (!all) {
         setState("idle");
-        setMessage("That was too quiet. Tap and speak again.");
         return;
       }
-      await send(blob);
+      setState("idle");
+      setMessage(null);
+      emit(all);
+      return;
     }
-  }, [emit, heard, send, teardown]);
+    mediaRef.current = null;
+    setState("idle");
+  }, [emit, heard, flushSegment, teardown]);
+
   stopRef.current = () => { void stop(); };
 
 
@@ -302,12 +371,14 @@ export function useVoice(onText: (text: string) => void) {
     slotsRef.current = [];
     committedRef.current = "";
     const m = teardown();
+    mediaRef.current = null;
     if (m) {
       m.stream.getTracks().forEach((t) => t.stop());
       m.node.disconnect();
       m.source.disconnect();
       m.ctx.close().catch(() => {});
     }
+
     finalRef.current = "";
     interimRef.current = "";
     setHeard("");
