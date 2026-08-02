@@ -4,6 +4,8 @@ import { Home, ChevronUp, ChevronDown, Check, Sparkles, LayoutGrid } from "lucid
 import { StarField } from "@/components/star-field";
 import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
+import { AskBox } from "@/components/ask-box";
+
 
 
 import { LanguageSwitcher } from "@/components/language-switcher";
