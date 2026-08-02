@@ -6,6 +6,7 @@ import { BackButton } from "@/components/back-button";
 import { AIInterpretation } from "@/components/ai-interpretation";
 import { UniversalInput } from "@/components/universal-input";
 import { ModuleRemedies } from "@/components/module-remedies";
+import { CalculationPanel } from "@/components/calculation-panel";
 
 
 
@@ -83,6 +84,7 @@ export function PageShell({
   hideAI,
   hideVoice,
   hideRemedies,
+  hideCalc,
 }: {
 
 
@@ -102,6 +104,8 @@ export function PageShell({
   hideVoice?: boolean;
   /** Set to true on utility pages to hide the planetary remedies panel. */
   hideRemedies?: boolean;
+  /** Set to true to hide the calculation-steps panel. */
+  hideCalc?: boolean;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   // This page already shows its own Back button, so hide the global floating one.
@@ -141,6 +145,8 @@ export function PageShell({
         ) : (
           <UniversalInput module={aiModule ?? title}>{children}</UniversalInput>
         )}
+
+        {!(hideCalc ?? hideAI) && <CalculationPanel module={aiModule ?? title} />}
 
         {!hideAI && (
           <AIInterpretation

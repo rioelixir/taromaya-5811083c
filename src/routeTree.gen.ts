@@ -40,6 +40,7 @@ import { Route as KaalsarpRouteImport } from './routes/kaalsarp'
 import { Route as HoroscopeRouteImport } from './routes/horoscope'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as HebrewTarotRouteImport } from './routes/hebrew-tarot'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as FestivalsRouteImport } from './routes/festivals'
@@ -235,6 +236,11 @@ const HistoryRoute = HistoryRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HebrewTarotRoute = HebrewTarotRouteImport.update({
+  id: '/hebrew-tarot',
+  path: '/hebrew-tarot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/hebrew-tarot': typeof HebrewTarotRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -540,6 +547,7 @@ export interface FileRoutesByTo {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/hebrew-tarot': typeof HebrewTarotRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -615,6 +623,7 @@ export interface FileRoutesById {
   '/festivals': typeof FestivalsRoute
   '/finance': typeof FinanceRoute
   '/health': typeof HealthRoute
+  '/hebrew-tarot': typeof HebrewTarotRoute
   '/help': typeof HelpRoute
   '/history': typeof HistoryRoute
   '/horoscope': typeof HoroscopeRoute
@@ -690,6 +699,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/hebrew-tarot'
     | '/help'
     | '/history'
     | '/horoscope'
@@ -763,6 +773,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/hebrew-tarot'
     | '/help'
     | '/history'
     | '/horoscope'
@@ -837,6 +848,7 @@ export interface FileRouteTypes {
     | '/festivals'
     | '/finance'
     | '/health'
+    | '/hebrew-tarot'
     | '/help'
     | '/history'
     | '/horoscope'
@@ -912,6 +924,7 @@ export interface RootRouteChildren {
   FestivalsRoute: typeof FestivalsRoute
   FinanceRoute: typeof FinanceRoute
   HealthRoute: typeof HealthRoute
+  HebrewTarotRoute: typeof HebrewTarotRoute
   HelpRoute: typeof HelpRoute
   HistoryRoute: typeof HistoryRoute
   HoroscopeRoute: typeof HoroscopeRoute
@@ -1172,6 +1185,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hebrew-tarot': {
+      id: '/hebrew-tarot'
+      path: '/hebrew-tarot'
+      fullPath: '/hebrew-tarot'
+      preLoaderRoute: typeof HebrewTarotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -1523,6 +1543,7 @@ const rootRouteChildren: RootRouteChildren = {
   FestivalsRoute: FestivalsRoute,
   FinanceRoute: FinanceRoute,
   HealthRoute: HealthRoute,
+  HebrewTarotRoute: HebrewTarotRoute,
   HelpRoute: HelpRoute,
   HistoryRoute: HistoryRoute,
   HoroscopeRoute: HoroscopeRoute,
