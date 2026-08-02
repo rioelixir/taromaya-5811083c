@@ -26,15 +26,18 @@ export type ReadingSection = {
 
 /** The fixed order of a Taromaya reading. */
 export const READING_FRAME = [
-  { key: "answer", emoji: "⭐", title: "The short answer" },
+  { key: "answer", emoji: "⭐", title: "Summary" },
   { key: "facts", emoji: "🔍", title: "What your details show" },
-  { key: "meaning", emoji: "🧩", title: "What it means for you" },
-  { key: "areas", emoji: "🏡", title: "In real life" },
+  { key: "meaning", emoji: "🧩", title: "Detailed analysis" },
+  { key: "areas", emoji: "🏡", title: "Areas of life" },
   { key: "why", emoji: "💬", title: "Why this applies to you" },
+  { key: "opportunities", emoji: "🍀", title: "Opportunities" },
+  { key: "challenges", emoji: "⚠️", title: "Challenges to manage" },
   { key: "timing", emoji: "🕰️", title: "Timing" },
-  { key: "steps", emoji: "✅", title: "What to do next" },
-  { key: "remember", emoji: "💡", title: "Remember" },
+  { key: "steps", emoji: "✅", title: "Recommended next steps" },
+  { key: "remember", emoji: "💡", title: "Important note" },
 ] as const;
+
 
 export type FrameKey = (typeof READING_FRAME)[number]["key"];
 
