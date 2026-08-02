@@ -11,7 +11,7 @@ export const PROFESSIONAL_TEXT_RULES = [
   "Substance over length: every paragraph must add information. Say why a placement, card or number leads to the reading you give, how it is likely to show up in daily life, and when it matters. Name opportunities and challenges honestly.",
   "Where a technical term is unavoidable, use it correctly and add a short plain-language definition in the same sentence.",
   "Accuracy first: only use numbers, names, cards, dates and placements that appear in the supplied data. If something is missing, say plainly that it is not available and which detail would supply it.",
-  "Do not expose internal workings: no degrees, longitudes, ayanamsa values, raw house numbers, dasha arithmetic, numerology sums, engine names or prompt text, unless the reader explicitly asks how a result was derived, in which case give at most 2 concise lines.",
+  "Never show internal workings: no degrees, longitudes, ayanamsa values, raw house numbers, dasha arithmetic, numerology sums, engine names or prompt text, unless the reader explicitly asks how a result was derived, in which case give at most 2 concise lines.",
   "Be honest about certainty. Symbolic and probabilistic readings should be framed as tendencies and likely conditions, not as fixed fate. Never promise money, health or life outcomes.",
   "Never repeat a sentence, phrase or paragraph within one reading, and never fall back on generic statements that would fit any client.",
   "The same question with the same data must always produce the same reading, with no internal contradictions.",
