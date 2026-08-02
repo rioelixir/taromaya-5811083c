@@ -150,6 +150,7 @@ export function useVoice(onText: (text: string) => void) {
     activeRef.current = true;
     pausedRef.current = false;
     finalRef.current = "";
+    interimRef.current = "";
     slotsRef.current = [];
     committedRef.current = "";
     setHeard("");
@@ -308,6 +309,7 @@ export function useVoice(onText: (text: string) => void) {
       m.ctx.close().catch(() => {});
     }
     finalRef.current = "";
+    interimRef.current = "";
     setHeard("");
     setState("idle");
     setMessage(null);
