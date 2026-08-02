@@ -3,6 +3,7 @@
 
 import type { KundliChart, PlanetName, Planet } from "./vedic";
 import { RASHIS } from "./vedic";
+import { detectClassicalYogas } from "./yogas-classical";
 
 // ─────────────────────────────────────────────────────────────
 // Divisional charts (Varga)
