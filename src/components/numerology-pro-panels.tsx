@@ -6,7 +6,7 @@ import {
   type NameSystem,
 } from "@/lib/name-numerology-pro";
 import {
-  birthNumbers, dashaAt, mahadashaTimeline, subPeriods, personalCycles,
+  birthNumbers, dashaAt, mahadashaTimeline, personalCycles,
   predictForDate, multiYearForecast, currentGrid, practicalGuidance,
   NUMBER_PLANET, GRID_ORDER, type Period,
 } from "@/lib/numerology-dasha";
@@ -172,7 +172,31 @@ function PeriodCard({ p, label }: { p: Period; label: string }) {
   );
 }
 
+type DashaTab = "maha" | "antar" | "pratyantar" | "personal" | "date" | "forecast";
+const DASHA_TAB_LABEL: Record<DashaTab, string> = {
+  maha: "Mahadasha",
+  antar: "Antardasha",
+  pratyantar: "Pratyantar Dasha",
+  personal: "Personal year",
+  date: "Any date",
+  forecast: "Forecast",
+};
+
+function LadderRows({ rows, prefix }: { rows: Period[]; prefix?: string }) {
+  return (
+    <div className="space-y-1">
+      {rows.map((p) => (
+        <div key={p.start.toISOString()} className="flex flex-wrap justify-between gap-2 border-b border-white/5 py-2 text-base last:border-0">
+          <span className="text-pearl">{prefix ? `${prefix} / ${p.lord}` : `Number ${p.lord} — ${p.planet}`}</span>
+          <span className="text-muted-foreground">{fmt(p.start)} to {fmt(p.end)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function DashaPanel({ birthDate }: { birthDate: string }) {
+  const [sub, setSub] = useState<DashaTab>("maha");
   const [queryDate, setQueryDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [fromYear, setFromYear] = useState(() => new Date().getFullYear());
   const [span, setSpan] = useState(10);
@@ -195,105 +219,135 @@ export function DashaPanel({ birthDate }: { birthDate: string }) {
 
   return (
     <div className="space-y-6">
-      <GlassCard>
-        <Head
-          title="Running periods today"
-          note="Number periods run in the order 1 to 9 from your birth day number. Each number rules as many years as itself, so one full round is 45 years."
-        />
-        {now ? (
-          <div className="grid gap-3 md:grid-cols-3">
-            <PeriodCard p={now.maha} label="Mahadasha" />
-            <PeriodCard p={now.antar} label="Antardasha" />
-            <PeriodCard p={now.pratyantar} label="Pratyantar Dasha" />
+      <div className="flex flex-wrap gap-2">
+        {(Object.keys(DASHA_TAB_LABEL) as DashaTab[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => setSub(t)}
+            className={`min-h-[44px] rounded-full px-4 py-2 text-xs uppercase tracking-widest ${
+              sub === t ? "gold-border bg-gold/15 text-pearl" : "border border-white/10 text-muted-foreground"
+            }`}
+          >
+            {DASHA_TAB_LABEL[t]}
+          </button>
+        ))}
+      </div>
+
+      {sub === "maha" && (
+        <>
+          <GlassCard>
+            <Head
+              title="Running Mahadasha"
+              note="Number periods run in the order 1 to 9 from your birth day number. Each number rules as many years as itself, so one full round is 45 years."
+            />
+            {now ? <PeriodCard p={now.maha} label="Mahadasha" />
+              : <p className="text-base text-muted-foreground">The ladder does not cover today's date.</p>}
+          </GlassCard>
+          <GlassCard>
+            <Head title="Whole life timeline" note="Every major period from birth, in order, with its start and end date." />
+            <LadderRows rows={ladder} />
+          </GlassCard>
+        </>
+      )}
+
+      {sub === "antar" && (
+        <>
+          <GlassCard>
+            <Head title="Running Antardasha" note="The sub-period inside the running major period." />
+            {now ? <PeriodCard p={now.antar} label="Antardasha" />
+              : <p className="text-base text-muted-foreground">The ladder does not cover today's date.</p>}
+          </GlassCard>
+          {now && (
+            <GlassCard>
+              <Head title="All Antardashas of the running Mahadasha" />
+              <LadderRows rows={now.antarList} prefix={String(now.maha.lord)} />
+            </GlassCard>
+          )}
+        </>
+      )}
+
+      {sub === "pratyantar" && (
+        <>
+          <GlassCard>
+            <Head title="Running Pratyantar Dasha" note="The fine period inside the running sub-period." />
+            {now ? <PeriodCard p={now.pratyantar} label="Pratyantar Dasha" />
+              : <p className="text-base text-muted-foreground">The ladder does not cover today's date.</p>}
+          </GlassCard>
+          {now && (
+            <GlassCard>
+              <Head title="All Pratyantar periods of the running Antardasha" />
+              <LadderRows rows={now.pratyantarList} prefix={`${now.maha.lord} / ${now.antar.lord}`} />
+            </GlassCard>
+          )}
+        </>
+      )}
+
+      {sub === "personal" && (
+        <GlassCard>
+          <Head title="Personal year, month and day" />
+          <Row k="Personal year" v={cycles.personalYear} />
+          <Row k="Personal month" v={cycles.personalMonth} />
+          <Row k="Personal day" v={cycles.personalDay} />
+          <Row k="Universal year" v={cycles.universalYear} />
+          <p className="mt-3 text-base text-pearl">{cycles.theme}</p>
+          <div className="mt-3 space-y-1 text-base text-pearl">
+            <p><span className="text-gold">Career. </span>{cycles.career}</p>
+            <p><span className="text-gold">Money. </span>{cycles.money}</p>
+            <p><span className="text-gold">Health. </span>{cycles.health}</p>
+            <p><span className="text-gold">Relationships. </span>{cycles.relationship}</p>
           </div>
-        ) : <p className="text-base text-muted-foreground">The ladder does not cover today's date.</p>}
-      </GlassCard>
+        </GlassCard>
+      )}
 
-      <GlassCard>
-        <Head title="Personal year, month and day" />
-        <Row k="Personal year" v={cycles.personalYear} />
-        <Row k="Personal month" v={cycles.personalMonth} />
-        <Row k="Personal day" v={cycles.personalDay} />
-        <Row k="Universal year" v={cycles.universalYear} />
-        <p className="mt-3 text-base text-pearl">{cycles.theme}</p>
-        <div className="mt-3 space-y-1 text-base text-pearl">
-          <p><span className="text-gold">Career. </span>{cycles.career}</p>
-          <p><span className="text-gold">Money. </span>{cycles.money}</p>
-          <p><span className="text-gold">Health. </span>{cycles.health}</p>
-          <p><span className="text-gold">Relationships. </span>{cycles.relationship}</p>
-        </div>
-      </GlassCard>
+      {sub === "date" && (
+        <GlassCard>
+          <Head title="Any date prediction" note="Pick any past or future date to see the periods and the personal year that were or will be active." />
+          <input
+            type="date"
+            value={queryDate}
+            onChange={(e) => setQueryDate(e.target.value)}
+            className="min-h-[44px] w-full rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl"
+          />
+          <p className="mt-3 text-base text-pearl">{prediction.summary}</p>
+          {prediction.maha && (
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              <PeriodCard p={prediction.maha} label="Mahadasha" />
+              <PeriodCard p={prediction.antar!} label="Antardasha" />
+              <PeriodCard p={prediction.pratyantar!} label="Pratyantar Dasha" />
+            </div>
+          )}
+        </GlassCard>
+      )}
 
-      <GlassCard>
-        <Head title="Any date prediction" note="Pick any past or future date to see the periods and the personal year that were or will be active." />
-        <input
-          type="date"
-          value={queryDate}
-          onChange={(e) => setQueryDate(e.target.value)}
-          className="min-h-[44px] w-full rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl"
-        />
-        <p className="mt-3 text-base text-pearl">{prediction.summary}</p>
-        {prediction.maha && (
-          <div className="mt-3 grid gap-3 md:grid-cols-3">
-            <PeriodCard p={prediction.maha} label="Mahadasha" />
-            <PeriodCard p={prediction.antar!} label="Antardasha" />
-            <PeriodCard p={prediction.pratyantar!} label="Pratyantar Dasha" />
+      {sub === "forecast" && (
+        <GlassCard>
+          <Head title="Multi-year forecast" />
+          <div className="mb-3 flex flex-wrap gap-3">
+            <label className="text-base text-muted-foreground">
+              From year
+              <input type="number" value={fromYear} onChange={(e) => setFromYear(Number(e.target.value) || fromYear)}
+                className="ml-2 min-h-[44px] w-28 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl" />
+            </label>
+            <label className="text-base text-muted-foreground">
+              Years
+              <input type="number" min={1} max={40} value={span} onChange={(e) => setSpan(Math.min(40, Math.max(1, Number(e.target.value) || 10)))}
+                className="ml-2 min-h-[44px] w-24 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl" />
+            </label>
           </div>
-        )}
-      </GlassCard>
-
-      <GlassCard>
-        <Head title="Multi-year forecast" />
-        <div className="mb-3 flex flex-wrap gap-3">
-          <label className="text-base text-muted-foreground">
-            From year
-            <input type="number" value={fromYear} onChange={(e) => setFromYear(Number(e.target.value) || fromYear)}
-              className="ml-2 min-h-[44px] w-28 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl" />
-          </label>
-          <label className="text-base text-muted-foreground">
-            Years
-            <input type="number" min={1} max={40} value={span} onChange={(e) => setSpan(Math.min(40, Math.max(1, Number(e.target.value) || 10)))}
-              className="ml-2 min-h-[44px] w-24 rounded-xl border border-white/10 bg-transparent px-3 text-base text-pearl" />
-          </label>
-        </div>
-        <div className="space-y-2">
-          {forecast.map((r) => (
-            <div key={r.year} className="rounded-xl border border-white/10 p-3">
-              <p className="text-base text-pearl">{r.year} — personal year {r.personalYear}, major {r.mahaLord}, sub {r.antarLord}, fine {r.pratyantarLord}</p>
-              <p className="text-sm text-muted-foreground">{r.headline}</p>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-
-      <GlassCard>
-        <Head title="Whole life timeline" note="Every major period from birth, in order, with its start and end date." />
-        <div className="space-y-1">
-          {ladder.map((p) => (
-            <div key={p.start.toISOString()} className="flex flex-wrap justify-between gap-2 border-b border-white/5 py-2 text-base last:border-0">
-              <span className="text-pearl">Number {p.lord} — {p.planet}</span>
-              <span className="text-muted-foreground">{fmt(p.start)} to {fmt(p.end)}</span>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-
-      <GlassCard>
-        <Head title="Sub-period breakdown of the running major period" />
-        {now && (
-          <div className="space-y-1">
-            {subPeriods(now.maha, "antar").map((p) => (
-              <div key={p.start.toISOString()} className="flex flex-wrap justify-between gap-2 border-b border-white/5 py-2 text-base last:border-0">
-                <span className="text-pearl">{now.maha.lord} / {p.lord}</span>
-                <span className="text-muted-foreground">{fmt(p.start)} to {fmt(p.end)}</span>
+          <div className="space-y-2">
+            {forecast.map((r) => (
+              <div key={r.year} className="rounded-xl border border-white/10 p-3">
+                <p className="text-base text-pearl">{r.year} — personal year {r.personalYear}, major {r.mahaLord}, sub {r.antarLord}, fine {r.pratyantarLord}</p>
+                <p className="text-sm text-muted-foreground">{r.headline}</p>
               </div>
             ))}
           </div>
-        )}
-      </GlassCard>
+        </GlassCard>
+      )}
     </div>
   );
 }
+
 
 // ── Current grid ────────────────────────────────────────────────────────────
 
