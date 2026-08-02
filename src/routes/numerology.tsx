@@ -36,11 +36,17 @@ export const Route = createFileRoute("/numerology")({
 });
 
 
-type Tab = "report" | "personal" | "vedic" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
+type Tab = "report" | "personal" | "vedic" | "namechart" | "dasha" | "currentgrid" | "guidance" | "hebrew" | "profiles" | "timeline" | "loshu" | "chinese" | "kabbalah" | "essence" | "name" | "mobile" | "compat";
 const TAB_LABEL: Record<Tab, string> = {
   report: "Full Report",
   personal: "Personal",
   vedic: "Vedic",
+  namechart: "Name chart",
+  dasha: "Periods",
+  currentgrid: "Current grid",
+  guidance: "Decisions",
+  hebrew: "Hebrew and tarot",
+  profiles: "Profiles",
   timeline: "Timeline",
   loshu: "Lo Shu",
   chinese: "Nine Star Ki",
@@ -50,6 +56,7 @@ const TAB_LABEL: Record<Tab, string> = {
   mobile: "Mobile",
   compat: "Kundli Matching",
 };
+
 
 
 function FullReportTab({
