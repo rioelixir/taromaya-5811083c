@@ -63,6 +63,8 @@ const CATALOG: Group[] = [
       { to: "/horoscope", label: "Daily horoscope", icon: Sun },
       { to: "/compatibility", label: "Kundli matching", icon: Heart },
       { to: "/numerology", label: "Numerology", icon: Hash },
+      { to: "/nadi", label: "Nadi astrology", icon: Hash },
+
       { to: "/calculators", label: "Calculators", icon: Hash },
       { to: "/baby-names", label: "Baby names", icon: Baby },
       { to: "/festivals", label: "Festival calendar", icon: Flame },
