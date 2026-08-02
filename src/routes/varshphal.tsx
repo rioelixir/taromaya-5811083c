@@ -181,6 +181,7 @@ function VarshphalView({ v }: { v: VarshphalChart }) {
       </GlassCard>
 
       <TajikaDeepPanel v={v} />
+      <YearDepthPanel v={v} />
     </div>
   );
 }
@@ -406,6 +407,142 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
         {icon}{label}
       </div>
       <div className="mt-1 font-display text-lg text-pearl">{value}</div>
+    </div>
+  );
+}
+
+function fmtDay(d: Date): string {
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function PeriodTable({ periods, title, note }: { periods: AnnualPeriod[]; title: string; note: string }) {
+  const running = currentPeriod(periods);
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-2 mb-1">
+        <Timer className="w-4 h-4 text-gold" />
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">{title}</div>
+      </div>
+      <p className="text-sm text-pearl/80 mb-3">{note}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            <tr>
+              <th className="text-left py-2">Ruler</th>
+              <th className="text-left">From</th>
+              <th className="text-left">To</th>
+              <th className="text-left">Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            {periods.map((p, i) => {
+              const live = running?.lord === p.lord && running?.start.getTime() === p.start.getTime();
+              return (
+                <tr key={i} className={`border-t border-white/5 ${live ? "bg-gold/10" : ""}`}>
+                  <td className="py-2 text-pearl">
+                    {p.lord}
+                    {live && <span className="ml-2 text-[10px] uppercase tracking-widest text-gold">Running now</span>}
+                  </td>
+                  <td className="text-muted-foreground">{fmtDay(p.start)}</td>
+                  <td className="text-muted-foreground">{fmtDay(p.end)}</td>
+                  <td className="text-pearl/80">{p.days}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </GlassCard>
+  );
+}
+
+function YearDepthPanel({ v }: { v: VarshphalChart }) {
+  const bala = useMemo(() => computePanchavargeeyaBala(v.chart), [v]);
+  const patyayini = useMemo(() => computePatyayiniDasha(v.chart, v.returnUTC), [v]);
+  const mudda = useMemo(() => computeMuddaDasha(v.chart, v.returnUTC), [v]);
+  const summary = useMemo(
+    () => summariseYear(v.chart, v.muntha.house, v.varshesh, bala),
+    [v, bala],
+  );
+  const sorted = [...bala].sort((a, b) => b.vishwa - a.vishwa);
+
+  return (
+    <div className="space-y-6">
+      <GlassCard>
+        <div className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
+          What this year is about
+        </div>
+        <p className="font-display text-xl text-pearl">{summary.theme}</p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-emerald-300/80 mb-2">Working in your favour</div>
+            <ul className="space-y-2">
+              {summary.supports.map((line, i) => (
+                <li key={i} className="text-sm text-pearl/85 leading-relaxed">{line}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-amber-300/80 mb-2">Needs care</div>
+            <ul className="space-y-2">
+              {summary.cautions.map((line, i) => (
+                <li key={i} className="text-sm text-pearl/85 leading-relaxed">{line}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </GlassCard>
+
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-1">
+          <Gauge className="w-4 h-4 text-gold" />
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Panchavargeeya Bala · five-fold annual strength
+          </div>
+        </div>
+        <p className="text-sm text-pearl/80 mb-4">
+          Each planet is scored on sign dignity, distance from its exaltation point, term lord,
+          decan lord and ninth-part lord. The five scores are combined and reduced to Vishwa
+          points out of twenty, which is how Tajika ranks the year's usable strength.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {sorted.map((b) => (
+            <div key={b.planet} className="rounded-xl border border-white/10 p-3">
+              <div className="flex items-center gap-2">
+                <span className="text-pearl font-medium">{PLANET_SHORT[b.planet]} {b.planet}</span>
+                <span className="ml-auto text-sm text-gold">{b.vishwa}/20</span>
+              </div>
+              <div className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{b.grade}</div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-gold to-gold-soft"
+                  style={{ width: `${Math.min(100, (b.vishwa / 20) * 100)}%` }} />
+              </div>
+              <ul className="mt-2 space-y-1">
+                {b.components.map((cp, i) => (
+                  <li key={i} className="text-[11px] text-muted-foreground">
+                    <span className="text-pearl/85">{cp.label}</span>
+                    <span className="float-right">{cp.points} / {cp.max}</span>
+                    <div className="clear-both text-[10px]">{cp.note}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PeriodTable
+          periods={mudda}
+          title="Mudda Dasha · the year month by month"
+          note="The Vimshottari order compressed into this one solar year, starting from the lord of the Moon's star in the annual chart."
+        />
+        <PeriodTable
+          periods={patyayini}
+          title="Patyayini Dasha · degree-based division"
+          note="The year split by the degrees each planet and the annual ascendant have travelled inside their sign, weighted by annual strength."
+        />
+      </div>
     </div>
   );
 }
