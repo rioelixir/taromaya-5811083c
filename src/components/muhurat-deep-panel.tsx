@@ -3,6 +3,7 @@ import { GlassCard } from "@/components/page-shell";
 import { computeMuhuratDeep, CHOGH_META, type ChoghSlot } from "@/lib/muhurat-deep";
 import { HORA_NATURE, type HoraSlot } from "@/lib/hora";
 import { Sun, Moon, Clock, Sparkles } from "lucide-react";
+import { DataTable, type Column } from "@/components/data-table";
 
 function fmt(d: Date | null) {
   return d ? d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "—";
@@ -62,68 +63,66 @@ export function MuhuratDeepPanel({ date, lat, lon }: { date: string; lat: number
   );
 }
 
+const choghColumns: Column<ChoghSlot>[] = [
+  { header: "Name", cell: (s: ChoghSlot) => <span>{s.name}</span> },
+  { header: "Lord", cell: (s: ChoghSlot) => <span className="opacity-80">{CHOGH_META[s.name].lord}</span> },
+  { header: "Time", cell: (s: ChoghSlot) => <span className="font-mono text-pearl">{fmt(s.from)} – {fmt(s.to)}</span> },
+  { header: "Best for", cell: (s: ChoghSlot) => <span className="opacity-80">{CHOGH_META[s.name].best}</span> },
+];
+
 function ChoghGrid({ slots, currentFrom }: { slots: ChoghSlot[]; currentFrom?: number }) {
   const day = slots.filter(s => s.isDay);
   const night = slots.filter(s => !s.isDay);
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-xs">
       <Section icon={<Sun className="h-3 w-3 text-gold" />} label="Day">
-        {day.map((c, i) => (
-          <ChoghCell key={i} slot={c} active={c.from.getTime() === currentFrom} />
-        ))}
+        <DataTable
+          columns={choghColumns}
+          rows={day}
+          rowKey={(s: ChoghSlot, i: number) => i}
+          rowClassName={(s: ChoghSlot) => `${natureColor(s.nature)} ${s.from.getTime() === currentFrom ? "ring-1 ring-gold/60" : ""}`}
+        />
       </Section>
       <Section icon={<Moon className="h-3 w-3 text-gold" />} label="Night">
-        {night.map((c, i) => (
-          <ChoghCell key={i} slot={c} active={c.from.getTime() === currentFrom} />
-        ))}
+        <DataTable
+          columns={choghColumns}
+          rows={night}
+          rowKey={(s: ChoghSlot, i: number) => i}
+          rowClassName={(s: ChoghSlot) => `${natureColor(s.nature)} ${s.from.getTime() === currentFrom ? "ring-1 ring-gold/60" : ""}`}
+        />
       </Section>
     </div>
   );
 }
 
-function ChoghCell({ slot, active }: { slot: ChoghSlot; active?: boolean }) {
-  const meta = CHOGH_META[slot.name];
-  return (
-    <div className={`rounded-xl border p-3 text-left transition ${natureColor(slot.nature)} ${active ? "ring-1 ring-gold/60 shadow-[0_0_25px_-10px_var(--gold)]" : ""}`}>
-      <div className="flex items-center justify-between text-[10px] uppercase tracking-widest opacity-80">
-        <span>{slot.name}</span>
-        <span>{meta.lord}</span>
-      </div>
-      <div className="mt-1 font-mono text-sm text-pearl">
-        {fmt(slot.from)} – {fmt(slot.to)}
-      </div>
-      <div className="mt-1 text-[10px] opacity-80 line-clamp-2">{meta.best}</div>
-    </div>
-  );
-}
+const horaColumns: Column<HoraSlot>[] = [
+  { header: "Lord", cell: (s: HoraSlot) => <span>{s.lord}</span> },
+  { header: "#", cell: (s: HoraSlot) => <span className="opacity-80">{s.index}</span> },
+  { header: "Time", cell: (s: HoraSlot) => <span className="font-mono text-pearl">{fmt(s.from)} – {fmt(s.to)}</span> },
+  { header: "Best for", cell: (s: HoraSlot) => <span className="opacity-80">{HORA_NATURE[s.lord].best}</span> },
+];
 
 function HoraGrid({ slots, currentFrom }: { slots: HoraSlot[]; currentFrom?: number }) {
   const day = slots.filter(s => s.isDay);
   const night = slots.filter(s => !s.isDay);
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-xs">
       <Section icon={<Sun className="h-3 w-3 text-gold" />} label="Day">
-        {day.map((h) => <HoraCell key={h.index} slot={h} active={h.from.getTime() === currentFrom} />)}
+        <DataTable
+          columns={horaColumns}
+          rows={day}
+          rowKey={(s: HoraSlot) => s.index}
+          rowClassName={(s: HoraSlot) => `${horaColor(s.nature)} ${s.from.getTime() === currentFrom ? "ring-1 ring-gold/60" : ""}`}
+        />
       </Section>
       <Section icon={<Moon className="h-3 w-3 text-gold" />} label="Night">
-        {night.map((h) => <HoraCell key={h.index} slot={h} active={h.from.getTime() === currentFrom} />)}
+        <DataTable
+          columns={horaColumns}
+          rows={night}
+          rowKey={(s: HoraSlot) => s.index}
+          rowClassName={(s: HoraSlot) => `${horaColor(s.nature)} ${s.from.getTime() === currentFrom ? "ring-1 ring-gold/60" : ""}`}
+        />
       </Section>
-    </div>
-  );
-}
-
-function HoraCell({ slot, active }: { slot: HoraSlot; active?: boolean }) {
-  const meta = HORA_NATURE[slot.lord];
-  return (
-    <div className={`rounded-xl border p-3 ${horaColor(slot.nature)} ${active ? "ring-1 ring-gold/60 shadow-[0_0_25px_-10px_var(--gold)]" : ""}`}>
-      <div className="flex items-center justify-between text-[10px] uppercase tracking-widest opacity-80">
-        <span>{slot.lord}</span>
-        <span>#{slot.index}</span>
-      </div>
-      <div className="mt-1 font-mono text-sm text-pearl">
-        {fmt(slot.from)} – {fmt(slot.to)}
-      </div>
-      <div className="mt-1 text-[10px] opacity-80 line-clamp-2">{meta.best}</div>
     </div>
   );
 }
@@ -134,7 +133,7 @@ function Section({ icon, label, children }: { icon: React.ReactNode; label: stri
       <div className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">
         {icon} {label} <Clock className="h-3 w-3 opacity-50" />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{children}</div>
+      <div>{children}</div>
     </div>
   );
 }

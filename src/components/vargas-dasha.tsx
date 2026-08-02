@@ -7,6 +7,7 @@ import { NorthIndianChart, SouthIndianChart } from "@/components/rashi-chart";
 import { dashaNarrative, vargaNarrative } from "@/lib/vedic-narrative";
 import { computeVimshottari, computeAshtottari, computeYogini, type DashaTree, type MahaPeriod, type AntarPeriod, type DashaPeriod } from "@/lib/vedic-extended";
 import { computeChara, computeNarayana, computeKalachakra } from "@/lib/dasha-sign";
+import { DataTable, type Column } from "@/components/data-table";
 
 type NP = {
   name: string;
@@ -111,15 +112,14 @@ function fmt(d: Date) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
 }
 
-function PratRow({ p, now }: { p: DashaPeriod; now: Date }) {
-  const active = now >= p.start && now < p.end;
-  return (
-    <div className={`flex items-center justify-between gap-2 rounded px-2 py-0.5 font-mono text-[11px] ${active ? "bg-primary/15 text-primary" : ""}`}>
-      <span>{p.lord}</span>
-      <span className="text-right text-muted-foreground">{fmt(p.start)} → {fmt(p.end)}</span>
-    </div>
-  );
-}
+const pratColumns: Column<DashaPeriod>[] = [
+  { header: "Lord", cell: (p: DashaPeriod) => p.lord },
+  {
+    header: "Period",
+    align: "right",
+    cell: (p: DashaPeriod) => <span className="text-muted-foreground">{fmt(p.start)} → {fmt(p.end)}</span>,
+  },
+];
 
 function AntarRow({ a, now, isOpen, onToggle }: { a: AntarPeriod; now: Date; isOpen: boolean; onToggle: () => void }) {
   const active = now >= a.start && now < a.end;
@@ -129,9 +129,16 @@ function AntarRow({ a, now, isOpen, onToggle }: { a: AntarPeriod; now: Date; isO
         <span>{isOpen ? "▾" : "▸"} {a.lord} <span className="text-muted-foreground">antar</span></span>
         <span className="text-muted-foreground">{fmt(a.start)} → {fmt(a.end)}</span>
       </button>
-      {isOpen && <div className="space-y-0.5 border-t border-border/20 px-3 py-2">
-        {a.pratyantar.map((p) => <PratRow key={p.lord + p.start.getTime()} p={p} now={now} />)}
-      </div>}
+      {isOpen && (
+        <div className="border-t border-border/20 px-3 py-2 font-mono text-[11px]">
+          <DataTable
+            columns={pratColumns}
+            rows={a.pratyantar}
+            rowKey={(p: DashaPeriod) => p.lord + p.start.getTime()}
+            rowClassName={(p: DashaPeriod) => (now >= p.start && now < p.end ? "bg-primary/15 text-primary" : "")}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,20 +1,30 @@
 import { useMemo } from "react";
 import { GlassCard } from "@/components/page-shell";
+import { DataTable, type Column } from "@/components/data-table";
 import { computeNumerology, reduce } from "@/lib/numerology";
 import { mobileRemedyPlan, nameRemedyPlan } from "@/lib/numerology-remedies";
 
+type StepRow = { step: string };
+
+function stepColumns(tone: "pearl" | "warn"): Column<StepRow>[] {
+  return [
+    { header: "#", cell: (_r: StepRow, i: number) => i + 1, className: "text-gold w-8" },
+    {
+      header: "Point",
+      cell: (r: StepRow) => r.step,
+      className: tone === "warn" ? "text-amber-200" : "text-pearl",
+    },
+  ];
+}
+
 function List({ title, items, tone = "pearl" }: { title: string; items: string[]; tone?: "pearl" | "warn" }) {
+  const rows: StepRow[] = items.map((s) => ({ step: s }));
   return (
     <div>
       <div className="text-[11px] uppercase tracking-widest text-muted-foreground">{title}</div>
-      <ul className="mt-2 space-y-2">
-        {items.map((s, i) => (
-          <li key={i} className={`flex gap-2 text-base leading-relaxed ${tone === "warn" ? "text-amber-200" : "text-pearl"}`}>
-            <span className="mt-0.5 text-gold">{i + 1}.</span>
-            <span>{s}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-2">
+        <DataTable columns={stepColumns(tone)} rows={rows} rowKey={(r: StepRow, i: number) => i} />
+      </div>
     </div>
   );
 }
@@ -25,10 +35,27 @@ function maskedDiff(number: string, changedAt: number[]) {
   ));
 }
 
+type MobileCandidate = ReturnType<typeof mobileRemedyPlan> extends infer P
+  ? P extends { candidates: Array<infer C> } ? C : never
+  : never;
+
+type NameOption = ReturnType<typeof nameRemedyPlan> extends infer P
+  ? P extends { better: Array<infer C> } ? C : never
+  : never;
+
 /** Suggested mobile-number changes and how to use them. */
 export function MobileRemedyPanel({ mobile, birthDate }: { mobile: string; birthDate: string }) {
   const plan = useMemo(() => mobileRemedyPlan(mobile, birthDate), [mobile, birthDate]);
   if (!plan) return null;
+
+  const candidateColumns: Column<MobileCandidate>[] = [
+    { header: "Number", cell: (c: MobileCandidate) => <span className="font-mono tracking-widest">{maskedDiff(c.number, c.changedAt)}</span> },
+    { header: "Reduces to", cell: (c: MobileCandidate) => c.reduced, align: "right" },
+    { header: "Digits changed", cell: (c: MobileCandidate) => c.changes, align: "right" },
+    { header: "Fit", cell: (c: MobileCandidate) => `${c.score} / 100`, align: "right" },
+    { header: "Why", cell: (c: MobileCandidate) => c.why, className: "text-pearl" },
+  ];
+
   return (
     <div className="mt-6">
       <GlassCard title="Suggested changes and remedies">
@@ -57,16 +84,8 @@ export function MobileRemedyPanel({ mobile, birthDate }: { mobile: string; birth
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
               Closest numbers that fit (changed digits in gold)
             </div>
-            <div className="mt-2 grid gap-2 md:grid-cols-2">
-              {plan.candidates.map((c) => (
-                <div key={c.number} className="rounded-xl bg-white/5 p-3">
-                  <div className="font-mono text-lg tracking-widest">{maskedDiff(c.number, c.changedAt)}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">
-                    Adds up to {c.reduced} · {c.changes === 1 ? "one digit changed" : `${c.changes} digits changed`} · fit {c.score} out of 100
-                  </div>
-                  <div className="mt-1 text-sm text-pearl">{c.why}</div>
-                </div>
-              ))}
+            <div className="mt-2">
+              <DataTable columns={candidateColumns} rows={plan.candidates} rowKey={(c: MobileCandidate) => c.number} />
             </div>
           </div>
         )}
@@ -95,6 +114,23 @@ export function NameRemedyPanel({ fullName, birthDate }: { fullName: string; bir
     return nameRemedyPlan(fullName, mulank, bhagyank, "Chaldean");
   }, [fullName, birthDate]);
   if (!plan) return null;
+
+  const betterColumns: Column<NameOption>[] = [
+    { header: "Spelling", cell: (o: NameOption) => o.spelling, className: "text-pearl" },
+    { header: "Change", cell: (o: NameOption) => o.change, className: "text-muted-foreground" },
+    { header: "Total → Root", cell: (o: NameOption) => `${o.compound} → ${o.root}`, align: "right" },
+    { header: "Harmony", cell: (o: NameOption) => `${o.score} / 100`, align: "right" },
+    { header: "Note", cell: (o: NameOption) => o.note, className: "text-pearl" },
+  ];
+
+  type AvoidOption = (typeof plan.avoid)[number];
+  const avoidColumns: Column<AvoidOption>[] = [
+    { header: "Spelling", cell: (o: AvoidOption) => o.spelling, className: "text-amber-200" },
+    { header: "Root", cell: (o: AvoidOption) => o.root, align: "right" },
+    { header: "Harmony", cell: (o: AvoidOption) => `${o.score} / 100`, align: "right" },
+  ];
+
+
   return (
     <div className="mt-6">
       <GlassCard title="Name remedies and suggested spellings">
@@ -121,16 +157,8 @@ export function NameRemedyPanel({ fullName, birthDate }: { fullName: string; bir
         {plan.better.length > 0 && (
           <div className="mt-5">
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Better spellings</div>
-            <div className="mt-2 grid gap-2 md:grid-cols-2">
-              {plan.better.map((o) => (
-                <div key={o.spelling} className="rounded-xl bg-white/5 p-3">
-                  <div className="text-lg text-pearl">{o.spelling}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">
-                    {o.compound} → {o.root} · {o.change} · harmony {o.score} out of 100
-                  </div>
-                  <div className="mt-1 text-sm text-pearl">{o.note}</div>
-                </div>
-              ))}
+            <div className="mt-2">
+              <DataTable columns={betterColumns} rows={plan.better} rowKey={(o: NameOption) => o.spelling} />
             </div>
           </div>
         )}
@@ -138,12 +166,8 @@ export function NameRemedyPanel({ fullName, birthDate }: { fullName: string; bir
         {plan.avoid.length > 0 && (
           <div className="mt-4">
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Spellings to avoid</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {plan.avoid.map((o) => (
-                <span key={o.spelling} className="rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1.5 text-sm text-amber-200">
-                  {o.spelling} · {o.root} · harmony {o.score}
-                </span>
-              ))}
+            <div className="mt-2">
+              <DataTable columns={avoidColumns} rows={plan.avoid} rowKey={(o: AvoidOption) => o.spelling} />
             </div>
           </div>
         )}

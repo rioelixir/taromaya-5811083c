@@ -1,6 +1,8 @@
 // Yogas & Doshas scanner with live Sade Sati window projection.
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { DataTable } from "@/components/data-table";
+
 import { detectYogas, detectDoshas, type Yoga, type Dosha } from "@/lib/vedic-extended";
 import { analyseSadeSati } from "@/lib/dosha-windows";
 import type { KundliChart } from "@/lib/vedic";
@@ -56,89 +58,83 @@ export function YogasDoshasPanel({ chart }: { chart: unknown }) {
 
       {tab === "yogas" && (
         <div className="space-y-3">
-          {presentYogas.length === 0 && <div className="text-sm text-muted-foreground">No classical yogas triggered.</div>}
-          <div className="grid gap-2 sm:grid-cols-2">
-            {presentYogas.map((y) => (
-              <div key={y.name} className={`rounded-lg border px-3 py-2 text-xs ${CAT_TONE[y.category]}`}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-medium">{y.name}</span>
-                  <span className="text-[10px] uppercase tracking-wider opacity-70">{y.category}</span>
-                </div>
-                <p className="mt-1 leading-relaxed opacity-90">{y.detail}</p>
-              </div>
-            ))}
-          </div>
+          <DataTable
+            columns={[
+              { header: "Yoga", cell: (y: Yoga) => <span className="font-medium text-pearl">{y.name}</span> },
+              { header: "Category", cell: (y: Yoga) => <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${CAT_TONE[y.category]}`}>{y.category}</span> },
+              { header: "What it means", className: "text-muted-foreground", cell: (y: Yoga) => y.detail },
+            ]}
+            rows={presentYogas}
+            rowKey={(y) => y.name}
+            empty="No classical yogas triggered."
+          />
           {absentYogas.length > 0 && (
             <details className="text-[11px] text-muted-foreground">
               <summary className="cursor-pointer select-none py-1">Show inactive ({absentYogas.length})</summary>
-              <ul className="mt-1 space-y-0.5 pl-2 font-mono">
-                {absentYogas.map((y) => <li key={y.name}>· {y.name}</li>)}
-              </ul>
+              <div className="mt-2">
+                <DataTable
+                  columns={[{ header: "Inactive yoga", cell: (y: Yoga) => y.name }]}
+                  rows={absentYogas}
+                  rowKey={(y) => y.name}
+                />
+              </div>
             </details>
           )}
         </div>
       )}
 
       {tab === "doshas" && (
-        <div className="space-y-2">
-          {doshas.map((d) => (
-            <div
-              key={d.name}
-              className={`rounded-lg border px-3 py-2 text-xs ${d.present && d.severity ? SEV_TONE[d.severity] : "border-border/30 bg-background/20 text-muted-foreground"}`}
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="font-medium">{d.name}</span>
-                <span className="text-[10px] uppercase tracking-wider opacity-70">
+        <DataTable
+          columns={[
+            { header: "Dosha", cell: (d: Dosha) => <span className="font-medium text-pearl">{d.name}</span> },
+            {
+              header: "Status",
+              cell: (d: Dosha) => (
+                <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${d.present && d.severity ? SEV_TONE[d.severity] : "border-border/30 text-muted-foreground"}`}>
                   {d.present ? (d.severity ?? "present") : "clear"}
                 </span>
-              </div>
-              <p className="mt-1 leading-relaxed opacity-90">{d.detail}</p>
-              {d.remedy && <p className="mt-1 text-[11px] italic opacity-80">Remedy — {d.remedy}</p>}
-            </div>
-          ))}
-        </div>
+              ),
+            },
+            { header: "What it means", className: "text-muted-foreground", cell: (d: Dosha) => d.detail },
+            { header: "Remedy", className: "text-primary/80", cell: (d: Dosha) => d.remedy ?? "—" },
+          ]}
+          rows={doshas}
+          rowKey={(d) => d.name}
+        />
       )}
 
       {tab === "sade" && sade && (
         <div className="space-y-3">
-          <div className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Natal Moon</div>
-                <div className="font-mono">{RASHIS[sade.natalMoonSign]}</div>
-              </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Saturn now</div>
-                <div className="font-mono">{RASHIS[sade.currentSaturnSign]}</div>
-              </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Status</div>
-                <div className={`font-mono ${sade.active ? "text-rose-300" : "text-emerald-300"}`}>
-                  {sade.active ? `Active · ${sade.currentPhase}` : "Not currently in Sade Sati"}
-                </div>
-              </div>
-            </div>
-          </div>
+          <DataTable
+            columns={[
+              { header: "Factor", cell: (r: { label: string; value: string; tone?: string }) => r.label },
+              { header: "Value", align: "right", className: "font-mono", cell: (r: { label: string; value: string; tone?: string }) => <span className={r.tone ?? ""}>{r.value}</span> },
+            ]}
+            rows={[
+              { label: "Natal Moon", value: RASHIS[sade.natalMoonSign] },
+              { label: "Saturn now", value: RASHIS[sade.currentSaturnSign] },
+              {
+                label: "Status",
+                value: sade.active ? `Active · ${sade.currentPhase}` : "Not currently in Sade Sati",
+                tone: sade.active ? "text-rose-300" : "text-emerald-300",
+              },
+            ]}
+            rowKey={(r) => r.label}
+          />
 
-          <div className="space-y-2">
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">7½-Year Window</div>
-            {sade.windows.map((w, i) => (
-              <div
-                key={i}
-                className={`grid grid-cols-[80px_1fr_auto] items-center gap-x-3 rounded-lg border px-3 py-2 text-xs ${
-                  w.active
-                    ? "border-rose-400/50 bg-rose-500/10 text-rose-100"
-                    : "border-border/30 bg-background/20"
-                }`}
-              >
-                <span className="font-medium">{w.phase}</span>
-                <span className="font-mono text-[11px]">Saturn in {RASHIS[w.sign]}</span>
-                <span className="text-right font-mono text-[10px] opacity-90">
-                  {fmtDate(w.start)} → {fmtDate(w.end)}
-                </span>
-              </div>
-            ))}
-          </div>
+          <DataTable
+            columns={[
+              { header: "Phase", cell: (w: (typeof sade.windows)[number]) => <span className="font-medium">{w.phase}</span> },
+              { header: "Saturn in", className: "font-mono", cell: (w: (typeof sade.windows)[number]) => RASHIS[w.sign] },
+              { header: "From", className: "font-mono", cell: (w: (typeof sade.windows)[number]) => fmtDate(w.start) },
+              { header: "To", className: "font-mono", cell: (w: (typeof sade.windows)[number]) => fmtDate(w.end) },
+              { header: "Running", cell: (w: (typeof sade.windows)[number]) => (w.active ? <span className="text-rose-300">Now</span> : <span className="text-muted-foreground">—</span>) },
+            ]}
+            rows={sade.windows}
+            rowClassName={(w) => (w.active ? "bg-rose-500/10" : "")}
+            caption="7½-year window"
+          />
+
 
           <div className="text-[10px] leading-relaxed text-muted-foreground">
             Sade Sati spans Saturn's transit through the 12th, natal, and 2nd signs from the Moon —

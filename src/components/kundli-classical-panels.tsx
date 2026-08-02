@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { GlassCard } from "@/components/page-shell";
+import { DataTable, type Column } from "@/components/data-table";
 import { RASHIS, type KundliChart } from "@/lib/vedic";
 import {
   praharOfBirth, compositeFriendship, ascendantReport, sudarshanaChakra,
@@ -7,18 +8,35 @@ import {
 } from "@/lib/kundli-classical";
 
 const KEY = "text-[11px] uppercase tracking-widest text-muted-foreground";
-const VAL = "text-sm text-pearl";
 const TH = "px-2 py-1.5 text-left text-[11px] uppercase tracking-widest text-muted-foreground";
 const TD = "px-2 py-1.5 text-sm text-pearl border-t border-white/5";
 
-function Pair({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="rounded-xl bg-white/5 px-3 py-2">
-      <div className={KEY}>{k}</div>
-      <div className={VAL}>{v}</div>
-    </div>
-  );
+type FieldValue = { field: string; value: string };
+
+const FV_COLUMNS: Column<FieldValue>[] = [
+  { header: "Field", cell: (r: FieldValue) => r.field, className: "text-muted-foreground" },
+  { header: "Value", cell: (r: FieldValue) => r.value, className: "text-pearl" },
+];
+
+function FieldValueTable({ rows }: { rows: FieldValue[] }) {
+  return <DataTable columns={FV_COLUMNS} rows={rows} rowKey={(r) => r.field} />;
 }
+
+type HouseRow = { house: number; sign: string; planets: string[] };
+
+const HOUSE_COLUMNS: Column<HouseRow>[] = [
+  { header: "House", cell: (h: HouseRow) => `${h.house}. ${h.sign}`, className: "text-muted-foreground" },
+  { header: "Planets", cell: (h: HouseRow) => (h.planets.length ? h.planets.join(", ") : "—"), align: "right", className: "text-pearl" },
+];
+
+type AgreementRow = { house: number; verdict: string };
+
+const AGREEMENT_COLUMNS: Column<AgreementRow>[] = [
+  { header: "House", cell: (a: AgreementRow) => String(a.house), className: "text-muted-foreground" },
+  { header: "Verdict", cell: (a: AgreementRow) => a.verdict, className: "text-pearl" },
+];
+
+type SignRow = { index: number; sign: string; letters: string };
 
 const TONE: Record<string, string> = {
   "Adhi Mitra": "text-emerald-300",
@@ -46,28 +64,42 @@ export function KundliClassicalPanels({
   const asc = useMemo(() => ascendantReport(chart), [chart]);
   const sudarshana = useMemo(() => sudarshanaChakra(chart), [chart]);
 
+  const ascRows: FieldValue[] = [
+    { field: "Ascendant", value: `${asc.ascendant} at ${asc.degree.toFixed(2)} degrees` },
+    { field: "Planetary lord", value: asc.planetaryLord },
+    { field: "Symbol", value: asc.symbol },
+    { field: "Element", value: asc.element },
+    { field: "Lucky stone", value: asc.luckyStone },
+    { field: "Alternate stone", value: asc.alternateStone },
+    { field: "Day of fast", value: asc.fastDay },
+    { field: "Presiding deity", value: asc.deity },
+    { field: "Lucky numbers", value: asc.luckyNumbers },
+    { field: "Lucky colours", value: asc.luckyColours },
+    { field: "Rashi Aksha (name letters)", value: asc.akshara },
+  ];
+  if (asc.lordPlacement) {
+    ascRows.push({
+      field: "Lagna lord placement",
+      value: `${asc.lordPlacement.sign}, house ${asc.lordPlacement.house}${asc.lordPlacement.retrograde ? ", retrograde" : ""}`,
+    });
+  }
+
+  const praharRows: FieldValue[] = [
+    { field: "Prahar", value: prahar.name },
+    { field: "Watch number", value: String(prahar.index) },
+    { field: "Part of day", value: prahar.partOfDay === "day" ? "Daytime birth" : "Night birth" },
+  ];
+
+  const signRows: SignRow[] = RASHIS.map((r, i) => ({ index: i, sign: r, letters: RASHI_AKSHARA[i] }));
+  const signColumns: Column<SignRow>[] = [
+    { header: "Sign", cell: (r: SignRow) => `${r.index + 1}. ${r.sign}` },
+    { header: "Name letters", cell: (r: SignRow) => r.letters, align: "right", className: "text-pearl" },
+  ];
+
   return (
     <div className="mt-6 space-y-6">
       <GlassCard title="Ascendant report" desc="The rising sign read as a standing brief: ruler, symbol, temperament and the classical remedial pointers.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <Pair k="Ascendant" v={`${asc.ascendant} at ${asc.degree.toFixed(2)} degrees`} />
-          <Pair k="Planetary lord" v={asc.planetaryLord} />
-          <Pair k="Symbol" v={asc.symbol} />
-          <Pair k="Element" v={asc.element} />
-          <Pair k="Lucky stone" v={asc.luckyStone} />
-          <Pair k="Alternate stone" v={asc.alternateStone} />
-          <Pair k="Day of fast" v={asc.fastDay} />
-          <Pair k="Presiding deity" v={asc.deity} />
-          <Pair k="Lucky numbers" v={asc.luckyNumbers} />
-          <Pair k="Lucky colours" v={asc.luckyColours} />
-          <Pair k="Rashi Aksha (name letters)" v={asc.akshara} />
-          {asc.lordPlacement && (
-            <Pair
-              k="Lagna lord placement"
-              v={`${asc.lordPlacement.sign}, house ${asc.lordPlacement.house}${asc.lordPlacement.retrograde ? ", retrograde" : ""}`}
-            />
-          )}
-        </div>
+        <FieldValueTable rows={ascRows} />
         <p className="mt-3 text-sm text-pearl/90">{asc.characteristics}</p>
         {asc.lordPlacement && (
           <p className="mt-2 text-sm text-pearl/90">
@@ -79,11 +111,7 @@ export function KundliClassicalPanels({
       </GlassCard>
 
       <GlassCard title="Prahar of birth" desc="The watch of the day or night the birth falls in, counted from the local sunrise.">
-        <div className="grid gap-2 sm:grid-cols-3">
-          <Pair k="Prahar" v={prahar.name} />
-          <Pair k="Watch number" v={String(prahar.index)} />
-          <Pair k="Part of day" v={prahar.partOfDay === "day" ? "Daytime birth" : "Night birth"} />
-        </div>
+        <FieldValueTable rows={praharRows} />
         <p className="mt-3 text-sm text-pearl/90">
           The Prahar is used alongside the Nakshatra when selecting name syllables and when judging which planet was
           governing the atmosphere at the moment of birth. A first-watch birth is read as a beginning-of-cycle
@@ -134,27 +162,20 @@ export function KundliClassicalPanels({
 
       <GlassCard title="Sudarshana Chakra" desc="The same planets read from three reference points: the rising sign, the Sun's sign and the Moon's sign.">
         <div className="grid gap-4 lg:grid-cols-3">
-          {[["From the Lagna", sudarshana.lagna], ["From the Sun", sudarshana.surya], ["From the Moon", sudarshana.chandra]].map(([label, wheel]) => (
-            <div key={label as string}>
-              <div className={`${KEY} mb-2`}>{label as string} ({(wheel as typeof sudarshana.lagna).base})</div>
-              <div className="space-y-1">
-                {(wheel as typeof sudarshana.lagna).houses.map((h) => (
-                  <div key={h.house} className="flex items-start justify-between gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs">
-                    <span className="text-muted-foreground">{h.house}. {h.sign}</span>
-                    <span className="text-right text-pearl">{h.planets.length ? h.planets.join(", ") : "—"}</span>
-                  </div>
-                ))}
-              </div>
+          {([["From the Lagna", sudarshana.lagna], ["From the Sun", sudarshana.surya], ["From the Moon", sudarshana.chandra]] as [string, typeof sudarshana.lagna][]).map(([label, wheel]) => (
+            <div key={label}>
+              <div className={`${KEY} mb-2`}>{label} ({wheel.base})</div>
+              <DataTable columns={HOUSE_COLUMNS} rows={wheel.houses} rowKey={(h: HouseRow) => h.house} />
             </div>
           ))}
         </div>
-        <div className="mt-4 space-y-1">
-          <div className={KEY}>Agreement across the three wheels</div>
-          {sudarshana.agreement.filter((a) => a.wheelsOccupied >= 2).map((a) => (
-            <div key={a.house} className="rounded-lg bg-white/5 px-3 py-1.5 text-sm text-pearl">
-              House {a.house}: {a.verdict}
-            </div>
-          ))}
+        <div className="mt-4">
+          <div className={`${KEY} mb-2`}>Agreement across the three wheels</div>
+          <DataTable
+            columns={AGREEMENT_COLUMNS}
+            rows={sudarshana.agreement.filter((a) => a.wheelsOccupied >= 2)}
+            rowKey={(a: AgreementRow) => a.house}
+          />
           <p className="mt-2 text-sm text-pearl/90">
             A theme carried by all three wheels is treated as settled in the chart. A theme present in two is probable
             and shows up under the matching Dasha. A theme in one wheel only tends to appear as an episode rather than a
@@ -164,14 +185,12 @@ export function KundliClassicalPanels({
       </GlassCard>
 
       <GlassCard title="Sign syllable reference" desc="The classical name letters for each sign, used when choosing or checking a given name.">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {RASHIS.map((r, i) => (
-            <div key={r} className={`rounded-xl px-3 py-2 ${i === chart.ascendant.rashi ? "border border-gold/30 bg-gold/5" : "bg-white/5"}`}>
-              <div className={KEY}>{i + 1}. {r}</div>
-              <div className={VAL}>{RASHI_AKSHARA[i]}</div>
-            </div>
-          ))}
-        </div>
+        <DataTable
+          columns={signColumns}
+          rows={signRows}
+          rowKey={(r: SignRow) => r.index}
+          rowClassName={(r: SignRow) => (r.index === chart.ascendant.rashi ? "bg-gold/5" : "")}
+        />
         <p className="mt-3 text-xs text-muted-foreground">
           {FRIENDSHIP_PLANETS.length} classical planets are used in the friendship judgement above. Rahu and Ketu are
           excluded there by convention, since they own no sign in the Parashari friendship scheme.
