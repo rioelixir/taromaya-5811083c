@@ -213,17 +213,22 @@ About 380 words.`,
   );
 }
 
-function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
+function WesternGrid({ onSelect, readings, cacheKey, period, today }: {
   onSelect: (sign: string) => void;
   luck: (s: string) => { scores: Record<string, number>; luckyNumber: number; luckyColor: string; direction: string; gemstone: string };
   readings: Record<string, string>;
   cacheKey: (s: string, p: Period, m: string) => string;
   period: Period;
+  today: Date;
 }) {
+  const all = useMemo(
+    () => SIGN_NAMES.map((_, i) => buildSignReading(i, "western", period, today)),
+    [period, today],
+  );
   return (
     <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
       {SIGN_NAMES.map((s, i) => {
-        const l = luck(s);
+        const r = all[i];
         const cached = !!readings[cacheKey(s, period, "western")];
         return (
           <button
@@ -240,19 +245,19 @@ function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
               <div className="text-3xl gold-text font-serif">{SIGN_GLYPHS[i]}</div>
             </div>
             <div className="mt-3 space-y-1.5">
-              {SCORE_KEYS.map((k) => (
-                <div key={k}>
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
-                    <span>{k}</span><span>{l.scores[k]}%</span>
+              {r.domains.map((d) => (
+                <div key={d.domain}>
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>{d.domain}</span><span>{d.score}%</span>
                   </div>
                   <div className="h-1 rounded-full bg-white/5 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${l.scores[k]}%` }} />
+                    <div className="h-full bg-gradient-to-r from-gold to-gold-soft" style={{ width: `${d.score}%` }} />
                   </div>
                 </div>
               ))}
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-muted-foreground">
-              <span>#{l.luckyNumber}</span><span>· {l.luckyColor}</span><span>· {l.direction}</span>
+              <span>Overall {r.overall}%</span><span>· {r.lucky.colour}</span><span>· {r.lucky.direction}</span>
             </div>
           </button>
         );
@@ -260,6 +265,7 @@ function WesternGrid({ onSelect, luck, readings, cacheKey, period }: {
     </div>
   );
 }
+
 
 function VedicGrid({ today, onSelect, readings, cacheKey, period }: {
   today: Date;
