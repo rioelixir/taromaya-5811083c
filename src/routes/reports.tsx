@@ -264,8 +264,10 @@ export function buildPdf(key: ReportKey, b: Birth) {
     pdf.line(margin, 40, w - margin, 40);
     y = 72;
   };
+  // Footer sits at h-36; never let content reach it.
+  const FOOTER_SAFE = 64;
   const ensureRoom = (need = 60) => {
-    if (y > h - need) newPage();
+    if (y > h - Math.max(need, FOOTER_SAFE)) newPage();
   };
 
   const drawH = (label: string) => {
@@ -280,7 +282,8 @@ export function buildPdf(key: ReportKey, b: Birth) {
     y += 28;
   };
   const drawSub = (label: string) => {
-    ensureRoom(40);
+    // Keep a sub-heading with at least the first lines that follow it.
+    ensureRoom(96);
     pdf.setTextColor(...GOLD_SOFT);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
