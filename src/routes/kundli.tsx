@@ -203,7 +203,6 @@ function KundliPage() {
       eyebrow="Vedic Kundli"
       title="Your birth chart"
       subtitle="Sidereal Lahiri calculations, whole-sign houses, divisional charts, Vimshottari dasha, yogas, and doshas — all computed privately in your browser."
-      hideVoice
     >
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">

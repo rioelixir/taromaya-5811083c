@@ -45,7 +45,7 @@ function NewKundliPage() {
   }, [birth]);
 
   return (
-    <PageShell title="Precision Kundli" subtitle="Swiss-Ephemeris engine · Lahiri default · D1 + D9 + Panchang">
+    <PageShell aiModule="Kundli" title="Precision Kundli" subtitle="Swiss-Ephemeris engine · Lahiri default · D1 + D9 + Panchang">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <BirthInputForm
           onComputed={(c, b) => { setChart(c as unknown as ChartLite); if (b) setBirth(b as unknown as typeof birth); }}
