@@ -1291,6 +1291,8 @@ function NameAnalysisTab({
           </GlassCard>
         </div>
       )}
+
+      <NameRemedyPanel fullName={fullName} birthDate={birthDate} />
     </>
   );
 }
