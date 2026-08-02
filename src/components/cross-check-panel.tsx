@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Check, X, ChevronDown, ScanSearch } from "lucide-react";
 import { runCrossCheck, type CrossCheckInput } from "@/lib/cross-check";
 import { GlassCard } from "@/components/page-shell";
+import { DataTable } from "@/components/data-table";
 
 /**
  * Live cross-check: recomputes the shared sky facts from the Kundli, Panchang,
@@ -56,7 +57,7 @@ export function CrossCheckPanel({ input, className }: { input: CrossCheckInput; 
                   <span className="flex flex-wrap gap-1.5">
                     {Object.entries(it.values).map(([k, v]) => (
                       <span key={k} className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-muted-foreground">
-                        {k}: <span className="text-pearl">{v}</span>
+                        {k}: <span className="text-pearl">{String(v)}</span>
                       </span>
                     ))}
                   </span>
