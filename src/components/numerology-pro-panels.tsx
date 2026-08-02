@@ -6,7 +6,7 @@ import {
   type NameSystem,
 } from "@/lib/name-numerology-pro";
 import {
-  birthNumbers, dashaAt, mahadashaTimeline, subPeriods, personalCycles,
+  birthNumbers, dashaAt, mahadashaTimeline, personalCycles,
   predictForDate, multiYearForecast, currentGrid, practicalGuidance,
   NUMBER_PLANET, GRID_ORDER, type Period,
 } from "@/lib/numerology-dasha";
