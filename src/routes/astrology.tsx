@@ -154,14 +154,6 @@ Structure: Overall Signature, Core Trinity (Sun · Moon · Rising), Chart Shape 
                         <div key={e.name} className="flex justify-between"><span>{e.name}</span><span className="gold-text">{e.count}</span></div>
                       ))}
                     </div>
-        <div className="mt-3">
-          <PlacePicker
-            value={{ place: (form as Record<string,string>).place ?? "", lat: form.lat, lon: form.lon, tz: form.tz }}
-            onChange={(pl) => setForm((f) => ({ ...f, place: pl.place, lat: pl.lat, lon: pl.lon, tz: pl.tz }))}
-            forDate={form.date}
-            forTime={form.time}
-          />
-        </div>
                     <div>
                       <div className="text-muted-foreground mb-1">Modes</div>
                       {dominants.modes.map((m) => (

@@ -1,4 +1,4 @@
-import { PlacePicker } from "@/components/place-picker";
+import { BirthOneBox } from "@/components/birth-one-box";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { calculateAstroChart } from "@/lib/astro-calc.functions";
