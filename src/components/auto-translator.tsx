@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { RTL_LANGS, useLang, type Lang } from "@/lib/i18n";
+import { RTL_LANGS, reviewedTerms, useLang, type Lang } from "@/lib/i18n";
 
-const CACHE_KEY = (lang: Lang) => `taromaya.translations.v2.${lang}`;
+const CACHE_KEY = (lang: Lang) => `taromaya.translations.v3.${lang}`;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "TEXTAREA", "SVG", "PATH", "CANVAS"]);
 const ATTR_ORIG = "data-i18n-orig";
-const MAX_LEN = 900;
+const MAX_LEN = 2000;
 const ATTRS = ["placeholder", "aria-label", "title", "alt", "label", "value"] as const;
+
 
 /** What we last wrote into a text node, so re-renders get re-translated. */
 const doneText = new WeakMap<Text, { src: string; out: string }>();
