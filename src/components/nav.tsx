@@ -329,9 +329,10 @@ function AuthFooter({ onClose }: { onClose: () => void }) {
  */
 const bottomNav = [
   { to: "/", label: "Home", icon: HomeIcon },
-  { to: "/tarot", label: "Cards", icon: Sparkles },
-  { to: "/history", label: "Past", icon: History },
-  { to: "/profile", label: "Me", icon: User },
+  { to: "/tarot", label: "Tarot", icon: Sparkles },
+  { to: "/history", label: "History", icon: History },
+  { to: "/profile", label: "Profile", icon: User },
+
 ] as const;
 
 export function BottomNav() {
