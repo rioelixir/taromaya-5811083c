@@ -77,11 +77,13 @@ function subscribe(cb: () => void) {
 export function setLang(next: Lang) {
   if (typeof window === "undefined") return;
   const prev = readLang();
+  if (prev === next) return;
   window.localStorage.setItem(STORAGE_KEY, next);
   listeners.forEach((l) => l());
-  // Full reload guarantees clean base text before re-translating.
-  if (prev !== next) window.location.reload();
+  // No reload: the translator restores English text and re-translates in place.
+  window.dispatchEvent(new CustomEvent("taromaya:lang", { detail: next }));
 }
+
 
 export function useLang(): Lang {
   const stored = useSyncExternalStore(subscribe, readLang, (): Lang => "en");
