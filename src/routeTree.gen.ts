@@ -67,6 +67,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VedicNumerologyIndexRouteImport } from './routes/vedic-numerology.index'
 import { Route as VedicNumerologyReportsRouteImport } from './routes/vedic-numerology.reports'
 import { Route as VedicNumerologyRemediesRouteImport } from './routes/vedic-numerology.remedies'
+import { Route as VedicNumerologyProfileRouteImport } from './routes/vedic-numerology.profile'
 import { Route as VedicNumerologyCalculatorRouteImport } from './routes/vedic-numerology.calculator'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
@@ -378,6 +379,11 @@ const VedicNumerologyRemediesRoute = VedicNumerologyRemediesRouteImport.update({
   path: '/remedies',
   getParentRoute: () => VedicNumerologyRoute,
 } as any)
+const VedicNumerologyProfileRoute = VedicNumerologyProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => VedicNumerologyRoute,
+} as any)
 const VedicNumerologyCalculatorRoute =
   VedicNumerologyCalculatorRouteImport.update({
     id: '/calculator',
@@ -560,6 +566,7 @@ export interface FileRoutesByFullPath {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
+  '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
@@ -639,6 +646,7 @@ export interface FileRoutesByTo {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
+  '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/vedic-numerology': typeof VedicNumerologyIndexRoute
@@ -721,6 +729,7 @@ export interface FileRoutesById {
   '/pages/$slug': typeof PagesSlugRoute
   '/share/$token': typeof ShareTokenRoute
   '/vedic-numerology/calculator': typeof VedicNumerologyCalculatorRoute
+  '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
@@ -803,6 +812,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/vedic-numerology/calculator'
+    | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/vedic-numerology/'
@@ -882,6 +892,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/vedic-numerology/calculator'
+    | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/vedic-numerology'
@@ -963,6 +974,7 @@ export interface FileRouteTypes {
     | '/pages/$slug'
     | '/share/$token'
     | '/vedic-numerology/calculator'
+    | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/vedic-numerology/'
@@ -1449,6 +1461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VedicNumerologyRemediesRouteImport
       parentRoute: typeof VedicNumerologyRoute
     }
+    '/vedic-numerology/profile': {
+      id: '/vedic-numerology/profile'
+      path: '/profile'
+      fullPath: '/vedic-numerology/profile'
+      preLoaderRoute: typeof VedicNumerologyProfileRouteImport
+      parentRoute: typeof VedicNumerologyRoute
+    }
     '/vedic-numerology/calculator': {
       id: '/vedic-numerology/calculator'
       path: '/calculator'
@@ -1638,6 +1657,7 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface VedicNumerologyRouteChildren {
   VedicNumerologyCalculatorRoute: typeof VedicNumerologyCalculatorRoute
+  VedicNumerologyProfileRoute: typeof VedicNumerologyProfileRoute
   VedicNumerologyRemediesRoute: typeof VedicNumerologyRemediesRoute
   VedicNumerologyReportsRoute: typeof VedicNumerologyReportsRoute
   VedicNumerologyIndexRoute: typeof VedicNumerologyIndexRoute
@@ -1645,6 +1665,7 @@ interface VedicNumerologyRouteChildren {
 
 const VedicNumerologyRouteChildren: VedicNumerologyRouteChildren = {
   VedicNumerologyCalculatorRoute: VedicNumerologyCalculatorRoute,
+  VedicNumerologyProfileRoute: VedicNumerologyProfileRoute,
   VedicNumerologyRemediesRoute: VedicNumerologyRemediesRoute,
   VedicNumerologyReportsRoute: VedicNumerologyReportsRoute,
   VedicNumerologyIndexRoute: VedicNumerologyIndexRoute,
