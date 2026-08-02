@@ -430,14 +430,23 @@ function KundliMatchingNumerology() {
     <>
       <div className="grid gap-4 md:grid-cols-2">
         <GlassCard title="Person A">
-          <input value={a.name} onChange={(e) => setA({ ...a, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <DateSelect label="" value={a.date} onChange={(v) => setA({ ...a, date: v })} />
+          <NumBox
+            fullName={a.name}
+            setFullName={(n) => setA((p) => ({ ...p, name: n }))}
+            birthDate={a.date}
+            setBirthDate={(d) => setA((p) => ({ ...p, date: d }))}
+          />
         </GlassCard>
         <GlassCard title="Person B">
-          <input value={b.name} onChange={(e) => setB({ ...b, name: e.target.value })} placeholder="Name" className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-pearl mb-3" />
-          <DateSelect label="" value={b.date} onChange={(v) => setB({ ...b, date: v })} />
+          <NumBox
+            fullName={b.name}
+            setFullName={(n) => setB((p) => ({ ...p, name: n }))}
+            birthDate={b.date}
+            setBirthDate={(d) => setB((p) => ({ ...p, date: d }))}
+          />
         </GlassCard>
       </div>
+
 
       {rA && rB && compat && (
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
