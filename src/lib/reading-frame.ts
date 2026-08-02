@@ -34,6 +34,7 @@ export const READING_FRAME = [
   { key: "opportunities", emoji: "🍀", title: "Opportunities" },
   { key: "challenges", emoji: "⚠️", title: "Challenges to manage" },
   { key: "timing", emoji: "🕰️", title: "Timing" },
+  { key: "practices", emoji: "🪔", title: "Supportive practices" },
   { key: "steps", emoji: "✅", title: "Recommended next steps" },
   { key: "remember", emoji: "💡", title: "Important note" },
 ] as const;
@@ -124,6 +125,50 @@ export function areaById(id: string): LifeArea | undefined {
 }
 
 /**
+ * Supportive, non-superstitious practices per life area. Deliberately practical:
+ * habit, attention and record-keeping rather than promises.
+ */
+export const AREA_PRACTICES: Record<LifeAreaId, string[]> = {
+  mood: [
+    "Keep the same sleep and wake window for the next two weeks; steadiness of routine is what settles the mind here",
+    "Spend ten quiet minutes at the same hour daily — breathing, prayer or simple stillness, whichever you already trust",
+  ],
+  work: [
+    "Write the week's three real priorities on paper each Monday and refuse a fourth",
+    "Close one pending commitment fully before accepting the next; unfinished work is the main drag in this phase",
+  ],
+  money: [
+    "List every recurring outflow once this month and cancel what you no longer use",
+    "Hold a fixed reserve untouched, and put any large decision through a seven-day waiting rule",
+  ],
+  love: [
+    "State one expectation plainly this week instead of hinting at it",
+    "Protect a regular, undistracted hour with the person who matters most",
+  ],
+  health: [
+    "Anchor the basics first: water, sleep and twenty minutes of movement daily",
+    "Note anything persistent in writing and take it to a qualified doctor rather than to a reading",
+  ],
+  purpose: [
+    "Reserve one fixed weekly slot for the pursuit that matters most and treat it as an appointment",
+    "Read or learn in small regular portions rather than in occasional long bursts",
+  ],
+};
+
+/** Two supportive practices for the areas this reading speaks to. */
+export function practicesFor(areas: Array<{ id: LifeAreaId }>, offset = 0): string[] {
+  const out: string[] = [];
+  areas.forEach((a, i) => {
+    const list = AREA_PRACTICES[a.id];
+    if (!list) return;
+    const line = list[(offset + i) % list.length];
+    if (line && !out.includes(line)) out.push(line);
+  });
+  if (!out.length) out.push(...AREA_PRACTICES.mood);
+  return out.slice(0, 3);
+}
+
+/**
  * The same framework written as instructions, for when a paid AI model is on.
  * Kept short on purpose: it is sent with every call.
  */
@@ -138,7 +183,8 @@ export const READING_FRAMEWORK_RULES = [
   "Why this applies to you: 2 to 3 sentences linking the client's own birth data and the current sky to the reading, without exposing chart arithmetic.",
   "Opportunities: 2 to 3 bullet lines naming favourable conditions and how to use them.",
   "Challenges to manage: 2 to 3 bullet lines naming honest difficulties and how to reduce their impact. Never alarmist.",
-  "Timing: 2 to 3 sentences on how long the condition lasts, when it strengthens and when to act. Never invent exact dates.",
+  "Timing: 2 to 3 sentences on how long the condition lasts, when within it the effect strengthens or eases, and which part of it is the better window to act in. Never invent exact dates.",
+  "Supportive practices: 2 to 3 bullet lines of steady, practical practices — routine, attention, record-keeping, study or quiet time. No purchases, no fear-based remedies, no guarantees.",
   "Recommended next steps: 3 to 4 bullet lines, each a concrete, practical action.",
   "Important note: one closing line, including a brief honest statement of certainty where the reading is symbolic.",
 ].join("\n");

@@ -1,5 +1,6 @@
 import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, CornerLeftUp } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /**
  * Goes back exactly one step. If there is no history to go back to
@@ -16,8 +17,12 @@ export function useStepBack() {
     return "/" + parts.slice(0, -1).join("/");
   })();
 
-  const canGoBack =
-    typeof window !== "undefined" ? window.history.length > 1 : false;
+  // Read history only after hydration, so the server and the first client
+  // render agree and React never has to patch up the button.
+  const [canGoBack, setCanGoBack] = useState(false);
+  useEffect(() => {
+    setCanGoBack(window.history.length > 1);
+  }, [pathname]);
 
   const stepBack = () => {
     if (canGoBack) {

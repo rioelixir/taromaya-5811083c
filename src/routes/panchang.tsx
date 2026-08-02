@@ -420,17 +420,18 @@ function MonthAlmanac({ date, lat, lon }: { date: string; lat: number; lon: numb
   return (
     <div className="mt-6">
       <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <CalendarDays className="w-4 h-4 text-gold" />
           <div className="text-xs uppercase tracking-widest text-muted-foreground">
             Almanac · next {days} days
           </div>
-          <div className="ml-auto flex gap-1">
+          <div className="ml-auto flex gap-2">
             {[15, 30, 60].map((n) => (
               <button
                 key={n}
                 onClick={() => setDays(n)}
-                className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                aria-pressed={days === n}
+                className={`min-h-11 min-w-11 px-3 text-sm rounded-full border ${
                   days === n ? "border-gold/60 bg-gold/10 text-gold" : "border-white/10 text-muted-foreground"
                 }`}
               >
@@ -439,6 +440,7 @@ function MonthAlmanac({ date, lat, lon }: { date: string; lat: number; lon: numb
             ))}
           </div>
         </div>
+
 
         {/* Heatstrip */}
         <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${Math.min(days, 30)}, minmax(0,1fr))` }}>
