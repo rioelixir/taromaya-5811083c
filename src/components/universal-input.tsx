@@ -212,6 +212,7 @@ export function UniversalInput({ module, children }: { module: string; children:
       if (d.date) patch.date = d.date;
       if (d.time) patch.time = d.time;
       if (Object.keys(patch).length > 0) {
+        console.log('DBG fill', JSON.stringify(patch));
         markBirthGiven(Object.keys(patch));
         target.onChange(patch);
         Object.assign(sessionMemory, patch);
