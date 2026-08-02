@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { PageShell, GlassCard } from "@/components/page-shell";
 import { computeKundli, RASHIS } from "@/lib/vedic";
 import { computeAshtakavarga, computeShadbala } from "@/lib/vedic-deep";
+import { ashtakavargaNarrative, shadbalaNarrative } from "@/lib/vedic-narrative";
+
 import { MapPin, Gauge, Grid3x3 } from "lucide-react";
 
 export const Route = createFileRoute("/strength")({
