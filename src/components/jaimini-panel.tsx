@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { DataTable, type Column } from "@/components/data-table";
 import {
   computeCharaKarakas,
   computeArudhaPadas,
@@ -38,6 +39,47 @@ export function JaiminiPanel({ chart, birthDate }: Props) {
 
   const now = Date.now();
 
+  const karakaCols: Column<(typeof karakas)[number]>[] = [
+    { header: "Karaka", cell: (k) => <span className="font-mono text-primary">{k.karaka}</span> },
+    { header: "Planet", cell: (k) => k.planet },
+    { header: "Sign", cell: (k) => RASHIS[k.rashi] },
+    { header: "Degree", align: "right", className: "font-mono", cell: (k) => `${k.degree.toFixed(2)}°` },
+    {
+      header: "Signifies",
+      className: "text-muted-foreground",
+      cell: (k) => KARAKA_MEANING[k.karaka as CharaKaraka],
+    },
+  ];
+
+  const arudhaCols: Column<(typeof arudhas)[number]>[] = [
+    {
+      header: "Pada",
+      cell: (a) => (
+        <span className="font-mono text-primary">{a.house === 12 ? "UL" : `A${a.house}`}</span>
+      ),
+    },
+    { header: "House", cell: (a) => `House ${a.house}` },
+    { header: "House lord", cell: (a) => a.lord },
+    { header: "Arudha sign", cell: (a) => RASHIS[a.arudha] },
+  ];
+
+  const dashaCols: Column<(typeof dasha)[number]>[] = [
+    { header: "Sign", cell: (d) => <span className="font-display">{RASHIS[d.sign]}</span> },
+    { header: "Lord", cell: (d) => d.lord },
+    { header: "Years", align: "right", className: "font-mono", cell: (d) => d.years },
+    { header: "From", className: "font-mono", cell: (d) => fmtDate(d.start) },
+    { header: "To", className: "font-mono", cell: (d) => fmtDate(d.end) },
+    {
+      header: "Status",
+      cell: (d) =>
+        now >= d.start.getTime() && now < d.end.getTime() ? (
+          <span className="text-primary">Running now</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+  ];
+
   return (
     <Card className="glass-card space-y-4 p-4">
       <div className="flex items-center justify-between gap-2">
@@ -63,87 +105,39 @@ export function JaiminiPanel({ chart, birthDate }: Props) {
       </div>
 
       {tab === "karakas" && (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Ranked by advancement within sign (Rahu reversed). The Atmakaraka (AK) is
-            the soul-signifier of the chart.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {karakas.map((k) => (
-              <div key={k.karaka} className="rounded-lg border border-border/40 bg-background/30 p-3 text-xs">
-                <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-primary text-sm">{k.karaka}</span>
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{k.planet}</span>
-                </div>
-                <div className="mt-1 font-mono">{RASHIS[k.rashi]} · {k.degree.toFixed(2)}°</div>
-                <div className="mt-1 text-muted-foreground">{KARAKA_MEANING[k.karaka as CharaKaraka]}</div>
-              </div>
-            ))}
-          </div>
-
-        </div>
+        <DataTable
+          columns={karakaCols}
+          rows={karakas}
+          rowKey={(k) => k.karaka}
+          caption="Ranked by advancement within sign (Rahu reversed). The Atmakaraka (AK) is the soul-signifier of the chart."
+        />
       )}
 
       {tab === "arudhas" && (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Arudha padas show the perceived image of each life area. A1 (Arudha Lagna)
-            is public self; UL (Upapada, from A12) governs marriage.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {arudhas.map((a) => {
-              const label = a.house === 12 ? "UL" : `A${a.house}`;
-              return (
-                <div
-                  key={a.house}
-                  className="rounded-lg border border-border/40 bg-background/30 p-2 text-xs"
-                >
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-primary">{label}</span>
-                    <span className="text-[10px] text-muted-foreground">
-                      H{a.house} · {a.lord}
-                    </span>
-                  </div>
-                  <div className="mt-1 font-mono">{RASHIS[a.arudha]}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <DataTable
+          columns={arudhaCols}
+          rows={arudhas}
+          rowKey={(a) => a.house}
+          caption="Arudha padas show the perceived image of each life area. A1 (Arudha Lagna) is public self; UL (Upapada, from A12) governs marriage."
+        />
       )}
 
       {tab === "dasha" && (
-        <div className="space-y-2">
-          {!birthDate ? (
-            <p className="text-xs text-muted-foreground">
-              Birth timestamp required to compute Chara Dasha.
-            </p>
-          ) : (
-            <>
-              <p className="text-xs text-muted-foreground">
-                Sign-based Mahadashas starting from Lagna; direction alternates by odd
-                and even signs. Duration = count to sign lord.
-              </p>
-              <div className="max-h-96 space-y-1.5 overflow-y-auto pr-1">
-                {dasha.map((d, i) => {
-                  const active = now >= d.start.getTime() && now < d.end.getTime();
-                  return (
-                    <div key={i} className={`rounded-lg border p-2.5 text-xs ${active ? "border-primary/60 bg-primary/10" : "border-border/40 bg-background/30"}`}>
-                      <div className="flex items-baseline justify-between">
-                        <span className={`font-display text-sm ${active ? "text-primary" : ""}`}>{RASHIS[d.sign]}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">{d.lord} · {d.years}y</span>
-                      </div>
-                      <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-                        {fmtDate(d.start)} → {fmtDate(d.end)} {active && <span className="ml-1 text-primary">● now</span>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-            </>
-          )}
-        </div>
+        !birthDate ? (
+          <p className="text-xs text-muted-foreground">
+            Birth timestamp required to compute Chara Dasha.
+          </p>
+        ) : (
+          <DataTable
+            columns={dashaCols}
+            rows={dasha}
+            maxHeight="24rem"
+            rowClassName={(d) =>
+              now >= d.start.getTime() && now < d.end.getTime() ? "bg-primary/10" : ""
+            }
+            caption="Sign-based Mahadashas starting from Lagna; direction alternates by odd and even signs. Duration = count to sign lord."
+          />
+        )
       )}
     </Card>
   );
