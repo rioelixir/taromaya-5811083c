@@ -415,11 +415,17 @@ export function offlineReading(input: ReadingRequest): string {
     .slice(0, 3)
     .map((d) => cap(d))
     .concat(
-      areas[0] ? `Give ${areas[0].label.toLowerCase()} ten honest minutes today` : "",
-      "Pick the one line above that feels most true and act on it today",
-      "Write down how it goes, so you can spot the pattern later",
+      areas[0] ? `Give ${areas[0].label.toLowerCase()} a protected ten minutes today` : "",
+      "Choose the single observation above that rings truest and act on it this week",
+      "Keep a short written record of the outcome so the pattern becomes visible",
     );
 
+  // Two distinct lines each, so no sentence is ever repeated in one reading.
+  const twoOf = (list: string[], offset: number) => {
+    const a = list[offset % list.length];
+    const b = list[(offset + 1 + (offset % (list.length - 1))) % list.length];
+    return (a === b ? [a] : [a, b]).map((l) => `• ${l}`);
+  };
 
   return composeReading([
     section("answer", answer),
@@ -427,14 +433,9 @@ export function offlineReading(input: ReadingRequest): string {
     section("meaning", story.length ? story : meanings.map((m) => `• ${cap(m.is)}, so ${m.feels}.`)),
     section("areas", areaLines),
     section("why", why),
-    section("opportunities", [
-      `• ${pick(OPPORTUNITY_LINES, n)}`,
-      `• ${pick(OPPORTUNITY_LINES, n >> 2)}`,
-    ]),
-    section("challenges", [
-      `• ${pick(CHALLENGE_LINES, n >> 1)}`,
-      `• ${pick(CHALLENGE_LINES, n >> 3)}`,
-    ]),
+    section("opportunities", twoOf(OPPORTUNITY_LINES, n)),
+    section("challenges", twoOf(CHALLENGE_LINES, n >> 2)),
+
     section("timing", [timing]),
 
     section(
