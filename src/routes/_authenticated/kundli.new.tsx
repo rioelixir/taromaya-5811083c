@@ -190,7 +190,7 @@ function NewKundliPage() {
               if (!moon || !birth) return null;
               const utcMs = Date.UTC(birth.year, birth.month - 1, birth.day, birth.hour, birth.minute, birth.seconds ?? 0)
                 - birth.tzOffsetHours * 3600 * 1000;
-              return <DashaTimeline birthDate={new Date(utcMs)} moonLongitude={moon.longitude} />;
+              return <DashaTimeline birthDate={new Date(utcMs)} moonLongitude={moon.longitude} chart={chart} />;
             })()}
           </div>
         )}

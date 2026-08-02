@@ -6,6 +6,7 @@ import { vargaSign } from "@/lib/vargas";
 import { NorthIndianChart, SouthIndianChart } from "@/components/rashi-chart";
 import { dashaNarrative, vargaNarrative } from "@/lib/vedic-narrative";
 import { computeVimshottari, computeAshtottari, computeYogini, type DashaTree, type MahaPeriod, type AntarPeriod, type DashaPeriod } from "@/lib/vedic-extended";
+import { computeChara, computeNarayana, computeKalachakra } from "@/lib/dasha-sign";
 
 type NP = {
   name: string;
@@ -168,15 +169,18 @@ function MahaCard({ m, now }: { m: MahaPeriod; now: Date }) {
 }
 
 const DASHA_SYSTEMS = [
-  { key: "vimshottari", label: "Vimshottari", note: "The 120-year nakshatra cycle used as the primary timing system in Parashari practice." },
-  { key: "ashtottari", label: "Ashtottari", note: "A 108-year cycle read as a second opinion, especially where Rahu and the night-birth conditions apply." },
-  { key: "yogini", label: "Yogini", note: "A 36-year cycle of eight yoginis, valued for short-range timing and day-to-day tendencies." },
+  { key: "vimshottari", label: "Vimshottari", note: "The 120-year nakshatra cycle used as the primary timing system in Parashari practice.", needsChart: false },
+  { key: "ashtottari", label: "Ashtottari", note: "A 108-year cycle read as a second opinion, especially where Rahu and the night-birth conditions apply.", needsChart: false },
+  { key: "yogini", label: "Yogini", note: "A 36-year cycle of eight yoginis, valued for short-range timing and day-to-day tendencies.", needsChart: false },
+  { key: "chara", label: "Chara", note: "The Jaimini sign cycle from the ascendant. Each sign runs for the distance between it and its ruler, which makes it useful for reading chapters of life rather than single events.", needsChart: true },
+  { key: "narayana", label: "Narayana", note: "Padakrama dasha, begun from the stronger of the ascendant or the seventh sign, with the classical adjustment when a sign ruler is exalted or debilitated.", needsChart: true },
+  { key: "kalachakra", label: "Kalachakra", note: "A sign cycle derived from the Moon's navamsa pada, read in the direct or reverse group depending on the pada. Traditionally weighed for health and turning points.", needsChart: false },
 ] as const;
 type DashaSystemKey = (typeof DASHA_SYSTEMS)[number]["key"];
 
 export function DashaTimeline({
-  birthDate, moonLongitude,
-}: { birthDate: Date; moonLongitude: number }) {
+  birthDate, moonLongitude, chart,
+}: { birthDate: Date; moonLongitude: number; chart?: Chart }) {
   const now = new Date();
   const [system, setSystem] = useState<DashaSystemKey>("vimshottari");
   const meta = DASHA_SYSTEMS.find((s) => s.key === system)!;
@@ -186,8 +190,11 @@ export function DashaTimeline({
     const degInNak = (((moonLongitude % 360) + 360) % 360) - nakIndex * NAK_SPAN;
     if (system === "ashtottari") return computeAshtottari(birthDate, nakIndex, degInNak);
     if (system === "yogini") return computeYogini(birthDate, nakIndex, degInNak);
+    if (system === "kalachakra") return computeKalachakra(birthDate, moonLongitude);
+    if (system === "chara" && chart) return computeChara(chart, birthDate);
+    if (system === "narayana" && chart) return computeNarayana(chart, birthDate);
     return computeVimshottari(birthDate, nakIndex, degInNak);
-  }, [birthDate, moonLongitude, system]);
+  }, [birthDate, moonLongitude, system, chart]);
 
   return (
     <div className="glass-card space-y-3 p-4">
@@ -198,7 +205,7 @@ export function DashaTimeline({
         </span>
       </div>
       <div className="inline-flex overflow-hidden rounded-full border border-border/50 bg-background/40 text-xs">
-        {DASHA_SYSTEMS.map((s) => (
+        {DASHA_SYSTEMS.filter((s) => chart || !s.needsChart).map((s) => (
           <button
             key={s.key}
             onClick={() => setSystem(s.key)}
