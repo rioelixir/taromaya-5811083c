@@ -646,6 +646,7 @@ export function detectYogas(chart: KundliChart): Yoga[] {
   }
 
   void sat; // used implicitly through Panch Mahapurusha
+  yogas.push(...detectClassicalYogas(chart));
   return yogas;
 }
 

@@ -91,7 +91,8 @@ export function computePanchavargeeyaBala(chart: KundliChart): PanchavargeeyaBal
       const own = (OWN_SIGNS[name] ?? []).includes(p.rashi);
       const signLord = RASHI_LORDS[p.rashi] as PlanetName;
       const friend = FRIENDS[name].includes(signLord);
-      const exalted = Math.abs(((EXALT_DEG[name] ?? 0) - p.longitude + 540) % 360 - 180) > 150;
+      const exaltSign = Math.floor((EXALT_DEG[name] ?? 0) / 30);
+      const exalted = p.rashi === exaltSign;
       const points = own ? 30 : exalted ? 30 : friend ? 22.5 : signLord === name ? 30 : 15;
       components.push({
         label: "Kshetra (sign dignity)", points, max: 30,
