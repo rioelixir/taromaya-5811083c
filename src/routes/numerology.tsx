@@ -1,5 +1,4 @@
 import { PremiumGate } from "@/components/premium-gate";
-import { DateSelect } from "@/components/date-select";
 import { BirthOneBox } from "@/components/birth-one-box";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
