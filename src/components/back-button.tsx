@@ -67,8 +67,8 @@ export function FloatingBackButton() {
     <div
       data-global-back
       className="fixed left-3 top-3 z-40 sm:left-4 sm:top-4"
-      data-no-translate
     >
+
       <BackButton className="shadow-lg backdrop-blur" />
     </div>
   );
