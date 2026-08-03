@@ -38,13 +38,15 @@ function Dashboard() {
     const [y, m, d] = active.birthDate.split("-").map(Number);
     const [hh, mm] = active.birthTime.split(":").map(Number);
     const birth = new Date(Date.UTC(y ?? 2000, (m ?? 1) - 1, d ?? 1, hh ?? 12, mm ?? 0));
-    const dasha = computeVimshottari(chart, birth);
-    const yogas = detectYogas(chart);
+    const moon = chart.planets.find((p) => p.name === "Moon");
+    const nakSpan = 360 / 27;
+    const degInNak = moon ? moon.longitude % nakSpan : 0;
+    const dasha = computeVimshottari(birth, chart.moonNakshatra.index, degInNak);
+    const yogas = detectYogas(chart).filter((y2) => y2.present);
     const doshas = detectDoshas(chart);
-    const now = Date.now();
-    const maha = dasha.periods.find((p) => p.start.getTime() <= now && p.end.getTime() > now);
-    const antar = maha?.antar.find((p) => p.start.getTime() <= now && p.end.getTime() > now);
-    const pratyantar = antar?.pratyantar.find((p) => p.start.getTime() <= now && p.end.getTime() > now);
+    const maha = dasha.currentMaha;
+    const antar = dasha.currentAntar;
+    const pratyantar = dasha.currentPratyantar;
     return { planets, houses, yogas, doshas, maha, antar, pratyantar, score: chartScore(planets) };
   }, [chart, active]);
 
