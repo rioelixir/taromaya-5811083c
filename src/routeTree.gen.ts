@@ -76,6 +76,9 @@ import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AstroProProfilesRouteImport } from './routes/astro-pro.profiles'
+import { Route as AstroProPlanetsRouteImport } from './routes/astro-pro.planets'
+import { Route as AstroProHousesRouteImport } from './routes/astro-pro.houses'
+import { Route as AstroProChartsRouteImport } from './routes/astro-pro.charts'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
@@ -428,6 +431,21 @@ const AstroProProfilesRoute = AstroProProfilesRouteImport.update({
   path: '/profiles',
   getParentRoute: () => AstroProRoute,
 } as any)
+const AstroProPlanetsRoute = AstroProPlanetsRouteImport.update({
+  id: '/planets',
+  path: '/planets',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProHousesRoute = AstroProHousesRouteImport.update({
+  id: '/houses',
+  path: '/houses',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProChartsRoute = AstroProChartsRouteImport.update({
+  id: '/charts',
+  path: '/charts',
+  getParentRoute: () => AstroProRoute,
+} as any)
 const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   id: '/api/transcribe',
   path: '/api/transcribe',
@@ -580,6 +598,9 @@ export interface FileRoutesByFullPath {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
   '/astro-pro/profiles': typeof AstroProProfilesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -662,6 +683,9 @@ export interface FileRoutesByTo {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
   '/astro-pro/profiles': typeof AstroProProfilesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -748,6 +772,9 @@ export interface FileRoutesById {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
   '/astro-pro/profiles': typeof AstroProProfilesRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -834,6 +861,9 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
     | '/astro-pro/profiles'
     | '/blog/$slug'
     | '/invite/$code'
@@ -916,6 +946,9 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
     | '/astro-pro/profiles'
     | '/blog/$slug'
     | '/invite/$code'
@@ -1001,6 +1034,9 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
     | '/astro-pro/profiles'
     | '/blog/$slug'
     | '/invite/$code'
@@ -1559,6 +1595,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AstroProProfilesRouteImport
       parentRoute: typeof AstroProRoute
     }
+    '/astro-pro/planets': {
+      id: '/astro-pro/planets'
+      path: '/planets'
+      fullPath: '/astro-pro/planets'
+      preLoaderRoute: typeof AstroProPlanetsRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/houses': {
+      id: '/astro-pro/houses'
+      path: '/houses'
+      fullPath: '/astro-pro/houses'
+      preLoaderRoute: typeof AstroProHousesRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/charts': {
+      id: '/astro-pro/charts'
+      path: '/charts'
+      fullPath: '/astro-pro/charts'
+      preLoaderRoute: typeof AstroProChartsRouteImport
+      parentRoute: typeof AstroProRoute
+    }
     '/api/transcribe': {
       id: '/api/transcribe'
       path: '/api/transcribe'
@@ -1702,11 +1759,17 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AstroProRouteChildren {
+  AstroProChartsRoute: typeof AstroProChartsRoute
+  AstroProHousesRoute: typeof AstroProHousesRoute
+  AstroProPlanetsRoute: typeof AstroProPlanetsRoute
   AstroProProfilesRoute: typeof AstroProProfilesRoute
   AstroProIndexRoute: typeof AstroProIndexRoute
 }
 
 const AstroProRouteChildren: AstroProRouteChildren = {
+  AstroProChartsRoute: AstroProChartsRoute,
+  AstroProHousesRoute: AstroProHousesRoute,
+  AstroProPlanetsRoute: AstroProPlanetsRoute,
   AstroProProfilesRoute: AstroProProfilesRoute,
   AstroProIndexRoute: AstroProIndexRoute,
 }
