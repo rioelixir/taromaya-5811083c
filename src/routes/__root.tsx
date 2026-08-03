@@ -217,7 +217,9 @@ function RootComponent() {
   }, []);
 
   const pathname = useRouter().state.location.pathname;
-  const chromeHidden = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const chromeHidden = [...PUBLIC_PATHS, ...CHROME_FREE].some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
