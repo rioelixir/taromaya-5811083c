@@ -19,7 +19,7 @@ export const Route = createFileRoute("/astro-pro/houses")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Houses;
+  component: Houses,
 });
 
 function Houses() {
