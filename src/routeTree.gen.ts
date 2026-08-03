@@ -66,6 +66,7 @@ import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VedicNumerologyIndexRouteImport } from './routes/vedic-numerology.index'
+import { Route as MobileNumerologyIndexRouteImport } from './routes/mobile-numerology.index'
 import { Route as AstroProIndexRouteImport } from './routes/astro-pro.index'
 import { Route as VedicNumerologyReportsRouteImport } from './routes/vedic-numerology.reports'
 import { Route as VedicNumerologyRemediesRouteImport } from './routes/vedic-numerology.remedies'
@@ -382,6 +383,11 @@ const VedicNumerologyIndexRoute = VedicNumerologyIndexRouteImport.update({
   path: '/',
   getParentRoute: () => VedicNumerologyRoute,
 } as any)
+const MobileNumerologyIndexRoute = MobileNumerologyIndexRouteImport.update({
+  id: '/mobile-numerology/',
+  path: '/mobile-numerology/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AstroProIndexRoute = AstroProIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -625,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/astro-pro/': typeof AstroProIndexRoute
+  '/mobile-numerology/': typeof MobileNumerologyIndexRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -712,6 +719,7 @@ export interface FileRoutesByTo {
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/astro-pro': typeof AstroProIndexRoute
+  '/mobile-numerology': typeof MobileNumerologyIndexRoute
   '/vedic-numerology': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -803,6 +811,7 @@ export interface FileRoutesById {
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
   '/astro-pro/': typeof AstroProIndexRoute
+  '/mobile-numerology/': typeof MobileNumerologyIndexRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -894,6 +903,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/astro-pro/'
+    | '/mobile-numerology/'
     | '/vedic-numerology/'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -981,6 +991,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/astro-pro'
+    | '/mobile-numerology'
     | '/vedic-numerology'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -1071,6 +1082,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
     | '/astro-pro/'
+    | '/mobile-numerology/'
     | '/vedic-numerology/'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -1142,6 +1154,7 @@ export interface RootRouteChildren {
   InviteCodeRoute: typeof InviteCodeRoute
   PagesSlugRoute: typeof PagesSlugRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  MobileNumerologyIndexRoute: typeof MobileNumerologyIndexRoute
   ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
   ApiPublicHelpAudioRoute: typeof ApiPublicHelpAudioRoute
   ApiPublicTranslateRoute: typeof ApiPublicTranslateRoute
@@ -1549,6 +1562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VedicNumerologyIndexRouteImport
       parentRoute: typeof VedicNumerologyRoute
     }
+    '/mobile-numerology/': {
+      id: '/mobile-numerology/'
+      path: '/mobile-numerology'
+      fullPath: '/mobile-numerology/'
+      preLoaderRoute: typeof MobileNumerologyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/astro-pro/': {
       id: '/astro-pro/'
       path: '/'
@@ -1913,6 +1933,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteCodeRoute: InviteCodeRoute,
   PagesSlugRoute: PagesSlugRoute,
   ShareTokenRoute: ShareTokenRoute,
+  MobileNumerologyIndexRoute: MobileNumerologyIndexRoute,
   ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
   ApiPublicHelpAudioRoute: ApiPublicHelpAudioRoute,
   ApiPublicTranslateRoute: ApiPublicTranslateRoute,
