@@ -558,3 +558,9 @@ html.has-pageshell-back [data-global-back] {
     radial-gradient(120% 80% at 12% 0%, color-mix(in oklab, var(--color-mnindigo) 9%, transparent) 0%, transparent 60%),
     radial-gradient(90% 70% at 92% 8%, color-mix(in oklab, var(--color-mngold) 12%, transparent) 0%, transparent 58%);
 }
+
+@keyframes mn-orbit {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.06); }
+  to { transform: rotate(360deg) scale(1); }
+}
