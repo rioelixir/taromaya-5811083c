@@ -10,7 +10,6 @@ import {
 } from "@/components/mobile-num/mn-kit";
 import { MN_MODULES } from "@/lib/mobile-num/modules";
 import { analyseNumber } from "@/lib/vedic-num/applied";
-import { COUNTRIES } from "@/lib/countries";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -249,9 +248,26 @@ function Modules() {
 
 /* ---------------------------- 5. analyzer ---------------------------- */
 
-const DIAL_CODES = Array.from(
-  new Map(COUNTRIES.map((c) => [c.dial, c])).values(),
-).sort((a, b) => a.name.localeCompare(b.name));
+/** Dial codes for the markets this product serves. */
+const DIAL_CODES: { dial: string; name: string }[] = [
+  { dial: "+91", name: "India" },
+  { dial: "+1", name: "United States / Canada" },
+  { dial: "+44", name: "United Kingdom" },
+  { dial: "+61", name: "Australia" },
+  { dial: "+64", name: "New Zealand" },
+  { dial: "+65", name: "Singapore" },
+  { dial: "+971", name: "United Arab Emirates" },
+  { dial: "+974", name: "Qatar" },
+  { dial: "+966", name: "Saudi Arabia" },
+  { dial: "+60", name: "Malaysia" },
+  { dial: "+27", name: "South Africa" },
+  { dial: "+977", name: "Nepal" },
+  { dial: "+94", name: "Sri Lanka" },
+  { dial: "+880", name: "Bangladesh" },
+  { dial: "+49", name: "Germany" },
+  { dial: "+33", name: "France" },
+  { dial: "+81", name: "Japan" },
+];
 
 const LUCKY_DAY: Record<number, string> = {
   1: "Sunday", 2: "Monday", 3: "Thursday", 4: "Saturday", 5: "Wednesday",
@@ -295,7 +311,7 @@ function Analyzer() {
                 className="h-11 w-full rounded-xl border border-mnline bg-mnsurface px-3 text-sm text-mnink outline-none focus:border-mnindigo"
               >
                 {DIAL_CODES.map((c) => (
-                  <option key={c.code} value={c.dial}>
+                  <option key={c.dial} value={c.dial}>
                     {c.dial} {c.name}
                   </option>
                 ))}
