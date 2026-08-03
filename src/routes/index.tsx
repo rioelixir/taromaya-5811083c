@@ -5,7 +5,7 @@ import {
   Heart, Hash, Sigma, Grid3X3, Music, Compass, Stars, Gauge, CalendarClock, Flame,
   Snowflake, Waves, Triangle, Crown, Briefcase, Coins, Activity, Leaf, Zap,
   Infinity as InfIcon, Home as HomeIcon, LineChart, FileText, Bookmark, BookOpen,
-  History, User, Settings, Baby, LayoutGrid, HelpCircle,
+  History, User, Settings, Baby, LayoutGrid, HelpCircle, Type,
 } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
