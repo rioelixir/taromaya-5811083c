@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Compass, ListChecks, Sigma } from "lucide-react";
 import { MnCard, MnPill, Reveal } from "@/components/mobile-num/mn-kit";
-import { MN_MODULES, mnModule } from "@/lib/mobile-num/modules";
+import { MN_MODULES, mnModule, type MnModule } from "@/lib/mobile-num/modules";
 
 export const Route = createFileRoute("/mobile-numerology/module/$slug")({
   loader: ({ params }) => {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/mobile-numerology/module/$slug")({
 });
 
 function ModuleDetail() {
-  const { mod } = Route.useLoaderData();
+  const { mod } = Route.useLoaderData() as { mod: MnModule };
   const index = MN_MODULES.findIndex((m) => m.slug === mod.slug);
   const next = MN_MODULES[(index + 1) % MN_MODULES.length]!;
 

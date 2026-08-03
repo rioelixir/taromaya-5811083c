@@ -93,6 +93,7 @@ import { Route as AuthenticatedDiagnosticsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedDeepJyotishRouteImport } from './routes/_authenticated/deep-jyotish'
 import { Route as AuthenticatedBirthDetailsRouteImport } from './routes/_authenticated/birth-details'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as MobileNumerologyModuleSlugRouteImport } from './routes/mobile-numerology.module.$slug'
 import { Route as ApiPublicTranslateRouteImport } from './routes/api/public/translate'
 import { Route as ApiPublicHelpAudioRouteImport } from './routes/api/public/help-audio'
 import { Route as ApiPublicBootstrapAdminsRouteImport } from './routes/api/public/bootstrap-admins'
@@ -522,6 +523,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const MobileNumerologyModuleSlugRoute =
+  MobileNumerologyModuleSlugRouteImport.update({
+    id: '/mobile-numerology/module/$slug',
+    path: '/mobile-numerology/module/$slug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTranslateRoute = ApiPublicTranslateRouteImport.update({
   id: '/api/public/translate',
   path: '/api/public/translate',
@@ -637,6 +644,7 @@ export interface FileRoutesByFullPath {
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/translate': typeof ApiPublicTranslateRoute
+  '/mobile-numerology/module/$slug': typeof MobileNumerologyModuleSlugRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesByTo {
@@ -725,6 +733,7 @@ export interface FileRoutesByTo {
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/translate': typeof ApiPublicTranslateRoute
+  '/mobile-numerology/module/$slug': typeof MobileNumerologyModuleSlugRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRoutesById {
@@ -817,6 +826,7 @@ export interface FileRoutesById {
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
   '/api/public/help-audio': typeof ApiPublicHelpAudioRoute
   '/api/public/translate': typeof ApiPublicTranslateRoute
+  '/mobile-numerology/module/$slug': typeof MobileNumerologyModuleSlugRoute
   '/api/public/hooks/sky-alerts': typeof ApiPublicHooksSkyAlertsRoute
 }
 export interface FileRouteTypes {
@@ -909,6 +919,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
     | '/api/public/translate'
+    | '/mobile-numerology/module/$slug'
     | '/api/public/hooks/sky-alerts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -997,6 +1008,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
     | '/api/public/translate'
+    | '/mobile-numerology/module/$slug'
     | '/api/public/hooks/sky-alerts'
   id:
     | '__root__'
@@ -1088,6 +1100,7 @@ export interface FileRouteTypes {
     | '/api/public/bootstrap-admins'
     | '/api/public/help-audio'
     | '/api/public/translate'
+    | '/mobile-numerology/module/$slug'
     | '/api/public/hooks/sky-alerts'
   fileRoutesById: FileRoutesById
 }
@@ -1158,6 +1171,7 @@ export interface RootRouteChildren {
   ApiPublicBootstrapAdminsRoute: typeof ApiPublicBootstrapAdminsRoute
   ApiPublicHelpAudioRoute: typeof ApiPublicHelpAudioRoute
   ApiPublicTranslateRoute: typeof ApiPublicTranslateRoute
+  MobileNumerologyModuleSlugRoute: typeof MobileNumerologyModuleSlugRoute
   ApiPublicHooksSkyAlertsRoute: typeof ApiPublicHooksSkyAlertsRoute
 }
 
@@ -1751,6 +1765,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/mobile-numerology/module/$slug': {
+      id: '/mobile-numerology/module/$slug'
+      path: '/mobile-numerology/module/$slug'
+      fullPath: '/mobile-numerology/module/$slug'
+      preLoaderRoute: typeof MobileNumerologyModuleSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/translate': {
       id: '/api/public/translate'
       path: '/api/public/translate'
@@ -1937,6 +1958,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBootstrapAdminsRoute: ApiPublicBootstrapAdminsRoute,
   ApiPublicHelpAudioRoute: ApiPublicHelpAudioRoute,
   ApiPublicTranslateRoute: ApiPublicTranslateRoute,
+  MobileNumerologyModuleSlugRoute: MobileNumerologyModuleSlugRoute,
   ApiPublicHooksSkyAlertsRoute: ApiPublicHooksSkyAlertsRoute,
 }
 export const routeTree = rootRouteImport
