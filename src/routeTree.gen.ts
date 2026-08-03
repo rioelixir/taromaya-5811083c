@@ -60,11 +60,13 @@ import { Route as AyurvedaRouteImport } from './routes/ayurveda'
 import { Route as AvakhadaRouteImport } from './routes/avakhada'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AstrologyRouteImport } from './routes/astrology'
+import { Route as AstroProRouteImport } from './routes/astro-pro'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as AcceptTermsRouteImport } from './routes/accept-terms'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VedicNumerologyIndexRouteImport } from './routes/vedic-numerology.index'
+import { Route as AstroProIndexRouteImport } from './routes/astro-pro.index'
 import { Route as VedicNumerologyReportsRouteImport } from './routes/vedic-numerology.reports'
 import { Route as VedicNumerologyRemediesRouteImport } from './routes/vedic-numerology.remedies'
 import { Route as VedicNumerologyProfileRouteImport } from './routes/vedic-numerology.profile'
@@ -73,6 +75,12 @@ import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PagesSlugRouteImport } from './routes/pages.$slug'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AstroProYogasRouteImport } from './routes/astro-pro.yogas'
+import { Route as AstroProProfilesRouteImport } from './routes/astro-pro.profiles'
+import { Route as AstroProPlanetsRouteImport } from './routes/astro-pro.planets'
+import { Route as AstroProHousesRouteImport } from './routes/astro-pro.houses'
+import { Route as AstroProDashasRouteImport } from './routes/astro-pro.dashas'
+import { Route as AstroProChartsRouteImport } from './routes/astro-pro.charts'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAiReadingRouteImport } from './routes/api/ai-reading'
@@ -345,6 +353,11 @@ const AstrologyRoute = AstrologyRouteImport.update({
   path: '/astrology',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AstroProRoute = AstroProRouteImport.update({
+  id: '/astro-pro',
+  path: '/astro-pro',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiRoute = AiRouteImport.update({
   id: '/ai',
   path: '/ai',
@@ -368,6 +381,11 @@ const VedicNumerologyIndexRoute = VedicNumerologyIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => VedicNumerologyRoute,
+} as any)
+const AstroProIndexRoute = AstroProIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AstroProRoute,
 } as any)
 const VedicNumerologyReportsRoute = VedicNumerologyReportsRouteImport.update({
   id: '/reports',
@@ -409,6 +427,36 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => BlogRoute,
+} as any)
+const AstroProYogasRoute = AstroProYogasRouteImport.update({
+  id: '/yogas',
+  path: '/yogas',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProProfilesRoute = AstroProProfilesRouteImport.update({
+  id: '/profiles',
+  path: '/profiles',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProPlanetsRoute = AstroProPlanetsRouteImport.update({
+  id: '/planets',
+  path: '/planets',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProHousesRoute = AstroProHousesRouteImport.update({
+  id: '/houses',
+  path: '/houses',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProDashasRoute = AstroProDashasRouteImport.update({
+  id: '/dashas',
+  path: '/dashas',
+  getParentRoute: () => AstroProRoute,
+} as any)
+const AstroProChartsRoute = AstroProChartsRouteImport.update({
+  id: '/charts',
+  path: '/charts',
+  getParentRoute: () => AstroProRoute,
 } as any)
 const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   id: '/api/transcribe',
@@ -499,6 +547,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
+  '/astro-pro': typeof AstroProRouteWithChildren
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/avakhada': typeof AvakhadaRoute
@@ -561,6 +610,12 @@ export interface FileRoutesByFullPath {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/dashas': typeof AstroProDashasRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
+  '/astro-pro/profiles': typeof AstroProProfilesRoute
+  '/astro-pro/yogas': typeof AstroProYogasRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -569,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
+  '/astro-pro/': typeof AstroProIndexRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -641,6 +697,12 @@ export interface FileRoutesByTo {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/dashas': typeof AstroProDashasRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
+  '/astro-pro/profiles': typeof AstroProProfilesRoute
+  '/astro-pro/yogas': typeof AstroProYogasRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -649,6 +711,7 @@ export interface FileRoutesByTo {
   '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
+  '/astro-pro': typeof AstroProIndexRoute
   '/vedic-numerology': typeof VedicNumerologyIndexRoute
   '/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -662,6 +725,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accept-terms': typeof AcceptTermsRoute
   '/ai': typeof AiRoute
+  '/astro-pro': typeof AstroProRouteWithChildren
   '/astrology': typeof AstrologyRoute
   '/auth': typeof AuthRoute
   '/avakhada': typeof AvakhadaRoute
@@ -724,6 +788,12 @@ export interface FileRoutesById {
   '/api/ai-reading': typeof ApiAiReadingRoute
   '/api/chat': typeof ApiChatRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/astro-pro/charts': typeof AstroProChartsRoute
+  '/astro-pro/dashas': typeof AstroProDashasRoute
+  '/astro-pro/houses': typeof AstroProHousesRoute
+  '/astro-pro/planets': typeof AstroProPlanetsRoute
+  '/astro-pro/profiles': typeof AstroProProfilesRoute
+  '/astro-pro/yogas': typeof AstroProYogasRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pages/$slug': typeof PagesSlugRoute
@@ -732,6 +802,7 @@ export interface FileRoutesById {
   '/vedic-numerology/profile': typeof VedicNumerologyProfileRoute
   '/vedic-numerology/remedies': typeof VedicNumerologyRemediesRoute
   '/vedic-numerology/reports': typeof VedicNumerologyReportsRoute
+  '/astro-pro/': typeof AstroProIndexRoute
   '/vedic-numerology/': typeof VedicNumerologyIndexRoute
   '/_authenticated/kundli/new': typeof AuthenticatedKundliNewRoute
   '/api/public/bootstrap-admins': typeof ApiPublicBootstrapAdminsRoute
@@ -745,6 +816,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-terms'
     | '/ai'
+    | '/astro-pro'
     | '/astrology'
     | '/auth'
     | '/avakhada'
@@ -807,6 +879,12 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/dashas'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
+    | '/astro-pro/profiles'
+    | '/astro-pro/yogas'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -815,6 +893,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
+    | '/astro-pro/'
     | '/vedic-numerology/'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -887,6 +966,12 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/dashas'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
+    | '/astro-pro/profiles'
+    | '/astro-pro/yogas'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -895,6 +980,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
+    | '/astro-pro'
     | '/vedic-numerology'
     | '/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -907,6 +993,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/accept-terms'
     | '/ai'
+    | '/astro-pro'
     | '/astrology'
     | '/auth'
     | '/avakhada'
@@ -969,6 +1056,12 @@ export interface FileRouteTypes {
     | '/api/ai-reading'
     | '/api/chat'
     | '/api/transcribe'
+    | '/astro-pro/charts'
+    | '/astro-pro/dashas'
+    | '/astro-pro/houses'
+    | '/astro-pro/planets'
+    | '/astro-pro/profiles'
+    | '/astro-pro/yogas'
     | '/blog/$slug'
     | '/invite/$code'
     | '/pages/$slug'
@@ -977,6 +1070,7 @@ export interface FileRouteTypes {
     | '/vedic-numerology/profile'
     | '/vedic-numerology/remedies'
     | '/vedic-numerology/reports'
+    | '/astro-pro/'
     | '/vedic-numerology/'
     | '/_authenticated/kundli/new'
     | '/api/public/bootstrap-admins'
@@ -990,6 +1084,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcceptTermsRoute: typeof AcceptTermsRoute
   AiRoute: typeof AiRoute
+  AstroProRoute: typeof AstroProRouteWithChildren
   AstrologyRoute: typeof AstrologyRoute
   AuthRoute: typeof AuthRoute
   AvakhadaRoute: typeof AvakhadaRoute
@@ -1412,6 +1507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AstrologyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/astro-pro': {
+      id: '/astro-pro'
+      path: '/astro-pro'
+      fullPath: '/astro-pro'
+      preLoaderRoute: typeof AstroProRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai': {
       id: '/ai'
       path: '/ai'
@@ -1446,6 +1548,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vedic-numerology/'
       preLoaderRoute: typeof VedicNumerologyIndexRouteImport
       parentRoute: typeof VedicNumerologyRoute
+    }
+    '/astro-pro/': {
+      id: '/astro-pro/'
+      path: '/'
+      fullPath: '/astro-pro/'
+      preLoaderRoute: typeof AstroProIndexRouteImport
+      parentRoute: typeof AstroProRoute
     }
     '/vedic-numerology/reports': {
       id: '/vedic-numerology/reports'
@@ -1502,6 +1611,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
+    }
+    '/astro-pro/yogas': {
+      id: '/astro-pro/yogas'
+      path: '/yogas'
+      fullPath: '/astro-pro/yogas'
+      preLoaderRoute: typeof AstroProYogasRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/profiles': {
+      id: '/astro-pro/profiles'
+      path: '/profiles'
+      fullPath: '/astro-pro/profiles'
+      preLoaderRoute: typeof AstroProProfilesRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/planets': {
+      id: '/astro-pro/planets'
+      path: '/planets'
+      fullPath: '/astro-pro/planets'
+      preLoaderRoute: typeof AstroProPlanetsRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/houses': {
+      id: '/astro-pro/houses'
+      path: '/houses'
+      fullPath: '/astro-pro/houses'
+      preLoaderRoute: typeof AstroProHousesRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/dashas': {
+      id: '/astro-pro/dashas'
+      path: '/dashas'
+      fullPath: '/astro-pro/dashas'
+      preLoaderRoute: typeof AstroProDashasRouteImport
+      parentRoute: typeof AstroProRoute
+    }
+    '/astro-pro/charts': {
+      id: '/astro-pro/charts'
+      path: '/charts'
+      fullPath: '/astro-pro/charts'
+      preLoaderRoute: typeof AstroProChartsRouteImport
+      parentRoute: typeof AstroProRoute
     }
     '/api/transcribe': {
       id: '/api/transcribe'
@@ -1645,6 +1796,30 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AstroProRouteChildren {
+  AstroProChartsRoute: typeof AstroProChartsRoute
+  AstroProDashasRoute: typeof AstroProDashasRoute
+  AstroProHousesRoute: typeof AstroProHousesRoute
+  AstroProPlanetsRoute: typeof AstroProPlanetsRoute
+  AstroProProfilesRoute: typeof AstroProProfilesRoute
+  AstroProYogasRoute: typeof AstroProYogasRoute
+  AstroProIndexRoute: typeof AstroProIndexRoute
+}
+
+const AstroProRouteChildren: AstroProRouteChildren = {
+  AstroProChartsRoute: AstroProChartsRoute,
+  AstroProDashasRoute: AstroProDashasRoute,
+  AstroProHousesRoute: AstroProHousesRoute,
+  AstroProPlanetsRoute: AstroProPlanetsRoute,
+  AstroProProfilesRoute: AstroProProfilesRoute,
+  AstroProYogasRoute: AstroProYogasRoute,
+  AstroProIndexRoute: AstroProIndexRoute,
+}
+
+const AstroProRouteWithChildren = AstroProRoute._addFileChildren(
+  AstroProRouteChildren,
+)
+
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
 }
@@ -1680,6 +1855,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcceptTermsRoute: AcceptTermsRoute,
   AiRoute: AiRoute,
+  AstroProRoute: AstroProRouteWithChildren,
   AstrologyRoute: AstrologyRoute,
   AuthRoute: AuthRoute,
   AvakhadaRoute: AvakhadaRoute,

@@ -44,6 +44,7 @@ const CORE: Tile[] = [
   { to: "/kundli", label: "Kundli", icon: Moon },
   { to: "/compatibility", label: "Kundli matching", icon: Heart },
   { to: "/panchang", label: "Panchang", icon: CalendarDays },
+  { to: "/astro-pro", label: "Astrology Pro", icon: Sparkles },
 ];
 
 const NUMBERS: Tile[] = [
