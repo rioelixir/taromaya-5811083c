@@ -426,11 +426,6 @@ const ADVICE: Record<number, string> = {
   9: "Convert reaction into training. Physical routine keeps your temper and your income both stable.",
 };
 
-const PERSONALITY_BODIES: Record<
-  number,
-  Record<string, string>
-> = {} as never; // built dynamically below
-
 const P_TITLES = [
   "Core personality", "Public image", "Inner nature", "Thinking pattern",
   "Decision making", "Communication style", "Creativity", "Discipline",
