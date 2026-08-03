@@ -5,7 +5,7 @@ import {
   Heart, Hash, Sigma, Grid3X3, Music, Compass, Stars, Gauge, CalendarClock, Flame,
   Snowflake, Waves, Triangle, Crown, Briefcase, Coins, Activity, Leaf, Zap,
   Infinity as InfIcon, Home as HomeIcon, LineChart, FileText, Bookmark, BookOpen,
-  History, User, Settings, Baby, LayoutGrid, HelpCircle,
+  History, User, Settings, Baby, LayoutGrid, HelpCircle, Type,
 } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 import { useAuth } from "@/hooks/use-auth";
@@ -52,6 +52,7 @@ const NUMBERS: Tile[] = [
   { to: "/loshu", label: "Lo Shu grid", icon: Grid3X3 },
   { to: "/vedic-numerology", label: "Vedic numerology", icon: Sigma },
   { to: "/mobile-numerology", label: "Mobile numerology", icon: Phone },
+  { to: "/name-numerology", label: "Name numerology", icon: Type },
   { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Star },
 ];
 
