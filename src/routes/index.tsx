@@ -52,6 +52,7 @@ const NUMBERS: Tile[] = [
   { to: "/loshu", label: "Lo Shu grid", icon: Grid3X3 },
   { to: "/vedic-numerology", label: "Vedic numerology", icon: Sigma },
   { to: "/mobile-numerology", label: "Mobile numerology", icon: Phone },
+  { to: "/name-numerology", label: "Name numerology", icon: Type },
   { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Star },
 ];
 

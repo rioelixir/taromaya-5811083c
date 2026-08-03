@@ -28,6 +28,7 @@ import { Route as RemediesRouteImport } from './routes/remedies'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PanchangRouteImport } from './routes/panchang'
 import { Route as NumerologyRouteImport } from './routes/numerology'
+import { Route as NameNumerologyRouteImport } from './routes/name-numerology'
 import { Route as NakshatraLocationRouteImport } from './routes/nakshatra-location'
 import { Route as NakshatraRouteImport } from './routes/nakshatra'
 import { Route as NadiRouteImport } from './routes/nadi'
@@ -193,6 +194,11 @@ const PanchangRoute = PanchangRouteImport.update({
 const NumerologyRoute = NumerologyRouteImport.update({
   id: '/numerology',
   path: '/numerology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NameNumerologyRoute = NameNumerologyRouteImport.update({
+  id: '/name-numerology',
+  path: '/name-numerology',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NakshatraLocationRoute = NakshatraLocationRouteImport.update({
@@ -593,6 +599,7 @@ export interface FileRoutesByFullPath {
   '/nadi': typeof NadiRoute
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
+  '/name-numerology': typeof NameNumerologyRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -683,6 +690,7 @@ export interface FileRoutesByTo {
   '/nadi': typeof NadiRoute
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
+  '/name-numerology': typeof NameNumerologyRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -775,6 +783,7 @@ export interface FileRoutesById {
   '/nadi': typeof NadiRoute
   '/nakshatra': typeof NakshatraRoute
   '/nakshatra-location': typeof NakshatraLocationRoute
+  '/name-numerology': typeof NameNumerologyRoute
   '/numerology': typeof NumerologyRoute
   '/panchang': typeof PanchangRoute
   '/profile': typeof ProfileRoute
@@ -868,6 +877,7 @@ export interface FileRouteTypes {
     | '/nadi'
     | '/nakshatra'
     | '/nakshatra-location'
+    | '/name-numerology'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -958,6 +968,7 @@ export interface FileRouteTypes {
     | '/nadi'
     | '/nakshatra'
     | '/nakshatra-location'
+    | '/name-numerology'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -1049,6 +1060,7 @@ export interface FileRouteTypes {
     | '/nadi'
     | '/nakshatra'
     | '/nakshatra-location'
+    | '/name-numerology'
     | '/numerology'
     | '/panchang'
     | '/profile'
@@ -1142,6 +1154,7 @@ export interface RootRouteChildren {
   NadiRoute: typeof NadiRoute
   NakshatraRoute: typeof NakshatraRoute
   NakshatraLocationRoute: typeof NakshatraLocationRoute
+  NameNumerologyRoute: typeof NameNumerologyRoute
   NumerologyRoute: typeof NumerologyRoute
   PanchangRoute: typeof PanchangRoute
   ProfileRoute: typeof ProfileRoute
@@ -1308,6 +1321,13 @@ declare module '@tanstack/react-router' {
       path: '/numerology'
       fullPath: '/numerology'
       preLoaderRoute: typeof NumerologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/name-numerology': {
+      id: '/name-numerology'
+      path: '/name-numerology'
+      fullPath: '/name-numerology'
+      preLoaderRoute: typeof NameNumerologyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nakshatra-location': {
@@ -1929,6 +1949,7 @@ const rootRouteChildren: RootRouteChildren = {
   NadiRoute: NadiRoute,
   NakshatraRoute: NakshatraRoute,
   NakshatraLocationRoute: NakshatraLocationRoute,
+  NameNumerologyRoute: NameNumerologyRoute,
   NumerologyRoute: NumerologyRoute,
   PanchangRoute: PanchangRoute,
   ProfileRoute: ProfileRoute,

@@ -148,7 +148,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 const PUBLIC_PATHS = ["/auth", "/terms", "/accept-terms"];
 /** Routes that own the full screen: no app chrome, no footer. */
-const CHROME_FREE = ["/mobile-numerology"];
+const CHROME_FREE = ["/mobile-numerology", "/name-numerology"];
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
