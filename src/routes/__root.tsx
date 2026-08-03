@@ -147,6 +147,8 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const PUBLIC_PATHS = ["/auth", "/terms", "/accept-terms"];
+/** Routes that own the full screen: no app chrome, no footer. */
+const CHROME_FREE = ["/mobile-numerology"];
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -215,7 +217,9 @@ function RootComponent() {
   }, []);
 
   const pathname = useRouter().state.location.pathname;
-  const chromeHidden = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const chromeHidden = [...PUBLIC_PATHS, ...CHROME_FREE].some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
