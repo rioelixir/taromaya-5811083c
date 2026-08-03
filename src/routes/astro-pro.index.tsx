@@ -154,7 +154,7 @@ function Dashboard() {
           <ul className="mt-4 space-y-2 text-sm leading-relaxed text-vnavy-soft">
             {data.yogas.slice(0, 5).map((y) => (
               <li key={y.name}>
-                <span className="font-medium text-vnavy">{y.name}</span> — {y.reason}
+                <span className="font-medium text-vnavy">{y.name}</span> — {y.detail}
               </li>
             ))}
             {data.yogas.length === 0 ? <li>No major yoga is formed in this chart.</li> : null}
