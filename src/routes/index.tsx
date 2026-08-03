@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Sparkles, Star, CalendarDays, Bot, ArrowRight, Sun, Moon, Feather, Headphones,
+  Phone, Sparkles, Star, CalendarDays, Bot, ArrowRight, Sun, Moon, Feather, Headphones,
   Heart, Hash, Sigma, Grid3X3, Music, Compass, Stars, Gauge, CalendarClock, Flame,
   Snowflake, Waves, Triangle, Crown, Briefcase, Coins, Activity, Leaf, Zap,
   Infinity as InfIcon, Home as HomeIcon, LineChart, FileText, Bookmark, BookOpen,
@@ -51,6 +51,7 @@ const NUMBERS: Tile[] = [
   { to: "/numerology", label: "Western numerology", icon: Hash, search: { tab: "report" } },
   { to: "/loshu", label: "Lo Shu grid", icon: Grid3X3 },
   { to: "/vedic-numerology", label: "Vedic numerology", icon: Sigma },
+  { to: "/mobile-numerology", label: "Mobile numerology", icon: Phone },
   { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Star },
 ];
 
