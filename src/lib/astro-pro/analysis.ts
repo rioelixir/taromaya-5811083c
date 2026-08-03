@@ -277,7 +277,7 @@ const NEGATIVE: Record<Dignity, string> = {
 export function analysePlanets(chart: KundliChart): PlanetReport[] {
   const ascSign = chart.ascendant.rashi;
   const sun = chart.planets.find((p) => p.name === "Sun");
-  return PLANET_ORDER.map((name) => {
+  return PLANET_ORDER.map((name): PlanetReport | null => {
     const p = chart.planets.find((x) => x.name === name);
     if (!p) return null;
     const dignity = dignityOf(p);
