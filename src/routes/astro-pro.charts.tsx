@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ProShell, ProCard, NeedsProfile, StrengthBar } from "@/components/astro-pro/pro-shell";
 import { DataTable } from "@/components/data-table";
-import { RashiChart } from "@/components/rashi-chart";
+import { NorthIndianChart, SouthIndianChart } from "@/components/rashi-chart";
 import { useProChart } from "@/lib/astro-pro/profiles";
 import { analysePlanets } from "@/lib/astro-pro/analysis";
 import { RASHIS, RASHI_LORDS, formatDegree, type PlanetName } from "@/lib/vedic";
@@ -66,8 +66,8 @@ function Charts() {
     const ascSign = v.ascendantSign;
     return {
       ascendant: { rashi: ascSign, degreeInRashi: 0 },
-      planets: v.placements.map((p) => ({
-        name: p.planet,
+      planets: v.planetSigns.map((p) => ({
+        name: p.name,
         longitude: p.sign * 30,
         rashi: p.sign,
         house: ((p.sign - ascSign + 12) % 12) + 1,
@@ -128,7 +128,7 @@ function Charts() {
         </div>
 
         <div className="mt-5">
-          <RashiChart chart={shown} style={style} />
+          {style === "north" ? <NorthIndianChart chart={shown} /> : <SouthIndianChart chart={shown} />}
         </div>
 
         <p className="mt-4 text-sm leading-relaxed text-vnavy-soft">
@@ -142,7 +142,7 @@ function Charts() {
         title="Placements"
         hint="Sign, house and the lord who carries the result in this division."
       >
-        <DataTable
+        <DataTable<(typeof shown)["planets"][number]>
           rows={shown.planets}
           rowKey={(r) => r.name}
           columns={[

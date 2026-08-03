@@ -75,7 +75,7 @@ function Planets() {
             { header: "Kala", cell: (r) => Math.round(r.kala), align: "right" },
             { header: "Chesta", cell: (r) => Math.round(r.chesta), align: "right" },
             { header: "Naisargika", cell: (r) => Math.round(r.naisargika), align: "right" },
-            { header: "Drik", cell: (r) => Math.round(r.drik), align: "right" },
+            { header: "Drik", cell: (r) => Math.round(r.drig), align: "right" },
             { header: "Total", cell: (r) => Math.round(r.total), align: "right" },
           ]}
         />
