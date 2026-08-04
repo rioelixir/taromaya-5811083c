@@ -19,85 +19,12 @@ type Group = { label: string; items: Item[] };
 
 const CATALOG: Group[] = [
   {
-    label: "Overview",
+    label: "Modules",
     items: [
       { to: "/", label: "Home", icon: LayoutDashboard },
-      { to: "/help", label: "Audio guide", icon: HelpCircle },
-      { to: "/tarot", label: "Tarot consultation", icon: Sparkles },
-      { to: "/kundli", label: "Janma Kundli", icon: Moon },
-      { to: "/ai", label: "Consult the guide", icon: Bot },
-      { to: "/history", label: "Reading history", icon: History },
-      { to: "/profile", label: "Profile", icon: User },
-      { to: "/birth-details", label: "Birth details", icon: Lock },
-    ],
-  },
-  {
-    label: "Vedic astrology",
-    items: [
-      { to: "/astrology", label: "Chart analysis", icon: Stars },
-      { to: "/avakhada", label: "Avakhada details", icon: Stars },
-      { to: "/strength", label: "Planetary strength", icon: Gauge },
-      { to: "/panchang", label: "Panchang", icon: CalendarDays },
-      { to: "/muhurat", label: "Muhurat", icon: CalendarClock },
-      { to: "/varshphal", label: "Annual forecast", icon: Sun },
-      { to: "/prashna", label: "Prashna", icon: CalendarClock },
-      { to: "/deep-jyotish", label: "Advanced Jyotish", icon: Stars },
-      { to: "/nakshatra", label: "Birth nakshatra", icon: Stars },
-      { to: "/nakshatra-location", label: "Nakshatra by place", icon: Compass },
-    ],
-  },
-  {
-    label: "Doshas and remedies",
-    items: [
-      { to: "/remedies", label: "Remedies", icon: Flame },
-      { to: "/sadesati", label: "Sade Sati", icon: Snowflake },
-      { to: "/kaalsarp", label: "Kaal Sarp analysis", icon: Waves },
-      { to: "/mangal-dosha", label: "Mangal Dosha", icon: Flame },
-      { to: "/yantra", label: "Yantra guidance", icon: Triangle },
-      { to: "/dharma", label: "Dharma and life path", icon: Crown },
-    ],
-  },
-  {
-    label: "Life and relationships",
-    items: [
-      { to: "/horoscope", label: "Daily horoscope", icon: Sun },
-      { to: "/compatibility", label: "Kundli matching", icon: Heart },
-      { to: "/numerology", label: "Numerology", icon: Hash },
-      { to: "/nadi", label: "Nadi astrology", icon: Hash },
-      { to: "/hebrew-tarot", label: "Hebrew and tarot", icon: Hash },
-
-      { to: "/calculators", label: "Calculators", icon: Hash },
-      { to: "/baby-names", label: "Baby names", icon: Baby },
-      { to: "/festivals", label: "Festival calendar", icon: Flame },
-      { to: "/career", label: "Career and education", icon: Briefcase },
-      { to: "/finance", label: "Finances", icon: Coins },
-      { to: "/health", label: "Health", icon: Activity },
-      { to: "/ayurveda", label: "Ayurvedic constitution", icon: Leaf },
-      { to: "/chakra", label: "Chakra assessment", icon: Zap },
-      { to: "/karma", label: "Karmic analysis", icon: InfIcon },
-      { to: "/vastu", label: "Vastu", icon: HomeIcon },
-      { to: "/life-dashboard", label: "Life dashboard", icon: LayoutGrid },
-    ],
-  },
-  {
-    label: "Transits and forecasts",
-    items: [
-      { to: "/transits", label: "Current transits", icon: LineChart },
-      { to: "/vedic-transits", label: "Vedic transits", icon: Moon },
-      { to: "/timeline", label: "Forecast timeline", icon: CalendarClock },
-
-      { to: "/dreams", label: "Dream interpretation", icon: Feather },
-      { to: "/moon-calendar", label: "Lunar calendar", icon: Moon },
-      { to: "/reports", label: "Full reports", icon: FileText },
-    ],
-  },
-  {
-    label: "Library",
-    items: [
-      { to: "/saved", label: "Saved charts", icon: Bookmark },
-      { to: "/bookmarks", label: "Bookmarks", icon: BookOpen },
-      { to: "/blog", label: "Articles", icon: BookOpen },
-      { to: "/faq", label: "Frequently asked questions", icon: BookOpen },
+      { to: "/tarot", label: "Tarot board", icon: Sparkles },
+      { to: "/mobile-numerology", label: "Mobile numerology", icon: Hash },
+      { to: "/hebrew-tarot", label: "Kabbalah numerology", icon: Hash },
     ],
   },
   {
@@ -107,10 +34,7 @@ const CATALOG: Group[] = [
       { to: "/settings", label: "Settings", icon: Settings },
     ],
   },
-
 ];
-
-
 
 function BrandMark() {
   const logo = useAppLogo();
